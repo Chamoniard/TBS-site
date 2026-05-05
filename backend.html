@@ -794,26 +794,20 @@
             max-width: 100%;
             box-sizing: border-box;
             flex: 0 1 auto;
+            height: auto;
+            max-height: none;
         }
 
-        /* Guest management section headings (`h3`): Logged events, Workflow, Other actions. */
-        #guest-editor #guest-management .log-title,
-        #guest-editor #guest-management .guest-workflow-title,
-        #guest-editor #guest-management .non-workflow-title,
-        #guest-editor #guest-management .files-title {
+        /* Guest management section headings (`h3`): Logged events, Workflow, Other actions, Files. */
+        #guest-editor #guest-management .management-style {
             flex: 0 0 auto;
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-            line-height: 1.3;
-            color: #0f172a;
-        }
-
-        /* Match roster table column-title size. */
-        #guest-editor #guest-management .log-title {
             font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.3;
+            color: #000000;
         }
 
         #guest-editor #guest-management .non-workflow {
@@ -838,44 +832,34 @@
             flex: 0 1 auto;
         }
 
-        #guest-editor #guest-management .guest-management-log {
-            flex: 0 1 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.35rem;
-            min-height: 0;
+        /* Authoritative log viewport rule: fixed 200px + internal vertical scroll. */
+        #guest-editor #guest-management #guest-management-log {
+            flex: 0 0 auto;
+            display: block;
+            height: 200px !important;
+            min-height: 200px !important;
+            max-height: 200px !important;
             margin: 0;
             padding: 0.5rem 0.65rem;
             box-sizing: border-box;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             background: #f8fafc;
-            overflow: hidden;
-        }
-
-        #guest-editor #guest-management .guest-management-log-entries {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: block;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            pointer-events: auto;
+            -webkit-overflow-scrolling: touch;
             font-family: 'Inter', sans-serif;
             font-size: 0.8125rem;
             font-weight: 400;
             line-height: 1.45;
             color: #0f172a;
-            height: 96px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            min-height: 96px;
-            flex: 0 0 auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         #guest-editor #guest-management .guest-management-log-entry {
             margin: 0 0 0.4rem 0;
-            padding: 0 0 0 0.65rem;
-            border-left: 2px solid #cbd5e1;
+            padding: 0;
             word-break: break-word;
         }
 
@@ -4804,18 +4788,11 @@
                                 </div>
                                 <div class="guest-management" id="guest-management" role="region" aria-label="Guest management" hidden aria-hidden="true">
                                         <div id="log" class="log">
-                                            <h3 class="log-title">Logged events</h3>
-                                            <div id="guest-management-log" class="guest-management-log">
-                                                <ul
-                                                    id="guest-management-log-entries"
-                                                    class="guest-management-log-entries"
-                                                    aria-label="Guest activity log"
-                                                    aria-live="polite"
-                                                ></ul>
-                                            </div>
+                                            <h3 class="log-title management-style">Logged events</h3>
+                                            <div id="guest-management-log" class="guest-management-log" aria-label="Guest activity log" aria-live="polite" style="height:200px;min-height:200px;max-height:200px;overflow-y:auto;overflow-x:hidden;"></div>
                                         </div>
                                         <div class="guest-workflow" id="guest-workflow">
-                                            <h3 class="guest-workflow-title">Workflow</h3>
+                                            <h3 class="guest-workflow-title management-style">Workflow</h3>
                                             <div id="readisno" class="readisno" hidden aria-hidden="true">
                                                 <p class="readisno-intro" id="readisno-intro"></p>
                                                 <div class="guest-application-actions">
@@ -4847,7 +4824,7 @@
                                             </div>
                                         </div>
                                         <div id="non-workflow" class="non-workflow">
-                                            <h3 class="non-workflow-title">Other actions</h3>
+                                            <h3 class="non-workflow-title management-style">Other actions</h3>
                                             <button
                                                 type="button"
                                                 class="guest-add-log-btn"
@@ -4875,7 +4852,7 @@
                                             </div>
                                         </div>
                                         <div id="files" class="files">
-                                            <h3 class="files-title">Files</h3>
+                                            <h3 class="files-title management-style">Files</h3>
                                         </div>
                                 </div>
                             </div>
@@ -7884,9 +7861,18 @@
         /** `#guest-management`: **`#log`** (Logged events + **Log** list), **Workflow**, **non-workflow** (**Other actions** + add log). */
         function syncGuestManagementLogPanel() {
             var outer = document.getElementById('guest-management');
-            var panel = document.getElementById('guest-management-log');
-            var listEl = document.getElementById('guest-management-log-entries');
-            if (!panel || !listEl) return;
+            var listEl = document.getElementById('guest-management-log');
+            var logWrap = document.getElementById('log');
+            if (!listEl) return;
+            if (logWrap) {
+                logWrap.style.height = 'auto';
+                logWrap.style.maxHeight = 'none';
+            }
+            listEl.style.setProperty('height', '200px', 'important');
+            listEl.style.setProperty('min-height', '200px', 'important');
+            listEl.style.setProperty('max-height', '200px', 'important');
+            listEl.style.setProperty('overflow-y', 'auto', 'important');
+            listEl.style.setProperty('overflow-x', 'hidden', 'important');
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) {
                 if (outer) {
@@ -7894,6 +7880,7 @@
                     outer.setAttribute('aria-hidden', 'true');
                 }
                 listEl.innerHTML = '';
+                listEl.scrollTop = 0;
                 resetGuestAddLogForm();
                 return;
             }
@@ -7903,20 +7890,25 @@
                 outer.setAttribute('aria-hidden', 'false');
             }
             var entries = g && Array.isArray(g.log) ? g.log : [];
+            var nextHtml = '';
             if (!entries.length) {
-                listEl.innerHTML =
-                    '<li class="guest-management-log-empty" role="status">No log entries yet.</li>';
+                nextHtml = '<div class="guest-management-log-empty" role="status">No log entries yet.</div>';
+                if (listEl.innerHTML !== nextHtml) {
+                    listEl.innerHTML = nextHtml;
+                    listEl.scrollTop = 0;
+                }
                 return;
             }
             var parts = [];
             for (var li = 0; li < entries.length; li++) {
                 var line = String(entries[li] != null ? entries[li] : '').trim();
                 if (!line) continue;
-                parts.push('<li class="guest-management-log-entry">' + escapeHtml(line) + '</li>');
+                parts.push('<div class="guest-management-log-entry">' + escapeHtml(line) + '</div>');
             }
-            listEl.innerHTML = parts.length
+            nextHtml = parts.length
                 ? parts.join('')
-                : '<li class="guest-management-log-empty" role="status">No log entries yet.</li>';
+                : '<div class="guest-management-log-empty" role="status">No log entries yet.</div>';
+            if (listEl.innerHTML !== nextHtml) listEl.innerHTML = nextHtml;
         }
 
         function syncGuestSendInviteButton() {
@@ -7950,7 +7942,7 @@
             if (intro) {
                 if (show && g) {
                     intro.textContent =
-                        'Invitation was sent. This guest can now be invoiced';
+                        'Application read and accepted. Guest can now be invited.';
                 } else {
                     intro.textContent = '';
                 }
