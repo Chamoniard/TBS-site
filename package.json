@@ -1,0 +1,20 @@
+{
+  "name": "blog-website",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080 --bind 127.0.0.1",
+    "start:3000": "python3 -m http.server 3000 --bind 127.0.0.1",
+    "start:serve": "npx --yes serve . -l 8080",
+    "speakers:merge": "node scripts/merge-speakers-html-parts.mjs",
+    "speakers:parse": "node scripts/parse-speakers-html.mjs",
+    "speakers:push": "node scripts/populate-airtable-speakers.mjs",
+    "speakers:sync-tbs-firestore": "node scripts/sync-tbs-zermatt-speakers-to-firestore.mjs",
+    "guests:sync-tbs-firestore": "node scripts/sync-tbs-zermatt-guests-to-firestore.mjs",
+    "airtable:check": "node scripts/airtable-check.mjs",
+    "content:sync-tbs": "node scripts/sync-contents-to-tbs-firestore.mjs",
+    "content:rebuild-index": "node scripts/rebuild-tbs-content-row-index.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}

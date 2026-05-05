@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBS Zermatt</title>
+    <link rel="icon" href="images/emblem.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/emblem.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://api.airtable.com">
+    <style>
+        /* Critical CSS for above-the-fold content */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #F4F3F2; margin: 0; padding: 0; }
+        .header { background: #003153; backdrop-filter: none; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); position: fixed; top: 0; width: 100%; z-index: 1000; transition: all 0.3s ease; }
+        .navbar { padding: 16px 0; margin-bottom: 0; }
+        .nav-container { max-width: 1500px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; }
+        .nav-logo .logo { height: 64.8px; width: auto; max-width: 324px; object-fit: contain; filter: brightness(0) invert(1); }
+        .nav-menu { display: flex; list-style: none; gap: 2rem; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
+        .nav-link { text-decoration: none; color: #fff; font-weight: 400; font-size: 1rem; transition: color 0.3s ease; white-space: nowrap; }
+        .nav-link:hover { color: #FFD700; }
+        .nav-link.active { color: #FFD700; font-weight: 500; }
+        @media (min-width: 769px) { .nav-link { font-size: 1.2rem; } }
+        :root { font-size: 18px; --navbar-height: calc(16px + 58.32px + (1rem * 1.2) + 16px); }
+        @media (max-width: 768px) { :root { font-size: 16px; --navbar-height: calc(8px + (0.45rem * 2 + 1.2 * 1rem) + 8px); } }
+        .hero { background: #f8fafc; color: #333; height: calc(var(--navbar-height) - 2px); min-height: calc(var(--navbar-height) - 2px); text-align: left; position: relative; width: 100%; margin: 0 0 8px 0; }
+        @media (max-width: 768px) { .hero { margin: 0 !important; } }
+        body.home-view .home-section { padding-top: 0 !important; margin-top: 0 !important; background-color: transparent !important; }
+        body.home-view .hero { display: none !important; }
+        body.home-view .header:not(.post-view) { background: transparent !important; box-shadow: none !important; }
+        body.home-view .navbar { background: transparent !important; box-shadow: none !important; }
+        .everything { margin: 0; padding: 0; }
+        /* Reserve hero poster area before app JS swaps in full home markup. */
+        .home-section > picture { display: block; height: 1016px; overflow: hidden; position: relative; }
+        .home-section > picture .home-poster-wide { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+        @media (max-width: 768px) { .home-section > picture { height: 1016px; } }
+        .container { max-width: 1500px; margin: 0 auto; padding: 0 20px; }
+    </style>
+    <link rel="stylesheet" href="styles.css?v=20260422-event-no-social">
+    <!-- LCP: preload optimized hero poster variants used by the home <picture> -->
+    <link rel="preload" as="image" href="images/poster_narrow_q72.jpg" media="(max-width: 768px)">
+    <link rel="preload" as="image" href="images/poster_wide_q72.jpg" media="(min-width: 769px)">
+    <!-- Mobile: tab row + Register; after main CSS for cascade -->
+    <style>
+        .nav-past-mobile,
+        .nav-register-mobile-top {
+            display: none !important;
+        }
+        @media (max-width: 768px) {
+            .nav-logo {
+                display: none !important;
+            }
+            .nav-container {
+                justify-content: flex-start !important;
+                align-items: center !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+                gap: 0 !important;
+            }
+            .nav-item-register-desktop,
+            .nav-past-desktop {
+                display: none !important;
+            }
+            .nav-past-mobile,
+            .nav-register-mobile-top {
+                display: flex !important;
+            }
+            .nav-menu {
+                display: flex !important;
+                position: static !important;
+                flex: 1 1 0 !important;
+                min-width: 0 !important;
+                width: auto !important;
+                max-width: none !important;
+                flex-direction: row !important;
+                align-items: stretch !important;
+                justify-content: center !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                gap: 8px !important;
+            }
+            .nav-menu > .nav-item:not(.nav-item-hidden):not(.nav-register-mobile-top) {
+                flex: 0 0 auto !important;
+                min-width: 0 !important;
+                justify-content: center !important;
+            }
+            .nav-register-mobile-top {
+                flex: 0 0 auto !important;
+                justify-content: center !important;
+            }
+            .nav-register-mobile-top .nav-register-pill {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                appearance: none !important;
+                -webkit-appearance: none !important;
+                font: inherit !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+                cursor: pointer !important;
+                background-color: #FFD700 !important;
+                color: #003153 !important;
+                border: none !important;
+                border-radius: 5px !important;
+                padding: 4px 8px !important;
+                font-size: 1rem !important;
+                font-weight: 400 !important;
+                margin: 0 !important;
+                white-space: nowrap !important;
+                box-sizing: border-box !important;
+                -webkit-tap-highlight-color: transparent !important;
+                line-height: normal !important;
+                text-align: center !important;
+            }
+            .nav-register-mobile-top .nav-register-pill:hover,
+            .nav-register-mobile-top .nav-register-pill:focus-visible {
+                background: #003153 !important;
+                color: #FFD700 !important;
+                outline: none !important;
+            }
+            .nav-register-mobile-top .nav-register-pill.active {
+                background: #003153 !important;
+                color: #FFD700 !important;
+                font-weight: 500 !important;
+            }
+            .nav-menu .mobile-top-tab-link {
+                font-size: 1rem !important;
+                font-weight: 400 !important;
+                color: #ffffff !important;
+                padding: 0.45rem 0.15rem !important;
+                margin: 0 !important;
+                text-align: center !important;
+                -webkit-tap-highlight-color: transparent !important;
+            }
+            .nav-menu .mobile-top-tab-link.active {
+                color: #FFD700 !important;
+                font-weight: 500 !important;
+            }
+        }
+    </style>
+    <!-- Single Google Fonts request (was three separate CSS round-trips). -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=League+Spartan:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <!-- Font Awesome: Safari often never promotes preload+onload to a stylesheet; use a normal link so icons render reliably. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
+    <script src="https://www.youtube.com/iframe_api" async></script>
+</head>
+<body class="home-view">
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo" role="button" tabindex="0" aria-label="Home">
+                    <img src="images/logo.png" alt="TBS Zermatt" class="logo" loading="eager" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <h2 style="display: none;">TBS Zermatt Blog</h2>
+                    <div class="nav-logo-subtitle">TBS27, 9-12 February, Hotel Alex, Zermatt</div>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
+                    </li>
+                    <li class="nav-item nav-past-desktop">
+                        <span class="nav-link" data-view="past-talks" style="cursor: pointer;">Past talks</span>
+                    </li>
+                    <li class="nav-item nav-past-mobile">
+                        <span class="nav-link mobile-top-tab-link" data-view="past-talks" style="cursor: pointer;">Talks</span>
+                    </li>
+                    <li class="nav-item nav-item-register-desktop">
+                        <span class="nav-link" data-view="register" style="cursor: pointer; background-color: #FFD700; color: #003153; border: none; border-radius: 5px; padding: 4px 8px;">Register</span>
+                    </li>
+                    <li class="nav-item nav-register-mobile-top">
+                        <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
+                    </li>
+                    <li class="nav-item nav-item-hidden">
+                        <a href="login.html" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item nav-item-hidden">
+                        <a href="login.html" class="nav-link user-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; font-size: 1.38rem; color: #003153; border-radius: 50%; transition: all 0.3s ease; background-color: #FFD700; border: 2px solid #FFD700; text-shadow: none; filter: none;">👤</a>
+                    </li>
+                </ul>
+                <div class="hamburger" aria-hidden="true">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="everything">
+        <section class="home-section">
+            <picture>
+                <source media="(max-width: 768px)" srcset="images/poster_narrow_q72.jpg">
+                <img src="images/poster_wide_q72.jpg" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
+                <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
+                <div class="mobile-poster-logo" aria-hidden="true">
+                    <img src="images/logo.png" alt="" class="mobile-poster-logo-img" width="324" height="65" loading="eager" decoding="async" onerror="this.style.display='none';">
+                </div>
+            </picture>
+            <div class="introslider-wrapper">
+                <div class="introslider">
+                </div>
+                <div class="home-introslider-scrollbar" aria-hidden="true">
+                    <div class="home-introslider-scrollbar-track">
+                        <div class="home-introslider-scrollbar-thumb"></div>
+                    </div>
+                </div>
+                <div class="introslider-indicators" aria-label="Slider position">
+                    <button type="button" class="introslider-dot" data-index="0" aria-label="Slide 1"></button>
+                    <button type="button" class="introslider-dot" data-index="1" aria-label="Slide 2"></button>
+                    <button type="button" class="introslider-dot" data-index="2" aria-label="Slide 3"></button>
+                    <button type="button" class="introslider-dot" data-index="3" aria-label="Slide 4"></button>
+                    <button type="button" class="introslider-dot" data-index="4" aria-label="Slide 5"></button>
+                    <button type="button" class="introslider-dot" data-index="5" aria-label="Slide 6"></button>
+                </div>
+            </div>
+            <div class="feed-section">
+                <div class="feed-section-inner-wrapper">
+                </div>
+            </div>
+        </section>
+        <section class="past-talks-section is-collapsed" hidden aria-hidden="true"></section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section footer-section-row">
+                <h2 class="section-titles">Social</h2>
+                <div class="hero-social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section footer-logo-section">
+                <div class="footer-logo-container">
+                    <img src="images/emblem.png" alt="TBS Zermatt" class="footer-logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="footer-logo-fallback" style="display: none;">
+                        <h3 style="color: #FFD700; margin: 0; font-size: 1.7rem;">TBS ZERMATT</h3>
+                        <p style="color: #94a3b8; margin: 0.5rem 0 0 0; font-size: 0.9rem;">THE SICKEST PATIENTS. THE FIRST HOURS.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section footer-section-row">
+                <h2 class="section-titles">Contact</h2>
+                <p><a href="mailto:info@TBS-Zermatt.org" style="color: #FFD700 !important;">info@TBS-Zermatt.org</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Canonical programme day blocks: home slider (script.js) and backend editor fetch from here -->
+    <div id="programme-index-source" hidden aria-hidden="true">
+        <div class="programme-tuesday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Tuesday will appear here.</p></div>
+        </div>
+        <div class="programme-wednesday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Wednesday will appear here.</p></div>
+        </div>
+        <div class="programme-thursday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Thursday will appear here.</p></div>
+        </div>
+        <div class="programme-friday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Friday will appear here.</p></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="script.js?v=20260425-firestore-row-ids" defer></script>
+    <script>
+        // Show loading state immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading class to body
+            document.body.classList.add('loading');
+            
+            // Hide loading state after page is fully loaded
+            window.addEventListener('load', function() {
+                document.body.classList.remove('loading');
+            });
+        });
+    </script>
+</body>
+</html>
