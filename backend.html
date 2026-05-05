@@ -761,6 +761,7 @@
             align-self: stretch;
             display: flex;
             flex-direction: column;
+            gap: 16px;
             box-sizing: border-box;
             padding: 12px 16px;
             border: none;
@@ -798,7 +799,8 @@
         /* Guest management section headings (`h3`): Logged events, Workflow, Other actions. */
         #guest-editor #guest-management .log-title,
         #guest-editor #guest-management .guest-workflow-title,
-        #guest-editor #guest-management .non-workflow-title {
+        #guest-editor #guest-management .non-workflow-title,
+        #guest-editor #guest-management .files-title {
             flex: 0 0 auto;
             margin: 0;
             padding: 0;
@@ -809,21 +811,23 @@
             color: #0f172a;
         }
 
-        /* Log (`#log`) → Workflow → non-workflow (add log). */
-        #guest-editor #guest-management .guest-management-other-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.75rem;
-            flex: 0 1 auto;
-            min-height: 0;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-            margin: 0;
+        /* Match roster table column-title size. */
+        #guest-editor #guest-management .log-title {
+            font-size: 1.2rem;
         }
 
         #guest-editor #guest-management .non-workflow {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            flex: 0 1 auto;
+        }
+
+        #guest-editor #guest-management .files {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -841,7 +845,6 @@
             align-items: stretch;
             gap: 0.35rem;
             min-height: 0;
-            max-height: 300px;
             margin: 0;
             padding: 0.5rem 0.65rem;
             box-sizing: border-box;
@@ -855,15 +858,17 @@
             margin: 0;
             padding: 0;
             list-style: none;
+            display: block;
             font-family: 'Inter', sans-serif;
             font-size: 0.8125rem;
             font-weight: 400;
             line-height: 1.45;
             color: #0f172a;
+            height: 96px;
             overflow-y: auto;
             overflow-x: hidden;
-            min-height: 0;
-            flex: 1 1 auto;
+            min-height: 96px;
+            flex: 0 0 auto;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -1411,11 +1416,11 @@
             color: #64748b;
         }
 
+        body.backend-page #guest-editor #guest-management[hidden],
         body.backend-page #guest-editor #guest-management #guest-send-invite-btn[hidden],
         body.backend-page #guest-editor #guest-management #readisno[hidden],
         body.backend-page #guest-editor #guest-management #invitedisno[hidden],
-        body.backend-page #guest-editor #guest-management #invoicedisno[hidden],
-        body.backend-page #guest-editor #guest-management #guest-management-other-actions[hidden] {
+        body.backend-page #guest-editor #guest-management #invoicedisno[hidden] {
             display: none !important;
         }
 
@@ -4797,8 +4802,7 @@
                                     <p class="speaker-editor-meta-line" id="guest-editor-id">Guest ID: -</p>
                                 </div>
                                 </div>
-                                <div class="guest-management" id="guest-management" role="region" aria-label="Guest management" aria-hidden="false">
-                                    <div id="guest-management-other-actions" class="guest-management-other-actions" hidden aria-hidden="true">
+                                <div class="guest-management" id="guest-management" role="region" aria-label="Guest management" hidden aria-hidden="true">
                                         <div id="log" class="log">
                                             <h3 class="log-title">Logged events</h3>
                                             <div id="guest-management-log" class="guest-management-log">
@@ -4870,7 +4874,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        <div id="files" class="files">
+                                            <h3 class="files-title">Files</h3>
+                                        </div>
                                 </div>
                             </div>
                             </div>
@@ -7836,7 +7842,7 @@
             if (intro) {
                 if (show) {
                     intro.textContent =
-                        'Guest has been invited to ' + evName + '. Ready to invite.';
+                        'Guest has been invited to ' + evName + ' and can now be invoiced.';
                 } else {
                     intro.textContent = '';
                 }
@@ -7875,9 +7881,9 @@
             wrap.setAttribute('aria-hidden', show ? 'false' : 'true');
         }
 
-        /** `#guest-management-other-actions`: **`#log`** (Logged events + **Log** list), **Workflow**, **non-workflow** (**Other actions** + add log). */
+        /** `#guest-management`: **`#log`** (Logged events + **Log** list), **Workflow**, **non-workflow** (**Other actions** + add log). */
         function syncGuestManagementLogPanel() {
-            var outer = document.getElementById('guest-management-other-actions');
+            var outer = document.getElementById('guest-management');
             var panel = document.getElementById('guest-management-log');
             var listEl = document.getElementById('guest-management-log-entries');
             if (!panel || !listEl) return;
