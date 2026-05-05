@@ -832,13 +832,13 @@
             flex: 0 1 auto;
         }
 
-        /* Authoritative log viewport rule: fixed 200px + internal vertical scroll. */
+        /* Authoritative log viewport rule: fixed 100px + internal vertical scroll. */
         #guest-editor #guest-management #guest-management-log {
             flex: 0 0 auto;
             display: block;
-            height: 200px !important;
-            min-height: 200px !important;
-            max-height: 200px !important;
+            height: 100px !important;
+            min-height: 100px !important;
+            max-height: 100px !important;
             margin: 0;
             padding: 0.5rem 0.65rem;
             box-sizing: border-box;
@@ -2786,6 +2786,10 @@
             align-self: stretch;
             width: 100%;
             max-width: 100%;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         #guest-editor #guest-management #invoicedisno .guest-send-invoice-btn {
@@ -3081,7 +3085,7 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-no {
-            background: #ba1e45;
+            background: #ff0000;
             color: #ffffff;
         }
 
@@ -3113,7 +3117,8 @@
 
         #guest-editor .guests-invited-wrap,
         #guest-editor .guests-read-wrap,
-        #guest-editor .guests-invoiced-wrap {
+        #guest-editor .guests-invoiced-wrap,
+        #guest-editor .guests-paid-wrap {
             position: relative;
             display: inline-block;
             max-width: 100%;
@@ -3121,7 +3126,8 @@
 
         #guest-editor .guests-list-table .guests-invited-badge-btn,
         #guest-editor .guests-list-table .guests-read-badge-btn,
-        #guest-editor .guests-list-table .guests-invoiced-badge-btn {
+        #guest-editor .guests-list-table .guests-invoiced-badge-btn,
+        #guest-editor .guests-list-table .guests-paid-badge-btn {
             cursor: pointer;
             font-weight: 400;
             font-size: 0.9rem;
@@ -3133,7 +3139,8 @@
 
         #guest-editor .guests-list-table .guests-invited-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-read-badge-btn.is-armed,
-        #guest-editor .guests-list-table .guests-invoiced-badge-btn.is-armed {
+        #guest-editor .guests-list-table .guests-invoiced-badge-btn.is-armed,
+        #guest-editor .guests-list-table .guests-paid-badge-btn.is-armed {
             outline: 2px solid #ff1493;
             outline-offset: 0;
             box-shadow: 0 0 10px rgba(255, 20, 147, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
@@ -3141,7 +3148,8 @@
 
         #guest-editor .guests-invited-dropdown,
         #guest-editor .guests-read-dropdown,
-        #guest-editor .guests-invoiced-dropdown {
+        #guest-editor .guests-invoiced-dropdown,
+        #guest-editor .guests-paid-dropdown {
             position: absolute;
             left: 0;
             top: calc(100% + 3px);
@@ -3159,14 +3167,16 @@
 
         #guest-editor .guests-invited-dropdown > li,
         #guest-editor .guests-read-dropdown > li,
-        #guest-editor .guests-invoiced-dropdown > li {
+        #guest-editor .guests-invoiced-dropdown > li,
+        #guest-editor .guests-paid-dropdown > li {
             margin: 0;
             padding: 0;
         }
 
         #guest-editor .guests-invited-dropdown .guests-invited-option,
         #guest-editor .guests-read-dropdown .guests-read-option,
-        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option {
+        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option,
+        #guest-editor .guests-paid-dropdown .guests-paid-option {
             display: block;
             width: 100%;
             margin: 0;
@@ -3188,8 +3198,24 @@
 
         #guest-editor .guests-invited-dropdown .guests-invited-option:hover,
         #guest-editor .guests-read-dropdown .guests-read-option:hover,
-        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option:hover {
+        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option:hover,
+        #guest-editor .guests-paid-dropdown .guests-paid-option:hover {
             background: #f1f5f9;
+        }
+
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-yes {
+            background: #008000;
+            color: #ffffff;
+        }
+
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-no {
+            background: #ff0000;
+            color: #ffffff;
+        }
+
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-cancelled {
+            background: #000000;
+            color: #ffffff;
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-read-denied {
@@ -4394,7 +4420,9 @@
                         <p class="backend-current-event-line" id="backend-current-event-display" aria-live="polite"></p>
                     </div>
                 </div>
-                <div id="status-container" class="backend-status-inline" aria-live="polite" aria-atomic="true"></div>
+                <div id="status-container" class="backend-status-inline" aria-live="polite" aria-atomic="true">
+                    <div id="status" class="status info">Hello!</div>
+                </div>
             </div>
             <div class="eventnavigation-aspects-spacer" aria-hidden="true"></div>
             <div class="aspects">
@@ -4789,7 +4817,7 @@
                                 <div class="guest-management" id="guest-management" role="region" aria-label="Guest management" hidden aria-hidden="true">
                                         <div id="log" class="log">
                                             <h3 class="log-title management-style">Logged events</h3>
-                                            <div id="guest-management-log" class="guest-management-log" aria-label="Guest activity log" aria-live="polite" style="height:200px;min-height:200px;max-height:200px;overflow-y:auto;overflow-x:hidden;"></div>
+                                            <div id="guest-management-log" class="guest-management-log" aria-label="Guest activity log" aria-live="polite" style="height:100px;min-height:100px;max-height:100px;overflow-y:auto;overflow-x:hidden;"></div>
                                         </div>
                                         <div class="guest-workflow" id="guest-workflow">
                                             <h3 class="guest-workflow-title management-style">Workflow</h3>
@@ -4821,6 +4849,9 @@
                                                 <button type="button" class="guest-send-invoice-btn" id="guest-send-invoice-btn">
                                                     Send invoice to Guest
                                                 </button>
+                                            </div>
+                                            <div id="invoicedisyes" class="invoicedisyes" hidden aria-hidden="true">
+                                                <p class="invoicedisyes-intro" id="invoicedisyes-intro"></p>
                                             </div>
                                         </div>
                                         <div id="non-workflow" class="non-workflow">
@@ -5070,6 +5101,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script>
         // Airtable configuration - using same credentials as index page
@@ -5089,6 +5121,7 @@
         window.TBS_GMAIL_CLIENT_ID = '696221319423-phc2to08bmn62tss89j8dforu8pjd7fk.apps.googleusercontent.com';
         const eventdates = ['2027-02-09', '2027-02-10', '2027-02-11', '2027-02-12'];
         let firestoreDb = null;
+        let functionsApp = null;
         let selectedevent = '';
         /** In-memory roster (+ inviteStatus, titlesStatus, travel, cme, refunded) */
         let speakerRosterInMemory = [];
@@ -5108,6 +5141,9 @@
         /** Invoiced column: Yes / No; same two-step interaction as Read. */
         var guestsInvoicedArmedDocId = '';
         var guestsInvoicedDropdownOpenDocId = '';
+        /** Paid column: Yes / No / Cancelled; same two-step interaction. */
+        var guestsPaidArmedDocId = '';
+        var guestsPaidDropdownOpenDocId = '';
         let guestsRosterLoadError = '';
         /** Set after a successful full fetch of tbs/Guests/{id}/item into memory (like Content preload). */
         let guestsMemoryLoaded = false;
@@ -5757,6 +5793,15 @@
                 firestoreDb = firebase.firestore();
             }
             return firestoreDb;
+        }
+
+        function getFunctions() {
+            if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded.');
+            if (!functionsApp) {
+                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                functionsApp = firebase.app().functions('us-central1');
+            }
+            return functionsApp;
         }
 
         /** One content row: `tbs/Content/{rowId}/item` (document `item` holds all fields). */
@@ -7190,6 +7235,7 @@
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No'];
+        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Cancelled'];
 
         function guestReadBadgeModifierClass(readVal) {
             var t = String(readVal != null ? readVal : '').trim();
@@ -7207,6 +7253,22 @@
             var low = t.toLowerCase();
             if (low === 'yes' || low === 'y' || low === 'true') return ' content-badge--guest-status-yes';
             if (low === 'no' || low === 'n' || low === 'false') return ' content-badge--guest-status-no';
+            return ' content-badge--guest-status-neutral';
+        }
+
+        function guestPaidBadgeModifierClass(paidVal) {
+            var t = String(paidVal != null ? paidVal : '').trim();
+            if (!t) return ' content-badge--guest-field-empty';
+            var low = t.toLowerCase();
+            if (low === 'yes' || low === 'y' || low === 'true') {
+                return ' content-badge--guest-paid-yes';
+            }
+            if (low === 'no' || low === 'n' || low === 'false') {
+                return ' content-badge--guest-paid-no';
+            }
+            if (low === 'cancelled' || low === 'canceled') {
+                return ' content-badge--guest-paid-cancelled';
+            }
             return ' content-badge--guest-status-neutral';
         }
 
@@ -7255,6 +7317,90 @@
             });
         }
 
+        function guestRosterPaidCellHtml(docId, paidVal) {
+            var raw = String(paidVal != null ? paidVal : '').trim();
+            var displayText = raw || '—';
+            var mod = guestPaidBadgeModifierClass(paidVal);
+            var opts = [];
+            for (var pi = 0; pi < GUEST_PAID_MENU_VALUES.length; pi++) {
+                var v = GUEST_PAID_MENU_VALUES[pi];
+                opts.push(
+                    '<li role="none"><button type="button" class="guests-paid-option" role="menuitem" data-paid-value="' +
+                    escapeHtml(v) +
+                    '">' +
+                    escapeHtml(v) +
+                    '</button></li>'
+                );
+            }
+            return (
+                '<td class="guests-roster-tag-cell guests-paid-cell">' +
+                '<div class="guests-paid-wrap">' +
+                '<button type="button" class="content-badge guests-paid-badge-btn' +
+                mod +
+                '" data-guests-id="' +
+                escapeHtml(docId) +
+                '" aria-haspopup="menu" aria-expanded="false" title="Paid: first click selects row, second opens values">' +
+                escapeHtml(displayText) +
+                '</button>' +
+                '<ul class="guests-paid-dropdown" hidden role="menu">' +
+                opts.join('') +
+                '</ul></div></td>'
+            );
+        }
+
+        function clearGuestsPaidUiState() {
+            guestsPaidArmedDocId = '';
+            guestsPaidDropdownOpenDocId = '';
+            document.querySelectorAll('#guest-editor .guests-paid-badge-btn.is-armed').forEach(function(b) {
+                b.classList.remove('is-armed');
+            });
+            document.querySelectorAll('#guest-editor .guests-paid-dropdown').forEach(function(el) {
+                el.hidden = true;
+            });
+            document.querySelectorAll('#guest-editor .guests-paid-badge-btn').forEach(function(b) {
+                b.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        async function setGuestPaidField(docId, value) {
+            var id = String(docId || '').trim();
+            if (!id) return;
+            var allowed = Object.create(null);
+            for (var ai = 0; ai < GUEST_PAID_MENU_VALUES.length; ai++) {
+                allowed[GUEST_PAID_MENU_VALUES[ai]] = true;
+            }
+            if (!allowed[value]) return;
+            var rec = findGuestInMemory(id);
+            if (!rec) return;
+            var prev = rec.paid;
+            rec.paid = value;
+            guestsPaidArmedDocId = '';
+            guestsPaidDropdownOpenDocId = '';
+            clearGuestsReadUiState();
+            clearGuestsInvitedUiState();
+            clearGuestsInvoicedUiState();
+            renderGuestsRoster();
+            try {
+                var db = getFirestore();
+                await db
+                    .collection('tbs')
+                    .doc('Guests')
+                    .collection(id)
+                    .doc('item')
+                    .set({ Paid: value }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Paid = ' + value + '.');
+                }
+            } catch (err) {
+                console.error('setGuestPaidField:', err);
+                rec.paid = prev;
+                renderGuestsRoster();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to update Paid.');
+                }
+            }
+        }
+
         async function setGuestInvoicedField(docId, value) {
             var id = String(docId || '').trim();
             if (!id) return;
@@ -7271,6 +7417,7 @@
             guestsInvoicedDropdownOpenDocId = '';
             clearGuestsReadUiState();
             clearGuestsInvitedUiState();
+            clearGuestsPaidUiState();
             renderGuestsRoster();
             try {
                 var db = getFirestore();
@@ -7280,6 +7427,9 @@
                     .collection(id)
                     .doc('item')
                     .set({ Invoiced: value }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Invoiced = ' + value + '.');
+                }
             } catch (err) {
                 console.error('setGuestInvoicedField:', err);
                 rec.invoiced = prev;
@@ -7410,6 +7560,9 @@
                     .collection(id)
                     .doc('item')
                     .set({ Invited: value }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Invited = ' + value + '.');
+                }
             } catch (err) {
                 console.error('setGuestInvitedField:', err);
                 rec.invited = prev;
@@ -7459,6 +7612,9 @@
                         },
                         { merge: true }
                     );
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Read = ' + value + '.');
+                }
             } catch (err) {
                 console.error('setGuestReadField:', err);
                 rec.read = prevRead;
@@ -7543,7 +7699,9 @@
                 if (typeof showStatus === 'function') {
                     showStatus(
                         'success',
-                        invitedValue === 'Reserve' ? 'Guest set to Reserve.' : 'Guest set to Sold out.'
+                        invitedValue === 'Reserve'
+                            ? 'Saved to Firebase: Guest set to Reserve.'
+                            : 'Saved to Firebase: Guest set to Sold out.'
                     );
                 }
             } catch (err) {
@@ -7609,7 +7767,7 @@
             try {
                 await itemRef.set({ Log: mergedLog }, { merge: true });
                 if (typeof showStatus === 'function') {
-                    showStatus('success', 'Log entry saved.');
+                    showStatus('success', 'Saved to Firebase: Log entry saved.');
                 }
             } catch (err) {
                 console.error('appendGuestManualLogLine:', err);
@@ -7671,6 +7829,9 @@
                     },
                     { merge: true }
                 );
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Application accepted.');
+                }
             } catch (err) {
                 console.error('acceptGuestApplication:', err);
                 rec.read = prevRead;
@@ -7733,6 +7894,9 @@
                     },
                     { merge: true }
                 );
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Application denied.');
+                }
             } catch (err) {
                 console.error('denyGuestApplication:', err);
                 rec.read = prevRead;
@@ -7784,6 +7948,16 @@
             return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'no';
         }
 
+        /** Invoiced is the literal “Yes” (case-insensitive). */
+        function guestInvoicedFieldIsYes(invoicedVal) {
+            return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'yes';
+        }
+
+        /** Paid is the literal “No” (case-insensitive). */
+        function guestPaidFieldIsNo(paidVal) {
+            return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'no';
+        }
+
         /** Invited is the literal “Yes” (case-insensitive). */
         function guestInvitedFieldIsYes(invitedVal) {
             return String(invitedVal != null ? invitedVal : '').trim().toLowerCase() === 'yes';
@@ -7796,26 +7970,45 @@
             );
         }
 
+        /** `#invoicedisyes`: Invoiced is Yes and Paid is No. */
+        function guestInvoicedisyesBlockShouldShow(g) {
+            return Boolean(
+                g && guestInvoicedFieldIsYes(g.invoiced) && guestPaidFieldIsNo(g.paid)
+            );
+        }
+
         function syncGuestInvoicedisnoBlock() {
             var wrap = document.getElementById('invoicedisno');
             var intro = document.getElementById('invoicedisno-intro');
             var btn = document.getElementById('guest-send-invoice-btn');
+            var yesWrap = document.getElementById('invoicedisyes');
+            var yesIntro = document.getElementById('invoicedisyes-intro');
             if (!wrap || !btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) {
                 wrap.hidden = true;
                 wrap.setAttribute('aria-hidden', 'true');
                 if (intro) intro.textContent = '';
+                if (yesWrap) {
+                    yesWrap.hidden = true;
+                    yesWrap.setAttribute('aria-hidden', 'true');
+                }
+                if (yesIntro) yesIntro.textContent = '';
                 return;
             }
             var g = findGuestInMemory(id);
             var show = guestInvoicedisnoBlockShouldShow(g);
+            var showYes = guestInvoicedisyesBlockShouldShow(g);
             var evName = String(current_event || '').trim() || 'the event';
-            var fullName = '';
+            var guestEmail = '';
+            var guestFullName = 'Guest';
             if (g) {
-                fullName = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
+                guestEmail = String(g.email || g.guestEmail || '').trim();
+                guestFullName = (
+                    String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()
+                ).trim() || String(g.fullName || '').trim() || 'Guest';
             }
-            if (!fullName) fullName = 'Guest';
+            if (!guestEmail) guestEmail = 'guest';
             if (intro) {
                 if (show) {
                     intro.textContent =
@@ -7824,12 +8017,21 @@
                     intro.textContent = '';
                 }
             }
-            var invLabel = 'Send invoice to ' + fullName;
+            var invLabel = 'Send invoice to ' + guestEmail;
             btn.textContent = invLabel;
             btn.setAttribute('aria-label', invLabel);
             btn.setAttribute('title', invLabel);
             wrap.hidden = !show;
             wrap.setAttribute('aria-hidden', show ? 'false' : 'true');
+            if (yesIntro) {
+                yesIntro.textContent = showYes ?
+                    (guestFullName + ' has be invoiced. Awaiting payment.') :
+                    '';
+            }
+            if (yesWrap) {
+                yesWrap.hidden = !showYes;
+                yesWrap.setAttribute('aria-hidden', showYes ? 'false' : 'true');
+            }
         }
 
         function syncGuestApplicationActionButtons() {
@@ -7868,9 +8070,9 @@
                 logWrap.style.height = 'auto';
                 logWrap.style.maxHeight = 'none';
             }
-            listEl.style.setProperty('height', '200px', 'important');
-            listEl.style.setProperty('min-height', '200px', 'important');
-            listEl.style.setProperty('max-height', '200px', 'important');
+            listEl.style.setProperty('height', '100px', 'important');
+            listEl.style.setProperty('min-height', '100px', 'important');
+            listEl.style.setProperty('max-height', '100px', 'important');
             listEl.style.setProperty('overflow-y', 'auto', 'important');
             listEl.style.setProperty('overflow-x', 'hidden', 'important');
             var id = String(guestFormEditingDocId || '').trim();
@@ -7909,6 +8111,7 @@
                 ? parts.join('')
                 : '<div class="guest-management-log-empty" role="status">No log entries yet.</div>';
             if (listEl.innerHTML !== nextHtml) listEl.innerHTML = nextHtml;
+            listEl.scrollTop = listEl.scrollHeight;
         }
 
         function syncGuestSendInviteButton() {
@@ -7929,20 +8132,21 @@
                 return;
             }
             var g = findGuestInMemory(id);
-            var guestLabel = '';
+            var guestEmail = '';
             if (g) {
-                guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
+                guestEmail = String(g.email || g.guestEmail || '').trim();
             }
-            if (!guestLabel) guestLabel = 'Guest';
-            var inviteLabel = 'Send e-mail invitation to ' + guestLabel;
+            if (!guestEmail) guestEmail = 'guest';
+            var inviteLabel = 'Send invitation to ' + guestEmail;
             btn.textContent = inviteLabel;
             btn.setAttribute('aria-label', inviteLabel);
             btn.setAttribute('title', inviteLabel);
             var show = Boolean(g && guestReadisyesBlockShouldShow(g));
             if (intro) {
                 if (show && g) {
+                    var firstName = String(g.name || '').trim() || 'Guest';
                     intro.textContent =
-                        'Application read and accepted. Guest can now be invited.';
+                        'Application read and accepted. ' + firstName + ' can now be invited.';
                 } else {
                     intro.textContent = '';
                 }
@@ -8012,6 +8216,9 @@
                     .collection(id)
                     .doc('item')
                     .set({ Attended: next ? 'Yes' : 'No' }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Attended = ' + (next ? 'Yes' : 'No') + '.');
+                }
             } catch (err) {
                 console.error('toggleGuestRosterField:', err);
                 await fetchAllGuestsIntoMemory({ force: true, showLoading: false });
@@ -8027,6 +8234,8 @@
             guestsReadDropdownOpenDocId = '';
             guestsInvoicedArmedDocId = '';
             guestsInvoicedDropdownOpenDocId = '';
+            guestsPaidArmedDocId = '';
+            guestsPaidDropdownOpenDocId = '';
             guestsRosterSortInPlace();
             var colCount = 9;
             var html = '<table class="guests-list-table" role="grid" aria-label="Guests roster">' +
@@ -8075,7 +8284,7 @@
                         guestRosterReadCellHtml(g.id, g.read) +
                         guestRosterInvitedCellHtml(g.id, g.invited) +
                         guestRosterInvoicedCellHtml(g.id, g.invoiced) +
-                        '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.paid) + '</td>' +
+                        guestRosterPaidCellHtml(g.id, g.paid) +
                         '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.briefed) + '</td>' +
                         guestRosterSquareToggleHtml('attended', 'Attended', !!g.attended) +
                         '<td class="guests-roster-tag-cell">' +
@@ -11804,9 +12013,58 @@
                     var iid = String(guestFormEditingDocId || '').trim();
                     var ig = iid ? findGuestInMemory(iid) : null;
                     if (!iid || !ig || !guestInvoicedisnoBlockShouldShow(ig)) return;
+                    if (guestSendInvoiceBtn.disabled) return;
+                    guestSendInvoiceBtn.disabled = true;
                     if (typeof showStatus === 'function') {
-                        showStatus('info', 'Send invoice: connect this action (e.g. template + Gmail) when ready.');
+                        showStatus('loading', 'Sending invoice...');
                     }
+                    var fnUrl =
+                        'https://us-central1-' +
+                        String(firebaseConfig.projectId || '').trim() +
+                        '.cloudfunctions.net/createGuestStripeInvoiceHttp';
+                    fetch(fnUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ guestId: iid })
+                    })
+                        .then(function(res) {
+                            if (!res.ok) {
+                                return res.json()
+                                    .catch(function() { return {}; })
+                                    .then(function(payload) {
+                                        var msg = payload && payload.error
+                                            ? String(payload.error)
+                                            : ('Function call failed (' + res.status + ')');
+                                        throw new Error(msg);
+                                    });
+                            }
+                            return res.json();
+                        })
+                        .then(function(data) {
+                            if (ig) {
+                                ig.invoiced = 'Yes';
+                                ig.paid = 'No';
+                                renderGuestsRoster();
+                                syncGuestInvoicedisnoBlock();
+                            }
+                            var okMsg = 'Invoice sent';
+                            if (data && data.message) okMsg = String(data.message);
+                            if (typeof showStatus === 'function') showStatus('success', okMsg);
+                        })
+                        .catch(function(err) {
+                            console.error('guest-send-invoice-btn:', err);
+                            if (typeof showStatus === 'function') {
+                                showStatus(
+                                    'error',
+                                    err && err.message
+                                        ? err.message
+                                        : 'Failed to send invoice.'
+                                );
+                            }
+                        })
+                        .finally(function() {
+                            guestSendInvoiceBtn.disabled = false;
+                        });
                 });
             }
             var guestSendToReservesBtn = document.getElementById('guest-send-to-reserves-btn');
@@ -11850,6 +12108,19 @@
             var guestAddLogPanel = document.getElementById('guest-add-log-panel');
             var guestAddLogInput = document.getElementById('guest-add-log-input');
             var guestAddLogSendBtn = document.getElementById('guest-add-log-send-btn');
+            var guestManagementLogEl = document.getElementById('guest-management-log');
+            if (guestManagementLogEl) {
+                guestManagementLogEl.addEventListener(
+                    'wheel',
+                    function(ev) {
+                        var dy = Number(ev && ev.deltaY ? ev.deltaY : 0);
+                        if (!dy) return;
+                        guestManagementLogEl.scrollTop += dy;
+                        ev.preventDefault();
+                    },
+                    { passive: false }
+                );
+            }
             if (guestAddLogBtn && guestAddLogPanel) {
                 guestAddLogBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
@@ -12044,6 +12315,16 @@
                         if (invId && invVal) void setGuestInvoicedField(invId, invVal);
                         return;
                     }
+                    var paidOpt = ev.target.closest('.guests-paid-option');
+                    if (paidOpt && guestsRosterItemsEl.contains(paidOpt)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var paidVal = paidOpt.getAttribute('data-paid-value');
+                        var paidRow = paidOpt.closest('.guests-roster-row');
+                        var paidId = paidRow && paidRow.getAttribute('data-guests-id');
+                        if (paidId && paidVal) void setGuestPaidField(paidId, paidVal);
+                        return;
+                    }
                     var invitedBtn = ev.target.closest('.guests-invited-badge-btn');
                     if (invitedBtn && guestsRosterItemsEl.contains(invitedBtn)) {
                         ev.preventDefault();
@@ -12164,12 +12445,53 @@
                             }
                         }
                     }
+                    var paidBtn = ev.target.closest('.guests-paid-badge-btn');
+                    if (paidBtn && guestsRosterItemsEl.contains(paidBtn)) {
+                        ev.preventDefault();
+                        var paidRow2 = paidBtn.closest('.guests-roster-row');
+                        var paidId2 = paidRow2 && paidRow2.getAttribute('data-guests-id');
+                        var paidWrap = paidBtn.closest('.guests-paid-wrap');
+                        var paidDropdown = paidWrap && paidWrap.querySelector('.guests-paid-dropdown');
+                        if (paidId2 && paidDropdown) {
+                            if (guestsPaidArmedDocId === paidId2) {
+                                if (!paidDropdown.hidden) {
+                                    paidDropdown.hidden = true;
+                                    paidBtn.setAttribute('aria-expanded', 'false');
+                                    guestsPaidDropdownOpenDocId = '';
+                                } else {
+                                    document.querySelectorAll('#guest-editor .guests-paid-dropdown').forEach(function(el) {
+                                        el.hidden = true;
+                                    });
+                                    document.querySelectorAll('#guest-editor .guests-paid-badge-btn').forEach(function(b) {
+                                        b.setAttribute('aria-expanded', 'false');
+                                    });
+                                    paidDropdown.hidden = false;
+                                    paidBtn.setAttribute('aria-expanded', 'true');
+                                    guestsPaidDropdownOpenDocId = paidId2;
+                                }
+                            } else {
+                                document.querySelectorAll('#guest-editor .guests-paid-badge-btn.is-armed').forEach(function(b) {
+                                    b.classList.remove('is-armed');
+                                });
+                                document.querySelectorAll('#guest-editor .guests-paid-dropdown').forEach(function(el) {
+                                    el.hidden = true;
+                                });
+                                document.querySelectorAll('#guest-editor .guests-paid-badge-btn').forEach(function(b) {
+                                    b.setAttribute('aria-expanded', 'false');
+                                });
+                                guestsPaidDropdownOpenDocId = '';
+                                guestsPaidArmedDocId = paidId2;
+                                paidBtn.classList.add('is-armed');
+                            }
+                        }
+                    }
                     var guestRow = ev.target.closest('.guests-roster-row');
                     if (!guestRow) return;
                     if (
                         ev.target.closest('.guests-invited-wrap') ||
                         ev.target.closest('.guests-read-wrap') ||
-                        ev.target.closest('.guests-invoiced-wrap')
+                        ev.target.closest('.guests-invoiced-wrap') ||
+                        ev.target.closest('.guests-paid-wrap')
                     ) {
                         return;
                     }
@@ -12186,9 +12508,11 @@
                 if (ev.target.closest('.guests-invited-wrap')) return;
                 if (ev.target.closest('.guests-read-wrap')) return;
                 if (ev.target.closest('.guests-invoiced-wrap')) return;
+                if (ev.target.closest('.guests-paid-wrap')) return;
                 clearGuestsInvitedUiState();
                 clearGuestsReadUiState();
                 clearGuestsInvoicedUiState();
+                clearGuestsPaidUiState();
             });
             clearGuestEditorForm();
             var contentRosterItemsEl = document.getElementById('content-list-items');
