@@ -43,7 +43,7 @@
         body.backend-page .speaker-viewer,
         body.backend-page .content-editor,
         body.backend-page .content-viewer,
-        body.backend-page .texteditor-main-row,
+        body.backend-page .html-editor,
         body.backend-page .folder-emails .emailer-message-list {
             overscroll-behavior: none;
         }
@@ -108,7 +108,8 @@
             box-shadow: none;
         }
 
-        body.backend-page button.add-speaker-button {
+        body.backend-page button.add-speaker-button,
+        body.backend-page button.add-content-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -123,7 +124,8 @@
             color: #003153;
         }
 
-        body.backend-page button.add-speaker-button:disabled {
+        body.backend-page button.add-speaker-button:disabled,
+        body.backend-page button.add-content-btn:disabled {
             background: #fef3c7;
             border: none;
             color: #94a3b8;
@@ -687,7 +689,8 @@
             color: #334155;
         }
 
-        .add-speaker-button {
+        .add-speaker-button,
+        .add-content-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -704,6 +707,62 @@
             flex: 1;
             min-height: 0;
             overflow: hidden;
+        }
+
+        #content-editor .content-top-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: stretch;
+            gap: 16px;
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        #content-editor .content-overview {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            margin-top: 0;
+            min-width: 0;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #content-editor .content-top-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: stretch;
+            gap: 16px;
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        #content-editor .content-top-left {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 2 1 0;
+            min-width: 0;
+            min-height: 55px;
+        }
+
+        #content-editor .content-top-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 55px;
         }
 
         #guest-editor .guests-overview {
@@ -723,12 +782,30 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
-            gap: 0.75rem 1rem;
+            justify-content: stretch;
+            gap: 16px;
             flex: 0 0 auto;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
+        }
+
+        #guest-editor .guests-top-left {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 2 1 0;
+            min-width: 0;
+            min-height: 55px;
+        }
+
+        #guest-editor .guests-top-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 55px;
         }
 
         #guest-editor .guests-bottom-row {
@@ -1094,11 +1171,46 @@
         }
 
         #guest-editor .guests-list,
-        #speaker-editor .speakers-list {
+#speaker-editor .speakers-list,
+#content-editor .content-list {
             border: 1px solid #e2e8f0;
             border-radius: 5px;
             box-sizing: border-box;
         }
+
+#content-editor .content-list-table,
+#content-editor .content-roster-table {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0f172a;
+    font-family: 'Inter', sans-serif;
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+}
+
+#content-editor .content-list-table thead th,
+#content-editor .content-roster-table thead th {
+    background: #ffffff;
+    color: #000000;
+    font-weight: 500;
+    font-size: 1.2rem;
+    border-bottom: none;
+}
+
+#content-editor .content-list-table tbody td,
+#content-editor .content-roster-table tbody td {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#content-editor .content-list-scroll {
+    overflow-x: auto;
+}
+
+#content-editor .content-list-items {
+    width: max-content;
+    min-width: 100%;
+}
 
         .guest-viewer {
             flex: 1 1 0;
@@ -1191,7 +1303,7 @@
         #speaker-editor .speakers-actions .add-speaker-button,
         #guest-editor .guests-actions .add-speaker-button,
         #guest-editor .guest-editor-toolbar .add-speaker-button,
-        #content-editor .content-actions .add-speaker-button {
+        #content-editor .content-actions .add-content-btn {
             flex: 0 0 auto;
             width: 35px;
             height: 35px;
@@ -1209,14 +1321,14 @@
         #speaker-editor .speakers-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guests-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guest-editor-toolbar .add-speaker-button:hover:not(:disabled),
-        #content-editor .content-actions .add-speaker-button:hover:not(:disabled) {
+        #content-editor .content-actions .add-content-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
         #speaker-editor .speakers-actions .add-speaker-button:disabled,
         #guest-editor .guests-actions .add-speaker-button:disabled,
         #guest-editor .guest-editor-toolbar .add-speaker-button:disabled,
-        #content-editor .content-actions .add-speaker-button:disabled {
+        #content-editor .content-actions .add-content-btn:disabled {
             background: #fef3c7;
             color: #94a3b8;
             cursor: not-allowed;
@@ -1241,7 +1353,7 @@
 
         #guest-editor .guest-viewer > .guest-editor {
             --guest-editor-shell-r: 8px;
-            --guest-editor-bw: 3px;
+            --guest-editor-bw: 1px;
             display: flex;
             flex-direction: column;
             flex: 1 1 0;
@@ -1251,7 +1363,7 @@
             padding: 0;
             box-sizing: border-box;
             background: transparent;
-            border: var(--guest-editor-bw) solid #0077b6;
+            border: var(--guest-editor-bw) solid #e2e8f0;
             border-radius: var(--guest-editor-shell-r);
             overflow: hidden;
             box-shadow: none;
@@ -1368,7 +1480,7 @@
 
         #guest-editor .guest-viewer > .guest-editor.is-empty {
             background: #e2e8f0;
-            opacity: 0.9;
+            opacity: 1;
             gap: 0;
         }
 
@@ -1411,6 +1523,7 @@
         /* Content tab: roster + editor in a 2:1 split. */
         #content-editor {
             --content-badge-width: 7.5rem;
+            --editor-gunmetal-border: #e2e8f0;
         }
 
         /* Speakers / Guests tabs: one pill size for roster tags + pills (matches Content badge width). */
@@ -1432,7 +1545,7 @@
         #content-editor .content-editor-panels > .content-list {
             flex: 2 1 0;
             min-height: 0;
-            padding-top: 24px;
+            padding-top: 0;
             box-sizing: border-box;
         }
 
@@ -1442,19 +1555,20 @@
             flex: 1 1 0;
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: auto minmax(0, 1fr);
+            grid-template-rows: auto auto minmax(0, 1fr);
             min-width: 0;
             min-height: 8rem;
             overflow: hidden;
             padding: 0;
             background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             box-sizing: border-box;
         }
 
         #content-editor .content-editor-empty {
             grid-column: 1;
-            grid-row: 2;
+            grid-row: 1 / 4;
             z-index: 5;
             margin: 0;
             align-self: stretch;
@@ -1466,12 +1580,14 @@
             justify-content: center;
             box-sizing: border-box;
             border-radius: inherit;
-            background: #e5e7eb;
+            background: #cbd5e1;
+            opacity: 0.95;
             color: #64748b;
             font-family: 'Inter', sans-serif;
-            font-size: 1.125rem;
-            font-weight: 600;
-            letter-spacing: 0.02em;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
             pointer-events: none;
         }
 
@@ -1479,19 +1595,30 @@
             display: none !important;
         }
 
-        #content-editor .content-viewer--no-selection > .content-editor {
-            opacity: 0.35;
-            filter: grayscale(1);
-            pointer-events: none;
-            user-select: none;
+        #content-editor .content-viewer--no-selection {
+            background: #e2e8f0;
+        }
+
+        #content-editor .content-viewer--no-selection .add-content-form {
+            display: none !important;
+        }
+
+        #content-editor .content-viewer--no-selection > .edit-content-top {
+            display: none !important;
+        }
+
+        #content-editor .content-viewer--no-selection > .edit-content-bottom {
+            display: none !important;
+        }
+
+        #content-editor .content-viewer--no-selection > .content-editor-toolbar {
+            display: none !important;
         }
 
         #content-editor .content-actions {
-            grid-column: 1;
-            grid-row: 1;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 0.5rem;
             flex: 0 0 auto;
             width: 100%;
@@ -1515,61 +1642,348 @@
             box-sizing: border-box;
         }
 
-        #content-editor .content-editor {
-            grid-column: 1;
-            grid-row: 2;
+        #content-editor .edit-content-bottom > .add-content-form {
             align-self: stretch;
             min-width: 0;
             min-height: 0;
             z-index: 0;
             display: flex;
             flex-direction: column;
+            justify-content: flex-start;
             align-items: stretch;
-            overflow-y: auto;
+            overflow: visible;
             box-sizing: border-box;
-            background: #e0f2fe;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 0 0 16px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            margin-top: 0;
+            padding: 8px 16px;
             box-shadow: none;
         }
 
         #content-editor .add-content-form {
-            padding-left: 16px;
-            padding-right: 16px;
+            padding: 8px 16px;
             box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            overflow: visible;
+        }
+
+        #content-editor .content-editor-toolbar-trailing .content-editor-delete-btn[hidden] {
+            display: none !important;
+        }
+
+        #content-editor .content-editor-delete-btn:hover:not(:disabled) {
+            filter: brightness(0.95);
+        }
+
+        #content-editor .content-editor-delete-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        #content-editor .add-content-form .add-content-form-field input,
+        #content-editor .add-content-form .add-content-form-field textarea {
+            border: none;
+            border-radius: 0;
+            background: #ffffff;
+            transition: background-color 0.15s ease;
+        }
+
+        #content-editor.content-editable-unlocked .add-content-form .add-content-form-field input,
+        #content-editor.content-editable-unlocked .add-content-form .add-content-form-field textarea {
+            background: #fdf2f8;
+        }
+
+        #content-editor .content-name-date-row {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        #content-editor .content-name-date-row .add-content-form-field {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        #content-editor .content-editor-badge-field {
+            position: relative;
+        }
+
+        #content-editor .content-editor-badge-field .content-editor-badge-btn {
+            cursor: pointer;
+        }
+
+        #content-editor .content-editor-badge-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 6px;
+            min-width: 100%;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+        }
+
+        #content-editor .content-editor-badge-dropdown[hidden] {
+            display: none !important;
+        }
+
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option {
+            align-self: flex-start;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option.is-selected {
+            box-shadow: inset 0 0 0 2px rgba(15, 23, 42, 0.25);
+        }
+
+        #content-editor .content-editor-badge-dropdown .content-editor-topic-option {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.is-selected {
+            background: #ec4899;
+            color: #ffffff;
+        }
+
+        #content-editor .content-type-event-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: flex-start;
+            align-self: flex-start;
+            gap: 16px;
+            min-width: 0;
+            background: #dbeafe;
+            border-radius: 5px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        #content-editor .content-type-event-row .add-content-form-field {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        #content-editor .content-type-event-row .add-content-form-field,
+        #content-editor .content-type-event-row .content-edit-published-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 6px;
+        }
+
+        #content-editor .content-type-event-row .add-content-form-field--featured {
+            flex: 0 0 auto;
+            min-width: auto;
+        }
+
+        #content-editor .content-type-event-row .content-edit-published-wrap {
+            flex: 0 0 auto;
+        }
+
+        #content-editor .content-editor-featured-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 35px;
+            height: 35px;
+            padding: 0 10px;
+            border: none;
+            border-radius: 999px;
+            background: transparent;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        #content-editor .content-editor-featured-btn .content-roster-featured-col-star {
+            color: #94a3b8;
+        }
+
+        #content-editor .content-editor-featured-btn.is-active .content-roster-featured-col-star {
+            color: #b8860b;
         }
 
         #content-editor .edit-content-top:has(#edit-content-title-display:empty) {
             margin-bottom: 0;
         }
 
+        #content-editor .content-viewer > .edit-content-top {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        #content-editor .content-viewer > .edit-content-bottom {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #content-editor .content-editor-toolbar {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            padding: 6px 8px 8px 8px;
+            margin: 0;
+            background: transparent;
+            border-bottom: none;
+        }
+
+        #content-editor .content-editor-toolbar .guest-editor-toolbar-leading {
+            display: none;
+        }
+
+        #content-editor .content-editor-toolbar-center {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        #content-editor .content-editor-toolbar .add-content-btn {
+            flex: 0 0 auto;
+            width: 35px;
+            height: 35px;
+            min-width: 35px;
+            min-height: 35px;
+            max-height: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+            border-radius: 50%;
+            background: #ffd700;
+            border: none;
+            box-shadow: none;
+            color: #003153;
+            cursor: pointer;
+        }
+
+        #content-editor .content-editor-toolbar .add-content-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #content-editor .content-editor-toolbar .add-content-btn:disabled {
+            background: #fef3c7;
+            color: #94a3b8;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        #content-editor .content-editor-toolbar .content-editor-delete-btn,
+        #content-editor .content-editor-toolbar .content-editor-delete-btn:hover:not(:disabled),
+        #content-editor .content-editor-toolbar .content-editor-delete-btn:disabled {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        #content-editor .content-editor-toolbar-trailing {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            min-width: 0;
+            margin-left: auto;
+        }
+
+        #content-editor .content-editor-toolbar-trailing .texteditor-save-btn {
+            width: 108px;
+            min-width: 108px;
+            max-width: 108px;
+            text-align: center;
+        }
+
+        #content-editor .content-editor-toolbar .content-editor-padlock-btn svg {
+            flex-shrink: 0;
+        }
+
+        #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled {
+            background: #fef3c7;
+            color: #94a3b8;
+        }
+
+        #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled:hover {
+            filter: none;
+        }
+
         #content-editor .content-editor-image-block {
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0;
         }
 
         #content-editor .content-editor-image-frame {
             width: 100%;
             max-width: 100%;
+            aspect-ratio: 16 / 9;
             min-height: 4rem;
             box-sizing: border-box;
             overflow: hidden;
-            border-radius: 6px 6px 5px 5px;
-            border: 1px solid #cbd5e1;
+            border-radius: 0;
+            border: none;
             background: #f8fafc;
             line-height: 0;
+            position: relative;
+            cursor: pointer;
         }
 
         #content-editor .content-editor-image-frame img {
             width: 100%;
             max-width: 100%;
-            height: auto;
+            height: 100%;
             display: block;
             vertical-align: top;
             object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        #content-editor #edit-content-image:not([src]) {
+            display: none;
+        }
+
+        #content-editor .content-editor-image-placeholder {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            color: #94a3b8;
+            z-index: 0;
+        }
+
+        #content-editor.content-editable-unlocked .content-editor-image-placeholder {
+            background: #fdf2f8;
+        }
+
+        #content-editor #edit-content-image:not([src]) + .content-editor-image-placeholder {
+            display: flex;
         }
         #content-editor .content-list-add-row {
             display: none;
@@ -1577,14 +1991,14 @@
 
         #content-editor .content-roster-table th.content-roster-featured-col,
         #content-editor .content-list-table th.content-roster-featured-col {
-            width: auto;
+            width: 1%;
             max-width: none;
             min-width: min-content;
             white-space: nowrap;
             text-align: center;
             vertical-align: middle;
-            padding-left: var(--backend-table-cell-pad-x);
-            padding-right: var(--backend-table-cell-pad-x);
+            padding-left: 4px;
+            padding-right: 4px;
         }
 
         #content-editor .content-roster-featured-col-star {
@@ -1596,12 +2010,12 @@
 
         #content-editor .content-roster-table td.content-roster-featured-cell,
         #content-editor .content-list-table td.content-roster-featured-cell {
-            width: 2.5rem;
-            max-width: 2.75rem;
+            width: 1%;
+            max-width: min-content;
             text-align: center;
             vertical-align: middle;
-            padding-left: var(--backend-table-cell-pad-x);
-            padding-right: var(--backend-table-cell-pad-x);
+            padding-left: 4px;
+            padding-right: 4px;
         }
 
         #content-editor .content-roster-featured-star {
@@ -1820,7 +2234,7 @@
             flex: 0 0 auto;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.2rem;
         }
 
@@ -1971,6 +2385,9 @@
         #content-editor .content-roster-table td.content-badge-cell,
         #content-editor .content-list-table td.content-badge-cell {
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #content-editor .content-badge-cell {
@@ -1979,10 +2396,34 @@
             text-align: left;
         }
 
+        #content-editor .content-roster-table td.content-badge-cell.content-badge-cell--topics,
+        #content-editor .content-list-table td.content-badge-cell.content-badge-cell--topics {
+            white-space: nowrap;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         /* Topic / Type / Event share `#content-editor .content-badge` chrome; modifiers only set colours. */
         #content-editor .content-badge.content-badge--topic {
             background: #ec4899;
             color: #ffffff;
+            white-space: nowrap;
+        }
+
+        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic {
+            background: #e2e8f0 !important;
+            color: #334155 !important;
+        }
+
+        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic.is-selected {
+            background: #ec4899 !important;
+            color: #ffffff !important;
         }
 
         #content-editor .content-badge.content-badge--type-standard {
@@ -1993,6 +2434,11 @@
         #content-editor .content-badge.content-badge--type-edit {
             background: #ffd700;
             color: #003153;
+        }
+
+        #content-editor .content-badge.content-badge--type-news {
+            background: #15803d;
+            color: #ffffff;
         }
 
         #content-editor .content-badge.content-badge--event-tbs25 {
@@ -2438,6 +2884,16 @@
             justify-content: flex-start;
         }
 
+        #content-editor .edit-content-top {
+            background-color: #0077b6;
+            padding: 0;
+            margin: 0;
+            border-radius: 7px 7px 0 0;
+            align-items: center;
+            gap: 0;
+            justify-content: flex-start;
+        }
+
         /* Equal flex sides keep `.selected-guestname` centered in the full bar; flag sits in the trailing side. */
         #guest-editor .edit-guest-top-spacer,
         #guest-editor .edit-guest-top-trailing {
@@ -2452,6 +2908,19 @@
             justify-content: flex-end;
         }
 
+        #content-editor .edit-content-top-spacer,
+        #content-editor .edit-content-top-trailing {
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        #content-editor .edit-content-top-trailing {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
         #guest-editor .edit-guest-top .selected-guestname-wrap {
             flex: 0 1 auto;
             min-width: 0;
@@ -2459,6 +2928,19 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
+        }
+
+        #content-editor .edit-content-top .edit-content-name-heading-wrap {
+            flex: 0 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #content-editor .edit-content-name-heading-wrap {
+            display: none;
         }
 
         #speaker-editor .edit-speaker-top .edit-speaker-name-heading {
@@ -2473,6 +2955,27 @@
             gap: 0.5rem;
             padding: 8px var(--backend-table-cell-pad-x);
             box-sizing: border-box;
+        }
+
+        #content-editor .edit-content-name-heading {
+            margin: 0;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 100%;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0.5rem;
+            padding: 8px var(--backend-table-cell-pad-x);
+            box-sizing: border-box;
+            color: #ffffff;
         }
 
         #guest-editor .edit-guest-top .selected-guestname {
@@ -2530,7 +3033,7 @@
             padding: 6px 8px 8px 8px;
             margin: 0;
             background: transparent;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: none;
         }
 
         #guest-editor .guest-editor-toolbar-leading {
@@ -3267,6 +3770,16 @@
             word-break: break-word;
         }
 
+        #content-editor .edit-content-title-text {
+            display: block;
+            word-break: break-word;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
         .speaker-viewer .add-speaker-form-field label,
         .content-editor .add-content-form-field label {
             border-bottom: none;
@@ -3343,6 +3856,14 @@
             padding-bottom: 0.35rem;
         }
 
+        #content-editor .add-content-form-field label {
+            border-bottom: none;
+            padding-bottom: 0;
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+
         #speaker-editor .add-speaker-long-bio-label {
             display: flex;
             align-items: baseline;
@@ -3400,6 +3921,12 @@
         .add-speaker-form-field textarea.add-speaker-form-field--long-bio,
         .add-content-form-field textarea.add-content-form-field--long-bio {
             min-height: 8rem;
+        }
+
+        #content-editor textarea#edit-content-excerpt,
+        #content-editor textarea#edit-content-body {
+            overflow-y: hidden;
+            resize: none;
         }
 
         #speaker-editor .long-bio-highlight-wrap {
@@ -3610,15 +4137,18 @@
 
         .texteditor.is-open {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 1rem;
         }
 
-        .texteditor-layout {
+        .text-selection {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             gap: 1rem;
-            flex: 1;
+            flex: 1 1 0;
+            min-width: 0;
             min-height: 0;
             overflow: hidden;
         }
@@ -3651,33 +4181,37 @@
             min-width: 0;
         }
 
-        .texteditor-main-row {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-            grid-template-rows: 1fr auto;
-            grid-template-areas:
-                'source render'
-                'save   .';
+        .html-editor {
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
             align-items: stretch;
-            flex: 1;
+            justify-content: flex-start;
+            flex: 1 1 0;
+            min-width: 0;
             min-height: 0;
             overflow: auto;
+            align-self: stretch;
         }
 
         @media (max-width: 720px) {
-            .texteditor-main-row {
-                grid-template-columns: minmax(0, 1fr);
-                grid-template-rows: minmax(240px, 32vh) minmax(240px, 32vh) auto;
-                grid-template-areas:
-                    'source'
-                    'render'
-                    'save';
+            .texteditor.is-open {
+                flex-direction: column;
+            }
+
+            .text-selection {
+                flex: 0 0 auto;
+                max-width: none;
+                min-width: 0;
+            }
+
+            .html-editor {
+                min-height: 0;
             }
         }
 
         .renderbox {
-            grid-area: render;
+            flex: 1 1 0;
             min-width: 0;
             min-height: 0;
             height: 100%;
@@ -3685,6 +4219,7 @@
             flex-direction: column;
             gap: 0.35rem;
             box-sizing: border-box;
+            align-self: stretch;
         }
 
         .texteditor-render-title {
@@ -3811,17 +4346,15 @@
             padding-bottom: 0.35rem;
         }
 
-        .texteditor-main-row > .texteditor-save-btn {
-            grid-area: save;
+        .html-editor > .texteditor-save-btn {
             justify-self: start;
             align-self: start;
         }
 
         .texteditor-code-area {
-            grid-area: source;
             width: 100%;
-            height: 100%;
-            min-height: 280px;
+            flex: 1 1 auto;
+            min-height: 0;
             padding: 0.75rem;
             font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
             font-size: 12px;
@@ -3842,10 +4375,10 @@
 
         .texteditor-programme-toolbar {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             flex-wrap: nowrap;
-            align-items: center;
-            gap: 0.75rem;
+            align-items: flex-start;
+            gap: 0.35rem;
             min-width: 0;
         }
 
@@ -3858,14 +4391,25 @@
             font-family: 'Inter', sans-serif;
         }
 
+        .texteditor-column-title {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #003153;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 0.35rem;
+        }
+
         .texteditor-selectors {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             gap: 0.5rem;
             align-items: center;
             min-width: 0;
-            flex: 1 1 auto;
-            overflow-x: auto;
+            flex: 0 0 auto;
+            width: 100%;
+            overflow: visible;
         }
 
         .texteditor-day-btn {
@@ -4438,7 +4982,7 @@
                     <a href="#speaker-editor" class="backend-editor-link is-active" id="speakers-toggle" role="button" aria-expanded="true" aria-controls="speaker-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Speakers</a>
                     <a href="#guest-editor" class="backend-editor-link" id="guests-toggle" role="button" aria-expanded="false" aria-controls="guest-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Guests</a>
                     <a href="#lodging-editor" class="backend-editor-link" id="lodging-toggle" role="button" aria-expanded="false" aria-controls="lodging-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Lodging</a>
-                    <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Snippets</a>
+                    <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                     <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
                     <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
                 </nav>
@@ -4446,8 +4990,8 @@
             </div>
 
             <section class="texteditor" id="texteditor" aria-hidden="true" data-name="texteditor">
-                <div class="texteditor-layout">
-                    <h2 class="texteditor-section-heading">TEXTS</h2>
+                <div class="text-selection">
+                    <p class="texteditor-column-title">Select pre-set</p>
                     <div class="texteditor-programme-toolbar texteditor-home-toolbar">
                         <p class="texteditor-programme-heading">Home:</p>
                         <div class="texteditor-selectors" id="texteditor-home-selectors" role="group" aria-label="Home page snippets">
@@ -4504,22 +5048,16 @@
                         <p class="texteditor-programme-heading">Programme:</p>
                         <div class="texteditor-selectors" id="texteditor-selectors" role="group" aria-label="Programme days"></div>
                     </div>
-                    <div class="texteditor-main-labels">
-                        <div class="texteditor-main-labels-col--source">
-                            <label class="texteditor-code-label" for="texteditor-code">HTML / source</label>
-                        </div>
-                        <div class="texteditor-main-labels-col--render">
-                            <h2 class="texteditor-render-title">Render</h2>
-                        </div>
-                    </div>
-                    <div class="texteditor-main-row">
-                        <textarea id="texteditor-code" class="texteditor-code-area" rows="18" spellcheck="false" autocomplete="off" wrap="off" aria-label="HTML source editor"></textarea>
-                        <div class="renderbox renderbox--idle">
-                            <div class="texteditor-render-surface">
-                                <div id="texteditor-render-html" class="texteditor-render-html" aria-live="polite"></div>
-                            </div>
-                        </div>
-                        <button type="button" class="texteditor-save-btn" id="texteditor-save-btn" disabled aria-disabled="true">Save</button>
+                </div>
+                <div class="html-editor">
+                    <p class="texteditor-column-title">Source</p>
+                    <textarea id="texteditor-code" class="texteditor-code-area" rows="18" spellcheck="false" autocomplete="off" wrap="off" aria-label="HTML source editor"></textarea>
+                    <button type="button" class="texteditor-save-btn" id="texteditor-save-btn" disabled aria-disabled="true">Save</button>
+                </div>
+                <div class="renderbox renderbox--idle">
+                    <p class="texteditor-column-title">Render</p>
+                    <div class="texteditor-render-surface">
+                        <div id="texteditor-render-html" class="texteditor-render-html" aria-live="polite"></div>
                     </div>
                 </div>
             </section>
@@ -4626,61 +5164,31 @@
             <section class="guest-overview-section" id="guest-editor" aria-hidden="true" aria-label="Guests" data-name="guest-editor">
                 <div class="guests-overview">
                     <div class="guests-top-row">
-                        <div id="guests-actions" class="guests-actions" aria-label="Guests actions">
-                            <button type="button" class="add-speaker-button" id="previous-guest" aria-label="Previous guest" title="Previous guest" disabled aria-disabled="true">
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M14 6L8 12l6 6z" />
-                                </svg>
-                            </button>
-                            <button type="button" class="add-speaker-button" id="next-guest" aria-label="Next guest" title="Next guest" disabled aria-disabled="true">
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M10 6l6 6-6 6z" />
-                                </svg>
-                            </button>
-                            <button type="button" class="add-speaker-button" id="add-guest-button" aria-label="Add guest" title="Add guest">
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                                </svg>
-                            </button>
-                            <button type="button" class="add-speaker-button" id="filter-guests" disabled aria-disabled="true" aria-label="Filter guests (inactive)" title="Filter (inactive)">
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="guests-bottom-row" id="guests-bottom-row">
-                        <div class="guests-bottom-track" id="guests-bottom-track">
-                        <div class="guests-list guests-list--roster" id="guests-list" aria-label="Guests list">
-                            <div class="guests-roster-list" id="guests-roster-list">
-                                <div class="guests-roster-scroll">
-                                    <div class="guests-roster-items" id="guests-roster-items" aria-live="polite"></div>
-                                </div>
+                        <div class="guests-top-left">
+                            <div id="guests-actions" class="guests-actions" aria-label="Guests actions">
+                                <button type="button" class="add-speaker-button" id="previous-guest" aria-label="Previous guest" title="Previous guest" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M14 6L8 12l6 6z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="add-speaker-button" id="next-guest" aria-label="Next guest" title="Next guest" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 6l6 6-6 6z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="add-speaker-button" id="add-guest-button" aria-label="Add guest" title="Add guest">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="add-speaker-button" id="filter-guests" disabled aria-disabled="true" aria-label="Filter guests (inactive)" title="Filter (inactive)">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                        <div class="guest-viewer" id="guest-viewer" aria-label="Guest viewer">
-                            <div class="guest-editor is-empty" id="guest-editor-panel">
-                            <div class="edit-guest-top">
-                                <div class="edit-guest-top-spacer" aria-hidden="true"></div>
-                                <div class="selected-guestname-wrap">
-                                    <div class="selected-guestname" role="group" aria-label="Guest name">
-                                        <span class="edit-guest-name-first" id="edit-guest-name-first" aria-live="polite"></span>
-                                        <span class="edit-guest-name-last" id="edit-guest-name-last" aria-live="polite"></span>
-                                    </div>
-                                </div>
-                                <div class="edit-guest-top-trailing">
-                                    <div id="edit-guest-country-flag-slot" class="edit-guest-country-flag-slot" hidden aria-hidden="true">
-                                        <img
-                                            id="edit-guest-country-flag"
-                                            class="edit-guest-country-flag"
-                                            alt=""
-                                            loading="lazy"
-                                            decoding="async"
-                                            referrerpolicy="no-referrer"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="guests-top-right">
                             <div class="guest-editor-toolbar" role="toolbar" aria-label="Guest editor tools">
                                 <div class="guest-editor-toolbar-leading">
                                     <button
@@ -4721,6 +5229,40 @@
                                             <path fill="currentColor" d="M6.41 6L5 7.41 9.59 12 5 16.59 6.41 18l6-6-6-6zm6 0L11 7.41 15.59 12 11 16.59 12.41 18l6-6-6-6z" />
                                         </svg>
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guests-bottom-row" id="guests-bottom-row">
+                        <div class="guests-bottom-track" id="guests-bottom-track">
+                        <div class="guests-list guests-list--roster" id="guests-list" aria-label="Guests list">
+                            <div class="guests-roster-list" id="guests-roster-list">
+                                <div class="guests-roster-scroll">
+                                    <div class="guests-roster-items" id="guests-roster-items" aria-live="polite"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="guest-viewer" id="guest-viewer" aria-label="Guest viewer">
+                            <div class="guest-editor is-empty" id="guest-editor-panel">
+                            <div class="edit-guest-top">
+                                <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                                <div class="selected-guestname-wrap">
+                                    <div class="selected-guestname" role="group" aria-label="Guest name">
+                                        <span class="edit-guest-name-first" id="edit-guest-name-first" aria-live="polite"></span>
+                                        <span class="edit-guest-name-last" id="edit-guest-name-last" aria-live="polite"></span>
+                                    </div>
+                                </div>
+                                <div class="edit-guest-top-trailing">
+                                    <div id="edit-guest-country-flag-slot" class="edit-guest-country-flag-slot" hidden aria-hidden="true">
+                                        <img
+                                            id="edit-guest-country-flag"
+                                            class="edit-guest-country-flag"
+                                            alt=""
+                                            loading="lazy"
+                                            decoding="async"
+                                            referrerpolicy="no-referrer"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <div class="guest-editor-bottom">
@@ -4899,76 +5441,123 @@
             </section>
 
             <section class="content-editor-section" id="content-editor" aria-hidden="true" aria-label="Content" data-name="content-editor">
+                <div class="content-top-row">
+                    <div class="content-top-left">
+                        <div id="content-actions" class="content-actions" hidden aria-label="Content actions">
+                            <button type="button" class="add-content-btn" id="previous-content" aria-label="Previous content" title="Previous content">
+                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                    <path fill="currentColor" d="M14 6L8 12l6 6z" />
+                                </svg>
+                            </button>
+                            <button type="button" class="add-content-btn" id="next-content" aria-label="Next content" title="Next content">
+                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                    <path fill="currentColor" d="M10 6l6 6-6 6z" />
+                                </svg>
+                            </button>
+                                <button
+                                    type="button"
+                                    class="add-content-btn"
+                                    id="content-actions-add-button"
+                                    aria-label="Add content"
+                                    title="Add content"
+                                >
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                    </svg>
+                                </button>
+                        </div>
+                    </div>
+                    <div class="content-top-right">
+                        <div class="content-editor-toolbar" role="toolbar" aria-label="Content editor tools">
+                            <div class="guest-editor-toolbar-leading" aria-hidden="true"></div>
+                            <div class="content-editor-toolbar-center">
+                                <button type="button" class="add-content-btn content-editor-padlock-btn" id="content-editor-padlock-btn" aria-label="Lock content" title="Lock">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path
+                                            fill="currentColor"
+                                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="content-editor-toolbar-trailing">
+                                <button type="button" class="texteditor-save-btn" id="add-content-save-btn" disabled aria-disabled="true">Save</button>
+                                <button type="button" class="texteditor-save-btn" id="content-toolbar-publish-btn" disabled aria-disabled="true">Publish</button>
+                                <button type="button" class="add-content-btn content-editor-delete-btn" id="content-editor-delete-btn" aria-disabled="true" aria-label="Delete selected content" title="Delete selected content" disabled>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="currentColor" d="M9 3h6l1 1h4v2H4V4h4l1-1zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 11h8a2 2 0 0 0 2-2V8H6v10a2 2 0 0 0 2 2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="content-editor-panels">
                     <div class="content-list" id="content-list" aria-label="Content list">
                         <div class="content-list-scroll">
                             <div class="content-list-items" id="content-list-items" aria-live="polite"></div>
                             <div class="content-list-add-row">
-                                <button type="button" class="add-speaker-button" id="add-content-button" aria-label="Add content" title="Add content">
+                                <button type="button" class="add-content-btn" id="add-content-button" aria-label="Add content" title="Add content">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="content-viewer">
-                        <div id="content-actions" class="content-actions" hidden aria-label="Content actions">
-                            <button
-                                type="button"
-                                class="add-speaker-button"
-                                id="content-actions-add-button"
-                                aria-label="Add content"
-                                title="Add content"
-                            >
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                                </svg>
-                            </button>
-                            <button type="button" class="add-speaker-button" id="previous-content" aria-label="Previous content" title="Previous content">
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M14 6L8 12l6 6z" />
-                                </svg>
-                            </button>
-                            <button type="button" class="add-speaker-button" id="next-content" aria-label="Next content" title="Next content">
-                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                    <path fill="currentColor" d="M10 6l6 6-6 6z" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="content-editor" aria-label="Content item">
-                        <div class="content-editor-media" aria-label="Content image">
-                            <div class="content-editor-image-block" id="edit-content-image-block" hidden>
-                                <div class="content-editor-image-frame">
-                                    <img id="edit-content-image" alt="" decoding="async" referrerpolicy="no-referrer" />
-                                </div>
-                            </div>
-                        </div>
-                            <div class="add-content-form" id="add-content-form">
-                            <div class="edit-content-top">
+                        <div class="edit-content-top">
+                            <div class="edit-content-top-spacer" aria-hidden="true"></div>
+                            <div class="edit-content-name-heading-wrap">
                                 <div class="edit-content-name-heading" role="group" aria-label="Title">
                                     <span class="edit-content-title-text" id="edit-content-title-display" aria-live="polite"></span>
                                 </div>
                             </div>
-                            <div class="add-content-form-field add-content-form-field--date-published">
-                                <div class="content-edit-date-published-row">
-                                    <div class="content-edit-date-wrap">
-                                        <label for="edit-content-date">Date</label>
-                                        <input type="text" id="edit-content-date" name="contentDate" autocomplete="off" spellcheck="false">
+                            <div class="edit-content-top-trailing" aria-hidden="true"></div>
+                        </div>
+                        <div class="edit-content-bottom">
+                            <div class="content-editor-media" aria-label="Content image">
+                                <div class="content-editor-image-block" id="edit-content-image-block" hidden>
+                                    <div class="content-editor-image-frame">
+                                        <img id="edit-content-image" alt="" decoding="async" referrerpolicy="no-referrer" />
+                                        <div class="content-editor-image-placeholder" id="edit-content-image-placeholder" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                                                <path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5 11 16.51 14.5 12l4.5 6H5l3.5-4.5zM7 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+                                            </svg>
+                                        </div>
                                     </div>
-                                    <div class="content-edit-published-wrap">
-                                        <span class="content-edit-published-label" id="edit-content-published-label">Published</span>
-                                        <button
-                                            type="button"
-                                            id="edit-content-published-toggle"
-                                            class="content-editor-published-btn"
-                                            aria-pressed="false"
-                                            aria-labelledby="edit-content-published-label"
-                                            aria-disabled="true"
-                                            disabled
-                                            title="Select a content row to change published state">
-                                            <span class="content-editor-published-square" aria-hidden="true">
-                                                <span class="content-editor-published-check">✓</span>
-                                            </span>
-                                        </button>
+                                    <input type="file" id="edit-content-image-upload" accept="image/*" hidden aria-hidden="true">
+                                </div>
+                            </div>
+                            <div class="add-content-form" id="add-content-form">
+                            <div class="content-type-event-row">
+                                <div class="add-content-form-field add-content-form-field--featured">
+                                    <label for="edit-content-featured-btn">Featured</label>
+                                    <input type="hidden" id="edit-content-featured" name="contentFeatured" value="No">
+                                    <button type="button" class="content-editor-featured-btn" id="edit-content-featured-btn" aria-pressed="false" aria-label="Featured: no" title="Not featured">
+                                        <span class="content-roster-featured-col-star" aria-hidden="true">★</span>
+                                    </button>
+                                </div>
+                                <div class="add-content-form-field">
+                                    <label for="edit-content-type">Type</label>
+                                    <input type="hidden" id="edit-content-type" name="contentType" autocomplete="off" spellcheck="false">
+                                    <div class="content-editor-badge-field">
+                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-type-badge-btn" id="edit-content-type-badge-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="edit-content-type-dropdown">Type</button>
+                                        <div class="content-editor-badge-dropdown" id="edit-content-type-dropdown" role="menu" hidden></div>
+                                    </div>
+                                </div>
+                                <div class="add-content-form-field">
+                                    <label for="edit-content-event">Event</label>
+                                    <input type="hidden" id="edit-content-event" name="contentEvent" autocomplete="off" spellcheck="false" placeholder="Comma-separated if multiple">
+                                    <div class="content-editor-badge-field">
+                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-event-badge-btn" id="edit-content-event-badge-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="edit-content-event-dropdown">Event</button>
+                                        <div class="content-editor-badge-dropdown" id="edit-content-event-dropdown" role="menu" hidden></div>
+                                    </div>
+                                </div>
+                                <div class="add-content-form-field">
+                                    <label for="edit-content-topic">Topics</label>
+                                    <input type="hidden" id="edit-content-topic" name="contentTopic" autocomplete="off" spellcheck="false">
+                                    <div class="content-editor-badge-field">
+                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-topic-badge-btn content-badge--topic" id="edit-content-topic-badge-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="edit-content-topic-dropdown">Topics</button>
+                                        <div class="content-editor-badge-dropdown" id="edit-content-topic-dropdown" role="menu" hidden></div>
                                     </div>
                                 </div>
                             </div>
@@ -4976,21 +5565,15 @@
                                 <label for="edit-content-title">Title</label>
                                 <input type="text" id="edit-content-title" name="contentTitle" autocomplete="off" spellcheck="false">
                             </div>
-                            <div class="add-content-form-field">
-                                <label for="edit-content-name">Name</label>
-                                <input type="text" id="edit-content-name" name="contentName" autocomplete="off" spellcheck="false">
-                            </div>
-                            <div class="add-content-form-field">
-                                <label for="edit-content-type">Type</label>
-                                <input type="text" id="edit-content-type" name="contentType" autocomplete="off" spellcheck="false">
-                            </div>
-                            <div class="add-content-form-field">
-                                <label for="edit-content-event">Event</label>
-                                <input type="text" id="edit-content-event" name="contentEvent" autocomplete="off" spellcheck="false" placeholder="Comma-separated if multiple">
-                            </div>
-                            <div class="add-content-form-field">
-                                <label for="edit-content-topic">Topics</label>
-                                <textarea id="edit-content-topic" name="contentTopic" rows="2" spellcheck="false" placeholder="Comma-separated"></textarea>
+                            <div class="content-name-date-row">
+                                <div class="add-content-form-field">
+                                    <label for="edit-content-name">Name</label>
+                                    <input type="text" id="edit-content-name" name="contentName" autocomplete="off" spellcheck="false">
+                                </div>
+                                <div class="add-content-form-field">
+                                    <label for="edit-content-date">Date</label>
+                                    <input type="date" id="edit-content-date" name="contentDate" autocomplete="off" spellcheck="false">
+                                </div>
                             </div>
                             <div class="add-content-form-field">
                                 <div class="content-long-field-label-row">
@@ -5014,10 +5597,7 @@
                                 <label for="edit-content-youtube">YouTube</label>
                                 <input type="text" id="edit-content-youtube" name="contentYoutube" autocomplete="off" spellcheck="false">
                             </div>
-                            <div class="add-content-form-actions">
-                                <button type="button" class="texteditor-save-btn" id="add-content-save-btn" disabled aria-disabled="true">Save</button>
                             </div>
-                        </div>
                         </div>
                         <p class="content-editor-empty" id="content-editor-empty" hidden aria-hidden="true" role="status">Select content</p>
                     </div>
@@ -5152,6 +5732,9 @@
         /** In-memory rows for Content tab; Image URL is read for editor preview only (Alt-image omitted). */
         let contentRosterInMemory = [];
         let contentFormEditingDocId = '';
+        let contentPadlockIsOpen = false;
+        let contentDeleteConfirmArmed = false;
+        let guestPadlockIsOpen = false;
         /** Set after a successful full fetch of tbs/Content/{rowId}/item into memory. */
         let contentMemoryLoaded = false;
         /** Promise from initial page load preload; used so Content tab can await the same fetch instead of duplicating work. */
@@ -5671,7 +6254,10 @@
 
         function markContentDocDirty(docId) {
             var id = String(docId || '').trim();
-            if (id) contentDirtyDocIds[id] = true;
+            if (!id) return;
+            var rec = findContentInMemory(id);
+            if (rec && rec.localOnly === true) return;
+            contentDirtyDocIds[id] = true;
         }
 
         function scheduleContentFirebaseSync() {
@@ -5909,12 +6495,37 @@
         }
 
         /**
+         * True when URL is already a Firebase Storage media URL (v0 REST with alt=media).
+         * Use as-is so we do not run getDownloadURL() and strip/replace the access token.
+         */
+        function isFirebaseStorageDirectMediaUrl(url) {
+            var u = String(url || '').trim();
+            if (!u || !/^https?:\/\//i.test(u)) return false;
+            if (u.indexOf('firebasestorage.googleapis.com') === -1) return false;
+            if (u.indexOf('alt=media') === -1) return false;
+            return true;
+        }
+
+        /** Fallback when client cannot call getDownloadURL() (e.g. rules); works if object is world-readable. */
+        function contentImageAltMediaUrlFromStoragePath(objectPath) {
+            var path = String(objectPath || '').trim();
+            if (!path || path.indexOf('/') === -1) return '';
+            var bucket = String((firebaseConfig && firebaseConfig.storageBucket) || '').trim();
+            if (!bucket) return '';
+            var enc = encodeURIComponent(path);
+            return 'https://firebasestorage.googleapis.com/v0/b/' + bucket + '/o/' + enc + '?alt=media';
+        }
+
+        /**
          * Resolve a stored image reference to a fresh download URL when possible.
-         * Fixes expired ?token= on https://firebasestorage.googleapis.com/... URLs.
+         * Tokenized https://firebasestorage... URLs are returned unchanged (preview after save).
          */
         function resolveContentImageDisplayUrl(rawUrl) {
             var url = String(rawUrl || '').trim();
             if (!url) return Promise.resolve('');
+            if (isFirebaseStorageDirectMediaUrl(url)) {
+                return Promise.resolve(url);
+            }
             try {
                 var st = getFirebaseStorage();
                 if (/^https?:\/\//i.test(url) || url.indexOf('gs://') === 0) {
@@ -5930,13 +6541,110 @@
                         .ref(url)
                         .getDownloadURL()
                         .catch(function () {
-                            return '';
+                            return contentImageAltMediaUrlFromStoragePath(url);
                         });
                 }
             } catch (e) {
                 return Promise.resolve(url);
             }
             return Promise.resolve(url);
+        }
+
+        function contentImageStoragePathForDoc(docId, fileName) {
+            var id = String(docId || '').trim();
+            var base = String(fileName || 'image').replace(/[^a-zA-Z0-9._-]+/g, '-');
+            var safe = base || 'image';
+            return 'tbs/Content/' + id + '/images/' + Date.now() + '-' + safe;
+        }
+
+        async function uploadContentImageFile(file, docId, meta) {
+            var id = String(docId || '').trim();
+            if (!id) throw new Error('Select content before uploading image.');
+            if (!file) throw new Error('No image selected.');
+            if (/^local-content-/i.test(id)) {
+                throw new Error('Draft must be saved before uploading image.');
+            }
+            meta = meta || {};
+            var base64Payload = await new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    resolve(String(reader.result || ''));
+                };
+                reader.onerror = function () {
+                    reject(new Error('Failed to read image file.'));
+                };
+                reader.readAsDataURL(file);
+            });
+            var projectId = String((firebaseConfig && firebaseConfig.projectId) || '').trim();
+            if (!projectId) throw new Error('Missing Firebase project id.');
+            var fnUrl = 'https://us-central1-' + projectId + '.cloudfunctions.net/uploadContentImageHttp';
+            var resp = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    docId: id,
+                    event: meta.event != null ? meta.event : '',
+                    name: meta.name != null ? meta.name : '',
+                    fileName: String(file.name || 'image'),
+                    contentType: String(file.type || 'image/jpeg'),
+                    dataBase64: String(base64Payload || ''),
+                }),
+            });
+            var data = {};
+            try {
+                data = await resp.json();
+            } catch (_) {}
+            if (!resp.ok) {
+                var msg = data && data.error ? String(data.error) : ('Upload failed (' + resp.status + ')');
+                throw new Error(msg);
+            }
+            var url = data && data.downloadUrl ? String(data.downloadUrl).trim() : '';
+            if (url && url.indexOf('firebasestorage.googleapis.com') !== -1) return url;
+            throw new Error('Upload did not return a valid Image download URL.');
+        }
+
+        function refreshCurrentContentImagePreview() {
+            var id = String(contentFormEditingDocId || '').trim();
+            if (!id) return;
+            var rec = findContentInMemory(id);
+            if (!rec) return;
+            var imgBlock = document.getElementById('edit-content-image-block');
+            var imgEl = document.getElementById('edit-content-image');
+            if (!imgBlock || !imgEl) return;
+            var localPreview = rec.localImagePreviewUrl != null ? String(rec.localImagePreviewUrl).trim() : '';
+            if (localPreview) {
+                imgBlock.hidden = false;
+                imgEl.alt = '';
+                imgEl.referrerPolicy = 'no-referrer';
+                imgEl.src = localPreview;
+                return;
+            }
+            var imgUrl = rec.image != null ? String(rec.image).trim() : '';
+            if (!imgUrl) {
+                imgEl.removeAttribute('src');
+                imgEl.removeAttribute('referrerpolicy');
+                imgEl.alt = '';
+                imgBlock.hidden = false;
+                return;
+            }
+            imgBlock.hidden = false;
+            imgEl.alt = '';
+            imgEl.removeAttribute('src');
+            resolveContentImageDisplayUrl(imgUrl)
+                .then(function (resolved) {
+                    var u = (resolved && String(resolved).trim()) || imgUrl;
+                    if (!u) {
+                        imgEl.removeAttribute('src');
+                        imgBlock.hidden = false;
+                        return;
+                    }
+                    imgEl.referrerPolicy = 'no-referrer';
+                    imgEl.src = u;
+                })
+                .catch(function () {
+                    imgEl.referrerPolicy = 'no-referrer';
+                    imgEl.src = imgUrl;
+                });
         }
 
         /** Schedule + activities: events/{eventId}/items/{meta|Programme-*|store}/… */
@@ -6002,6 +6710,18 @@
             if (!textEl || !counterEl) return;
             var letters = String(textEl.value || '').length;
             counterEl.textContent = letters + '/1000 characters';
+        }
+
+        function autosizeContentTextarea(id) {
+            var textEl = document.getElementById(id);
+            if (!textEl) return;
+            textEl.style.height = 'auto';
+            textEl.style.height = textEl.scrollHeight + 'px';
+        }
+
+        function autosizeContentLongTextareas() {
+            autosizeContentTextarea('edit-content-excerpt');
+            autosizeContentTextarea('edit-content-body');
         }
 
         function syncLongBioOverflowScroll() {
@@ -7087,6 +7807,20 @@
                     padlock.removeAttribute('aria-disabled');
                 }
             }
+            syncGuestPadlockButtonUi();
+        }
+
+        function syncGuestPadlockButtonUi() {
+            var padlock = document.getElementById('guest-editor-padlock-btn');
+            if (!padlock) return;
+            var closedPath = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+            var openPath = 'M18 8h-8V6c0-1.63 1.32-2.95 2.95-2.95 1.28 0 2.39.83 2.8 2h2.1c-.47-2.28-2.49-4-4.9-4C10.24 1.05 8 3.29 8 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z';
+            var svg = padlock.querySelector('svg');
+            var path = svg ? svg.querySelector('path') : null;
+            if (path) path.setAttribute('d', guestPadlockIsOpen ? openPath : closedPath);
+            padlock.setAttribute('aria-label', guestPadlockIsOpen ? 'Unlock guest' : 'Lock guest');
+            padlock.setAttribute('title', guestPadlockIsOpen ? 'Unlock' : 'Lock');
+            padlock.setAttribute('aria-pressed', guestPadlockIsOpen ? 'true' : 'false');
         }
 
         function scrollGuestEditorBottomToBio(options) {
@@ -8862,6 +9596,83 @@
             return true;
         }
 
+        async function cleanupLegacyContentDocAfterIdMigration(oldId) {
+            var legacyId = String(oldId || '').trim();
+            if (!legacyId) return;
+            try {
+                var db = getFirestore();
+                var batch = db.batch();
+                batch.delete(contentItemDocRef(db, legacyId));
+                var manifestRef = db.collection('tbs').doc('Content');
+                var FV = firebase.firestore.FieldValue;
+                batch.set(manifestRef, { rowIds: FV.arrayRemove(legacyId) }, { merge: true });
+                await batch.commit();
+            } catch (err) {
+                console.warn('cleanupLegacyContentDocAfterIdMigration:', err);
+            }
+        }
+
+        async function deleteSelectedContentRecord() {
+            var docId = String(contentFormEditingDocId || '').trim();
+            if (!docId) return;
+            var rec = findContentInMemory(docId);
+            if (!rec) return;
+            try {
+                if (contentSyncTimer) {
+                    clearTimeout(contentSyncTimer);
+                    contentSyncTimer = null;
+                }
+                delete contentDirtyDocIds[docId];
+                if (!(rec.localOnly === true)) {
+                    await flushContentToFirebase({ silent: true });
+                    var db = getFirestore();
+                    var batch = db.batch();
+                    batch.delete(contentItemDocRef(db, docId));
+                    var FV = firebase.firestore.FieldValue;
+                    batch.set(db.collection('tbs').doc('Content'), { rowIds: FV.arrayRemove(docId) }, { merge: true });
+                    await batch.commit();
+                }
+                if (rec.localImagePreviewUrl) {
+                    try {
+                        URL.revokeObjectURL(rec.localImagePreviewUrl);
+                    } catch (_) {}
+                }
+                for (var i = 0; i < contentRosterInMemory.length; i++) {
+                    if (contentRosterInMemory[i] && contentRosterInMemory[i].id === docId) {
+                        contentRosterInMemory.splice(i, 1);
+                        break;
+                    }
+                }
+                contentFormEditingDocId = '';
+                contentDeleteConfirmArmed = false;
+                clearContentRosterItemSelection();
+                clearContentEditorForm();
+                renderContentTableFromMemory();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Deleted selected content.');
+                }
+            } catch (err) {
+                console.error('deleteSelectedContentRecord:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to delete selected content.');
+                }
+            }
+        }
+
+        function syncContentDeleteButtonUi(hasSelection, canEdit) {
+            var btn = document.getElementById('content-editor-delete-btn');
+            if (!btn) return;
+            var visible = true;
+            var enabled = !!(hasSelection && canEdit);
+            btn.hidden = !visible;
+            btn.disabled = !enabled;
+            btn.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+            if (!enabled) contentDeleteConfirmArmed = false;
+            var label = contentDeleteConfirmArmed ? 'Press again to confirm delete' : 'Delete selected content';
+            btn.setAttribute('title', label);
+            btn.setAttribute('aria-label', label);
+        }
+
         /** HTML body for tbs/Snippets field `Guest invitation` (same as Snippets preset). */
         async function fetchGuestInvitationHtmlFromFirestore() {
             var db = getFirestore();
@@ -9155,6 +9966,7 @@
         function contentTypeBadgeClassForLabel(label) {
             var low = String(label != null ? label : '').trim().toLowerCase();
             if (low === 'edit') return 'content-badge content-badge--type-edit';
+            if (low === 'news') return 'content-badge content-badge--type-news';
             return 'content-badge content-badge--type-standard';
         }
 
@@ -9203,6 +10015,152 @@
                 out += '<span class="' + cls + '">' + escapeHtml(label) + '</span>';
             }
             return out;
+        }
+
+        var CONTENT_EDITOR_TYPE_OPTIONS = ['Video', 'Edit', 'News'];
+        var CONTENT_EDITOR_EVENT_OPTIONS = ['TBS25', 'TBS26', 'TBS27'];
+
+        function closeContentBadgeDropdowns() {
+            var typeDropdown = document.getElementById('edit-content-type-dropdown');
+            var eventDropdown = document.getElementById('edit-content-event-dropdown');
+            var topicDropdown = document.getElementById('edit-content-topic-dropdown');
+            var typeBtn = document.getElementById('edit-content-type-badge-btn');
+            var eventBtn = document.getElementById('edit-content-event-badge-btn');
+            var topicBtn = document.getElementById('edit-content-topic-badge-btn');
+            if (typeDropdown) typeDropdown.hidden = true;
+            if (eventDropdown) eventDropdown.hidden = true;
+            if (topicDropdown) topicDropdown.hidden = true;
+            if (typeBtn) typeBtn.setAttribute('aria-expanded', 'false');
+            if (eventBtn) eventBtn.setAttribute('aria-expanded', 'false');
+            if (topicBtn) topicBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function syncContentTypeEventBadgeUi() {
+            var typeInput = document.getElementById('edit-content-type');
+            var eventInput = document.getElementById('edit-content-event');
+            var topicInput = document.getElementById('edit-content-topic');
+            var typeBtn = document.getElementById('edit-content-type-badge-btn');
+            var eventBtn = document.getElementById('edit-content-event-badge-btn');
+            var topicBtn = document.getElementById('edit-content-topic-badge-btn');
+            if (typeBtn) {
+                var typeLabel = String(typeInput && typeInput.value ? typeInput.value : '').trim();
+                typeBtn.textContent = typeLabel || 'Type';
+                typeBtn.className = 'content-badge content-editor-badge-btn content-editor-type-badge-btn';
+                if (typeLabel) {
+                    typeBtn.className += ' ' + contentTypeBadgeClassForLabel(typeLabel).replace(/^content-badge\s*/, '');
+                } else {
+                    typeBtn.className += ' content-badge--type-standard';
+                }
+            }
+            if (eventBtn) {
+                var eventLabel = String(eventInput && eventInput.value ? eventInput.value : '').trim();
+                eventBtn.textContent = eventLabel || 'Event';
+                eventBtn.className = 'content-badge content-editor-badge-btn content-editor-event-badge-btn';
+                eventBtn.className += ' ' + contentEventBadgeClassForLabel(eventLabel).replace(/^content-badge\s*/, '');
+            }
+            if (topicBtn) {
+                var topicRaw = contentParseListInputToFirestore(topicInput && topicInput.value ? topicInput.value : '');
+                var topicValues = Array.isArray(topicRaw)
+                    ? topicRaw
+                    : (topicRaw ? [String(topicRaw)] : []);
+                var topicCount = topicValues.length;
+                topicBtn.textContent = 'Topics (' + topicCount + ')';
+                topicBtn.className = 'content-badge content-editor-badge-btn content-editor-topic-badge-btn content-badge--topic';
+            }
+        }
+
+        function contentTopicOptionsFromMemory() {
+            var out = [];
+            var seen = {};
+            for (var i = 0; i < contentRosterInMemory.length; i++) {
+                var rec = contentRosterInMemory[i];
+                var vals = contentParseListInputToFirestore(contentDisplayListField(rec && rec.topic));
+                if (!Array.isArray(vals)) continue;
+                for (var j = 0; j < vals.length; j++) {
+                    var t = String(vals[j] != null ? vals[j] : '').trim();
+                    if (!t) continue;
+                    var k = t.toLowerCase();
+                    if (seen[k]) continue;
+                    seen[k] = true;
+                    out.push(t);
+                }
+            }
+            out.sort(function (a, b) { return a.localeCompare(b); });
+            return out;
+        }
+
+        function syncContentTopicDropdownSelectedUi() {
+            var dropdown = document.getElementById('edit-content-topic-dropdown');
+            var topicInput = document.getElementById('edit-content-topic');
+            if (!dropdown) return;
+            var selectedRaw = contentParseListInputToFirestore(topicInput && topicInput.value ? topicInput.value : '');
+            var selected = Array.isArray(selectedRaw)
+                ? selectedRaw
+                : (selectedRaw ? [String(selectedRaw)] : []);
+            var selectedMap = {};
+            for (var i = 0; i < selected.length; i++) {
+                selectedMap[String(selected[i]).trim().toLowerCase()] = true;
+            }
+            dropdown.querySelectorAll('.content-editor-topic-option').forEach(function (btn) {
+                var val = String(btn.getAttribute('data-value') || '').trim().toLowerCase();
+                var on = Boolean(selectedMap[val]);
+                btn.classList.toggle('is-selected', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                btn.setAttribute('title', on ? 'Selected' : 'Not selected');
+                btn.style.background = on ? '#ec4899' : '#e2e8f0';
+                btn.style.color = on ? '#ffffff' : '#334155';
+            });
+        }
+
+        function buildContentTopicDropdown() {
+            var dropdown = document.getElementById('edit-content-topic-dropdown');
+            if (!dropdown) return;
+            var options = contentTopicOptionsFromMemory();
+            var html = '';
+            for (var i = 0; i < options.length; i++) {
+                var opt = String(options[i] || '').trim();
+                if (!opt) continue;
+                html += '<button type="button" class="content-badge content-badge--topic content-editor-badge-option content-editor-topic-option" data-value="' + escapeHtml(opt) + '" role="menuitemcheckbox" aria-pressed="false">' + escapeHtml(opt) + '</button>';
+            }
+            dropdown.innerHTML = html;
+            syncContentTopicDropdownSelectedUi();
+        }
+
+        function syncContentFeaturedUi() {
+            var featuredInput = document.getElementById('edit-content-featured');
+            var featuredBtn = document.getElementById('edit-content-featured-btn');
+            if (!featuredBtn) return;
+            var val = String(featuredInput && featuredInput.value ? featuredInput.value : '').trim().toLowerCase();
+            var on = val === 'yes' || val === 'true' || val === '1';
+            featuredBtn.classList.toggle('is-active', on);
+            featuredBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            featuredBtn.setAttribute('aria-label', on ? 'Featured: yes' : 'Featured: no');
+            featuredBtn.setAttribute('title', on ? 'Featured' : 'Not featured');
+        }
+
+        function buildContentBadgeDropdown(dropdownId, options, onSelect) {
+            var dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            var html = '';
+            for (var i = 0; i < options.length; i++) {
+                var opt = String(options[i] || '').trim();
+                if (!opt) continue;
+                var cls = dropdownId === 'edit-content-type-dropdown'
+                    ? contentTypeBadgeClassForLabel(opt)
+                    : contentEventBadgeClassForLabel(opt);
+                html += '<button type="button" class="' + cls + ' content-editor-badge-option" data-value="' + escapeHtml(opt) + '" role="menuitem">' + escapeHtml(opt) + '</button>';
+            }
+            dropdown.innerHTML = html;
+            dropdown.addEventListener('click', function (ev) {
+                var btn = ev.target.closest('.content-editor-badge-option');
+                if (!btn || !dropdown.contains(btn)) return;
+                ev.preventDefault();
+                var nextValue = String(btn.getAttribute('data-value') || '').trim();
+                onSelect(nextValue);
+                closeContentBadgeDropdowns();
+                syncContentTypeEventBadgeUi();
+                onContentFormInput();
+            });
         }
 
         /** Topic: array of strings (or comma-separated string); each value → pink badge. */
@@ -9314,9 +10272,9 @@
             var html =
                 '<table class="content-list-table content-roster-table" role="grid" aria-label="Content list">' +
                 '<thead><tr>' +
-                '<th scope="col">Date</th>' +
                 '<th scope="col" class="content-roster-title-col">Title</th>' +
                 '<th scope="col" class="content-roster-name-col">Name</th>' +
+                '<th scope="col">Date</th>' +
                 '<th scope="col" class="content-roster-featured-col" aria-label="Featured" title="Featured"><span class="content-roster-featured-col-star" aria-hidden="true">★</span></th>' +
                 '<th scope="col" class="content-roster-published-col">Published</th>' +
                 '<th scope="col">Type</th>' +
@@ -9325,6 +10283,7 @@
                 '</tr></thead><tbody>';
             for (var j = 0; j < contentRosterInMemory.length; j++) {
                 var r = contentRosterInMemory[j];
+                if (r && r.localOnly === true) continue;
                 var featuredCell =
                     r.featured === true
                         ? '<span class="content-roster-featured-star" title="Featured" aria-label="Featured">★</span>'
@@ -9351,9 +10310,6 @@
                     '<tr class="content-roster-row" data-content-id="' +
                     escapeHtml(r.id) +
                     '">' +
-                    '<td class="content-roster-date-cell">' +
-                    escapeHtml(formatContentDateForDisplay(r.date)) +
-                    '</td>' +
                     '<td class="content-roster-title-col">' +
                     '<span class="content-roster-title-truncate" title="' +
                     escapeHtml(r.title != null ? String(r.title) : '') +
@@ -9366,6 +10322,9 @@
                     '">' +
                     escapeHtml(r.name != null ? String(r.name) : '') +
                     '</span></td>' +
+                    '<td class="content-roster-date-cell">' +
+                    escapeHtml(formatContentDateForDisplay(r.date)) +
+                    '</td>' +
                     '<td class="content-roster-featured-cell">' +
                     featuredCell +
                     '</td>' +
@@ -9378,7 +10337,7 @@
                     '<td class="content-badge-cell">' +
                     (eventCell || '&nbsp;') +
                     '</td>' +
-                    '<td class="content-badge-cell">' +
+                    '<td class="content-badge-cell content-badge-cell--topics">' +
                     (topicsCell || '&nbsp;') +
                     '</td>' +
                     '</tr>';
@@ -9442,7 +10401,6 @@
         }
 
         function navigateContentInRoster(delta) {
-            syncContentFormToMemoryIfEditing();
             var id = String(contentFormEditingDocId || '').trim();
             if (!id) return;
             var idx = findContentRosterIndexById(id);
@@ -9450,8 +10408,7 @@
             var nextIdx = idx + delta;
             if (nextIdx < 0 || nextIdx >= contentRosterInMemory.length) return;
             var rec = contentRosterInMemory[nextIdx];
-            populateContentEditorFromRecord(rec);
-            syncContentRosterSelectionHighlight();
+            void switchToContentRecord(rec, null);
         }
 
         function updateContentHeadingFromForm() {
@@ -9466,14 +10423,78 @@
             var btn = document.getElementById('add-content-save-btn');
             if (!btn) return;
             var id = String(contentFormEditingDocId || '').trim();
-            var active = Boolean(id);
+            var titleEl = document.getElementById('edit-content-title');
+            var nameEl = document.getElementById('edit-content-name');
+            var hasTitle = Boolean(titleEl && String(titleEl.value || '').trim());
+            var hasName = Boolean(nameEl && String(nameEl.value || '').trim());
+            var active = Boolean(id) && hasTitle && hasName;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
         }
 
+        function updateContentToolbarPublishButtonUi() {
+            var btn = document.getElementById('content-toolbar-publish-btn');
+            if (!btn) return;
+            var id = String(contentFormEditingDocId || '').trim();
+            if (!id) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.textContent = 'Publish';
+                btn.setAttribute('title', 'Select a content row to change publish state');
+                btn.setAttribute('aria-label', 'Publish selected content');
+                return;
+            }
+            var rec = findContentInMemory(id);
+            if (!rec) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.textContent = 'Publish';
+                btn.setAttribute('title', 'Select a content row to change publish state');
+                btn.setAttribute('aria-label', 'Publish selected content');
+                return;
+            }
+            var dateEl = document.getElementById('edit-content-date');
+            var titleEl = document.getElementById('edit-content-title');
+            var nameEl = document.getElementById('edit-content-name');
+            var typeEl = document.getElementById('edit-content-type');
+            var eventEl = document.getElementById('edit-content-event');
+            var topicEl = document.getElementById('edit-content-topic');
+            var excerptEl = document.getElementById('edit-content-excerpt');
+            var bodyEl = document.getElementById('edit-content-body');
+            var ytEl = document.getElementById('edit-content-youtube');
+            var allFilled = Boolean(
+                dateEl && String(dateEl.value || '').trim() &&
+                titleEl && String(titleEl.value || '').trim() &&
+                nameEl && String(nameEl.value || '').trim() &&
+                typeEl && String(typeEl.value || '').trim() &&
+                eventEl && String(eventEl.value || '').trim() &&
+                topicEl && String(topicEl.value || '').trim() &&
+                excerptEl && String(excerptEl.value || '').trim() &&
+                bodyEl && String(bodyEl.value || '').trim() &&
+                ytEl && String(ytEl.value || '').trim()
+            );
+            if (!allFilled) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.textContent = 'Publish';
+                btn.setAttribute('title', 'Fill all content fields to enable publish');
+                btn.setAttribute('aria-label', 'Publish selected content');
+                return;
+            }
+            var isPublished = rec.published === true;
+            btn.disabled = false;
+            btn.setAttribute('aria-disabled', 'false');
+            btn.textContent = isPublished ? 'Unpublish' : 'Publish';
+            btn.setAttribute('title', isPublished ? 'Unpublish selected content' : 'Publish selected content');
+            btn.setAttribute('aria-label', isPublished ? 'Unpublish selected content' : 'Publish selected content');
+        }
+
         function updateContentEditorPublishedToggleUi() {
             var btn = document.getElementById('edit-content-published-toggle');
-            if (!btn) return;
+            if (!btn) {
+                updateContentToolbarPublishButtonUi();
+                return;
+            }
             var id = String(contentFormEditingDocId || '').trim();
             if (!id) {
                 btn.disabled = true;
@@ -9481,6 +10502,7 @@
                 btn.setAttribute('aria-pressed', 'false');
                 btn.setAttribute('title', 'Select a content row to change published state');
                 btn.setAttribute('aria-label', 'Published: not applicable');
+                updateContentToolbarPublishButtonUi();
                 return;
             }
             var rec = findContentInMemory(id);
@@ -9490,6 +10512,7 @@
                 btn.setAttribute('aria-pressed', 'false');
                 btn.setAttribute('title', 'Select a content row to change published state');
                 btn.setAttribute('aria-label', 'Published: not applicable');
+                updateContentToolbarPublishButtonUi();
                 return;
             }
             btn.disabled = false;
@@ -9498,9 +10521,11 @@
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
             btn.setAttribute('title', on ? 'Published — click to unpublish' : 'Not published — click to publish');
             btn.setAttribute('aria-label', on ? 'Published: yes' : 'Published: no');
+            updateContentToolbarPublishButtonUi();
         }
 
-        function syncContentFormToMemoryIfEditing() {
+        function syncContentFormToMemoryIfEditing(opts) {
+            opts = opts || {};
             var id = String(contentFormEditingDocId || '').trim();
             if (!id) return;
             var rec = findContentInMemory(id);
@@ -9510,6 +10535,7 @@
             var nameEl = document.getElementById('edit-content-name');
             var typeEl = document.getElementById('edit-content-type');
             var eventEl = document.getElementById('edit-content-event');
+            var featuredEl = document.getElementById('edit-content-featured');
             var topicEl = document.getElementById('edit-content-topic');
             var excerptEl = document.getElementById('edit-content-excerpt');
             var bodyEl = document.getElementById('edit-content-body');
@@ -9519,6 +10545,7 @@
             rec.title = titleEl ? String(titleEl.value || '') : '';
             rec.name = nameEl ? String(nameEl.value || '') : '';
             rec.type = typeEl ? String(typeEl.value || '') : '';
+            rec.featured = Boolean(featuredEl && String(featuredEl.value || '').trim().toLowerCase() === 'yes');
             if (eventEl) rec.event = contentParseListInputToFirestore(eventEl.value);
             if (topicEl) {
                 var tp = contentParseListInputToFirestore(topicEl.value);
@@ -9528,24 +10555,78 @@
             rec.contentBody = bodyEl ? String(bodyEl.value || '') : '';
             rec.fieldcolour = colourEl ? String(colourEl.value || '') : '';
             rec.youtube = ytEl ? String(ytEl.value || '') : '';
-            markContentDocDirty(id);
-            renderContentTableFromMemory();
-            scheduleContentFirebaseSync();
+            if (!opts.noDirtySync) {
+                markContentDocDirty(id);
+                renderContentTableFromMemory();
+                if (!(rec.localOnly === true)) {
+                    scheduleContentFirebaseSync();
+                }
+            }
             updateContentHeadingFromForm();
             updateContentSaveButtonState();
         }
 
-        function toggleContentPublishedForRow(docId) {
+        function createLocalContentDraftId() {
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var id = '';
+            for (var i = 0; i < 20; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return id;
+        }
+
+        function createLocalDraftContentRecord() {
+            var localId = createLocalContentDraftId();
+            return {
+                id: localId,
+                title: '',
+                name: '',
+                date: '',
+                type: '',
+                event: [],
+                topic: [],
+                excerpt: '',
+                contentBody: '',
+                fieldcolour: '',
+                youtube: '',
+                featured: false,
+                published: false,
+                image: '',
+                localOnly: true,
+                pendingImageFile: null,
+                localImagePreviewUrl: '',
+            };
+        }
+
+        async function toggleContentPublishedForRow(docId) {
             var id = String(docId || '').trim();
             if (!id) return;
             var rec = findContentInMemory(id);
             if (!rec) return;
             /* Empty square → published true → Firestore Published: 'Yes'; checkmark → false → 'No'. */
-            rec.published = !(rec.published === true);
+            var wasPublished = rec.published === true;
+            rec.published = !wasPublished;
+            var nowPublished = rec.published === true;
             markContentDocDirty(id);
             renderContentTableFromMemory();
-            void flushContentToFirebase({ silent: true });
             updateContentEditorPublishedToggleUi();
+            var saved = await flushContentToFirebase({ silent: true });
+            if (typeof showStatus === 'function') {
+                if (saved) {
+                    showStatus('success', nowPublished ? 'Published: saved to Firebase.' : 'Unpublished: saved to Firebase.');
+                } else {
+                    rec.published = wasPublished;
+                    markContentDocDirty(id);
+                    renderContentTableFromMemory();
+                    updateContentEditorPublishedToggleUi();
+                    showStatus('error', 'Could not save published state to Firebase.');
+                }
+            } else if (!saved) {
+                rec.published = wasPublished;
+                markContentDocDirty(id);
+                renderContentTableFromMemory();
+                updateContentEditorPublishedToggleUi();
+            }
         }
 
         function syncContentEditorEmptyState() {
@@ -9553,14 +10634,83 @@
             var emptyEl = document.getElementById('content-editor-empty');
             if (!root || !emptyEl) return;
             var has = String(contentFormEditingDocId || '').trim();
+            var padlock = document.getElementById('content-editor-padlock-btn');
             if (has) {
                 root.classList.remove('content-viewer--no-selection');
                 emptyEl.hidden = true;
                 emptyEl.setAttribute('aria-hidden', 'true');
+                if (padlock) {
+                    padlock.disabled = false;
+                    padlock.removeAttribute('aria-disabled');
+                }
             } else {
                 root.classList.add('content-viewer--no-selection');
                 emptyEl.hidden = false;
                 emptyEl.setAttribute('aria-hidden', 'false');
+                contentPadlockIsOpen = false;
+                if (padlock) {
+                    padlock.disabled = true;
+                    padlock.setAttribute('aria-disabled', 'true');
+                }
+            }
+            syncContentPadlockButtonUi();
+            syncContentEditabilityFromPadlock();
+        }
+
+        function syncContentPadlockButtonUi() {
+            var padlock = document.getElementById('content-editor-padlock-btn');
+            if (!padlock) return;
+            var closedPath = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+            var openPath = 'M18 8h-8V6c0-1.63 1.32-2.95 2.95-2.95 1.28 0 2.39.83 2.8 2h2.1c-.47-2.28-2.49-4-4.9-4C10.24 1.05 8 3.29 8 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z';
+            var svg = padlock.querySelector('svg');
+            var path = svg ? svg.querySelector('path') : null;
+            if (path) path.setAttribute('d', contentPadlockIsOpen ? openPath : closedPath);
+            padlock.setAttribute('aria-label', contentPadlockIsOpen ? 'Unlock content' : 'Lock content');
+            padlock.setAttribute('title', contentPadlockIsOpen ? 'Unlock' : 'Lock');
+            padlock.setAttribute('aria-pressed', contentPadlockIsOpen ? 'true' : 'false');
+        }
+
+        function syncContentEditabilityFromPadlock() {
+            var form = document.getElementById('add-content-form');
+            var editorRoot = document.getElementById('content-editor');
+            if (!form) return;
+            var hasSelection = Boolean(String(contentFormEditingDocId || '').trim());
+            var canEdit = hasSelection && contentPadlockIsOpen;
+            form.querySelectorAll('input, textarea').forEach(function (el) {
+                el.disabled = !canEdit;
+            });
+            form.querySelectorAll(
+                '#edit-content-featured-btn, ' +
+                '#edit-content-type-badge-btn, ' +
+                '#edit-content-event-badge-btn, ' +
+                '#edit-content-topic-badge-btn'
+            ).forEach(function (btn) {
+                btn.disabled = !canEdit;
+                btn.setAttribute('aria-disabled', canEdit ? 'false' : 'true');
+            });
+            syncContentDeleteButtonUi(hasSelection, canEdit);
+            if (editorRoot) editorRoot.classList.toggle('content-editable-unlocked', canEdit);
+        }
+
+        async function switchToContentRecord(rec, rowEl) {
+            var nextId = String(rec && rec.id ? rec.id : '').trim();
+            if (!nextId) return;
+            var currentId = String(contentFormEditingDocId || '').trim();
+            if (currentId && currentId !== nextId) {
+                var currentRec = findContentInMemory(currentId);
+                syncContentFormToMemoryIfEditing();
+                if (!(currentRec && currentRec.localOnly === true)) {
+                    var saved = await flushContentToFirebase({ silent: true });
+                    if (!saved) return;
+                }
+            }
+            contentPadlockIsOpen = false;
+            contentDeleteConfirmArmed = false;
+            populateContentEditorFromRecord(rec);
+            if (rowEl) {
+                setContentRosterItemSelection(rowEl);
+            } else {
+                syncContentRosterSelectionHighlight();
             }
         }
 
@@ -9571,6 +10721,7 @@
             var nameEl = document.getElementById('edit-content-name');
             var typeEl = document.getElementById('edit-content-type');
             var eventEl = document.getElementById('edit-content-event');
+            var featuredEl = document.getElementById('edit-content-featured');
             var topicEl = document.getElementById('edit-content-topic');
             var excerptEl = document.getElementById('edit-content-excerpt');
             var bodyEl = document.getElementById('edit-content-body');
@@ -9584,6 +10735,7 @@
                 if (nameEl) nameEl.value = '';
                 if (typeEl) typeEl.value = '';
                 if (eventEl) eventEl.value = '';
+                if (featuredEl) featuredEl.value = 'No';
                 if (topicEl) topicEl.value = '';
                 if (excerptEl) excerptEl.value = '';
                 if (bodyEl) bodyEl.value = '';
@@ -9602,6 +10754,10 @@
                 updateContentNavButtons();
                 updateExcerptLetterCounter();
                 updateContentBodyLetterCounter();
+                syncContentTypeEventBadgeUi();
+                syncContentFeaturedUi();
+                autosizeContentLongTextareas();
+                syncContentTopicDropdownSelectedUi();
                 return;
             }
             contentFormEditingDocId = String(rec.id || '').trim();
@@ -9614,6 +10770,7 @@
             if (nameEl) nameEl.value = name;
             if (typeEl) typeEl.value = rec.type != null ? String(rec.type) : '';
             if (eventEl) eventEl.value = contentDisplayListField(rec.event);
+            if (featuredEl) featuredEl.value = rec.featured === true ? 'Yes' : 'No';
             if (topicEl) topicEl.value = contentDisplayListField(rec.topic);
             if (excerptEl) excerptEl.value = rec.excerpt != null ? String(rec.excerpt) : '';
             if (bodyEl) bodyEl.value = rec.contentBody != null ? String(rec.contentBody) : '';
@@ -9628,7 +10785,7 @@
                         imgEl.removeAttribute('src');
                         imgEl.removeAttribute('referrerpolicy');
                         imgEl.alt = '';
-                        imgBlock.hidden = true;
+                        imgBlock.hidden = false;
                         return;
                     }
                     imgBlock.hidden = false;
@@ -9639,7 +10796,7 @@
                             var u = (resolved && String(resolved).trim()) || url;
                             if (!u) {
                                 imgEl.removeAttribute('src');
-                                imgBlock.hidden = true;
+                                imgBlock.hidden = false;
                                 return;
                             }
                             imgEl.referrerPolicy = 'no-referrer';
@@ -9655,7 +10812,7 @@
                 } else {
                     imgEl.removeAttribute('src');
                     imgEl.alt = '';
-                    imgBlock.hidden = true;
+                    imgBlock.hidden = false;
                     var docId = String(rec.id || '').trim();
                     if (docId && typeof getFirestore === 'function') {
                         (function () {
@@ -9686,6 +10843,10 @@
             updateContentNavButtons();
             updateExcerptLetterCounter();
             updateContentBodyLetterCounter();
+            syncContentTypeEventBadgeUi();
+            syncContentFeaturedUi();
+            autosizeContentLongTextareas();
+            syncContentTopicDropdownSelectedUi();
         }
 
         function clearContentEditorForm() {
@@ -12251,6 +13412,17 @@
                     scrollGuestEditorBottomToBio();
                 });
             }
+            var guestPadlockBtn = document.getElementById('guest-editor-padlock-btn');
+            if (guestPadlockBtn) {
+                guestPadlockBtn.addEventListener('click', function(ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    if (guestPadlockBtn.disabled) return;
+                    guestPadlockIsOpen = !guestPadlockIsOpen;
+                    syncGuestPadlockButtonUi();
+                });
+                syncGuestPadlockButtonUi();
+            }
             var guestEditorBottomEl = document.querySelector('#guest-editor #guest-editor-panel .guest-editor-bottom');
             if (guestEditorBottomEl) {
                 guestEditorBottomEl.addEventListener('scroll', function() {
@@ -12517,7 +13689,7 @@
             clearGuestEditorForm();
             var contentRosterItemsEl = document.getElementById('content-list-items');
             if (contentRosterItemsEl) {
-                contentRosterItemsEl.addEventListener('click', function (e) {
+                contentRosterItemsEl.addEventListener('click', async function (e) {
                     var pubBtn = e.target.closest('.content-roster-published-btn');
                     if (pubBtn && contentRosterItemsEl.contains(pubBtn)) {
                         e.preventDefault();
@@ -12539,14 +13711,30 @@
                         }
                     }
                     if (found) {
-                        populateContentEditorFromRecord(found);
-                        setContentRosterItemSelection(row);
+                        await switchToContentRecord(found, row);
                     }
                 });
             }
-            function onAddContentToolbarClick() {
-                clearContentRosterItemSelection();
-                clearContentEditorForm();
+            async function onAddContentToolbarClick() {
+                var editingId = String(contentFormEditingDocId || '').trim();
+                if (editingId) {
+                    var editingRec = findContentInMemory(editingId);
+                    syncContentFormToMemoryIfEditing();
+                    if (!(editingRec && editingRec.localOnly === true)) {
+                        var saved = await flushContentToFirebase({ silent: true });
+                        if (!saved) return;
+                        if (typeof showStatus === 'function') {
+                            showStatus('success', 'Saved selected content to Firebase.');
+                        }
+                    }
+                }
+                var draft = createLocalDraftContentRecord();
+                contentRosterInMemory.unshift(draft);
+                contentPadlockIsOpen = true;
+                contentDeleteConfirmArmed = false;
+                renderContentTableFromMemory();
+                populateContentEditorFromRecord(draft);
+                syncContentRosterSelectionHighlight();
             }
             ['add-content-button', 'content-actions-add-button'].forEach(function (contentAddId) {
                 var addContentBtn = document.getElementById(contentAddId);
@@ -12572,15 +13760,146 @@
             if (addContentSaveBtn) {
                 addContentSaveBtn.addEventListener('click', async function () {
                     if (addContentSaveBtn.disabled) return;
-                    if (!String(contentFormEditingDocId || '').trim()) return;
+                    var cid = String(contentFormEditingDocId || '').trim();
+                    if (!cid) return;
+                    var rec = findContentInMemory(cid);
+                    if (!rec) return;
+                    var legacyIdToCleanup = '';
+                    if (/^local-content-/i.test(String(rec.id || ''))) {
+                        legacyIdToCleanup = String(rec.id || '').trim();
+                        var newPersistentId = createLocalContentDraftId();
+                        rec.id = newPersistentId;
+                        contentFormEditingDocId = newPersistentId;
+                        cid = newPersistentId;
+                        delete contentDirtyDocIds[legacyIdToCleanup];
+                        renderContentTableFromMemory();
+                        syncContentRosterSelectionHighlight();
+                    }
+                    if (rec.localOnly === true) rec.localOnly = false;
+                    if (rec && rec.pendingImageFile) {
+                        try {
+                            syncContentFormToMemoryIfEditing({ noDirtySync: true });
+                            var newImageUrl = await uploadContentImageFile(rec.pendingImageFile, cid, {
+                                event: rec.event,
+                                name: rec.name,
+                            });
+                            rec.image = newImageUrl;
+                            rec.pendingImageFile = null;
+                            if (rec.localImagePreviewUrl) {
+                                try {
+                                    URL.revokeObjectURL(rec.localImagePreviewUrl);
+                                } catch (_) {}
+                                rec.localImagePreviewUrl = '';
+                            }
+                            refreshCurrentContentImagePreview();
+                        } catch (imgErr) {
+                            console.error('Content image upload on save:', imgErr);
+                            if (typeof showStatus === 'function') {
+                                showStatus('error', imgErr && imgErr.message ? imgErr.message : 'Failed to upload image.');
+                            }
+                            return;
+                        }
+                    }
                     syncContentFormToMemoryIfEditing();
+                    markContentDocDirty(cid);
                     await flushContentToFirebase();
+                    if (legacyIdToCleanup) {
+                        await cleanupLegacyContentDocAfterIdMigration(legacyIdToCleanup);
+                    }
+                    contentDeleteConfirmArmed = false;
+                    syncContentEditabilityFromPadlock();
+                });
+            }
+            var contentDeleteBtn = document.getElementById('content-editor-delete-btn');
+            if (contentDeleteBtn) {
+                contentDeleteBtn.addEventListener('click', async function () {
+                    if (contentDeleteBtn.disabled) return;
+                    if (!contentDeleteConfirmArmed) {
+                        contentDeleteConfirmArmed = true;
+                        syncContentEditabilityFromPadlock();
+                        if (typeof showStatus === 'function') {
+                            showStatus('info', 'Press Confirm delete again to delete selected content.');
+                        }
+                        return;
+                    }
+                    await deleteSelectedContentRecord();
+                });
+            }
+            var contentToolbarPublishBtn = document.getElementById('content-toolbar-publish-btn');
+            if (contentToolbarPublishBtn) {
+                contentToolbarPublishBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (contentToolbarPublishBtn.disabled) return;
+                    var cid = String(contentFormEditingDocId || '').trim();
+                    if (!cid) return;
+                    toggleContentPublishedForRow(cid);
+                });
+            }
+            var contentPadlockBtn = document.getElementById('content-editor-padlock-btn');
+            if (contentPadlockBtn) {
+                contentPadlockBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (contentPadlockBtn.disabled) return;
+                    contentPadlockIsOpen = !contentPadlockIsOpen;
+                    contentDeleteConfirmArmed = false;
+                    syncContentPadlockButtonUi();
+                    syncContentEditabilityFromPadlock();
+                });
+                syncContentPadlockButtonUi();
+                syncContentEditabilityFromPadlock();
+            }
+            var contentImageFrameEl = document.querySelector('#content-editor .content-editor-image-frame');
+            var contentImageUploadEl = document.getElementById('edit-content-image-upload');
+            if (contentImageFrameEl && contentImageUploadEl) {
+                contentImageFrameEl.addEventListener('click', function () {
+                    var cid = String(contentFormEditingDocId || '').trim();
+                    if (!cid) return;
+                    if (!contentPadlockIsOpen) {
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', 'Unlock content to edit image.');
+                        }
+                        return;
+                    }
+                    contentImageUploadEl.click();
+                });
+                contentImageUploadEl.addEventListener('change', async function () {
+                    var cid = String(contentFormEditingDocId || '').trim();
+                    if (!cid) return;
+                    var file = contentImageUploadEl.files && contentImageUploadEl.files[0];
+                    if (!file) return;
+                    try {
+                        var rec = findContentInMemory(cid);
+                        if (!rec) return;
+                        if (rec.localImagePreviewUrl) {
+                            try {
+                                URL.revokeObjectURL(rec.localImagePreviewUrl);
+                            } catch (_) {}
+                        }
+                        rec.pendingImageFile = file;
+                        rec.localImagePreviewUrl = URL.createObjectURL(file);
+                        refreshCurrentContentImagePreview();
+                        if (typeof showStatus === 'function') {
+                            showStatus('success', 'Image selected locally. It uploads when you press Save.');
+                        }
+                    } catch (err) {
+                        console.error('Content image upload:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', err && err.message ? err.message : 'Failed to upload image.');
+                        }
+                    } finally {
+                        contentImageUploadEl.value = '';
+                    }
                 });
             }
             function onContentFormInput() {
                 syncContentFormToMemoryIfEditing();
                 updateExcerptLetterCounter();
                 updateContentBodyLetterCounter();
+                syncContentTypeEventBadgeUi();
+                syncContentFeaturedUi();
+                autosizeContentLongTextareas();
+                syncContentTopicDropdownSelectedUi();
+                updateContentToolbarPublishButtonUi();
             }
             [
                 'edit-content-date',
@@ -12600,6 +13919,110 @@
                     el.addEventListener('change', onContentFormInput);
                 }
             });
+            autosizeContentLongTextareas();
+            buildContentBadgeDropdown('edit-content-type-dropdown', CONTENT_EDITOR_TYPE_OPTIONS, function (nextValue) {
+                var typeEl = document.getElementById('edit-content-type');
+                if (typeEl) typeEl.value = nextValue;
+            });
+            buildContentBadgeDropdown('edit-content-event-dropdown', CONTENT_EDITOR_EVENT_OPTIONS, function (nextValue) {
+                var eventEl = document.getElementById('edit-content-event');
+                if (eventEl) eventEl.value = nextValue;
+            });
+            buildContentTopicDropdown();
+            (function initContentBadgeDropdownButtons() {
+                var typeBtn = document.getElementById('edit-content-type-badge-btn');
+                var eventBtn = document.getElementById('edit-content-event-badge-btn');
+                var topicBtn = document.getElementById('edit-content-topic-badge-btn');
+                var typeDropdown = document.getElementById('edit-content-type-dropdown');
+                var eventDropdown = document.getElementById('edit-content-event-dropdown');
+                var topicDropdown = document.getElementById('edit-content-topic-dropdown');
+                var topicInput = document.getElementById('edit-content-topic');
+                if (typeBtn && typeDropdown) {
+                    typeBtn.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var shouldOpen = typeDropdown.hidden;
+                        closeContentBadgeDropdowns();
+                        typeDropdown.hidden = !shouldOpen;
+                        typeBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+                    });
+                }
+                if (eventBtn && eventDropdown) {
+                    eventBtn.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var shouldOpen = eventDropdown.hidden;
+                        closeContentBadgeDropdowns();
+                        eventDropdown.hidden = !shouldOpen;
+                        eventBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+                    });
+                }
+                if (topicBtn && topicDropdown && topicInput) {
+                    topicBtn.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var shouldOpen = topicDropdown.hidden;
+                        closeContentBadgeDropdowns();
+                        if (shouldOpen) buildContentTopicDropdown();
+                        topicDropdown.hidden = !shouldOpen;
+                        topicBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+                    });
+                    topicDropdown.addEventListener('mousedown', function (ev) {
+                        var btn = ev.target.closest('.content-editor-topic-option');
+                        if (!btn || !topicDropdown.contains(btn)) return;
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var val = String(btn.getAttribute('data-value') || '').trim();
+                        if (!val) return;
+                        var isOn = btn.classList.contains('is-selected');
+                        if (!isOn) {
+                            var selectedNow = topicDropdown.querySelectorAll('.content-editor-topic-option.is-selected').length;
+                            if (selectedNow >= 2) {
+                                if (typeof showStatus === 'function') {
+                                    showStatus('error', 'You can select up to 2 topics.');
+                                }
+                                return;
+                            }
+                        }
+                        btn.classList.toggle('is-selected', !isOn);
+                        btn.setAttribute('aria-pressed', !isOn ? 'true' : 'false');
+                        btn.style.background = !isOn ? '#ec4899' : '#e2e8f0';
+                        btn.style.color = !isOn ? '#ffffff' : '#334155';
+                        var selectedVals = [];
+                        topicDropdown.querySelectorAll('.content-editor-topic-option.is-selected').forEach(function (opt) {
+                            var t = String(opt.getAttribute('data-value') || '').trim();
+                            if (t) selectedVals.push(t);
+                        });
+                        topicInput.value = selectedVals.join(', ');
+                        syncContentTypeEventBadgeUi();
+                        syncContentTopicDropdownSelectedUi();
+                        onContentFormInput();
+                    });
+                }
+                document.addEventListener('click', function (ev) {
+                    if (ev.target.closest('#edit-content-type-dropdown')) return;
+                    if (ev.target.closest('#edit-content-event-dropdown')) return;
+                    if (ev.target.closest('#edit-content-topic-dropdown')) return;
+                    if (ev.target.closest('#edit-content-type-badge-btn')) return;
+                    if (ev.target.closest('#edit-content-event-badge-btn')) return;
+                    if (ev.target.closest('#edit-content-topic-badge-btn')) return;
+                    closeContentBadgeDropdowns();
+                });
+                syncContentTypeEventBadgeUi();
+            })();
+            (function initContentFeaturedButton() {
+                var featuredBtn = document.getElementById('edit-content-featured-btn');
+                var featuredEl = document.getElementById('edit-content-featured');
+                if (!featuredBtn || !featuredEl) return;
+                featuredBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    var on = String(featuredEl.value || '').trim().toLowerCase() === 'yes';
+                    featuredEl.value = on ? 'No' : 'Yes';
+                    syncContentFeaturedUi();
+                    onContentFormInput();
+                });
+                syncContentFeaturedUi();
+            })();
             var editContentPublishedBtn = document.getElementById('edit-content-published-toggle');
             if (editContentPublishedBtn) {
                 editContentPublishedBtn.addEventListener('click', function (e) {
@@ -12927,23 +14350,29 @@
                 texteditorSpeakerEmailTemplatesSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
             }
 
+            showStatus('loading', 'Loading backend settings...');
             await syncSelectedAndCurrentEventFromSettings();
             updateBackendEditorVisibility();
             updateEditSpeakerNameHeading();
             updateAddSpeakerSaveButtonState();
             updateContentSaveButtonState();
+            showStatus('loading', 'Fetching content and guests...');
             backendContentPreloadPromise = fetchAllContentIntoMemory().catch(function (err) {
                 console.error('Content preload failed:', err);
+                if (typeof showStatus === 'function') showStatus('error', 'Failed to fetch content.');
             });
             backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({}).catch(function (err) {
                 console.error('Guests preload failed:', err);
+                if (typeof showStatus === 'function') showStatus('error', 'Failed to fetch guests.');
             });
+            showStatus('loading', 'Fetching programme and speakers...');
             await Promise.all([
                 loadProgrammeFromFirestore(selectedevent),
                 fetchSpeakersForSelectedEvent(),
                 backendContentPreloadPromise,
                 backendGuestsPreloadPromise
             ]);
+            showStatus('success', 'All startup data fetched. Backend is ready.');
             updateBackendContentCountDisplay();
             setBackendPanel('speakers');
             const storedActivitiesEl = document.querySelector('.editor .activities .storage');

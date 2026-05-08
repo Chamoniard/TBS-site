@@ -1,9 +1,11 @@
+import {randomUUID} from "node:crypto";
 import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
+import {getStorage} from "firebase-admin/storage";
 import Stripe from "stripe";
 
 // For cost control, you can set the maximum number of containers that can be
@@ -284,6 +286,161 @@ export const createGuestStripeInvoiceHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Stripe invoice generation failed.",
+    });
+  }
+});
+
+/**
+ * Upload content image via Admin SDK to avoid client Storage rule issues.
+ * Expects JSON: { docId, fileName, contentType, dataBase64 }.
+ */
+export const uploadContentImageHttp = onRequest({
+  serviceAccount: "tbs-app-e2062@appspot.gserviceaccount.com",
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  try {
+    const slugPart = (input: unknown): string => {
+      let t = String(input ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[\s/]+/g, "-")
+        .replace(/[^a-z0-9-]+/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+      if (!t) t = "x";
+      return t.slice(0, 120);
+    };
+    const body = (req.body || {}) as Record<string, unknown>;
+    const docId = String(body.docId || "").trim();
+    const eventRaw = body.event;
+    const nameRaw = body.name;
+    const fileNameRaw = String(body.fileName || "image").trim();
+    const contentTypeRaw = String(body.contentType || "image/jpeg").trim();
+    const dataBase64Raw = String(body.dataBase64 || "").trim();
+
+    if (!docId) {
+      res.status(400).json({error: "Missing docId."});
+      return;
+    }
+    if (!dataBase64Raw) {
+      res.status(400).json({error: "Missing dataBase64."});
+      return;
+    }
+
+    const safeDocId = docId.replace(/[^a-zA-Z0-9_-]+/g, "");
+    if (!safeDocId) {
+      res.status(400).json({error: "Invalid docId."});
+      return;
+    }
+    const safeContentType =
+      /^[a-z]+\/[a-z0-9.+-]+$/i.test(contentTypeRaw) ?
+        contentTypeRaw :
+        "image/jpeg";
+
+    /**
+     * Stable object name under thumbnails folder (matches Airtable sync).
+     * @param {string} contentType MIME type.
+     * @param {string} uploadedName Original filename fallback.
+     * @return {string} e.g. `image.png`.
+     */
+    const imageBasename = (
+      contentType: string,
+      uploadedName: string,
+    ): string => {
+      const ct = String(contentType || "").toLowerCase();
+      if (ct.includes("png")) return "image.png";
+      if (ct.includes("webp")) return "image.webp";
+      if (ct.includes("gif")) return "image.gif";
+      if (ct.includes("jpeg") || ct.includes("jpg")) return "image.jpg";
+      const fn = String(uploadedName || "").toLowerCase();
+      const m = fn.match(/\.([a-z0-9]+)$/i);
+      if (m) return `image.${m[1].toLowerCase()}`;
+      return "image.jpg";
+    };
+    const base64 = dataBase64Raw.includes(",") ?
+      dataBase64Raw.split(",").pop() || "" :
+      dataBase64Raw;
+    const bytes = Buffer.from(base64, "base64");
+    if (!bytes.length) {
+      res.status(400).json({error: "Invalid image payload."});
+      return;
+    }
+
+    const bucket = getStorage().bucket("tbs-app-e2062.firebasestorage.app");
+    const eventStr = Array.isArray(eventRaw) ?
+      eventRaw.filter(Boolean).join("-") :
+      String(eventRaw || "");
+    const nameStr = String(nameRaw || "");
+    const eventPart = slugPart(eventStr);
+    const namePart = slugPart(nameStr);
+    const slugBase = `${eventPart}-${namePart}`.replace(/^-+|-+$/g, "");
+    const slug = slugBase && slugBase !== "-" ?
+      slugBase :
+      slugPart(safeDocId || "content");
+    const thumbPrefix = `TBS/thumbnails/${slug}/`;
+    const objectName = imageBasename(safeContentType, fileNameRaw);
+    const objectPath = `${thumbPrefix}${objectName}`;
+
+    const [existingInFolder] = await bucket.getFiles({prefix: thumbPrefix});
+    for (const existing of existingInFolder) {
+      const n = existing.name || "";
+      if (!n.startsWith(thumbPrefix)) continue;
+      const base = n.slice(thumbPrefix.length);
+      if (!/^image\.[a-z0-9]+$/i.test(base)) continue;
+      try {
+        await existing.delete({ignoreNotFound: true});
+      } catch (delErr) {
+        logger.warn("uploadContentImageHttp: remove old image", {
+          name: n,
+          err: delErr,
+        });
+      }
+    }
+
+    const file = bucket.file(objectPath);
+    const downloadToken = randomUUID();
+    await file.save(bytes, {
+      metadata: {
+        contentType: safeContentType,
+        metadata: {
+          firebaseStorageDownloadTokens: downloadToken,
+        },
+      },
+      resumable: false,
+    });
+    const bucketName = bucket.name;
+    const encodedPath = encodeURIComponent(objectPath);
+    const downloadUrl =
+      `https://firebasestorage.googleapis.com/v0/b/${bucketName}` +
+      `/o/${encodedPath}?alt=media&token=${downloadToken}`;
+
+    logger.info("uploadContentImageHttp ok", {
+      docId: safeDocId,
+      path: objectPath,
+      downloadUrl: downloadUrl,
+      size: bytes.length,
+      contentType: safeContentType,
+    });
+    res.status(200).json({
+      ok: true,
+      path: objectPath,
+      downloadUrl: downloadUrl,
+    });
+  } catch (err) {
+    logger.error("uploadContentImageHttp failed", {err});
+    res.status(500).json({
+      error: err instanceof Error ? err.message : "Failed to upload image.",
     });
   }
 });
