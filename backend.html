@@ -22,6 +22,14 @@
 
         /* ===== LAYOUT STYLES ===== */
         body.backend-page {
+            --backend-square-btn-size: 35px;
+            /* Rounded rectangles (labels, multi-icon controls, table cells) */
+            --backend-square-btn-radius: 5px;
+            /* Single-icon / single-character circular controls (equal width × height) */
+            --backend-icon-btn-radius: 50%;
+            /* Gold toolbar label buttons (Save, Publish, guest Bio/Actions, etc.) */
+            --backend-gold-toolbar-btn-font: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
+            --backend-gold-toolbar-btn-width: 108px;
             --backend-table-cell-pad-x: 8px;
             --backend-roster-row-pad-y: 0.175rem;
             background-color: #f1f5f9;
@@ -56,7 +64,7 @@
             font-weight: 600;
             font-size: 1rem;
             line-height: 1.25;
-            border-radius: 8px;
+            border-radius: 5px;
             border: none;
             padding: 0.5rem 1.25rem;
             background: #FFD700;
@@ -86,22 +94,26 @@
             cursor: default;
         }
 
-        body.backend-page button.texteditor-day-btn {
+        /* Pre-sets / snippets tab: keep pill styling (not --backend-icon-btn-radius) */
+        body.backend-page #texteditor button.texteditor-day-btn,
+        body.backend-page #texteditor button.texteditor-snippet-btn {
             background: #FFD700;
             border: none;
             color: #003153;
             font-weight: 500;
             font-size: 0.875rem;
             padding: 0.4rem 0.85rem;
-            border-radius: 5px;
+            border-radius: 10px;
             box-shadow: none;
         }
 
-        body.backend-page button.texteditor-day-btn:hover:not(:disabled) {
+        body.backend-page #texteditor button.texteditor-day-btn:hover:not(:disabled),
+        body.backend-page #texteditor button.texteditor-snippet-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
-        body.backend-page button.texteditor-day-btn.is-active {
+        body.backend-page #texteditor button.texteditor-day-btn.is-active,
+        body.backend-page #texteditor button.texteditor-snippet-btn.is-active {
             background: #fef3c7;
             border: none;
             color: #003153;
@@ -109,26 +121,37 @@
         }
 
         body.backend-page button.add-speaker-button,
-        body.backend-page button.add-content-btn {
+        body.backend-page button.add-content-btn,
+        body.backend-page button.add-lodging-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 3px;
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
-            min-height: 35px;
+            padding: 0;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
             box-sizing: border-box;
-            border-radius: 50%;
+            border-radius: var(--backend-icon-btn-radius);
             border: none;
             color: #003153;
         }
 
         body.backend-page button.add-speaker-button:disabled,
-        body.backend-page button.add-content-btn:disabled {
+        body.backend-page button.add-content-btn:disabled,
+        body.backend-page button.add-lodging-btn:disabled {
             background: #fef3c7;
             border: none;
             color: #94a3b8;
+        }
+
+        body.backend-page button.texteditor-save-btn {
+            padding: 0;
+            font-family: var(--backend-gold-toolbar-btn-font);
+            font-size: 0.8125rem;
+            line-height: 1;
         }
 
         body.backend-page .main {
@@ -498,7 +521,7 @@
             font-weight: 500;
             line-height: 1.3;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             background: transparent;
             color: #003153;
             padding: 6px 8px;
@@ -573,7 +596,7 @@
             padding: 0;
             margin: 0;
             border: 1px solid #cbd5e1;
-            border-radius: 5px;
+            border-radius: var(--backend-icon-btn-radius);
             background: #f8fafc;
             color: #003153;
             font-size: 0.7rem;
@@ -690,7 +713,8 @@
         }
 
         .add-speaker-button,
-        .add-content-btn {
+        .add-content-btn,
+        .add-lodging-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -720,6 +744,8 @@
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
+            height: 55px;
+            min-height: 55px;
         }
 
         #content-editor .content-overview {
@@ -745,6 +771,8 @@
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
+            height: 55px;
+            min-height: 55px;
         }
 
         #content-editor .content-top-left {
@@ -763,6 +791,181 @@
             flex: 1 1 0;
             min-width: 0;
             min-height: 55px;
+        }
+
+        #lodging-editor .lodging-overview {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            margin-top: 0;
+            min-width: 0;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #lodging-editor .lodging-top-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: stretch;
+            gap: 16px;
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            height: 55px;
+            min-height: 55px;
+        }
+
+        #lodging-editor .lodging-top-left {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 2 1 0;
+            min-width: 0;
+            min-height: 55px;
+        }
+
+        #lodging-editor .lodging-top-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 55px;
+        }
+
+        #lodging-editor .lodging-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 100%;
+            height: 55px;
+            min-height: 55px;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+            background: transparent;
+        }
+
+        #lodging-editor .lodging-editor-toolbar {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            padding: 0 8px;
+            margin: 0;
+            background: transparent;
+            border-bottom: none;
+            min-height: 55px;
+        }
+
+        #lodging-editor .lodging-editor-toolbar .guest-editor-toolbar-leading {
+            display: none;
+        }
+
+        #lodging-editor .lodging-editor-toolbar-center {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        #lodging-editor .lodging-editor-toolbar .add-lodging-btn {
+            flex: 0 0 auto;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            box-sizing: border-box;
+            border-radius: var(--backend-icon-btn-radius);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffd700;
+            border: none;
+            box-shadow: none;
+            color: #003153;
+            cursor: pointer;
+        }
+
+        #lodging-editor .lodging-editor-toolbar .add-lodging-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #lodging-editor .lodging-editor-toolbar .add-lodging-btn:disabled {
+            background: #fef3c7;
+            color: #94a3b8;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        #lodging-editor .lodging-editor-toolbar .lodging-editor-delete-btn,
+        #lodging-editor .lodging-editor-toolbar .lodging-editor-delete-btn:hover:not(:disabled),
+        #lodging-editor .lodging-editor-toolbar .lodging-editor-delete-btn:disabled {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        #lodging-editor .lodging-editor-toolbar-trailing {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            min-width: 0;
+            margin-left: auto;
+        }
+
+        #lodging-editor .lodging-editor-toolbar-trailing .texteditor-save-btn {
+            flex: 0 0 var(--backend-gold-toolbar-btn-width);
+            width: var(--backend-gold-toolbar-btn-width);
+            min-width: var(--backend-gold-toolbar-btn-width);
+            max-width: var(--backend-gold-toolbar-btn-width);
+            height: 35px;
+            min-height: 35px;
+            max-height: 35px;
+            padding: 0;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--backend-gold-toolbar-btn-font);
+            font-size: 0.8125rem;
+            line-height: 1;
+            text-align: center;
+        }
+
+        #lodging-editor .lodging-editor-toolbar .lodging-editor-padlock-btn svg {
+            flex-shrink: 0;
+        }
+
+        #lodging-editor .lodging-editor-toolbar #lodging-editor-padlock-btn:disabled {
+            background: #fef3c7;
+            color: #94a3b8;
+        }
+
+        #lodging-editor .lodging-editor-toolbar #lodging-editor-padlock-btn:disabled:hover {
+            filter: none;
         }
 
         #guest-editor .guests-overview {
@@ -788,6 +991,8 @@
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
+            height: 55px;
+            min-height: 55px;
         }
 
         #guest-editor .guests-top-left {
@@ -969,7 +1174,7 @@
             height: auto;
             padding: 8px 12px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             background: #ffd700;
             border: none;
             box-shadow: none;
@@ -1052,7 +1257,7 @@
             min-height: 35px;
             padding: 8px 14px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             border: none;
             background: #338a17;
             color: #ffffff;
@@ -1085,6 +1290,8 @@
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
+            height: 55px;
+            min-height: 55px;
         }
 
         #speaker-editor .speakers-bottom-row {
@@ -1305,11 +1512,14 @@
         #guest-editor .guest-editor-toolbar .add-speaker-button,
         #content-editor .content-actions .add-content-btn {
             flex: 0 0 auto;
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
-            min-height: 35px;
-            max-height: 100%;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            border-radius: var(--backend-icon-btn-radius);
+            padding: 0;
             box-sizing: border-box;
             background: #ffd700;
             border: none;
@@ -1318,17 +1528,78 @@
             cursor: pointer;
         }
 
+        #speaker-editor .speakers-actions .add-speaker-button {
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+        }
+
+        #content-editor .content-actions .add-content-btn {
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+        }
+
+        #guest-editor .guests-actions .add-speaker-button {
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+        }
+
+        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn {
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            border-radius: var(--backend-icon-btn-radius);
+            padding: 0;
+        }
+
+        #lodging-editor .lodging-actions .add-lodging-btn {
+            flex: 0 0 auto;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            box-sizing: border-box;
+            background: #ffd700;
+            border: none;
+            box-shadow: none;
+            color: #003153;
+            cursor: pointer;
+            border-radius: var(--backend-icon-btn-radius);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
         #speaker-editor .speakers-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guests-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guest-editor-toolbar .add-speaker-button:hover:not(:disabled),
-        #content-editor .content-actions .add-content-btn:hover:not(:disabled) {
+        #content-editor .content-actions .add-content-btn:hover:not(:disabled),
+        #lodging-editor .lodging-actions .add-lodging-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
         #speaker-editor .speakers-actions .add-speaker-button:disabled,
         #guest-editor .guests-actions .add-speaker-button:disabled,
         #guest-editor .guest-editor-toolbar .add-speaker-button:disabled,
-        #content-editor .content-actions .add-content-btn:disabled {
+        #content-editor .content-actions .add-content-btn:disabled,
+        #lodging-editor .lodging-actions .add-lodging-btn:disabled {
             background: #fef3c7;
             color: #94a3b8;
             cursor: not-allowed;
@@ -1798,11 +2069,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 35px;
-            height: 35px;
-            padding: 0 10px;
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            padding: 0;
             border: none;
-            border-radius: 999px;
+            border-radius: var(--backend-icon-btn-radius);
             background: transparent;
             cursor: pointer;
             box-sizing: border-box;
@@ -1845,10 +2118,11 @@
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
-            padding: 6px 8px 8px 8px;
+            padding: 0 8px;
             margin: 0;
             background: transparent;
             border-bottom: none;
+            min-height: 55px;
         }
 
         #content-editor .content-editor-toolbar .guest-editor-toolbar-leading {
@@ -1866,14 +2140,18 @@
 
         #content-editor .content-editor-toolbar .add-content-btn {
             flex: 0 0 auto;
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
-            min-height: 35px;
-            max-height: 100%;
-            padding: 3px;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
             box-sizing: border-box;
-            border-radius: 50%;
+            border-radius: var(--backend-icon-btn-radius);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background: #ffd700;
             border: none;
             box-shadow: none;
@@ -1911,9 +2189,21 @@
         }
 
         #content-editor .content-editor-toolbar-trailing .texteditor-save-btn {
-            width: 108px;
-            min-width: 108px;
-            max-width: 108px;
+            flex: 0 0 var(--backend-gold-toolbar-btn-width);
+            width: var(--backend-gold-toolbar-btn-width);
+            min-width: var(--backend-gold-toolbar-btn-width);
+            max-width: var(--backend-gold-toolbar-btn-width);
+            height: 35px;
+            min-height: 35px;
+            max-height: 35px;
+            padding: 0;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--backend-gold-toolbar-btn-font);
+            font-size: 0.8125rem;
+            line-height: 1;
             text-align: center;
         }
 
@@ -2247,10 +2537,11 @@
         }
 
         #content-editor .content-editor-published-btn {
-            width: 30px;
-            height: 30px;
-            min-width: 30px;
-            min-height: 30px;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
             padding: 0;
             margin: 0;
             border: none;
@@ -2259,7 +2550,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
+            border-radius: var(--backend-icon-btn-radius);
             box-sizing: border-box;
             vertical-align: middle;
         }
@@ -2279,8 +2570,8 @@
         }
 
         #content-editor .content-editor-published-square {
-            width: 30px;
-            height: 30px;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
             box-sizing: border-box;
             display: inline-flex;
             align-items: center;
@@ -2797,7 +3088,7 @@
         body.backend-page button.speaker-roster-tag--presented-yes {
             background: transparent;
             border: 1px solid #2a3439;
-            border-radius: 4px;
+            border-radius: 5px;
             padding: 2px 4px;
             min-width: 2rem;
             width: 100%;
@@ -3030,10 +3321,11 @@
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
-            padding: 6px 8px 8px 8px;
+            padding: 0 8px;
             margin: 0;
             background: transparent;
             border-bottom: none;
+            min-height: 55px;
         }
 
         #guest-editor .guest-editor-toolbar-leading {
@@ -3084,37 +3376,31 @@
 
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn,
         #guest-editor .guest-editor-toolbar .guest-editor-bio-btn {
-            flex: 0 0 auto;
+            flex: 0 0 var(--backend-gold-toolbar-btn-width);
             display: inline-flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
             gap: 0.12rem;
-            width: auto;
-            min-width: 0;
+            width: var(--backend-gold-toolbar-btn-width);
+            min-width: var(--backend-gold-toolbar-btn-width);
+            max-width: var(--backend-gold-toolbar-btn-width);
             height: 35px;
             min-height: 35px;
-            max-height: 100%;
-            padding: 3px 12px 3px 10px;
+            max-height: 35px;
+            padding: 0;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: var(--backend-square-btn-radius);
             background: #ffd700;
             border: none;
             box-shadow: none;
             color: #003153;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
+            font-family: var(--backend-gold-toolbar-btn-font);
+            font-size: 0.8125rem;
             font-weight: 600;
-            line-height: 1.2;
+            line-height: 1;
+            text-align: center;
             cursor: pointer;
-        }
-
-        #guest-editor .guest-editor-toolbar .guest-editor-actions-btn {
-            padding: 3px 10px 3px 12px;
-        }
-
-        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn {
-            padding: 3px 12px 3px 10px;
         }
 
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn .display-editor-actions-text,
@@ -3154,7 +3440,7 @@
             height: auto;
             padding: 8px 12px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             background: #338a17;
             border: none;
             box-shadow: none;
@@ -3232,7 +3518,7 @@
             min-height: 35px;
             padding: 8px 14px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             border: none;
             background: #cbd5e1;
             color: #1e293b;
@@ -3262,7 +3548,7 @@
             min-height: 35px;
             padding: 8px 14px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             border: none;
             background: #000000;
             color: #ffffff;
@@ -3354,7 +3640,7 @@
             min-height: 35px;
             padding: 8px 14px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             border: none;
             background: #338a17;
             color: #ffffff;
@@ -3378,7 +3664,7 @@
             min-height: 35px;
             padding: 8px 14px;
             box-sizing: border-box;
-            border-radius: 999px;
+            border-radius: 5px;
             border: none;
             background: #000000;
             color: #ffffff;
@@ -3685,7 +3971,7 @@
             margin: 0;
             padding: 0.4rem 0.75rem;
             border: none;
-            border-radius: 0;
+            border-radius: 5px;
             background: transparent;
             color: #0f172a;
             font-family: 'Inter', sans-serif;
@@ -4137,9 +4423,69 @@
 
         .texteditor.is-open {
             display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+        }
+
+        #texteditor .snippets-top-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 16px;
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            height: 55px;
+            min-height: 55px;
+        }
+
+        #texteditor .snippets-top-row-trailing {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        /* Match Content / Lodging toolbar Save: fixed size, monospace label; colors from body.backend-page button */
+        #texteditor .snippets-top-row .texteditor-save-btn {
+            flex: 0 0 var(--backend-gold-toolbar-btn-width);
+            width: var(--backend-gold-toolbar-btn-width);
+            min-width: var(--backend-gold-toolbar-btn-width);
+            max-width: var(--backend-gold-toolbar-btn-width);
+            height: 35px;
+            min-height: 35px;
+            max-height: 35px;
+            padding: 0;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--backend-gold-toolbar-btn-font);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+        }
+
+        #texteditor .snippets-top-row .texteditor-save-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        .texteditor-main {
+            display: flex;
             flex-direction: row;
             align-items: flex-start;
             gap: 1rem;
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .text-selection {
@@ -4195,7 +4541,7 @@
         }
 
         @media (max-width: 720px) {
-            .texteditor.is-open {
+            .texteditor-main {
                 flex-direction: column;
             }
 
@@ -4217,7 +4563,8 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            /* Match .html-editor gap so Source textarea and Render surface share one horizontal line */
+            gap: 1rem;
             box-sizing: border-box;
             align-self: stretch;
         }
@@ -4344,11 +4691,6 @@
             margin: 0;
             border-bottom: 1px solid #000000;
             padding-bottom: 0.35rem;
-        }
-
-        .html-editor > .texteditor-save-btn {
-            justify-self: start;
-            align-self: start;
         }
 
         .texteditor-code-area {
@@ -4618,7 +4960,7 @@
             margin: 0;
             padding: 0;
             border: 1px solid #003153;
-            border-radius: 10px;
+            border-radius: 5px;
             background: transparent;
             overflow: hidden;
         }
@@ -4628,7 +4970,7 @@
             flex-shrink: 0;
             background: #FFD700;
             padding: 0;
-            border-radius: 0 0 10px 10px;
+            border-radius: 0 0 5px 5px;
             border-top: 1px solid #a67c00;
         }
 
@@ -4637,7 +4979,7 @@
             min-height: 135px;
             background: #FFD700;
             padding: 0.75rem;
-            border-radius: 10px;
+            border-radius: 5px;
             border: 1px solid #003153;
             box-sizing: border-box;
             flex-shrink: 0;
@@ -4808,7 +5150,7 @@
             margin-left: 8px;
             background: #FAFAFA;
             border: 1px solid #003153;
-            border-radius: 10px;
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
             gap: 0;
@@ -4820,7 +5162,7 @@
             min-height: 0;
             background: #fafaf8;
             position: relative;
-            border-radius: 0 0 10px 10px;
+            border-radius: 0 0 5px 5px;
         }
 
         .editor .grid .grid-column-programme .programme-activity {
@@ -4869,7 +5211,7 @@
             flex-shrink: 0;
             background: #FFD700;
             padding: 0;
-            border-radius: 10px 10px 0 0;
+            border-radius: 5px 5px 0 0;
             border-bottom: 1px solid #a67c00;
             border-right: 1px solid #003153;
         }
@@ -4879,7 +5221,7 @@
             flex-shrink: 0;
             background: #FFD700;
             padding: 0;
-            border-radius: 0 0 10px 10px;
+            border-radius: 0 0 5px 5px;
             border-top: 1px solid #a67c00;
         }
 
@@ -4891,7 +5233,7 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 8px;
-            border-radius: 10px 10px 0 0;
+            border-radius: 5px 5px 0 0;
             text-align: center;
         }
 
@@ -4950,6 +5292,7 @@
         .activity-edit-popup .activity-edit-buttons button {
             font-size: 0.875rem;
             padding: 0.45rem 1rem;
+            border-radius: 5px;
         }
 
     </style>
@@ -4990,6 +5333,12 @@
             </div>
 
             <section class="texteditor" id="texteditor" aria-hidden="true" data-name="texteditor">
+                <div class="snippets-top-row" role="toolbar" aria-label="Snippet editor actions">
+                    <div class="snippets-top-row-trailing">
+                        <button type="button" class="texteditor-save-btn" id="texteditor-save-btn" disabled aria-disabled="true">Save</button>
+                    </div>
+                </div>
+                <div class="texteditor-main">
                 <div class="text-selection">
                     <p class="texteditor-column-title">Select pre-set</p>
                     <div class="texteditor-programme-toolbar texteditor-home-toolbar">
@@ -5052,13 +5401,13 @@
                 <div class="html-editor">
                     <p class="texteditor-column-title">Source</p>
                     <textarea id="texteditor-code" class="texteditor-code-area" rows="18" spellcheck="false" autocomplete="off" wrap="off" aria-label="HTML source editor"></textarea>
-                    <button type="button" class="texteditor-save-btn" id="texteditor-save-btn" disabled aria-disabled="true">Save</button>
                 </div>
                 <div class="renderbox renderbox--idle">
                     <p class="texteditor-column-title">Render</p>
                     <div class="texteditor-render-surface">
                         <div id="texteditor-render-html" class="texteditor-render-html" aria-live="polite"></div>
                     </div>
+                </div>
                 </div>
             </section>
 
@@ -5437,7 +5786,60 @@
             </section>
 
             <section class="lodging-section" id="lodging-editor" aria-hidden="true" aria-label="Lodging" data-name="lodging-editor">
-                <p class="lodging-placeholder">Lodging — content coming soon.</p>
+                <div class="lodging-overview">
+                    <div class="lodging-top-row">
+                        <div class="lodging-top-left">
+                            <div id="lodging-actions" class="lodging-actions" hidden aria-label="Lodging actions">
+                                <button type="button" class="add-lodging-btn" id="previous-lodging" aria-label="Previous lodging" title="Previous lodging">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M14 6L8 12l6 6z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="add-lodging-btn" id="next-lodging" aria-label="Next lodging" title="Next lodging">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 6l6 6-6 6z" />
+                                    </svg>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="add-lodging-btn"
+                                    id="lodging-actions-add-button"
+                                    aria-label="Add lodging"
+                                    title="Add lodging"
+                                >
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="lodging-top-right">
+                            <div class="lodging-editor-toolbar" role="toolbar" aria-label="Lodging editor tools">
+                                <div class="guest-editor-toolbar-leading" aria-hidden="true"></div>
+                                <div class="lodging-editor-toolbar-center">
+                                    <button type="button" class="add-lodging-btn lodging-editor-padlock-btn" id="lodging-editor-padlock-btn" aria-label="Lock lodging" title="Lock">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path
+                                                fill="currentColor"
+                                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="lodging-editor-toolbar-trailing">
+                                    <button type="button" class="texteditor-save-btn" id="add-lodging-save-btn" disabled aria-disabled="true">Save</button>
+                                    <button type="button" class="texteditor-save-btn" id="lodging-toolbar-publish-btn" disabled aria-disabled="true">Publish</button>
+                                    <button type="button" class="add-lodging-btn lodging-editor-delete-btn" id="lodging-editor-delete-btn" aria-disabled="true" aria-label="Delete selected lodging" title="Delete selected lodging" disabled>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path fill="currentColor" d="M9 3h6l1 1h4v2H4V4h4l1-1zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 11h8a2 2 0 0 0 2-2V8H6v10a2 2 0 0 0 2 2z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="lodging-placeholder">Lodging — content coming soon.</p>
+                </div>
             </section>
 
             <section class="content-editor-section" id="content-editor" aria-hidden="true" aria-label="Content" data-name="content-editor">
@@ -5740,6 +6142,8 @@
         /** Promise from initial page load preload; used so Content tab can await the same fetch instead of duplicating work. */
         var backendContentPreloadPromise = null;
         var contentDirtyDocIds = Object.create(null);
+        /** Local-only drafts skip contentDirtyDocIds (no auto-sync); track edits for Save button enablement. */
+        var contentLocalDraftDirtyIds = Object.create(null);
         var contentSyncTimer = null;
         var contentPeriodicSyncTimer = null;
         var contentSyncInFlight = false;
@@ -6321,6 +6725,7 @@
             } finally {
                 contentSyncInFlight = false;
                 if (Object.keys(contentDirtyDocIds).length) scheduleContentFirebaseSync();
+                if (typeof updateContentSaveButtonState === 'function') updateContentSaveButtonState();
             }
         }
 
@@ -9623,6 +10028,7 @@
                     contentSyncTimer = null;
                 }
                 delete contentDirtyDocIds[docId];
+                delete contentLocalDraftDirtyIds[docId];
                 if (!(rec.localOnly === true)) {
                     await flushContentToFirebase({ silent: true });
                     var db = getFirestore();
@@ -10427,7 +10833,12 @@
             var nameEl = document.getElementById('edit-content-name');
             var hasTitle = Boolean(titleEl && String(titleEl.value || '').trim());
             var hasName = Boolean(nameEl && String(nameEl.value || '').trim());
-            var active = Boolean(id) && hasTitle && hasName;
+            var rec = id ? findContentInMemory(id) : null;
+            var dirty =
+                Boolean(id && contentDirtyDocIds[id]) ||
+                Boolean(id && contentLocalDraftDirtyIds[id]) ||
+                Boolean(rec && rec.pendingImageFile);
+            var active = Boolean(id) && hasTitle && hasName && dirty;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
         }
@@ -10451,6 +10862,18 @@
                 btn.textContent = 'Publish';
                 btn.setAttribute('title', 'Select a content row to change publish state');
                 btn.setAttribute('aria-label', 'Publish selected content');
+                return;
+            }
+            if (!contentPadlockIsOpen) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                var lockedPublished = rec.published === true;
+                btn.textContent = lockedPublished ? 'Unpublish' : 'Publish';
+                btn.setAttribute('title', 'Unlock content to change publish state');
+                btn.setAttribute(
+                    'aria-label',
+                    lockedPublished ? 'Unpublish selected content (unlock to use)' : 'Publish selected content (unlock to use)'
+                );
                 return;
             }
             var dateEl = document.getElementById('edit-content-date');
@@ -10557,6 +10980,9 @@
             rec.youtube = ytEl ? String(ytEl.value || '') : '';
             if (!opts.noDirtySync) {
                 markContentDocDirty(id);
+                if (rec.localOnly === true) {
+                    contentLocalDraftDirtyIds[id] = true;
+                }
                 renderContentTableFromMemory();
                 if (!(rec.localOnly === true)) {
                     scheduleContentFirebaseSync();
@@ -10627,6 +11053,7 @@
                 renderContentTableFromMemory();
                 updateContentEditorPublishedToggleUi();
             }
+            updateContentSaveButtonState();
         }
 
         function syncContentEditorEmptyState() {
@@ -10673,7 +11100,10 @@
         function syncContentEditabilityFromPadlock() {
             var form = document.getElementById('add-content-form');
             var editorRoot = document.getElementById('content-editor');
-            if (!form) return;
+            if (!form) {
+                updateContentToolbarPublishButtonUi();
+                return;
+            }
             var hasSelection = Boolean(String(contentFormEditingDocId || '').trim());
             var canEdit = hasSelection && contentPadlockIsOpen;
             form.querySelectorAll('input, textarea').forEach(function (el) {
@@ -10690,6 +11120,67 @@
             });
             syncContentDeleteButtonUi(hasSelection, canEdit);
             if (editorRoot) editorRoot.classList.toggle('content-editable-unlocked', canEdit);
+            updateContentToolbarPublishButtonUi();
+        }
+
+        /** Content toolbar lives outside `.content-viewer`; exclude it so padlock/save keep working. */
+        function isPointerInsideContentEditorViewerOrTopChrome(target) {
+            if (!target || typeof target.closest !== 'function') return false;
+            return Boolean(
+                target.closest('#content-editor .content-viewer') ||
+                    target.closest('#content-editor .content-top-row')
+            );
+        }
+
+        function isPointerInsideGuestViewerOrTopChrome(target) {
+            if (!target || typeof target.closest !== 'function') return false;
+            return Boolean(
+                target.closest('#guest-viewer') || target.closest('#guest-editor .guests-top-row')
+            );
+        }
+
+        async function saveAndLockContentIfSelectionFromViewerBlur() {
+            var id = String(contentFormEditingDocId || '').trim();
+            if (!id) return;
+            var rec = findContentInMemory(id);
+            syncContentFormToMemoryIfEditing();
+            if (!(rec && rec.localOnly === true)) {
+                await flushContentToFirebase({ silent: true });
+            }
+            contentPadlockIsOpen = false;
+            contentDeleteConfirmArmed = false;
+            syncContentPadlockButtonUi();
+            syncContentEditabilityFromPadlock();
+            syncContentRosterSelectionHighlight();
+            updateContentSaveButtonState();
+        }
+
+        function lockGuestIfSelectionFromViewerBlur() {
+            if (!String(guestFormEditingDocId || '').trim()) return;
+            guestPadlockIsOpen = false;
+            syncGuestPadlockButtonUi();
+        }
+
+        var viewerBlurSaveLockInFlight = null;
+        function onDocumentPointerDownSaveLockWhenOutsideViewers(ev) {
+            if (!ev || ev.button !== 0) return;
+            var t = ev.target;
+            if (!(t instanceof Element)) {
+                t = t && t.parentElement;
+            }
+            if (!(t instanceof Element)) return;
+            var cid = String(contentFormEditingDocId || '').trim();
+            if (cid && !isPointerInsideContentEditorViewerOrTopChrome(t)) {
+                if (!viewerBlurSaveLockInFlight) {
+                    viewerBlurSaveLockInFlight = saveAndLockContentIfSelectionFromViewerBlur().finally(function () {
+                        viewerBlurSaveLockInFlight = null;
+                    });
+                }
+            }
+            var gid = String(guestFormEditingDocId || '').trim();
+            if (gid && !isPointerInsideGuestViewerOrTopChrome(t)) {
+                lockGuestIfSelectionFromViewerBlur();
+            }
         }
 
         async function switchToContentRecord(rec, rowEl) {
@@ -11420,6 +11911,10 @@
             if (contentActionsEl) {
                 contentActionsEl.hidden = !isContent;
             }
+            var lodgingActionsEl = document.getElementById('lodging-actions');
+            if (lodgingActionsEl) {
+                lodgingActionsEl.hidden = !isLodging;
+            }
             var speakerActionsEl = document.getElementById('speakers-actions');
             if (speakerActionsEl) {
                 speakerActionsEl.hidden = !isSpeakers;
@@ -11545,6 +12040,8 @@
                 if (backendContentCountElNoEvent) backendContentCountElNoEvent.hidden = true;
                 var contentActionsElNoEvent = document.getElementById('content-actions');
                 if (contentActionsElNoEvent) contentActionsElNoEvent.hidden = true;
+                var lodgingActionsElNoEvent = document.getElementById('lodging-actions');
+                if (lodgingActionsElNoEvent) lodgingActionsElNoEvent.hidden = true;
                 var speakerActionsElNoEvent = document.getElementById('speakers-actions');
                 if (speakerActionsElNoEvent) speakerActionsElNoEvent.hidden = false;
             }
@@ -13772,6 +14269,7 @@
                         contentFormEditingDocId = newPersistentId;
                         cid = newPersistentId;
                         delete contentDirtyDocIds[legacyIdToCleanup];
+                        delete contentLocalDraftDirtyIds[legacyIdToCleanup];
                         renderContentTableFromMemory();
                         syncContentRosterSelectionHighlight();
                     }
@@ -13802,12 +14300,17 @@
                     }
                     syncContentFormToMemoryIfEditing();
                     markContentDocDirty(cid);
-                    await flushContentToFirebase();
-                    if (legacyIdToCleanup) {
-                        await cleanupLegacyContentDocAfterIdMigration(legacyIdToCleanup);
+                    var flushed = await flushContentToFirebase();
+                    if (flushed) {
+                        delete contentLocalDraftDirtyIds[cid];
+                        if (legacyIdToCleanup) delete contentLocalDraftDirtyIds[legacyIdToCleanup];
+                        if (legacyIdToCleanup) {
+                            await cleanupLegacyContentDocAfterIdMigration(legacyIdToCleanup);
+                        }
                     }
                     contentDeleteConfirmArmed = false;
                     syncContentEditabilityFromPadlock();
+                    updateContentSaveButtonState();
                 });
             }
             var contentDeleteBtn = document.getElementById('content-editor-delete-btn');
@@ -13878,6 +14381,7 @@
                         rec.pendingImageFile = file;
                         rec.localImagePreviewUrl = URL.createObjectURL(file);
                         refreshCurrentContentImagePreview();
+                        updateContentSaveButtonState();
                         if (typeof showStatus === 'function') {
                             showStatus('success', 'Image selected locally. It uploads when you press Save.');
                         }
@@ -14037,11 +14541,13 @@
             var contentActionsToolbarEl = document.getElementById('content-actions');
             if (contentRosterListEl) {
                 document.addEventListener('click', function (e) {
+                    if (e.target && e.target.closest && e.target.closest('#content-editor .content-viewer')) return;
                     if (contentRosterListEl.contains(e.target)) return;
                     if (contentActionsToolbarEl && contentActionsToolbarEl.contains(e.target)) return;
                     clearContentRosterItemSelection();
                 });
             }
+            document.addEventListener('pointerdown', onDocumentPointerDownSaveLockWhenOutsideViewers, true);
             var speakerRosterListEl = document.getElementById('speaker-roster-list');
             var speakerActionsToolbarEl = document.getElementById('speakers-actions');
             if (speakerRosterListEl) {
