@@ -418,17 +418,14 @@
             padding-top: 0;
         }
 
+        .lodging-section {
+            border: none;
+        }
+
         .speakers-overview.is-open {
             flex-direction: column;
             align-items: stretch;
             gap: 0;
-        }
-
-        .lodging-placeholder {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            color: #64748b;
-            font-size: 0.95rem;
         }
 
         .emailer-panels {
@@ -793,6 +790,7 @@
             min-height: 55px;
         }
 
+        /* Match `#content-editor .content-list` chrome */
         #lodging-editor .lodging-overview {
             display: flex;
             flex-direction: column;
@@ -803,140 +801,143 @@
             flex: 1;
             min-height: 0;
             overflow: hidden;
+            height: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+
+        #lodging-editor .lodging-subcollections-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+
+        #lodging-editor .lodging-subcollections-list {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        #lodging-editor .lodging-subcollection-title {
+            margin: 0;
+            padding: var(--backend-roster-row-pad-y) var(--backend-table-cell-pad-x);
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        #lodging-editor .lodging-subcollections-empty {
+            margin: 0;
+            padding: 1rem var(--backend-table-cell-pad-x);
+            font-size: 0.875rem;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
         }
 
         #lodging-editor .lodging-top-row {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
-            align-items: center;
+            align-items: flex-start;
             justify-content: stretch;
-            gap: 16px;
+            gap: 0;
             flex: 0 0 auto;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
-            height: 55px;
             min-height: 55px;
         }
 
         #lodging-editor .lodging-top-left {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: flex-start;
-            flex: 2 1 0;
+            flex: 1 1 auto;
+            width: 100%;
             min-width: 0;
             min-height: 55px;
+            box-sizing: border-box;
         }
 
-        #lodging-editor .lodging-top-right {
+        #lodging-editor .lodging-actions-strip {
             display: flex;
-            align-items: center;
+            flex-direction: row;
+            align-items: flex-start;
             justify-content: flex-start;
+            gap: 12px;
             flex: 1 1 0;
             min-width: 0;
             min-height: 55px;
         }
 
-        #lodging-editor .lodging-actions {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.5rem;
-            flex: 0 0 auto;
-            width: 100%;
-            max-width: 100%;
-            height: 55px;
-            min-height: 55px;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            border: none;
-            border-radius: 0;
-            overflow: visible;
-            background: transparent;
-        }
-
-        #lodging-editor .lodging-editor-toolbar {
+        #lodging-editor .add-house {
             display: flex;
             flex-direction: row;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             align-items: center;
-            gap: 0.5rem;
-            width: 100%;
+            gap: 8px 12px;
+            flex: 0 1 auto;
             min-width: 0;
+            padding: 8px 10px;
             box-sizing: border-box;
-            padding: 0 8px;
-            margin: 0;
-            background: transparent;
-            border-bottom: none;
-            min-height: 55px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--backend-square-btn-radius);
+            background: #f8fafc;
         }
 
-        #lodging-editor .lodging-editor-toolbar .guest-editor-toolbar-leading {
-            display: none;
-        }
-
-        #lodging-editor .lodging-editor-toolbar-center {
+        #lodging-editor .add-house-field {
             display: flex;
             flex-direction: row;
-            flex-wrap: nowrap;
             align-items: center;
-            justify-content: center;
-            flex: 0 0 auto;
+            gap: 6px;
+            flex: 0 1 auto;
+            min-width: 0;
         }
 
-        #lodging-editor .lodging-editor-toolbar .add-lodging-btn {
-            flex: 0 0 auto;
-            width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            box-sizing: border-box;
-            border-radius: var(--backend-icon-btn-radius);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #ffd700;
-            border: none;
-            box-shadow: none;
+        #lodging-editor .add-house-field label {
+            margin: 0;
+            font-size: 0.8125rem;
+            font-weight: 600;
             color: #003153;
-            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
         }
 
-        #lodging-editor .lodging-editor-toolbar .add-lodging-btn:hover:not(:disabled) {
-            filter: brightness(0.92);
-        }
-
-        #lodging-editor .lodging-editor-toolbar .add-lodging-btn:disabled {
-            background: #fef3c7;
-            color: #94a3b8;
-            cursor: not-allowed;
-            filter: none;
-        }
-
-        #lodging-editor .lodging-editor-toolbar .lodging-editor-delete-btn,
-        #lodging-editor .lodging-editor-toolbar .lodging-editor-delete-btn:hover:not(:disabled),
-        #lodging-editor .lodging-editor-toolbar .lodging-editor-delete-btn:disabled {
-            background: #dc2626 !important;
-            color: #ffffff !important;
-        }
-
-        #lodging-editor .lodging-editor-toolbar-trailing {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0.5rem;
+        #lodging-editor .add-house-field input {
+            width: 10rem;
+            max-width: 28vw;
             min-width: 0;
-            margin-left: auto;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8125rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            background: #ffffff;
         }
 
-        #lodging-editor .lodging-editor-toolbar-trailing .texteditor-save-btn {
+        #lodging-editor .add-house-field input[type='number'] {
+            width: 4rem;
+            max-width: 12vw;
+        }
+
+        #lodging-editor .add-house .texteditor-save-btn {
             flex: 0 0 var(--backend-gold-toolbar-btn-width);
             width: var(--backend-gold-toolbar-btn-width);
             min-width: var(--backend-gold-toolbar-btn-width);
@@ -951,21 +952,31 @@
             justify-content: center;
             font-family: var(--backend-gold-toolbar-btn-font);
             font-size: 0.8125rem;
+            font-weight: 600;
             line-height: 1;
-            text-align: center;
         }
 
-        #lodging-editor .lodging-editor-toolbar .lodging-editor-padlock-btn svg {
-            flex-shrink: 0;
+        #lodging-editor .add-house .texteditor-save-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
         }
 
-        #lodging-editor .lodging-editor-toolbar #lodging-editor-padlock-btn:disabled {
-            background: #fef3c7;
-            color: #94a3b8;
-        }
-
-        #lodging-editor .lodging-editor-toolbar #lodging-editor-padlock-btn:disabled:hover {
-            filter: none;
+        #lodging-editor .lodging-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+            width: auto;
+            max-width: 100%;
+            height: 55px;
+            min-height: 55px;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+            background: transparent;
         }
 
         #guest-editor .guests-overview {
@@ -1055,7 +1066,8 @@
             overflow-y: hidden;
         }
 
-        #guest-editor #guest-management .guest-workflow {
+        #guest-editor #guest-management .guest-workflow,
+        #speaker-editor #speaker-management .speaker-workflow {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -1065,9 +1077,13 @@
             box-sizing: border-box;
             margin: 0;
             flex: 0 1 auto;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #e0f2fe;
         }
 
-        #guest-editor #guest-management .log {
+        #guest-editor #guest-management .log,
+        #speaker-editor #speaker-management .speaker-log {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -1075,13 +1091,18 @@
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
+            margin: 0;
             flex: 0 1 auto;
             height: auto;
             max-height: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #f1f5f9;
         }
 
-        /* Guest management section headings (`h3`): Logged events, Workflow, Other actions, Files. */
-        #guest-editor #guest-management .management-style {
+        /* Guest and speaker management section headings (`h3`): Logged events, Workflow, Other actions, Files. */
+        #guest-editor #guest-management .management-style,
+        #speaker-editor #speaker-management .management-style {
             flex: 0 0 auto;
             margin: 0;
             padding: 0;
@@ -1092,7 +1113,8 @@
             color: #000000;
         }
 
-        #guest-editor #guest-management .non-workflow {
+        #guest-editor #guest-management .non-workflow,
+        #speaker-editor #speaker-management .speaker-other-actions {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -1103,7 +1125,8 @@
             flex: 0 1 auto;
         }
 
-        #guest-editor #guest-management .files {
+        #guest-editor #guest-management .files,
+        #speaker-editor #speaker-management .speaker-files {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -1115,7 +1138,8 @@
         }
 
         /* Authoritative log viewport rule: fixed 100px + internal vertical scroll. */
-        #guest-editor #guest-management #guest-management-log {
+        #guest-editor #guest-management #guest-management-log,
+        #speaker-editor #speaker-management #speaker-management-log {
             flex: 0 0 auto;
             display: block;
             height: 100px !important;
@@ -1124,9 +1148,9 @@
             margin: 0;
             padding: 0.5rem 0.65rem;
             box-sizing: border-box;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            background: #f8fafc;
+            border: none;
+            border-radius: 0;
+            background: transparent;
             overflow-y: auto !important;
             overflow-x: hidden;
             overscroll-behavior: contain;
@@ -1139,17 +1163,20 @@
             color: #0f172a;
         }
 
-        #guest-editor #guest-management .guest-management-log-entry {
+        #guest-editor #guest-management .guest-management-log-entry,
+        #speaker-editor #speaker-management .speaker-management-log-entry {
             margin: 0 0 0.4rem 0;
             padding: 0;
             word-break: break-word;
         }
 
-        #guest-editor #guest-management .guest-management-log-entry:last-child {
+        #guest-editor #guest-management .guest-management-log-entry:last-child,
+        #speaker-editor #speaker-management .speaker-management-log-entry:last-child {
             margin-bottom: 0;
         }
 
-        #guest-editor #guest-management .guest-management-log-empty {
+        #guest-editor #guest-management .guest-management-log-empty,
+        #speaker-editor #speaker-management .speaker-management-log-empty {
             margin: 0;
             padding: 0;
             list-style: none;
@@ -1158,7 +1185,8 @@
         }
 
         /* Add log: same gold pill family as #guest-send-invite-btn. */
-        #guest-editor #guest-management .guest-add-log-btn {
+        #guest-editor #guest-management .guest-add-log-btn,
+        #speaker-editor #speaker-management .speaker-add-log-btn {
             flex: 0 0 auto;
             display: inline-flex;
             flex-direction: row;
@@ -1188,17 +1216,20 @@
             cursor: pointer;
         }
 
-        #guest-editor #guest-management .guest-add-log-btn:hover:not(:disabled) {
+        #guest-editor #guest-management .guest-add-log-btn:hover:not(:disabled),
+        #speaker-editor #speaker-management .speaker-add-log-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
-        #guest-editor #guest-management .guest-add-log-btn:disabled {
+        #guest-editor #guest-management .guest-add-log-btn:disabled,
+        #speaker-editor #speaker-management .speaker-add-log-btn:disabled {
             background: #fef3c7;
             color: #94a3b8;
             cursor: not-allowed;
         }
 
-        #guest-editor #guest-management .guest-add-log-panel {
+        #guest-editor #guest-management .guest-add-log-panel,
+        #speaker-editor #speaker-management .speaker-add-log-panel {
             flex: 0 0 auto;
             display: flex;
             flex-direction: column;
@@ -1210,11 +1241,13 @@
             box-sizing: border-box;
         }
 
-        body.backend-page #guest-editor #guest-management .guest-add-log-panel[hidden] {
+        body.backend-page #guest-editor #guest-management .guest-add-log-panel[hidden],
+        body.backend-page #speaker-editor #speaker-management .speaker-add-log-panel[hidden] {
             display: none !important;
         }
 
-        #guest-editor #guest-management .guest-add-log-panel-inner {
+        #guest-editor #guest-management .guest-add-log-panel-inner,
+        #speaker-editor #speaker-management .speaker-add-log-panel-inner {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -1224,7 +1257,8 @@
             box-sizing: border-box;
         }
 
-        #guest-editor #guest-management .guest-add-log-input {
+        #guest-editor #guest-management .guest-add-log-input,
+        #speaker-editor #speaker-management .speaker-add-log-input {
             flex: 0 0 auto;
             width: 100%;
             min-width: 0;
@@ -1240,14 +1274,16 @@
             line-height: 1.35;
         }
 
-        #guest-editor #guest-management .guest-add-log-input:focus {
+        #guest-editor #guest-management .guest-add-log-input:focus,
+        #speaker-editor #speaker-management .speaker-add-log-input:focus {
             outline: none;
             border-color: #64748b;
             box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.2);
         }
 
         /* Send: same green pill as .guest-accept-application-btn. */
-        #guest-editor #guest-management .guest-add-log-send-btn {
+        #guest-editor #guest-management .guest-add-log-send-btn,
+        #speaker-editor #speaker-management .speaker-add-log-send-btn {
             flex: 0 0 auto;
             display: inline-flex;
             align-items: center;
@@ -1269,11 +1305,13 @@
             box-shadow: none;
         }
 
-        #guest-editor #guest-management .guest-add-log-send-btn:hover:not(:disabled) {
+        #guest-editor #guest-management .guest-add-log-send-btn:hover:not(:disabled),
+        #speaker-editor #speaker-management .speaker-add-log-send-btn:hover:not(:disabled) {
             filter: brightness(1.08);
         }
 
-        #guest-editor #guest-management .guest-add-log-send-btn:disabled {
+        #guest-editor #guest-management .guest-add-log-send-btn:disabled,
+        #speaker-editor #speaker-management .speaker-add-log-send-btn:disabled {
             opacity: 0.65;
             cursor: not-allowed;
             filter: none;
@@ -1284,13 +1322,31 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
-            gap: 0.75rem 1rem;
+            justify-content: stretch;
+            gap: 16px;
             flex: 0 0 auto;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
             height: 55px;
+            min-height: 55px;
+        }
+
+        #speaker-editor .speakers-top-left {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 2 1 0;
+            min-width: 0;
+            min-height: 55px;
+        }
+
+        #speaker-editor .speakers-top-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1 1 0;
+            min-width: 0;
             min-height: 55px;
         }
 
@@ -1318,9 +1374,9 @@
 
         #speaker-editor .speaker-editor-shell {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: stretch;
-            gap: 12px;
+            gap: 0;
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
@@ -1330,13 +1386,14 @@
         }
 
         #speaker-editor #speaker-management {
-            flex: 0 0 clamp(11rem, 24vw, 20rem);
-            max-width: min(40%, 22rem);
+            flex: 0 0 100%;
+            min-width: 100%;
+            width: 100%;
+            min-height: 0;
             align-self: stretch;
             display: flex;
             flex-direction: column;
-            min-height: 0;
-            width: auto;
+            gap: 16px;
             box-sizing: border-box;
             padding: 12px 16px;
             border: none;
@@ -1345,11 +1402,7 @@
             font-family: 'Inter', sans-serif;
             color: #0f172a;
             overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        #speaker-editor #speaker-editor-panel:not(.is-empty) ~ #speaker-management {
-            background: #e0f2fe;
+            overflow-y: hidden;
         }
 
         #guest-editor .guests-top-row .guests-actions {
@@ -1385,30 +1438,36 @@
             box-sizing: border-box;
         }
 
-#content-editor .content-list-table,
-#content-editor .content-roster-table {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #0f172a;
-    font-family: 'Inter', sans-serif;
-    width: max-content;
-    min-width: 100%;
-    table-layout: auto;
-}
+        #content-editor .content-list-table,
+        #content-editor .content-roster-table,
+        #guest-editor .guests-list-table,
+        #speaker-editor .speakers-roster-table {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            width: max-content;
+            min-width: 100%;
+            table-layout: auto;
+        }
 
-#content-editor .content-list-table thead th,
-#content-editor .content-roster-table thead th {
-    background: #ffffff;
-    color: #000000;
-    font-weight: 500;
-    font-size: 1.2rem;
-    border-bottom: none;
-}
+        #content-editor .content-list-table thead th,
+        #content-editor .content-roster-table thead th,
+        #guest-editor .guests-list-table thead th,
+        #speaker-editor .speakers-roster-table thead th {
+            background: #ffffff;
+            color: #000000;
+            font-weight: 500;
+            font-size: 1.2rem;
+            border-bottom: none;
+        }
 
-#content-editor .content-list-table tbody td,
-#content-editor .content-roster-table tbody td {
-    border-bottom: 1px solid #e2e8f0;
-}
+        #content-editor .content-list-table tbody td,
+        #content-editor .content-roster-table tbody td,
+        #guest-editor .guests-list-table tbody td,
+        #speaker-editor .speakers-roster-table tbody td {
+            border-bottom: 1px solid #e2e8f0;
+        }
 
 #content-editor .content-list-scroll {
     overflow-x: auto;
@@ -1441,6 +1500,7 @@
 
         /* Speakers tab: viewer is editor only (toolbar lives in .speakers-top-row). */
         #speaker-editor .speaker-viewer {
+            position: relative;
             display: flex;
             flex-direction: column;
             flex: 1 1 0;
@@ -1454,6 +1514,7 @@
 
         /* Guests: actions moved to .guests-top-row; viewer is editor only. */
         #guest-editor .guest-viewer {
+            position: relative;
             display: flex;
             flex-direction: column;
             flex: 1 1 0;
@@ -1555,7 +1616,8 @@
             max-height: var(--backend-square-btn-size);
         }
 
-        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn {
+        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-padlock-btn {
             width: var(--backend-square-btn-size);
             height: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -1588,6 +1650,7 @@
         }
 
         #speaker-editor .speakers-actions .add-speaker-button:hover:not(:disabled),
+        #speaker-editor .speaker-editor-toolbar .add-speaker-button:hover:not(:disabled),
         #guest-editor .guests-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guest-editor-toolbar .add-speaker-button:hover:not(:disabled),
         #content-editor .content-actions .add-content-btn:hover:not(:disabled),
@@ -1595,17 +1658,9 @@
             filter: brightness(0.92);
         }
 
-        #speaker-editor .speakers-actions .add-speaker-button:disabled,
-        #guest-editor .guests-actions .add-speaker-button:disabled,
-        #guest-editor .guest-editor-toolbar .add-speaker-button:disabled,
-        #content-editor .content-actions .add-content-btn:disabled,
-        #lodging-editor .lodging-actions .add-lodging-btn:disabled {
-            background: #fef3c7;
-            color: #94a3b8;
-            cursor: not-allowed;
-        }
-
         #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor {
+            --guest-editor-shell-r: 8px;
+            --guest-editor-bw: 1px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -1615,9 +1670,9 @@
             min-height: 0;
             padding: 0;
             box-sizing: border-box;
-            background: #e0f2fe;
-            border: 1px solid var(--editor-gunmetal-border);
-            border-radius: 5px;
+            background: transparent;
+            border: var(--guest-editor-bw) solid #e2e8f0;
+            border-radius: var(--guest-editor-shell-r);
             overflow: hidden;
             box-shadow: none;
         }
@@ -1642,30 +1697,48 @@
 
         #speaker-editor .speaker-editor-bottom {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            flex-wrap: nowrap;
             align-items: stretch;
-            gap: 16px;
-            flex: 1 1 0;
-            justify-content: flex-start;
-            align-self: stretch;
+            gap: 0;
+            flex: 1 1 auto;
             min-height: 0;
-            overflow: hidden;
-            padding: 8px 8px 16px 8px;
-            border-radius: 0 0 5px 5px;
+            min-width: 0;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            overscroll-behavior-x: none;
+            touch-action: none;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 8px 0 16px 0;
+            border-radius: 0 0 calc(var(--guest-editor-shell-r) - var(--guest-editor-bw))
+                calc(var(--guest-editor-shell-r) - var(--guest-editor-bw));
+        }
+
+        #speaker-editor .speaker-editor-bottom::-webkit-scrollbar {
+            display: none;
+            height: 0;
+            width: 0;
         }
 
         #speaker-editor .speaker-editor-bio {
             margin: 0;
-            padding: 0;
+            padding: 0 16px;
             display: flex;
             flex-direction: column;
             align-items: stretch;
             gap: 8px;
-            flex: 1 1 0;
-            min-width: 0;
+            flex: 0 0 100%;
+            min-width: 100%;
+            width: 100%;
             min-height: 0;
+            align-self: stretch;
+            box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
         }
 
         #guest-editor .guest-editor-bottom {
@@ -1714,80 +1787,80 @@
             overscroll-behavior-y: contain;
         }
 
-        #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor.is-empty {
-            background: #e2e8f0;
-            opacity: 0.9;
-            gap: 0;
-        }
-
-        #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor.is-empty .speakerpic {
-            display: none;
-        }
-
-        #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor.is-empty .edit-speaker-top {
-            min-height: 12rem;
-            align-items: center;
-            justify-content: center;
+        #speaker-editor .speaker-editor-empty {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
             margin: 0;
-            background-color: #cbd5e1;
-            opacity: 0.95;
-        }
-
-        #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor.is-empty .speaker-editor-bottom {
-            background-color: #cbd5e1;
-            opacity: 0.95;
-        }
-
-        #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor.is-empty .speaker-editor-bio {
-            display: none;
-        }
-
-        #speaker-editor .speaker-viewer > .speaker-editor-shell > .speaker-editor.is-empty .edit-speaker-name-heading {
+            display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
+            box-sizing: border-box;
+            border-radius: 8px;
+            background: #cbd5e1;
+            opacity: 0.95;
             color: #64748b;
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+            pointer-events: none;
         }
 
-        #guest-editor .guest-viewer > .guest-editor.is-empty {
+        #speaker-editor .speaker-editor-empty[hidden] {
+            display: none !important;
+        }
+
+        #speaker-editor .speaker-viewer--no-selection {
             background: #e2e8f0;
-            opacity: 1;
-            gap: 0;
         }
 
-        #guest-editor .guest-viewer > .guest-editor.is-empty .edit-guest-top {
-            min-height: 12rem;
-            align-items: center;
+        #speaker-editor .speaker-viewer--no-selection .edit-speaker-top,
+        #speaker-editor .speaker-viewer--no-selection .speaker-editor-bottom {
+            display: none !important;
+        }
+
+        #guest-editor .guest-editor-empty {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
             margin: 0;
-            background-color: #cbd5e1;
-            opacity: 0.95;
-        }
-
-        #guest-editor .guest-viewer > .guest-editor.is-empty .guest-editor-bottom {
-            background-color: #cbd5e1;
-            opacity: 0.95;
-        }
-
-        #guest-editor .guest-viewer > .guest-editor.is-empty .guest-editor-bio {
-            display: none;
-        }
-
-        #guest-editor .guest-viewer > .guest-editor.is-empty .guest-editor-toolbar {
-            display: none;
-        }
-
-        #guest-editor .guest-viewer > .guest-editor.is-empty .selected-guestname {
+            display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
+            box-sizing: border-box;
+            border-radius: 8px;
+            background: #cbd5e1;
+            opacity: 0.95;
             color: #64748b;
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+            pointer-events: none;
+        }
+
+        #guest-editor .guest-editor-empty[hidden] {
+            display: none !important;
+        }
+
+        #guest-editor .guest-viewer--no-selection {
+            background: #e2e8f0;
+        }
+
+        #guest-editor .guest-viewer--no-selection .edit-guest-top,
+        #guest-editor .guest-viewer--no-selection .guest-editor-bottom {
+            display: none !important;
         }
 
         body.backend-page #guest-editor #guest-management[hidden],
         body.backend-page #guest-editor #guest-management #guest-send-invite-btn[hidden],
         body.backend-page #guest-editor #guest-management #readisno[hidden],
         body.backend-page #guest-editor #guest-management #invitedisno[hidden],
-        body.backend-page #guest-editor #guest-management #invoicedisno[hidden] {
+        body.backend-page #guest-editor #guest-management #invoicedisno[hidden],
+        body.backend-page #speaker-editor #speaker-management[hidden] {
             display: none !important;
         }
 
@@ -2109,6 +2182,48 @@
             overflow-x: hidden;
         }
 
+        /*
+         * Match body cell text from `#content-editor .content-list-table`
+         * (0.875rem / 500 / #0f172a / Inter). Labels (`.add-content-form-field label`) keep their own rules.
+         */
+        #content-editor .edit-content-bottom input:not([type='hidden']):not([type='file']),
+        #content-editor .edit-content-bottom textarea {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #content-editor .edit-content-bottom .content-badge {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: normal;
+        }
+
+        #content-editor .edit-content-bottom .content-long-field-letter-counter {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #content-editor .edit-content-bottom .content-editor-badge-dropdown .content-editor-badge-option:not(.content-editor-topic-option) {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: normal;
+        }
+
+        #content-editor .edit-content-bottom .content-editor-badge-dropdown .content-editor-topic-option {
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: normal;
+        }
+
         #content-editor .content-editor-toolbar {
             display: flex;
             flex-direction: row;
@@ -2163,18 +2278,18 @@
             filter: brightness(0.92);
         }
 
-        #content-editor .content-editor-toolbar .add-content-btn:disabled {
-            background: #fef3c7;
-            color: #94a3b8;
-            cursor: not-allowed;
-            filter: none;
-        }
-
         #content-editor .content-editor-toolbar .content-editor-delete-btn,
         #content-editor .content-editor-toolbar .content-editor-delete-btn:hover:not(:disabled),
         #content-editor .content-editor-toolbar .content-editor-delete-btn:disabled {
             background: #dc2626 !important;
             color: #ffffff !important;
+        }
+
+        #content-editor .content-editor-toolbar .content-editor-delete-btn.content-editor-delete-btn--no-selection:disabled {
+            background: #fee2e2 !important;
+            color: #fca5a5 !important;
+            opacity: 1;
+            filter: none;
         }
 
         #content-editor .content-editor-toolbar-trailing {
@@ -2209,15 +2324,6 @@
 
         #content-editor .content-editor-toolbar .content-editor-padlock-btn svg {
             flex-shrink: 0;
-        }
-
-        #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled {
-            background: #fef3c7;
-            color: #94a3b8;
-        }
-
-        #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled:hover {
-            filter: none;
         }
 
         #content-editor .content-editor-image-block {
@@ -2836,7 +2942,8 @@
 
         .speakers-roster-table,
         .guests-list-table,
-        .content-list-table {
+        .content-list-table,
+        .content-roster-table {
             width: max-content;
             min-width: 100%;
             /* separate: sticky header stays correct (collapse glitches in Chrome). */
@@ -2854,13 +2961,16 @@
         .guests-list-table th,
         .guests-list-table td,
         .content-list-table th,
-        .content-list-table td {
+        .content-list-table td,
+        .content-roster-table th,
+        .content-roster-table td {
             text-align: left;
         }
 
         .speakers-roster-table thead th,
         .guests-list-table thead th,
-        .content-list-table thead th {
+        .content-list-table thead th,
+        .content-roster-table thead th {
             text-align: left;
             text-transform: none;
             letter-spacing: normal;
@@ -2869,6 +2979,7 @@
             color: #000000;
             font-weight: 500;
             font-size: 1.2rem;
+            font-family: 'Inter', sans-serif;
             border-bottom: none;
             position: sticky;
             top: 0;
@@ -2941,7 +3052,8 @@
 
         .speakers-roster-table tbody td,
         .guests-list-table tbody td,
-        .content-list-table tbody td {
+        .content-list-table tbody td,
+        .content-roster-table tbody td {
             padding: var(--backend-roster-row-pad-y) var(--backend-table-cell-pad-x);
             vertical-align: middle;
             border-bottom: 1px solid #e2e8f0;
@@ -3028,7 +3140,9 @@
         #speaker-editor .speakers-roster-table .content-badge,
         #speaker-editor .speakers-roster-table .content-roster-published-btn,
         #guest-editor .guests-list-table .content-roster-published-btn,
-        #guest-editor .guests-list-table .content-badge {
+        #guest-editor .guests-list-table .content-badge,
+        #content-editor .content-list-table .content-roster-published-btn,
+        #content-editor .content-roster-table .content-roster-published-btn {
             width: var(--backend-roster-pill-width);
             min-width: var(--backend-roster-pill-width);
             max-width: var(--backend-roster-pill-width);
@@ -3038,6 +3152,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.01875em;
+            line-height: 1.2;
         }
 
         #speaker-editor .speakers-roster-table button.speaker-roster-tag--presented-no,
@@ -3054,6 +3173,7 @@
         }
 
         body.backend-page button.speaker-roster-tag--lodging-no,
+        body.backend-page button.speaker-roster-tag--invite-no,
         body.backend-page button.speaker-roster-tag--bio-no,
         body.backend-page button.speaker-roster-tag--brief-no,
         body.backend-page button.speaker-roster-tag--titles-no,
@@ -3064,18 +3184,20 @@
             color: #ffffff;
         }
 
-        body.backend-page button.speaker-roster-tag--lodging-yes,
+        body.backend-page button.speaker-roster-tag--lodging-own,
+        body.backend-page button.speaker-roster-tag--lodging-confirmed,
         body.backend-page button.speaker-roster-tag--bio-uploaded,
         body.backend-page button.speaker-roster-tag--brief-final,
         body.backend-page button.speaker-roster-tag--titles-yes,
         body.backend-page button.speaker-roster-tag--travel-yes,
         body.backend-page button.speaker-roster-tag--refunded-yes,
-        body.backend-page button.speaker-roster-tag--invite-accepted,
+        body.backend-page button.speaker-roster-tag--invite-confirmed,
         body.backend-page button.speaker-roster-tag--cme-sent {
             background: #338a17;
             color: #ffffff;
         }
 
+        body.backend-page button.speaker-roster-tag--lodging-requested,
         body.backend-page button.speaker-roster-tag--bio-received,
         body.backend-page button.speaker-roster-tag--brief-first,
         body.backend-page button.speaker-roster-tag--invite-invited,
@@ -3160,7 +3282,8 @@
             background-color: #0077b6;
             padding: 0;
             margin: 0;
-            border-radius: 5px 5px 0 0;
+            border-radius: calc(var(--guest-editor-shell-r) - var(--guest-editor-bw))
+                calc(var(--guest-editor-shell-r) - var(--guest-editor-bw)) 0 0;
             align-items: center;
         }
 
@@ -3312,7 +3435,8 @@
             max-width: 100%;
         }
 
-        #guest-editor .guest-editor-toolbar {
+        #guest-editor .guest-editor-toolbar,
+        #speaker-editor .speaker-editor-toolbar {
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
             align-items: center;
@@ -3328,7 +3452,8 @@
             min-height: 55px;
         }
 
-        #guest-editor .guest-editor-toolbar-leading {
+        #guest-editor .guest-editor-toolbar-leading,
+        #speaker-editor .speaker-editor-toolbar-leading {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -3338,7 +3463,8 @@
             min-width: 0;
         }
 
-        #guest-editor .guest-editor-toolbar-center {
+        #guest-editor .guest-editor-toolbar-center,
+        #speaker-editor .speaker-editor-toolbar-center {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -3347,7 +3473,8 @@
             justify-self: center;
         }
 
-        #guest-editor .guest-editor-toolbar-trailing {
+        #guest-editor .guest-editor-toolbar-trailing,
+        #speaker-editor .speaker-editor-toolbar-trailing {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -3358,24 +3485,55 @@
             min-width: 0;
         }
 
-        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn svg {
+        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn svg,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-padlock-btn svg {
             flex-shrink: 0;
         }
 
-        /* Padlock: yellow on Bio view; slate gray when Guest management strip is showing. */
-        #guest-editor .guest-editor-toolbar #guest-editor-padlock-btn:disabled {
-            background: #e2e8f0;
-            color: #64748b;
+        /* Toolbars: inactive buttons use the same transparent yellow as other disabled backend controls. */
+        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn:disabled,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-padlock-btn:disabled,
+        #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:disabled,
+        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:disabled,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-actions-btn:disabled,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-bio-btn:disabled,
+        #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled,
+        #content-editor .content-editor-toolbar .add-content-btn:disabled,
+        #content-editor .content-editor-toolbar .texteditor-save-btn:disabled:not(.texteditor-save-btn--saved),
+        #content-editor .content-actions .add-content-btn:disabled,
+        #guest-editor .guests-actions .add-speaker-button:disabled,
+        #speaker-editor .speakers-actions .add-speaker-button:disabled,
+        #lodging-editor .lodging-actions .add-lodging-btn:disabled,
+        #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved) {
+            background: #fef3c7;
+            border: none;
+            color: #94a3b8;
             cursor: not-allowed;
             filter: none;
+            opacity: 1;
         }
 
-        #guest-editor .guest-editor-toolbar #guest-editor-padlock-btn:disabled:hover {
+        #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn:disabled:hover,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-padlock-btn:disabled:hover,
+        #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:disabled:hover,
+        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:disabled:hover,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-actions-btn:disabled:hover,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-bio-btn:disabled:hover,
+        #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled:hover,
+        #content-editor .content-editor-toolbar .add-content-btn:disabled:hover,
+        #content-editor .content-editor-toolbar .texteditor-save-btn:disabled:not(.texteditor-save-btn--saved):hover,
+        #content-editor .content-actions .add-content-btn:disabled:hover,
+        #guest-editor .guests-actions .add-speaker-button:disabled:hover,
+        #speaker-editor .speakers-actions .add-speaker-button:disabled:hover,
+        #lodging-editor .lodging-actions .add-lodging-btn:disabled:hover,
+        #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved):hover {
             filter: none;
         }
 
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn,
-        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn {
+        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-actions-btn,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-bio-btn {
             flex: 0 0 var(--backend-gold-toolbar-btn-width);
             display: inline-flex;
             flex-direction: row;
@@ -3404,22 +3562,27 @@
         }
 
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn .display-editor-actions-text,
-        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn .guest-editor-bio-text {
+        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn .guest-editor-bio-text,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-actions-btn .display-editor-actions-text,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-bio-btn .guest-editor-bio-text {
             flex: 0 0 auto;
         }
 
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn svg,
-        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn svg {
+        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn svg,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-actions-btn svg,
+        #speaker-editor .speaker-editor-toolbar .guest-editor-bio-btn svg {
             flex-shrink: 0;
         }
 
-        #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:hover,
-        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:hover {
+        #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:hover:not(:disabled),
+        #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:hover:not(:disabled),
+        #speaker-editor .speaker-editor-toolbar .guest-editor-actions-btn:hover:not(:disabled),
+        #speaker-editor .speaker-editor-toolbar .guest-editor-bio-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
-        /* Bio and Actions share .guest-editor-actions-btn (display: inline-flex); ensure [hidden] always wins. */
-        #guest-editor .guest-editor-toolbar #guest-editor-bio-btn[hidden],
+        /* Guests: Actions toggles visibility; Bio stays visible and uses disabled when inactive. */
         #guest-editor .guest-editor-toolbar #display-guest-actions[hidden] {
             display: none !important;
         }
@@ -3712,7 +3875,9 @@
         /* Guest viewer: label above control (same stacking as #speaker-editor .speaker-editor / .add-speaker-form-field). */
         #guest-editor .guest-editor-bio > .add-speaker-form-field,
         #guest-editor .guest-editor-bio .guest-viewer-name-row .add-speaker-form-field,
-        #guest-editor .guest-editor-profile .add-speaker-form-field {
+        #guest-editor .guest-editor-profile .add-speaker-form-field,
+        #speaker-editor .speaker-editor-bio > .add-speaker-form-field,
+        #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field {
             flex-direction: column;
             flex-wrap: nowrap;
             align-items: stretch;
@@ -3721,7 +3886,9 @@
 
         #guest-editor .guest-editor-bio > .add-speaker-form-field > label,
         #guest-editor .guest-editor-bio .guest-viewer-name-row .add-speaker-form-field > label,
-        #guest-editor .guest-editor-profile .add-speaker-form-field > label {
+        #guest-editor .guest-editor-profile .add-speaker-form-field > label,
+        #speaker-editor .speaker-editor-bio > .add-speaker-form-field > label,
+        #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field > label {
             flex: 0 0 auto;
             min-width: 0;
             max-width: 100%;
@@ -3733,20 +3900,31 @@
             padding-bottom: 0.35rem;
             font-size: 0.8rem;
             font-weight: 400;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
         }
 
         #guest-editor .guest-editor-bio > .add-speaker-form-field > input,
         #guest-editor .guest-editor-bio .guest-viewer-name-row .add-speaker-form-field > input,
         #guest-editor .guest-editor-profile .add-speaker-form-field > input,
         #guest-editor .guest-editor-profile .add-speaker-form-field > .guest-bio-display,
-        #guest-editor .guest-editor-profile .add-speaker-form-field > .guest-clinical-context-display {
+        #guest-editor .guest-editor-profile .add-speaker-form-field > .guest-clinical-context-display,
+        #speaker-editor .speaker-editor-bio > .add-speaker-form-field > input,
+        #speaker-editor .speaker-editor-bio > .add-speaker-form-field > textarea,
+        #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field > input {
             flex: 0 1 auto;
             min-width: 0;
             width: 100%;
             max-width: 100%;
+            font-size: 1rem;
             font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            line-height: 1.5;
         }
 
+        #speaker-editor .speaker-editor-bio input,
+        #speaker-editor .speaker-editor-bio textarea,
         #guest-editor .guest-editor-bio input[readonly],
         #guest-editor .guest-editor-bio .guest-viewer-name-row input[readonly],
         #guest-editor .guest-editor-profile input[readonly],
@@ -3759,6 +3937,11 @@
             padding-right: 0;
             resize: vertical;
             cursor: default;
+        }
+
+        #speaker-editor .speaker-editor-bio input:not([readonly]),
+        #speaker-editor .speaker-editor-bio textarea:not([readonly]) {
+            cursor: text;
         }
 
         /* Read-only Bio: `#guest-editor-bio` scrolls when content exceeds the pane. */
@@ -4066,18 +4249,19 @@
             color: #ffffff;
         }
 
-        .speaker-viewer .add-speaker-form-field label,
         .content-editor .add-content-form-field label {
             border-bottom: none;
             padding-bottom: 0;
         }
 
-        #guest-editor .guest-viewer .add-speaker-form-field label {
+        #guest-editor .guest-viewer .add-speaker-form-field label,
+        #speaker-editor .speaker-viewer .add-speaker-form-field label {
             border-bottom: none;
             padding-bottom: 0;
             color: #64748b;
             font-size: 0.8rem;
             font-weight: 400;
+            font-family: 'Inter', sans-serif;
         }
 
         #speaker-editor .speaker-editor,
@@ -4217,9 +4401,9 @@
 
         #speaker-editor .long-bio-highlight-wrap {
             position: relative;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            background: #ffffff;
+            border: none;
+            border-radius: 0;
+            background: transparent;
             overflow: hidden;
         }
 
@@ -4228,7 +4412,7 @@
             inset: 0;
             pointer-events: none;
             overflow: hidden;
-            background: #ffffff;
+            background: transparent;
         }
 
         #speaker-editor .long-bio-highlight-content {
@@ -4259,7 +4443,11 @@
             border-radius: 0;
             background: transparent;
             box-shadow: none;
-            line-height: 1.4;
+            font-size: 1rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            line-height: 1.5;
         }
 
         #speaker-editor textarea#add-speaker-long-bio:focus {
@@ -4783,6 +4971,7 @@
         body.backend-page .texteditor,
         body.backend-page #speaker-editor,
         body.backend-page #guest-editor,
+        body.backend-page #lodging-editor,
         body.backend-page #content-editor,
         body.backend-page #emailer-editor {
             flex: 1 1 0;
@@ -5308,7 +5497,7 @@
                     </div>
                 </div>
                 <div id="status-container" class="backend-status-inline" aria-live="polite" aria-atomic="true">
-                    <div id="status" class="status info">Hello!</div>
+                    <div id="status" class="status loading">Starting backend…</div>
                 </div>
             </div>
             <div class="eventnavigation-aspects-spacer" aria-hidden="true"></div>
@@ -5413,6 +5602,7 @@
 
             <section class="speakers-overview is-open" id="speaker-editor" aria-hidden="false" aria-label="Speakers" data-name="speaker-editor">
                 <div class="speakers-top-row">
+                    <div class="speakers-top-left">
                     <div id="speakers-actions" class="speakers-actions" aria-label="Speaker actions">
                         <button type="button" class="add-speaker-button" id="previous-speaker" aria-label="Previous speaker" title="Previous speaker">
                             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -5435,6 +5625,49 @@
                             </svg>
                         </button>
                     </div>
+                    </div>
+                    <div class="speakers-top-right">
+                        <div class="speaker-editor-toolbar" role="toolbar" aria-label="Speaker editor tools">
+                            <div class="speaker-editor-toolbar-leading">
+                                <button
+                                    type="button"
+                                    class="guest-editor-actions-btn guest-editor-bio-btn"
+                                    id="speaker-editor-bio-btn"
+                                    aria-label="Speaker bio"
+                                    title="Speaker bio"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                        <path
+                                            fill="currentColor"
+                                            transform="matrix(-1,0,0,1,24,0)"
+                                            d="M6.41 6L5 7.41 9.59 12 5 16.59 6.41 18l6-6-6-6zm6 0L11 7.41 15.59 12 11 16.59 12.41 18l6-6-6-6z"
+                                        />
+                                    </svg>
+                                    <span class="guest-editor-bio-text">Bio</span>
+                                </button>
+                            </div>
+                            <div class="speaker-editor-toolbar-center">
+                                <button type="button" class="add-speaker-button guest-editor-padlock-btn" id="speaker-editor-padlock-btn" aria-label="Lock speaker" title="Lock" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path
+                                            fill="currentColor"
+                                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="speaker-editor-toolbar-trailing">
+                                <button type="button" class="guest-editor-actions-btn" id="display-speaker-actions" aria-label="Speaker management actions" title="Speaker management" disabled aria-disabled="true">
+                                    <span class="display-editor-actions-text">Actions</span>
+                                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                        <path fill="currentColor" d="M6.41 6L5 7.41 9.59 12 5 16.59 6.41 18l6-6-6-6zm6 0L11 7.41 15.59 12 11 16.59 12.41 18l6-6-6-6z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="speakers-bottom-row" id="speakers-bottom-row">
                     <div class="speakers-bottom-track" id="speakers-bottom-track">
@@ -5445,9 +5678,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="speaker-viewer" id="speaker-viewer" aria-label="Speaker">
+                    <div class="speaker-viewer speaker-viewer--no-selection" id="speaker-viewer" aria-label="Speaker">
                         <div class="speaker-editor-shell">
-                        <div class="speaker-editor" id="speaker-editor-panel">
+                        <div class="speaker-editor is-empty" id="speaker-editor-panel">
                             <div class="edit-speaker-top">
                                 <div class="edit-speaker-name-heading" role="group" aria-label="Speaker name">
                                     <span class="edit-speaker-name-first" id="edit-speaker-name-first" aria-live="polite"></span>
@@ -5501,10 +5734,50 @@
                                 <p class="speaker-editor-meta-line" id="speaker-editor-id">Speaker ID: -</p>
                             </div>
                             </div>
+                            <div class="speaker-management" id="speaker-management" role="region" aria-label="Speaker management" hidden aria-hidden="true">
+                                <div class="speaker-log" id="speaker-log">
+                                    <h3 class="speaker-log-title management-style">Logged events</h3>
+                                    <div id="speaker-management-log" class="speaker-management-log" aria-label="Speaker activity log" aria-live="polite" style="height:100px;min-height:100px;max-height:100px;overflow-y:auto;overflow-x:hidden;"></div>
+                                </div>
+                                <div class="speaker-workflow" id="speaker-workflow">
+                                    <h3 class="speaker-workflow-title management-style">Workflow</h3>
+                                </div>
+                                <div class="speaker-other-actions" id="speaker-other-actions">
+                                    <h3 class="speaker-other-actions-title management-style">Other actions</h3>
+                                    <button
+                                        type="button"
+                                        class="speaker-add-log-btn"
+                                        id="speaker-add-log-btn"
+                                        aria-expanded="false"
+                                        aria-controls="speaker-add-log-panel"
+                                    >
+                                        Add log
+                                    </button>
+                                    <div id="speaker-add-log-panel" class="speaker-add-log-panel" hidden aria-hidden="true">
+                                        <div class="speaker-add-log-panel-inner">
+                                            <input
+                                                type="text"
+                                                id="speaker-add-log-input"
+                                                class="speaker-add-log-input"
+                                                maxlength="2000"
+                                                placeholder="Log message"
+                                                autocomplete="off"
+                                                aria-label="Manual log message"
+                                            />
+                                            <button type="button" class="speaker-add-log-send-btn" id="speaker-add-log-send-btn">
+                                                Send
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="speaker-files" id="speaker-files">
+                                    <h3 class="speaker-files-title management-style">Files</h3>
+                                </div>
+                            </div>
                             </div>
                         </div>
-                            <div class="speaker-management" id="speaker-management" role="region" aria-label="Speaker management" aria-hidden="false"></div>
                         </div>
+                        <p class="speaker-editor-empty" id="speaker-editor-empty" role="status">Select speaker</p>
                     </div>
                     </div>
                 </div>
@@ -5546,8 +5819,6 @@
                                         id="guest-editor-bio-btn"
                                         aria-label="Guest bio"
                                         title="Guest bio"
-                                        hidden
-                                        aria-hidden="true"
                                         disabled
                                         aria-disabled="true"
                                     >
@@ -5591,7 +5862,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="guest-viewer" id="guest-viewer" aria-label="Guest viewer">
+                        <div class="guest-viewer guest-viewer--no-selection" id="guest-viewer" aria-label="Guest viewer">
                             <div class="guest-editor is-empty" id="guest-editor-panel">
                             <div class="edit-guest-top">
                                 <div class="edit-guest-top-spacer" aria-hidden="true"></div>
@@ -5779,6 +6050,7 @@
                                 </div>
                             </div>
                             </div>
+                            <p class="guest-editor-empty" id="guest-editor-empty" role="status">Select guest</p>
                         </div>
                     </div>
                 </div>
@@ -5789,6 +6061,7 @@
                 <div class="lodging-overview">
                     <div class="lodging-top-row">
                         <div class="lodging-top-left">
+                            <div class="lodging-actions-strip">
                             <div id="lodging-actions" class="lodging-actions" hidden aria-label="Lodging actions">
                                 <button type="button" class="add-lodging-btn" id="previous-lodging" aria-label="Previous lodging" title="Previous lodging">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -5812,33 +6085,23 @@
                                     </svg>
                                 </button>
                             </div>
-                        </div>
-                        <div class="lodging-top-right">
-                            <div class="lodging-editor-toolbar" role="toolbar" aria-label="Lodging editor tools">
-                                <div class="guest-editor-toolbar-leading" aria-hidden="true"></div>
-                                <div class="lodging-editor-toolbar-center">
-                                    <button type="button" class="add-lodging-btn lodging-editor-padlock-btn" id="lodging-editor-padlock-btn" aria-label="Lock lodging" title="Lock">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path
-                                                fill="currentColor"
-                                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
-                                            />
-                                        </svg>
-                                    </button>
+                            <div id="add-house" class="add-house" hidden aria-hidden="true" aria-label="Add house">
+                                <div class="add-house-field">
+                                    <label for="add-house-name">House name</label>
+                                    <input type="text" id="add-house-name" name="add-house-name" autocomplete="off" maxlength="500" />
                                 </div>
-                                <div class="lodging-editor-toolbar-trailing">
-                                    <button type="button" class="texteditor-save-btn" id="add-lodging-save-btn" disabled aria-disabled="true">Save</button>
-                                    <button type="button" class="texteditor-save-btn" id="lodging-toolbar-publish-btn" disabled aria-disabled="true">Publish</button>
-                                    <button type="button" class="add-lodging-btn lodging-editor-delete-btn" id="lodging-editor-delete-btn" aria-disabled="true" aria-label="Delete selected lodging" title="Delete selected lodging" disabled>
-                                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                                            <path fill="currentColor" d="M9 3h6l1 1h4v2H4V4h4l1-1zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 11h8a2 2 0 0 0 2-2V8H6v10a2 2 0 0 0 2 2z"/>
-                                        </svg>
-                                    </button>
+                                <div class="add-house-field">
+                                    <label for="add-house-beds">Number of beds</label>
+                                    <input type="number" id="add-house-beds" name="add-house-beds" min="1" max="25" step="1" inputmode="numeric" />
                                 </div>
+                                <button type="button" class="texteditor-save-btn" id="add-house-save-btn">Save</button>
+                            </div>
                             </div>
                         </div>
                     </div>
-                    <p class="lodging-placeholder">Lodging — content coming soon.</p>
+                    <div class="lodging-subcollections-wrap">
+                        <div id="lodging-subcollections-list" class="lodging-subcollections-list" aria-live="polite"></div>
+                    </div>
                 </div>
             </section>
 
@@ -6082,6 +6345,7 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
@@ -6137,6 +6401,7 @@
         let contentPadlockIsOpen = false;
         let contentDeleteConfirmArmed = false;
         let guestPadlockIsOpen = false;
+        let speakerPadlockIsOpen = false;
         /** Set after a successful full fetch of tbs/Content/{rowId}/item into memory. */
         let contentMemoryLoaded = false;
         /** Promise from initial page load preload; used so Content tab can await the same fetch instead of duplicating work. */
@@ -6149,11 +6414,11 @@
         var contentSyncInFlight = false;
         var CONTENT_FIREBASE_DEBOUNCE_MS = 2000;
         var CONTENT_FIREBASE_PERIODIC_MS = 12000;
-        var SPEAKER_LODGING_VALUES = ['No', 'Yes', 'Own'];
+        var SPEAKER_LODGING_VALUES = ['No', 'Requested', 'Own lodging', 'Confirmed'];
         var SPEAKER_BIO_STATUS_VALUES = ['No', 'Received', 'Uploaded'];
         var SPEAKER_BRIEF_VALUES = ['No', 'First brief', 'Final brief'];
         var SPEAKER_PRESENTED_VALUES = ['No', 'Yes'];
-        var SPEAKER_INVITE_STATUS_VALUES = ['Invited', 'Accepted'];
+        var SPEAKER_INVITE_STATUS_VALUES = ['No', 'Invited', 'Confirmed'];
         var SPEAKER_TITLES_VALUES = ['No', 'Yes'];
         var SPEAKER_TRAVEL_VALUES = ['No', 'Yes'];
         var SPEAKER_CME_VALUES = ['No', 'Ready', 'Sent'];
@@ -6164,9 +6429,10 @@
             if (!s) return 'No';
             var low = s.toLowerCase();
             if (low === 'no') return 'No';
-            if (low === 'yes') return 'Yes';
-            if (low === 'own') return 'Own';
-            // Preserve non-standard Firebase values instead of collapsing to "No".
+            if (low === 'requested') return 'Requested';
+            if (low === 'own lodging' || low === 'own') return 'Own lodging';
+            if (low === 'confirmed' || low === 'yes') return 'Confirmed';
+            if (SPEAKER_LODGING_VALUES.indexOf(s) >= 0) return s;
             return s;
         }
 
@@ -6265,11 +6531,12 @@
 
         function normalizeSpeakerInviteStatus(v) {
             var s = v != null ? String(v).trim() : '';
-            if (!s) return 'Invited';
+            if (!s) return 'No';
             var low = s.toLowerCase();
+            if (low === 'no' || low === 'n') return 'No';
             if (low === 'invited') return 'Invited';
-            if (low === 'accepted') return 'Accepted';
-            // Preserve non-standard Firebase values instead of collapsing to "Invited".
+            if (low === 'confirmed' || low === 'accepted') return 'Confirmed';
+            if (SPEAKER_INVITE_STATUS_VALUES.indexOf(s) >= 0) return s;
             return s;
         }
 
@@ -6310,7 +6577,11 @@
         }
 
         function speakerRosterLodgingTagClass(lodging) {
-            return normalizeSpeakerLodging(lodging) === 'No' ? 'speaker-roster-tag--lodging-no' : 'speaker-roster-tag--lodging-yes';
+            var L = normalizeSpeakerLodging(lodging);
+            if (L === 'No') return 'speaker-roster-tag--lodging-no';
+            if (L === 'Requested') return 'speaker-roster-tag--lodging-requested';
+            if (L === 'Own lodging') return 'speaker-roster-tag--lodging-own';
+            return 'speaker-roster-tag--lodging-confirmed';
         }
 
         function speakerRosterBioTagClass(bioStatus) {
@@ -6334,7 +6605,10 @@
         }
 
         function speakerRosterInviteTagClass(inviteStatus) {
-            return normalizeSpeakerInviteStatus(inviteStatus) === 'Invited' ? 'speaker-roster-tag--invite-invited' : 'speaker-roster-tag--invite-accepted';
+            var I = normalizeSpeakerInviteStatus(inviteStatus);
+            if (I === 'No') return 'speaker-roster-tag--invite-no';
+            if (I === 'Invited') return 'speaker-roster-tag--invite-invited';
+            return 'speaker-roster-tag--invite-confirmed';
         }
 
         function speakerRosterTitlesTagClass(titlesStatus) {
@@ -6801,6 +7075,255 @@
             return db.collection('tbs').doc('Content').collection(id).doc('item');
         }
 
+        /** Bed slots doc: `tbs/Lodging/{houseName}/{houseName}beds` with string fields `L1`…`Ln`. */
+        function tbsLodgingHouseBedsDocRef(db, houseName) {
+            var name = String(houseName || '').trim();
+            return db.collection('tbs').doc('Lodging').collection(name).doc(name + 'beds');
+        }
+
+        /**
+         * Parent doc ids under `tbs` that may hold lodging house subcollections (`tbs/{id}/{houseName}/…`).
+         * Case matters in Firestore; try both Console spellings.
+         */
+        var TBS_LODGING_PARENT_DOC_IDS = ['Lodging', 'lodging'];
+
+        /** Optional manifest arrays on `tbs/Lodging` or `tbs/lodging` when created from this UI. */
+        var FIRESTORE_TBS_LODGING_SUBCOLLECTION_IDS_FIELD = 'subcollectionIds';
+
+        function tbsLodgingManifestDocRef(db) {
+            return db.collection('tbs').doc('Lodging');
+        }
+
+        /**
+         * Firestore REST requires a Firebase Auth ID token for listCollectionIds under typical security rules.
+         * Enable Anonymous sign-in in Firebase Console → Authentication → Sign-in method.
+         */
+        async function ensureFirebaseAuthForFirestoreRest() {
+            if (typeof firebase === 'undefined') return null;
+            try {
+                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                if (!firebase.auth) return null;
+                var auth = firebase.auth();
+                if (auth.currentUser) return await auth.currentUser.getIdToken();
+                var cred = await auth.signInAnonymously();
+                return cred.user ? await cred.user.getIdToken() : null;
+            } catch (e) {
+                console.warn('ensureFirebaseAuthForFirestoreRest:', e);
+                return null;
+            }
+        }
+
+        /**
+         * Firestore REST listCollectionIds — lists real subcollection ids (same as Firebase Console).
+         * Sends Authorization: Bearer & API key (REST expects both for browser clients).
+         */
+        async function firestoreRestListCollectionIdsUnderParent(lodgingDocId, idToken) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var docPath = 'tbs/' + String(lodgingDocId || 'Lodging');
+            var parent =
+                'projects/' +
+                projectId +
+                '/databases/(default)/documents/' +
+                docPath;
+            var all = [];
+            var pageToken = '';
+            try {
+                do {
+                    var body = { pageSize: 100 };
+                    if (pageToken) body.pageToken = pageToken;
+                    var url =
+                        'https://firestore.googleapis.com/v1/' +
+                        parent +
+                        ':listCollectionIds?key=' +
+                        encodeURIComponent(apiKey);
+                    var headers = { 'Content-Type': 'application/json' };
+                    if (idToken) headers.Authorization = 'Bearer ' + idToken;
+                    var res = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(body),
+                    });
+                    if (!res.ok) {
+                        console.warn(
+                            'firestoreRestListCollectionIdsUnderParent',
+                            docPath,
+                            res.status,
+                            await res.text()
+                        );
+                        return null;
+                    }
+                    var json = await res.json();
+                    if (Array.isArray(json.collectionIds)) {
+                        all = all.concat(json.collectionIds);
+                    }
+                    pageToken = json.nextPageToken || '';
+                } while (pageToken);
+                return all;
+            } catch (e) {
+                console.warn('firestoreRestListCollectionIdsUnderParent', docPath, e);
+                return null;
+            }
+        }
+
+        /**
+         * Lists document ids in a top-level collection (e.g. root `Lodging`) when houses are docs, not subcollections.
+         * GET .../documents/{collectionId}
+         */
+        async function firestoreRestListDocumentIdsInRootCollection(collectionId, idToken) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var cid = String(collectionId || '').replace(/^\/+|\/+$/g, '');
+            if (!cid) return null;
+            var all = [];
+            var pageToken = '';
+            try {
+                do {
+                    var qs =
+                        'pageSize=100&key=' +
+                        encodeURIComponent(apiKey) +
+                        (pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : '');
+                    var url =
+                        'https://firestore.googleapis.com/v1/projects/' +
+                        projectId +
+                        '/databases/(default)/documents/' +
+                        encodeURIComponent(cid) +
+                        '?' +
+                        qs;
+                    var headers = {};
+                    if (idToken) headers.Authorization = 'Bearer ' + idToken;
+                    var res = await fetch(url, { method: 'GET', headers: headers });
+                    if (!res.ok) {
+                        console.warn(
+                            'firestoreRestListDocumentIdsInRootCollection',
+                            cid,
+                            res.status,
+                            await res.text()
+                        );
+                        return null;
+                    }
+                    var json = await res.json();
+                    var docs = json.documents;
+                    if (Array.isArray(docs)) {
+                        for (var di = 0; di < docs.length; di++) {
+                            var name = docs[di] && docs[di].name ? String(docs[di].name) : '';
+                            var parts = name.split('/');
+                            var last = parts.length ? parts[parts.length - 1] : '';
+                            if (last) all.push(last);
+                        }
+                    }
+                    pageToken = json.nextPageToken || '';
+                } while (pageToken);
+                return all;
+            } catch (e) {
+                console.warn('firestoreRestListDocumentIdsInRootCollection', cid, e);
+                return null;
+            }
+        }
+
+        /** Some Firebase JS builds expose listCollections on DocumentReference (Node-like); use when present. */
+        async function firestoreSdkListCollectionIdsUnderParent(db, lodgingDocId) {
+            var ref = db.collection('tbs').doc(String(lodgingDocId));
+            if (typeof ref.listCollections !== 'function') return null;
+            try {
+                var cols = await ref.listCollections();
+                return cols.map(function(c) {
+                    return c.id;
+                });
+            } catch (e) {
+                console.warn('firestoreSdkListCollectionIdsUnderParent', lodgingDocId, e);
+                return null;
+            }
+        }
+
+        function mergeLodgingManifestFieldsInto(data, addId) {
+            if (!data || typeof data !== 'object') return;
+            var keys = [
+                FIRESTORE_TBS_LODGING_SUBCOLLECTION_IDS_FIELD,
+                'subcollections',
+                'houseNames',
+                'houses',
+                'collectionIds'
+            ];
+            for (var ki = 0; ki < keys.length; ki++) {
+                var raw = data[keys[ki]];
+                if (!Array.isArray(raw)) continue;
+                for (var ri = 0; ri < raw.length; ri++) {
+                    addId(raw[ri]);
+                }
+            }
+        }
+
+        async function refreshLodgingSubcollectionsList() {
+            var el = document.getElementById('lodging-subcollections-list');
+            if (!el) return;
+            el.innerHTML = '<p class="lodging-subcollections-empty">Loading…</p>';
+            try {
+                var db = getFirestore();
+                var idToken = await ensureFirebaseAuthForFirestoreRest();
+                if (!idToken) {
+                    console.warn(
+                        'Lodging list: no Firebase Auth token (enable Anonymous sign-in in Firebase Console, or check firebase-auth-compat.js).'
+                    );
+                }
+
+                var seen = {};
+                var ids = [];
+
+                function addId(name) {
+                    var k = String(name != null ? name : '').trim();
+                    if (!k || seen[k]) return;
+                    seen[k] = true;
+                    ids.push(k);
+                }
+
+                var pi;
+                for (pi = 0; pi < TBS_LODGING_PARENT_DOC_IDS.length; pi++) {
+                    var restIds = await firestoreRestListCollectionIdsUnderParent(
+                        TBS_LODGING_PARENT_DOC_IDS[pi],
+                        idToken
+                    );
+                    if (Array.isArray(restIds)) {
+                        restIds.forEach(addId);
+                    }
+                }
+
+                for (pi = 0; pi < TBS_LODGING_PARENT_DOC_IDS.length; pi++) {
+                    var sdkIds = await firestoreSdkListCollectionIdsUnderParent(db, TBS_LODGING_PARENT_DOC_IDS[pi]);
+                    if (Array.isArray(sdkIds)) {
+                        sdkIds.forEach(addId);
+                    }
+                }
+
+                for (pi = 0; pi < TBS_LODGING_PARENT_DOC_IDS.length; pi++) {
+                    var snap = await db.collection('tbs').doc(TBS_LODGING_PARENT_DOC_IDS[pi]).get();
+                    if (snap.exists) mergeLodgingManifestFieldsInto(snap.data(), addId);
+                }
+
+                /* Houses as documents in root collection `Lodging` (some projects use this shape). */
+                var rootLodgingDocs = await firestoreRestListDocumentIdsInRootCollection('Lodging', idToken);
+                if (Array.isArray(rootLodgingDocs)) rootLodgingDocs.forEach(addId);
+
+                ids.sort(function(a, b) {
+                    return String(a).localeCompare(String(b), undefined, { sensitivity: 'base' });
+                });
+                if (ids.length === 0) {
+                    el.innerHTML =
+                        '<p class="lodging-subcollections-empty">No lodging entries found. Houses must live as <strong>subcollections</strong> under document <code>tbs/Lodging</code> (or <code>tbs/lodging</code>), or as documents in root collection <code>Lodging</code>. Enable <strong>Anonymous</strong> sign-in in Firebase Authentication (needed for listing). Update Firestore rules so authenticated users can read <code>tbs/Lodging</code> and its subcollections.</p>';
+                    return;
+                }
+                el.innerHTML = ids
+                    .map(function(name) {
+                        return '<p class="lodging-subcollection-title">' + escapeHtml(String(name)) + '</p>';
+                    })
+                    .join('');
+            } catch (err) {
+                console.error('refreshLodgingSubcollectionsList:', err);
+                el.innerHTML =
+                    '<p class="lodging-subcollections-empty">Could not load lodging list. See browser console.</p>';
+            }
+        }
+
         /** Global speaker row: `tbs/Speakers/{rowId}/item` (same layout as Airtable sync script). */
         function tbsSpeakerItemRef(db, rowId) {
             var id = String(rowId || '').trim();
@@ -7087,7 +7610,7 @@
             var fnOk = fn && String(fn.value || '').trim() !== '';
             var lnOk = ln && String(ln.value || '').trim() !== '';
             var emOk = em && String(em.value || '').trim() !== '';
-            var active = fnOk && lnOk && emOk;
+            var active = fnOk && lnOk && emOk && speakerPadlockIsOpen;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
         }
@@ -7159,34 +7682,62 @@
         function updateAddSpeakerDeleteButtonState() {
             var delBtn = document.getElementById('add-speaker-delete-btn');
             var id = String(speakerFormEditingDocId || '').trim();
-            var canDelete = id !== '' && id !== '_init';
+            var hasSpeaker = id !== '' && id !== '_init';
+            var canDelete = hasSpeaker && speakerPadlockIsOpen;
             if (delBtn) {
                 delBtn.disabled = !canDelete;
                 delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
             }
             var collectionEl = document.getElementById('speaker-editor-collection');
             if (collectionEl) {
-                collectionEl.textContent = canDelete
+                collectionEl.textContent = hasSpeaker
                     ? 'Collection: tbs/Speakers/' + id + '/item'
                     : 'Collection: tbs/Speakers/{speakerId}/item';
             }
             var idEl = document.getElementById('speaker-editor-id');
             if (idEl) {
-                idEl.textContent = 'Speaker ID: ' + (canDelete ? id : '-');
+                idEl.textContent = 'Speaker ID: ' + (hasSpeaker ? id : '-');
             }
-            setSpeakerEditorEmptyState(!canDelete);
         }
 
         function setSpeakerEditorEmptyState(isEmpty) {
             var panel = document.getElementById('speaker-editor-panel');
+            var viewer = document.getElementById('speaker-viewer');
+            var emptyEl = document.getElementById('speaker-editor-empty');
             if (!panel) return;
             panel.classList.toggle('is-empty', !!isEmpty);
+            if (viewer) viewer.classList.toggle('speaker-viewer--no-selection', !!isEmpty);
+            if (emptyEl) {
+                emptyEl.hidden = !isEmpty;
+                emptyEl.setAttribute('aria-hidden', isEmpty ? 'false' : 'true');
+            }
+            var mgmt = document.getElementById('speaker-management');
+            if (mgmt) {
+                mgmt.hidden = !!isEmpty;
+                mgmt.setAttribute('aria-hidden', isEmpty ? 'true' : 'false');
+            }
+            if (isEmpty) {
+                speakerPadlockIsOpen = false;
+                requestAnimationFrame(function () {
+                    scrollSpeakerEditorBottomToBio({ instant: true });
+                });
+            }
+            syncSpeakerPadlockButtonUi();
+            syncSpeakerEditabilityFromPadlock();
+            syncSpeakerEditorToolbarForBottomScroll();
         }
 
         function setGuestEditorEmptyState(isEmpty) {
             var panel = document.getElementById('guest-editor-panel');
-            if (!panel) return;
-            panel.classList.toggle('is-empty', !!isEmpty);
+            var viewer = document.getElementById('guest-viewer');
+            var emptyEl = document.getElementById('guest-editor-empty');
+            if (panel) panel.classList.toggle('is-empty', !!isEmpty);
+            if (viewer) viewer.classList.toggle('guest-viewer--no-selection', !!isEmpty);
+            if (emptyEl) {
+                emptyEl.hidden = !isEmpty;
+                emptyEl.setAttribute('aria-hidden', isEmpty ? 'false' : 'true');
+            }
+            syncGuestEditorToolbarForBottomScroll();
         }
 
         function openSpeakerDeleteConfirmModal() {
@@ -7384,7 +7935,7 @@
                     speakerCoalesceStringField(d, ['Presented', 'Presented?', 'presented']) || 'No'
                 ),
                 inviteStatus: normalizeSpeakerInviteStatus(
-                    speakerCoalesceStringField(d, ['inviteStatus', 'Invite status', 'Status']) || 'Invited'
+                    speakerCoalesceStringField(d, ['inviteStatus', 'Invite status', 'Status']) || 'No'
                 ),
                 titlesStatus: normalizeSpeakerTitlesStatus(
                     speakerCoalesceStringField(d, ['titlesStatus', 'Title', 'Titles received?']) || 'No'
@@ -8121,9 +8672,9 @@
             if (!guestFirstEl || !guestLastEl) return;
             var headingId = String(guestFormEditingDocId || '').trim();
             if (!headingId) {
-                guestFirstEl.textContent = 'Select guest';
+                guestFirstEl.textContent = '';
                 guestLastEl.textContent = '';
-                if (bottomFirstEl) bottomFirstEl.value = 'Select guest';
+                if (bottomFirstEl) bottomFirstEl.value = '';
                 if (bottomLastEl) bottomLastEl.value = '';
                 syncEditGuestCountryFlag(null);
                 return;
@@ -8171,6 +8722,11 @@
             return page > 0 && el.scrollLeft >= page * 0.45;
         }
 
+        function isGuestEditorSelectionEmpty() {
+            var panel = document.getElementById('guest-editor-panel');
+            return !panel || panel.classList.contains('is-empty');
+        }
+
         function syncGuestEditorToolbarForBottomScroll() {
             var bottom = getGuestEditorBottomEl();
             var actions = document.getElementById('display-guest-actions');
@@ -8179,32 +8735,31 @@
             if (!bottom || !actions || !bioBtn) return;
             var page = bottom.clientWidth;
             var atMgmt = page > 0 && bottom.scrollLeft >= page * 0.45;
+            var selectionEmpty = isGuestEditorSelectionEmpty();
 
-            /* Exclusive: only one of Bio / Actions may be visible; never both. */
             actions.hidden = true;
             actions.setAttribute('aria-hidden', 'true');
             actions.disabled = true;
             actions.setAttribute('aria-disabled', 'true');
-            bioBtn.hidden = true;
-            bioBtn.setAttribute('aria-hidden', 'true');
-            bioBtn.disabled = true;
-            bioBtn.setAttribute('aria-disabled', 'true');
 
-            if (atMgmt) {
-                bioBtn.hidden = false;
-                bioBtn.setAttribute('aria-hidden', 'false');
-                bioBtn.disabled = false;
-                bioBtn.removeAttribute('aria-disabled');
-            } else {
+            bioBtn.hidden = false;
+            bioBtn.setAttribute('aria-hidden', 'false');
+            var bioActive = !selectionEmpty && atMgmt;
+            bioBtn.disabled = !bioActive;
+            bioBtn.setAttribute('aria-disabled', bioActive ? 'false' : 'true');
+
+            if (!atMgmt) {
                 actions.hidden = false;
                 actions.setAttribute('aria-hidden', 'false');
-                actions.disabled = false;
-                actions.removeAttribute('aria-disabled');
+                if (!selectionEmpty) {
+                    actions.disabled = false;
+                    actions.removeAttribute('aria-disabled');
+                }
             }
 
             /* Padlock only on Bio / profile strip; grayed out while Guest management is visible. */
             if (padlock) {
-                if (atMgmt) {
+                if (selectionEmpty || atMgmt) {
                     padlock.disabled = true;
                     padlock.setAttribute('aria-disabled', 'true');
                 } else {
@@ -8260,6 +8815,119 @@
             }
             requestAnimationFrame(function () {
                 syncGuestEditorToolbarForBottomScroll();
+            });
+        }
+
+        function getSpeakerEditorBottomEl() {
+            return document.querySelector('#speaker-editor #speaker-editor-panel .speaker-editor-bottom');
+        }
+
+        function isSpeakerEditorBottomShowingManagement() {
+            var el = getSpeakerEditorBottomEl();
+            if (!el) return false;
+            var page = el.clientWidth;
+            return page > 0 && el.scrollLeft >= page * 0.45;
+        }
+
+        function isSpeakerEditorSelectionEmpty() {
+            var panel = document.getElementById('speaker-editor-panel');
+            return !panel || panel.classList.contains('is-empty');
+        }
+
+        function syncSpeakerEditorToolbarForBottomScroll() {
+            var bottom = getSpeakerEditorBottomEl();
+            var actions = document.getElementById('display-speaker-actions');
+            var bioBtn = document.getElementById('speaker-editor-bio-btn');
+            var padlock = document.getElementById('speaker-editor-padlock-btn');
+            if (!bottom || !actions || !bioBtn) return;
+            var page = bottom.clientWidth;
+            var atMgmt = page > 0 && bottom.scrollLeft >= page * 0.45;
+            var selectionEmpty = isSpeakerEditorSelectionEmpty();
+
+            bioBtn.hidden = false;
+            bioBtn.setAttribute('aria-hidden', 'false');
+            var bioActive = !selectionEmpty && atMgmt;
+            bioBtn.disabled = !bioActive;
+            bioBtn.setAttribute('aria-disabled', bioActive ? 'false' : 'true');
+
+            actions.hidden = false;
+            actions.setAttribute('aria-hidden', 'false');
+            var actionsActive = !selectionEmpty && !atMgmt;
+            actions.disabled = !actionsActive;
+            actions.setAttribute('aria-disabled', actionsActive ? 'false' : 'true');
+
+            if (padlock) {
+                var padlockActive = !selectionEmpty && !atMgmt;
+                padlock.disabled = !padlockActive;
+                padlock.setAttribute('aria-disabled', padlockActive ? 'false' : 'true');
+            }
+            syncSpeakerPadlockButtonUi();
+        }
+
+        function syncSpeakerPadlockButtonUi() {
+            var padlock = document.getElementById('speaker-editor-padlock-btn');
+            if (!padlock) return;
+            var closedPath = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+            var openPath = 'M18 8h-8V6c0-1.63 1.32-2.95 2.95-2.95 1.28 0 2.39.83 2.8 2h2.1c-.47-2.28-2.49-4-4.9-4C10.24 1.05 8 3.29 8 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z';
+            var svg = padlock.querySelector('svg');
+            var path = svg ? svg.querySelector('path') : null;
+            if (path) path.setAttribute('d', speakerPadlockIsOpen ? openPath : closedPath);
+            padlock.setAttribute('aria-label', speakerPadlockIsOpen ? 'Unlock speaker' : 'Lock speaker');
+            padlock.setAttribute('title', speakerPadlockIsOpen ? 'Unlock' : 'Lock');
+            padlock.setAttribute('aria-pressed', speakerPadlockIsOpen ? 'true' : 'false');
+        }
+
+        function syncSpeakerEditabilityFromPadlock() {
+            var panel = document.getElementById('speaker-editor-panel');
+            if (!panel) return;
+            var canEdit = !panel.classList.contains('is-empty') && speakerPadlockIsOpen;
+            panel.querySelectorAll('#speaker-editor-bio input, #speaker-editor-bio textarea').forEach(function (el) {
+                el.disabled = !canEdit;
+                if (canEdit) {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('aria-readonly');
+                } else {
+                    el.readOnly = true;
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('aria-readonly', 'true');
+                }
+            });
+            updateAddSpeakerSaveButtonState();
+            updateAddSpeakerDeleteButtonState();
+        }
+
+        function scrollSpeakerEditorBottomToBio(options) {
+            var opts = options && typeof options === 'object' ? options : {};
+            var instant = Boolean(opts.instant);
+            var el = getSpeakerEditorBottomEl();
+            var bio = document.getElementById('speaker-editor-bio');
+            var behavior = instant ? 'auto' : 'smooth';
+            if (bio && typeof bio.scrollIntoView === 'function') {
+                bio.scrollIntoView({ behavior: behavior, block: 'nearest', inline: 'start' });
+            } else if (el) {
+                el.scrollLeft = 0;
+            }
+            if (el) {
+                requestAnimationFrame(function () {
+                    syncSpeakerEditorToolbarForBottomScroll();
+                });
+            }
+        }
+
+        function scrollSpeakerEditorBottomToManagement(options) {
+            var opts = options && typeof options === 'object' ? options : {};
+            var instant = Boolean(opts.instant);
+            var el = getSpeakerEditorBottomEl();
+            if (!el) return;
+            var page = el.clientWidth;
+            if (page < 1) return;
+            if (instant) {
+                el.scrollLeft = page;
+            } else {
+                el.scrollTo({ left: page, behavior: 'smooth' });
+            }
+            requestAnimationFrame(function () {
+                syncSpeakerEditorToolbarForBottomScroll();
             });
         }
 
@@ -9644,6 +10312,7 @@
             var nextIdx = idx + delta;
             if (nextIdx < 0 || nextIdx >= speakerRosterInMemory.length) return;
             var s = speakerRosterInMemory[nextIdx];
+            speakerPadlockIsOpen = false;
             populateEditSpeakerFormFromRecord(s);
             syncSpeakerRosterSelectionHighlight();
         }
@@ -9809,13 +10478,28 @@
             void flushSpeakersToFirebase({ silent: true });
         }
 
+        function cycleSpeakerRosterTagField(docId, field) {
+            var id = String(docId || '').trim();
+            var fieldKey = String(field || '').trim();
+            if (!id || !fieldKey) return;
+            var meta = speakerRosterTagFieldMeta[fieldKey];
+            if (!meta) return;
+            var rec = findSpeakerInMemory(id);
+            if (!rec) return;
+            var current = meta.norm(rec[fieldKey]);
+            rec[fieldKey] = nextSpeakerSelectValue(meta.order, current);
+            markSpeakerDocDirty(id);
+            renderSpeakerRoster();
+            void flushSpeakersToFirebase({ silent: true });
+        }
+
         function updateEditSpeakerNameHeading() {
             var firstEl = document.getElementById('edit-speaker-name-first');
             var lastEl = document.getElementById('edit-speaker-name-last');
             if (!firstEl || !lastEl) return;
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') {
-                firstEl.textContent = 'Select speaker';
+                firstEl.textContent = '';
                 lastEl.textContent = '';
                 return;
             }
@@ -9829,6 +10513,7 @@
 
         function populateEditSpeakerFormFromRecord(s) {
             if (!s) return;
+            speakerPadlockIsOpen = false;
             speakerFormEditingDocId = String(s.id || '').trim();
             var fn = document.getElementById('add-speaker-first-name');
             var ln = document.getElementById('add-speaker-last-name');
@@ -9846,6 +10531,8 @@
             updateAddSpeakerDeleteButtonState();
             syncSpeakerRosterSelectionHighlight();
             updateSpeakerNavButtons();
+            syncSpeakerPadlockButtonUi();
+            syncSpeakerEditabilityFromPadlock();
         }
 
         function texteditorMarkupFromElement(el) {
@@ -10072,6 +10759,7 @@
             var enabled = !!(hasSelection && canEdit);
             btn.hidden = !visible;
             btn.disabled = !enabled;
+            btn.classList.toggle('content-editor-delete-btn--no-selection', !hasSelection);
             btn.setAttribute('aria-disabled', enabled ? 'false' : 'true');
             if (!enabled) contentDeleteConfirmArmed = false;
             var label = contentDeleteConfirmArmed ? 'Press again to confirm delete' : 'Delete selected content';
@@ -11161,6 +11849,21 @@
             syncGuestPadlockButtonUi();
         }
 
+        function isPointerInsideSpeakerViewerOrTopChrome(target) {
+            if (!target || typeof target.closest !== 'function') return false;
+            return Boolean(
+                target.closest('#speaker-viewer') || target.closest('#speaker-editor .speakers-top-row')
+            );
+        }
+
+        function lockSpeakerIfSelectionFromViewerBlur() {
+            var panel = document.getElementById('speaker-editor-panel');
+            if (!panel || panel.classList.contains('is-empty')) return;
+            speakerPadlockIsOpen = false;
+            syncSpeakerPadlockButtonUi();
+            syncSpeakerEditabilityFromPadlock();
+        }
+
         var viewerBlurSaveLockInFlight = null;
         function onDocumentPointerDownSaveLockWhenOutsideViewers(ev) {
             if (!ev || ev.button !== 0) return;
@@ -11180,6 +11883,10 @@
             var gid = String(guestFormEditingDocId || '').trim();
             if (gid && !isPointerInsideGuestViewerOrTopChrome(t)) {
                 lockGuestIfSelectionFromViewerBlur();
+            }
+            var sid = String(speakerFormEditingDocId || '').trim();
+            if (sid && !isPointerInsideSpeakerViewerOrTopChrome(t)) {
+                lockSpeakerIfSelectionFromViewerBlur();
             }
         }
 
@@ -11932,6 +12639,9 @@
             }
             if (isGuests) {
                 void loadAndRenderGuestsTable();
+            }
+            if (isLodging) {
+                void refreshLodgingSubcollectionsList();
             }
             if (isEmailer) {
                 var emailerStatusEl = document.getElementById('emailer-editor-status');
@@ -13408,6 +14118,33 @@
             return hh + ':' + mm + ': ' + (message != null ? String(message) : '');
         }
 
+        function describeBackendStartupLoadedSummary() {
+            var contentCount = Array.isArray(contentRosterInMemory) ? contentRosterInMemory.length : 0;
+            var guestCount = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
+            var speakerCount = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory.length : 0;
+            var programmeDayCount = programmeState && Array.isArray(programmeState.dayDates) ? programmeState.dayDates.length : 0;
+            var eventLabel = String(selectedevent || current_event || '').trim() || 'selected event';
+            return (
+                eventLabel +
+                ': ' +
+                contentCount +
+                ' content item' +
+                (contentCount === 1 ? '' : 's') +
+                ', ' +
+                guestCount +
+                ' guest' +
+                (guestCount === 1 ? '' : 's') +
+                ', ' +
+                speakerCount +
+                ' speaker' +
+                (speakerCount === 1 ? '' : 's') +
+                ', ' +
+                programmeDayCount +
+                ' programme day' +
+                (programmeDayCount === 1 ? '' : 's')
+            );
+        }
+
         function showStatus(type, message) {
             var existingStatus = document.getElementById('status');
             if (existingStatus) {
@@ -13511,6 +14248,75 @@
                     setBackendPanel('lodging');
                 });
             }
+
+            var lodgingActionsAddBtn = document.getElementById('lodging-actions-add-button');
+            var addHousePanel = document.getElementById('add-house');
+            var addHouseSaveBtn = document.getElementById('add-house-save-btn');
+            var addHouseNameInput = document.getElementById('add-house-name');
+            var addHouseBedsInput = document.getElementById('add-house-beds');
+
+            function setAddHousePanelHidden(hidden) {
+                if (!addHousePanel) return;
+                addHousePanel.hidden = hidden;
+                addHousePanel.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+            }
+
+            if (lodgingActionsAddBtn && addHousePanel) {
+                lodgingActionsAddBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setAddHousePanelHidden(!addHousePanel.hidden);
+                    if (!addHousePanel.hidden && addHouseNameInput) addHouseNameInput.focus();
+                });
+            }
+
+            if (addHouseSaveBtn) {
+                addHouseSaveBtn.addEventListener('click', async function() {
+                    var houseName = addHouseNameInput ? String(addHouseNameInput.value || '').trim() : '';
+                    var bedsStr = addHouseBedsInput ? String(addHouseBedsInput.value || '').trim() : '';
+                    if (!houseName) {
+                        showStatus('error', 'Enter a house name.');
+                        return;
+                    }
+                    if (houseName.indexOf('/') !== -1) {
+                        showStatus('error', 'House name cannot contain "/".');
+                        return;
+                    }
+                    var beds = parseInt(bedsStr, 10);
+                    if (!Number.isFinite(beds) || beds < 1 || beds > 25) {
+                        showStatus('error', 'Number of beds must be between 1 and 25.');
+                        return;
+                    }
+                    var payload = {};
+                    for (var b = 1; b <= beds; b++) {
+                        payload['L' + b] = '';
+                    }
+                    addHouseSaveBtn.disabled = true;
+                    addHouseSaveBtn.setAttribute('aria-disabled', 'true');
+                    showStatus('loading', 'Saving lodging…');
+                    try {
+                        var db = getFirestore();
+                        var FV = firebase.firestore.FieldValue;
+                        var manifestPatch = {};
+                        manifestPatch[FIRESTORE_TBS_LODGING_SUBCOLLECTION_IDS_FIELD] = FV.arrayUnion(houseName);
+                        var batch = db.batch();
+                        batch.set(tbsLodgingHouseBedsDocRef(db, houseName), payload);
+                        batch.set(tbsLodgingManifestDocRef(db), manifestPatch, { merge: true });
+                        await batch.commit();
+                        if (addHouseNameInput) addHouseNameInput.value = '';
+                        if (addHouseBedsInput) addHouseBedsInput.value = '';
+                        setAddHousePanelHidden(true);
+                        showStatus('success', 'Created new lodging: ' + houseName);
+                        refreshLodgingSubcollectionsList();
+                    } catch (err) {
+                        console.error('add-house save:', err);
+                        showStatus('error', err && err.message ? err.message : 'Failed to create lodging in Firestore.');
+                    } finally {
+                        addHouseSaveBtn.disabled = false;
+                        addHouseSaveBtn.removeAttribute('aria-disabled');
+                    }
+                });
+            }
+
             if (emailerToggle) {
                 emailerToggle.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -13583,9 +14389,12 @@
                         el.value = '';
                     });
                     updateEditSpeakerNameHeading();
+                    speakerPadlockIsOpen = true;
                     updateAddSpeakerSaveButtonState();
                     updateAddSpeakerDeleteButtonState();
                     updateSpeakerNavButtons();
+                    syncSpeakerPadlockButtonUi();
+                    syncSpeakerEditabilityFromPadlock();
                     var first = document.getElementById('add-speaker-first-name');
                     if (first) first.focus();
                 });
@@ -13605,6 +14414,53 @@
                     if (nextSpeakerBtn.disabled) return;
                     navigateSpeakerInRoster(1);
                 });
+            }
+            var displaySpeakerActionsBtn = document.getElementById('display-speaker-actions');
+            if (displaySpeakerActionsBtn) {
+                displaySpeakerActionsBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    scrollSpeakerEditorBottomToManagement();
+                });
+            }
+            var speakerEditorBioBtn = document.getElementById('speaker-editor-bio-btn');
+            if (speakerEditorBioBtn) {
+                speakerEditorBioBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    scrollSpeakerEditorBottomToBio();
+                });
+            }
+            var speakerEditorBottomEl = document.querySelector('#speaker-editor #speaker-editor-panel .speaker-editor-bottom');
+            if (speakerEditorBottomEl) {
+                speakerEditorBottomEl.addEventListener('scroll', function () {
+                    syncSpeakerEditorToolbarForBottomScroll();
+                });
+                speakerEditorBottomEl.addEventListener(
+                    'wheel',
+                    function (we) {
+                        if (we) we.preventDefault();
+                    },
+                    { passive: false, capture: true }
+                );
+                speakerEditorBottomEl.addEventListener(
+                    'touchmove',
+                    function (te) {
+                        if (te) te.preventDefault();
+                    },
+                    { passive: false, capture: true }
+                );
+                syncSpeakerEditorToolbarForBottomScroll();
+            }
+            var speakerPadlockBtn = document.getElementById('speaker-editor-padlock-btn');
+            if (speakerPadlockBtn) {
+                speakerPadlockBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    if (speakerPadlockBtn.disabled) return;
+                    speakerPadlockIsOpen = !speakerPadlockIsOpen;
+                    syncSpeakerPadlockButtonUi();
+                    syncSpeakerEditabilityFromPadlock();
+                });
+                syncSpeakerPadlockButtonUi();
             }
             var rosterItemsEl = document.getElementById('speaker-roster-items');
             if (rosterItemsEl) {
@@ -13627,6 +14483,16 @@
                         if (pubId) toggleSpeakerBioPublishForRow(pubId);
                         return;
                     }
+                    var tagBtn = e.target.closest('.speaker-roster-tag');
+                    if (tagBtn && rosterItemsEl.contains(tagBtn)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var tagRow = tagBtn.closest('.speaker-roster-row');
+                        var tagId = tagRow && tagRow.getAttribute('data-speaker-id');
+                        var tagField = tagBtn.getAttribute('data-field');
+                        if (tagId && tagField) cycleSpeakerRosterTagField(tagId, tagField);
+                        return;
+                    }
                     var row = e.target.closest('.speaker-roster-row');
                     if (!row) return;
                     var sid = row.getAttribute('data-speaker-id');
@@ -13639,6 +14505,7 @@
                         }
                     }
                     if (found) {
+                        speakerPadlockIsOpen = false;
                         populateEditSpeakerFormFromRecord(found);
                         setSpeakerRosterItemSelection(row);
                     }
@@ -14856,29 +15723,105 @@
                 texteditorSpeakerEmailTemplatesSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
             }
 
-            showStatus('loading', 'Loading backend settings...');
+            showStatus('loading', 'Loading backend settings from Firestore…');
             await syncSelectedAndCurrentEventFromSettings();
             updateBackendEditorVisibility();
             updateEditSpeakerNameHeading();
             updateAddSpeakerSaveButtonState();
             updateContentSaveButtonState();
-            showStatus('loading', 'Fetching content and guests...');
-            backendContentPreloadPromise = fetchAllContentIntoMemory().catch(function (err) {
-                console.error('Content preload failed:', err);
-                if (typeof showStatus === 'function') showStatus('error', 'Failed to fetch content.');
-            });
-            backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({}).catch(function (err) {
-                console.error('Guests preload failed:', err);
-                if (typeof showStatus === 'function') showStatus('error', 'Failed to fetch guests.');
-            });
-            showStatus('loading', 'Fetching programme and speakers...');
+            var startupEventLabel = String(selectedevent || current_event || '').trim() || 'the selected event';
+            var startupLoaded = { content: false, guests: false, programme: false, speakers: false };
+            function updateBackendStartupLoadStatus(errorMessage) {
+                if (errorMessage) {
+                    showStatus('error', errorMessage);
+                    return;
+                }
+                var done = [];
+                var pending = [];
+                if (startupLoaded.content) {
+                    var contentCount = Array.isArray(contentRosterInMemory) ? contentRosterInMemory.length : 0;
+                    done.push(contentCount + ' content item' + (contentCount === 1 ? '' : 's'));
+                } else {
+                    pending.push('content');
+                }
+                if (startupLoaded.guests) {
+                    var guestCount = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
+                    done.push(guestCount + ' guest' + (guestCount === 1 ? '' : 's'));
+                } else {
+                    pending.push('guests');
+                }
+                if (startupLoaded.programme) {
+                    var programmeDayCount =
+                        programmeState && Array.isArray(programmeState.dayDates) ? programmeState.dayDates.length : 0;
+                    done.push(programmeDayCount + ' programme day' + (programmeDayCount === 1 ? '' : 's'));
+                } else {
+                    pending.push('programme');
+                }
+                if (startupLoaded.speakers) {
+                    var speakerCount = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory.length : 0;
+                    done.push(speakerCount + ' speaker' + (speakerCount === 1 ? '' : 's'));
+                } else {
+                    pending.push('speakers');
+                }
+                var message = '';
+                if (done.length) {
+                    message += 'Loaded ' + done.join(', ') + '.';
+                }
+                if (pending.length) {
+                    message += ' Loading ' + pending.join(', ') + ' for ' + startupEventLabel + '…';
+                } else {
+                    message += ' Finishing startup…';
+                }
+                showStatus('loading', message.trim());
+            }
+            function markStartupLoaded(key) {
+                startupLoaded[key] = true;
+                updateBackendStartupLoadStatus();
+            }
+            updateBackendStartupLoadStatus();
+            backendContentPreloadPromise = fetchAllContentIntoMemory()
+                .then(function () {
+                    markStartupLoaded('content');
+                })
+                .catch(function (err) {
+                    console.error('Content preload failed:', err);
+                    updateBackendStartupLoadStatus('Failed to load content from Firestore.');
+                    throw err;
+                });
+            backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({})
+                .then(function () {
+                    markStartupLoaded('guests');
+                })
+                .catch(function (err) {
+                    console.error('Guests preload failed:', err);
+                    updateBackendStartupLoadStatus('Failed to load guests from Firestore.');
+                    throw err;
+                });
             await Promise.all([
-                loadProgrammeFromFirestore(selectedevent),
-                fetchSpeakersForSelectedEvent(),
+                loadProgrammeFromFirestore(selectedevent)
+                    .then(function () {
+                        markStartupLoaded('programme');
+                    })
+                    .catch(function (err) {
+                        console.error('Programme preload failed:', err);
+                        updateBackendStartupLoadStatus('Failed to load programme from Firestore.');
+                        throw err;
+                    }),
+                fetchSpeakersForSelectedEvent()
+                    .then(function () {
+                        markStartupLoaded('speakers');
+                    })
+                    .catch(function (err) {
+                        console.error('Speakers preload failed:', err);
+                        updateBackendStartupLoadStatus('Failed to load speakers from Firestore.');
+                        throw err;
+                    }),
                 backendContentPreloadPromise,
                 backendGuestsPreloadPromise
             ]);
-            showStatus('success', 'All startup data fetched. Backend is ready.');
+            showStatus('success', 'Backend ready. Loaded ' + describeBackendStartupLoadedSummary() + '.');
+            syncGuestEditorToolbarForBottomScroll();
+            syncSpeakerEditorToolbarForBottomScroll();
             updateBackendContentCountDisplay();
             setBackendPanel('speakers');
             const storedActivitiesEl = document.querySelector('.editor .activities .storage');

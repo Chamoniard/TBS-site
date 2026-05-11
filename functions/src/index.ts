@@ -100,6 +100,18 @@ function guestLogPrefixYyMmDd(): string {
 }
 
 /**
+ * Human-readable calendar date for guest invoice records.
+ * @param {Date} date Invoice send timestamp.
+ * @return {string} Date string such as 2026-05-11.
+ */
+function formatGuestInvoicedDateDisplay(date: Date): string {
+  const yyyy = String(date.getFullYear());
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+/**
  * Builds customer full name from Firebase "Full name".
  * @param {Record<string, unknown>} data Firestore guest item data.
  * @param {string} fallbackName Fallback display name.
@@ -256,12 +268,17 @@ export const createGuestStripeInvoiceHttp = onRequest({
 
     const sentLogLine = `${guestLogPrefixYyMmDd()}: ` +
       `Stripe invoice finalized and sent (${finalizedInvoice.id}).`;
+    const invoicedDate = formatGuestInvoicedDateDisplay(new Date());
     await itemRef.set({
       "Invoiced": "Yes",
       "Paid": "No",
+      "Invoiced date": invoicedDate,
       "Stripe Invoice Id": finalizedInvoice.id,
       "Stripe Invoice Status": finalizedInvoice.status || "open",
       "Stripe Invoice Url": finalizedInvoice.hosted_invoice_url || "",
+      "Invoice created": String(finalizedInvoice.created || ""),
+      "Stripe Invoice Template Id Used": stripeInvoiceTemplateId,
+      "Stripe Invoice Price Id Used": stripeInvoicePriceId,
       "Log": FieldValue.arrayUnion(sentLogLine),
     }, {merge: true});
 
