@@ -7,7 +7,7 @@
     <link rel="icon" href="images/emblem.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -49,26 +49,9 @@
             user-select: none;
         }
 
-        .poster-bg-mobile {
-            display: none;
-        }
-
         @media (max-width: 768px) {
             .poster-bg {
-                display: none;
-            }
-
-            .poster-bg-mobile {
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
                 width: 768px;
-                height: auto;
-                max-width: none;
-                z-index: 0;
-                pointer-events: none;
-                user-select: none;
             }
 
             .index-content {
@@ -133,8 +116,10 @@
 </head>
 <body aria-label="Poster background page">
     <div class="index-content">
-        <img src="images/poster_wide.png" alt="" class="poster-bg" aria-hidden="true">
-        <img src="images/poster_narrow.png" alt="" class="poster-bg-mobile" aria-hidden="true">
+        <picture>
+            <source media="(max-width: 768px)" srcset="images/poster_narrow.png">
+            <img src="images/poster_wide.png" alt="" class="poster-bg" decoding="async" fetchpriority="high" aria-hidden="true">
+        </picture>
         <div class="index-brand">
             <img src="images/logo.png" alt="TBS Zermatt" class="index-logo">
             <p class="index-standby-title">Stand by...</p>
