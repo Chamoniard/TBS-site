@@ -19,7 +19,11 @@ const firestoreHomeCache = {
     eventInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — tbs/Snippets field Eventinfo (home .event-contents)
     registrationManifesto: { value: '', fetchedAt: 0, promise: null },
     /** First programme-band card: `tbs/Snippets` field `Programmeinfo`. */
-    programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null }
+    programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
+    /** `tbs/Settings` field `displayspeakers` (`Yes` / `No`). */
+    siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
+    /** `tbs/Settings` field `displayprogramme` (`Yes` / `No`). */
+    siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null }
 };
 
 function isFreshFirestoreCacheEntry(entry) {
@@ -1374,7 +1378,7 @@ const TBS_HOTEL_ALEX_URL = 'https://www.hotelalexzermatt.com/en/';
 /** Event body for home About slide */
 const ABOUT_EVENT_INNER_HTML = `
                                 <h3 class="about-title introslider-title">Event</h3>
-                                <p>How do we think, decide and act when medicine matters the most? TBS is a forum dedicated to the early management of critical illness. It is about first-hour critical care, physiology, behaviour and emerging technologies.<br><br></p>
+                                <p>TBS is a forum dedicated to the early management of critical illness. It is about first-hour critical care, physiology, behaviour and emerging technologies.<br><br></p>
 `;
 
 /** Location body for home Location slide */
@@ -1409,17 +1413,17 @@ ${ABOUT_LOCATION_INNER_HTML}
 
 /** Home introslider: About panel before featured-video */
 const FEATURED_ABOUT_SLIDER_HTML = `
-                    <div class="about">
+                    <div class="about introslider-clickable" role="button" tabindex="0" aria-label="Scroll to Welcome to TBS27">
                         <div class="about-text">
 ${ABOUT_EVENT_INNER_HTML}
-                </div>
+                        </div>
                         <h3 class="featured-bottom-title introslider-title">About</h3>
             </div>
         `;
 
-/** Home introslider: duplicated About panel as Location container → scroll to home Location band */
+/** Home introslider: Location panel → scroll to programme section */
 const FEATURED_LOCATION_SLIDER_HTML = `
-                    <div class="location introslider-clickable" role="button" tabindex="0" aria-label="Scroll to location section">
+                    <div class="location introslider-clickable" role="button" tabindex="0" aria-label="Scroll to programme section">
                         <div class="about-text">
 ${ABOUT_LOCATION_INNER_HTML}
                         </div>
@@ -1458,7 +1462,7 @@ const FEATURED_ABOUT_SPEAKERS_SLIDER_HTML = `
                     <div class="about-speakers introslider-clickable" role="button" tabindex="0" aria-label="Scroll to speakers section">
                         <div class="about-text">
                                 <h3 class="about-title introslider-title">Speakers</h3>
-                                <p>Our speakers are carefully selected from the cutting edge of critical care, resuscitation and cognitive sciences. We then ask them to go above and beyond the studies and the guidelines.</p>
+                                <p>Carefully selected from the cutting edge of critical care, resuscitation and cognitive sciences. We ask them to go above and beyond the studies and the guidelines.</p>
                             </div>
                         <h3 class="featured-bottom-title introslider-title">Speakers</h3>
                         </div>
@@ -1510,7 +1514,7 @@ const HOME_SPONSORS_SECTION_HTML = `
 
 /** Max rendered logo height (px); row logic still scales down responsively as space shrinks. */
 function homeSponsorLogosMaxHeightPx() {
-    return 40;
+    return 50;
 }
 
 function sponsorLogosRowGapPx(rowEl) {
@@ -1668,7 +1672,7 @@ const HOME_LOCATION_SECTION_HTML =
                     <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async" aria-hidden="true">
                     <div class="event-section-inner-wrapper">
                         <div class="eventintroduction">
-                            <h1 class="section-titles maintitle-heading">WELCOME TO TBS27</h1>
+                            <h1 class="section-titles maintitle-heading" id="home-event-welcome-heading">WELCOME TO TBS27</h1>
                             <div class="event-texts">
                                 <div class="event-contents"></div>
                             </div>
@@ -1712,7 +1716,7 @@ const HOME_ONDEMAND_SECTION_HTML = `
                 </div>
 `;
 
-/** Registration at bottom of home; order after .ondemand-section is fixed in displayNewsGrid. */
+/** Registration at bottom of home; order after speakers/programme is fixed in displayNewsGrid. */
 const HOME_REGISTRATION_OUTER_HTML = `
                 <div class="registration-section" role="region" aria-labelledby="home-registration-heading">
                     <div class="registration-section-inner-wrapper">
@@ -1886,7 +1890,7 @@ const HOME_REGISTRATION_OUTER_HTML = `
                                 <div class="registration-form-row">
                                     <div class="registration-field">
                                         <label for="reg-very-brief-bio">Very brief bio</label>
-                                        <textarea id="reg-very-brief-bio" name="veryBriefBio" placeholder="This is a long text string"></textarea>
+                                        <textarea id="reg-very-brief-bio" name="veryBriefBio" rows="4"></textarea>
                                     </div>
                                 </div>
                                 <div class="registration-form-row">
@@ -1905,8 +1909,8 @@ const HOME_REGISTRATION_OUTER_HTML = `
                                     </fieldset>
                                 </div>
                                 <div class="registration-form-row registration-form-row--actions">
-                                    <button type="submit" class="registration-submit-btn">Submit registration</button>
-                                    <p class="registration-smallprint">Submitting this form registers your interest; final confirmation and payment information will be sent by email.</p>
+                                    <button type="submit" class="registration-submit-btn nav-register-pill">Apply</button>
+                                    <p class="registration-smallprint">Submitting this form registers your interest in attending TBS. We'll be in touch shortly.</p>
                                 </div>
                             </form>
                     </div>
@@ -2113,11 +2117,18 @@ function scrollToHomeProgrammeSection() {
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
 }
 
-/** Smooth scroll to home Event band (#home-location-heading). */
-function scrollToHomeLocationSection() {
-    const el =
-        document.getElementById('home-location-heading') ||
-        document.querySelector('.home-section .event-section');
+/** Home Event band welcome title (introslider Event about-text scroll target). */
+function getHomeEventWelcomeHeadingEl() {
+    return (
+        document.getElementById('home-event-welcome-heading') ||
+        document.querySelector('.home-section .event-section .maintitle-heading') ||
+        document.querySelector('.home-section .event-section')
+    );
+}
+
+/** Smooth scroll to home Event welcome title (Welcome to TBS27). */
+function scrollToHomeEventWelcomeSection() {
+    const el = getHomeEventWelcomeHeadingEl();
     if (!el) return;
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
@@ -2242,6 +2253,25 @@ function revealStuckHomeStageBands(homeSection) {
     });
 }
 
+/** Show home bands below the hero intro (do not wait on feed/Firestore). */
+function revealHomeStageBandsBelowIntro(homeSection) {
+    if (!homeSection) return;
+    [
+        homeSection.querySelector(':scope > .event-section'),
+        homeSection.querySelector(':scope > .sponsors-section'),
+        homeSection.querySelector(':scope > .feed-section'),
+        homeSection.querySelector(':scope > .speaker-section'),
+        homeSection.querySelector(':scope > .programme-section'),
+        homeSection.querySelector(':scope > .registration-section')
+    ].forEach(function (el) {
+        if (el) el.classList.remove('home-stage-hidden');
+    });
+    requestAnimationFrame(function () {
+        kickLocationTrailerEmbed(homeSection.querySelector('.event-section'));
+        layoutHomeSponsorLogosRowApply(homeSection.querySelector('.sponsors-section'));
+    });
+}
+
 // Show the feed content (different from blog posts)
 async function showFeedContent() {
     document.body.classList.add('home-view');
@@ -2309,8 +2339,7 @@ ${HOME_REGISTRATION_OUTER_HTML}
         const sponsorsWrap = homeSection && homeSection.querySelector(':scope > .sponsors-section');
         const speakersWrap = homeSection && homeSection.querySelector(':scope > .speaker-section');
         const regWrap = homeSection && homeSection.querySelector(':scope > .registration-section');
-        const ondemandWrap = homeSection && homeSection.querySelector(':scope > .ondemand-section');
-        [introWrap, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, ondemandWrap, regWrap].forEach((el) => {
+        [introWrap, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, regWrap].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
 
@@ -2350,6 +2379,21 @@ ${HOME_REGISTRATION_OUTER_HTML}
                 }
             });
         }
+        const aboutEventSlideEl = main.querySelector('.home-section .introslider > .about');
+        if (aboutEventSlideEl) {
+            aboutEventSlideEl.addEventListener('click', function(e) {
+                if (e.target.closest('a')) return;
+                e.preventDefault();
+                e.stopPropagation();
+                scrollToHomeEventWelcomeSection();
+            });
+            aboutEventSlideEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    scrollToHomeEventWelcomeSection();
+                }
+            });
+        }
         const locationSlideEl = main.querySelector('.home-section .introslider > .location');
         if (locationSlideEl) {
             locationSlideEl.addEventListener('click', function(e) {
@@ -2379,12 +2423,13 @@ ${HOME_REGISTRATION_OUTER_HTML}
         try {
             await waitForHomePosterPictureReady(pictureEl);
             if (introWrap) introWrap.classList.remove('home-stage-hidden');
+            revealHomeStageBandsBelowIntro(homeSection);
             setupHomeHeroIntrosliderPosterGap(8);
             requestAnimationFrame(function () {
                 initPosterSnow();
             });
 
-            // Start heavy data work immediately so it runs in parallel with intro image settling.
+            // Start heavy data work in parallel; bands are already visible (see revealHomeStageBandsBelowIntro).
             const newsFeedPromise = loadNewsFeed();
             const speakersPromise = speakersWrap ? populateHomeSpeakersSliderFromFirebase(speakersWrap) : Promise.resolve();
             const registrationManifestoPromise = regWrap
@@ -2395,23 +2440,8 @@ ${HOME_REGISTRATION_OUTER_HTML}
             const registrationManifestoHtml = results && results.length >= 3 ? results[2] : '';
 
             const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
-            if (eventSectionWrap) {
-                eventSectionWrap.classList.remove('home-stage-hidden');
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(function () {
-                        kickLocationTrailerEmbed(eventSectionWrap);
-                    });
-                });
-            }
-            if (sponsorsWrap) {
-                sponsorsWrap.classList.remove('home-stage-hidden');
-            }
-            if (feedWrap) feedWrap.classList.remove('home-stage-hidden');
-            if (speakersWrap) speakersWrap.classList.remove('home-stage-hidden');
             if (programmeWrap) programmeWrap.classList.remove('home-stage-hidden');
-            if (ondemandWrap) ondemandWrap.classList.remove('home-stage-hidden');
 
-            if (regWrap) regWrap.classList.remove('home-stage-hidden');
             if (regWrap) {
                 const manifestoEl = regWrap.querySelector('p.registration-manifesto');
                 if (manifestoEl && typeof registrationManifestoHtml === 'string') {
@@ -2450,24 +2480,9 @@ async function goToHomeRegistration(e) {
     });
 }
 
-/** Introslider Location panel / scroll target: home Location band title. */
+/** Introslider Location panel → programme section. */
 async function goToHomeLocation(e) {
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    setPastTalksOpenState(false);
-    if (!document.body.classList.contains('home-view')) {
-        await showFeedContent();
-    }
-    setActiveNavView('feed');
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const el = document.getElementById('home-location-heading');
-            if (!el) return;
-            const reduce =
-                typeof window.matchMedia === 'function' &&
-                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-        });
-    });
+    await goToHomeProgramme(e);
 }
 
 /** Programme nav: load home (if needed) and smooth-scroll to the Programme section title. */
@@ -2834,6 +2849,101 @@ const HOME_LOCATION_BAND_DEFAULT_HTML = `<p>Getting to Zermatt is fairly straigh
 const TBS27_HOME_PROGRAMME_EVENT_ID = 'TBS27';
 /** First home speaker card HTML: Firestore `tbs/snippets` field `Speakers`. */
 const HOME_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
+const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
+const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
+/** Placeholder slides when Settings hide speakers/programme roster (after optional info card). */
+const HOME_CAROUSEL_TBA_CARD_COUNT = 2;
+
+/** @returns {boolean} true when speaker roster cards should show (default Yes). */
+function normalizeHomeDisplaySpeakersSetting(value) {
+    const s = String(value == null ? '' : value).trim().toLowerCase();
+    if (s === 'no' || s === 'n') return false;
+    if (s === 'yes' || s === 'y') return true;
+    return true;
+}
+
+/** @returns {boolean} true when programme day cards should show (default Yes). */
+function normalizeHomeDisplayProgrammeSetting(value) {
+    const s = String(value == null ? '' : value).trim().toLowerCase();
+    if (s === 'no' || s === 'n') return false;
+    if (s === 'yes' || s === 'y') return true;
+    return true;
+}
+
+async function fetchHomeSiteSettingsFromFirestore() {
+    const speakersCached = firestoreHomeCache.siteSettingsDisplaySpeakers;
+    const programmeCached = firestoreHomeCache.siteSettingsDisplayProgramme;
+    if (
+        isFreshFirestoreCacheEntry(speakersCached) &&
+        isFreshFirestoreCacheEntry(programmeCached)
+    ) {
+        return {
+            displaySpeakers: !!speakersCached.value,
+            displayProgramme: !!programmeCached.value
+        };
+    }
+    if (speakersCached && speakersCached.promise) {
+        const displaySpeakers = await speakersCached.promise;
+        const displayProgramme =
+            programmeCached && programmeCached.promise
+                ? await programmeCached.promise
+                : !!programmeCached.value;
+        return { displaySpeakers: !!displaySpeakers, displayProgramme: !!displayProgramme };
+    }
+
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const snap = await db.collection('tbs').doc('Settings').get();
+            const data = snap && snap.exists ? snap.data() || {} : {};
+            return {
+                displaySpeakers: normalizeHomeDisplaySpeakersSetting(
+                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD]
+                ),
+                displayProgramme: normalizeHomeDisplayProgrammeSetting(
+                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD]
+                )
+            };
+        } catch (e) {
+            console.error('fetchHomeSiteSettingsFromFirestore', e);
+            return { displaySpeakers: true, displayProgramme: true };
+        }
+    })();
+
+    firestoreHomeCache.siteSettingsDisplaySpeakers = {
+        value: speakersCached ? speakersCached.value : true,
+        fetchedAt: speakersCached ? Number(speakersCached.fetchedAt || 0) : 0,
+        promise: promise.then((s) => s.displaySpeakers)
+    };
+    firestoreHomeCache.siteSettingsDisplayProgramme = {
+        value: programmeCached ? programmeCached.value : true,
+        fetchedAt: programmeCached ? Number(programmeCached.fetchedAt || 0) : 0,
+        promise: promise.then((s) => s.displayProgramme)
+    };
+    const settings = await promise;
+    const now = Date.now();
+    firestoreHomeCache.siteSettingsDisplaySpeakers = {
+        value: settings.displaySpeakers,
+        fetchedAt: now,
+        promise: null
+    };
+    firestoreHomeCache.siteSettingsDisplayProgramme = {
+        value: settings.displayProgramme,
+        fetchedAt: now,
+        promise: null
+    };
+    return settings;
+}
+
+async function fetchHomeDisplaySpeakersFromFirestore() {
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    return settings.displaySpeakers;
+}
+
+async function fetchHomeDisplayProgrammeFromFirestore() {
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    return settings.displayProgramme;
+}
 /** Home registration manifesto HTML: Firestore `tbs/Snippets` field `Registration`. */
 const HOME_SNIPPETS_TEGISTRATION_FIELD = 'Registration';
 /** Home Location body HTML: Firestore `events/{eventId}` field `locationinfo` (same as backend Snippets → Location save). */
@@ -2951,6 +3061,36 @@ function normalizeProgrammeInfoSlideHtml(htmlString) {
     } catch (e) {
         return '<div class="programme-info programme-friday"><div class="programme-day-content programmestyle">' + t + '</div></div>';
     }
+}
+
+/** Programme intro slide HTML (Firestore snippet, localStorage draft, then hero teaser). */
+async function resolveHomeProgrammeInfoSlideHtml() {
+    let infoHtmlRaw = String(await fetchHomeProgrammeBandIntroFromSnippets() || '').trim();
+    if (!infoHtmlRaw) {
+        try {
+            const fromLs = localStorage.getItem(TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY);
+            if (fromLs != null && String(fromLs).trim() !== '') {
+                infoHtmlRaw = String(fromLs).trim();
+            }
+        } catch (e) {
+            /* ignore */
+        }
+    }
+    if (!infoHtmlRaw) {
+        infoHtmlRaw = HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML.trim();
+    }
+    return normalizeProgrammeInfoSlideHtml(infoHtmlRaw);
+}
+
+/** Placeholder programme slide when `tbs/Settings.displayprogramme` is `No`. */
+function buildHomeProgrammeTbaSlideHtml() {
+    return (
+        '<div class="programme-tba programme-friday" role="status" aria-label="Programme to be announced">' +
+        '<div class="programme-day-content programmestyle home-carousel-tba-body">' +
+        '<h3 class="home-carousel-tba-title">Programme TBA</h3>' +
+        '</div>' +
+        '</div>'
+    );
 }
 
 /** Same ordering as backend speaker roster (first name, then last name, then doc id). */
@@ -3351,6 +3491,26 @@ function appendHomeSpeakerinfoCard(track, html) {
     track.appendChild(article);
 }
 
+/** Placeholder speaker slide when `tbs/Settings.displayspeakers` is `No`. */
+function appendHomeSpeakerTbaCard(track) {
+    const article = document.createElement('article');
+    article.className = 'speaker-card speaker-card--tba';
+    article.setAttribute('aria-label', 'Speakers to be announced');
+
+    const innerWrap = document.createElement('div');
+    innerWrap.className = 'speaker-card-inner-wrapper';
+    const contentWrap = document.createElement('div');
+    contentWrap.className = 'speaker-content home-carousel-tba-body';
+    const nameEl = document.createElement('h3');
+    nameEl.className = 'speaker-card-name home-carousel-tba-title';
+    nameEl.textContent = 'Speakers TBA';
+
+    contentWrap.appendChild(nameEl);
+    innerWrap.appendChild(contentWrap);
+    article.appendChild(innerWrap);
+    track.appendChild(article);
+}
+
 /**
  * @param {boolean} expandableLongBio — same rule as former per-card chevron: first real speaker when there is no
  * `speakerinfo` card has no long-bio expand. Cards with this flag toggle short/long bio on press.
@@ -3548,11 +3708,33 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     try {
         track.innerHTML = '';
         const eventId = TBS27_HOME_PROGRAMME_EVENT_ID;
-        const [speakers, speakerinfoRaw] = await Promise.all([
-            fetchHomeSpeakersListFromFirebase(eventId),
-            fetchHomeEventSpeakerInfoFromFirebase(eventId)
-        ]);
+        const displaySpeakers = await fetchHomeDisplaySpeakersFromFirestore();
+        speakersWrapperEl.classList.toggle('home-carousel--minimal', !displaySpeakers);
+        const speakerinfoRaw = await fetchHomeEventSpeakerInfoFromFirebase(eventId);
         const speakerinfoHtml = String(speakerinfoRaw || '').trim();
+        const hasInfoCard = !!speakerinfoHtml;
+
+        if (!displaySpeakers) {
+            const syntheticInfo = {
+                id: '__speakerinfo__',
+                firstName: '',
+                lastName: '',
+                shortBio: '',
+                longBio: ''
+            };
+            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = hasInfoCard ? speakerinfoHtml : null;
+            speakersWrapperEl._homeSpeakersList = hasInfoCard ? [syntheticInfo] : [];
+            speakersWrapperEl._homeSpeakersExpanded = false;
+            if (hasInfoCard) {
+                appendHomeSpeakerinfoCard(track, speakerinfoHtml);
+            }
+            for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
+                appendHomeSpeakerTbaCard(track);
+            }
+            return;
+        }
+
+        const speakers = await fetchHomeSpeakersListFromFirebase(eventId);
         if (!speakers.length && !speakerinfoHtml) {
             speakersWrapperEl._homeSpeakersList = [];
             speakersWrapperEl._homeFirstCardSpeakerInfoHtml = null;
@@ -3560,7 +3742,6 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
             return;
         }
 
-        const hasInfoCard = !!speakerinfoHtml;
         const syntheticInfo = {
             id: '__speakerinfo__',
             firstName: '',
@@ -3592,6 +3773,19 @@ const PROGRAMME_INDEX_SLIDE_DEFAULTS = [
 ];
 
 async function buildHomeProgrammeSliderDaySlidesHTML() {
+    const displayProgramme = await fetchHomeDisplayProgrammeFromFirestore();
+    const infoSlide = await resolveHomeProgrammeInfoSlideHtml();
+    if (!displayProgramme) {
+        const parts = [];
+        if (infoSlide) {
+            parts.push(infoSlide);
+        }
+        for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
+            parts.push(buildHomeProgrammeTbaSlideHtml());
+        }
+        return parts;
+    }
+
     const source = document.getElementById('programme-index-source');
     const parts = [];
     const dayFetches = PROGRAMME_INDEX_DAY_ORDER.map(function (day) {
@@ -3626,22 +3820,6 @@ async function buildHomeProgrammeSliderDaySlidesHTML() {
         }
         parts.push(PROGRAMME_INDEX_SLIDE_DEFAULTS[i] || PROGRAMME_INDEX_SLIDE_DEFAULTS[0]);
     }
-    // First card: `tbs/Snippets.Programmeinfo`, then localStorage draft, then hero teaser copy.
-    let infoHtmlRaw = String(await fetchHomeProgrammeBandIntroFromSnippets() || '').trim();
-    if (!infoHtmlRaw) {
-        try {
-            const fromLs = localStorage.getItem(TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY);
-            if (fromLs != null && String(fromLs).trim() !== '') {
-                infoHtmlRaw = String(fromLs).trim();
-            }
-        } catch (e) {
-            /* ignore */
-        }
-    }
-    if (!infoHtmlRaw) {
-        infoHtmlRaw = HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML.trim();
-    }
-    const infoSlide = normalizeProgrammeInfoSlideHtml(infoHtmlRaw);
     if (infoSlide) {
         parts.unshift(infoSlide);
     }
@@ -3674,7 +3852,10 @@ async function displayNewsGrid(records) {
     const programmeSliderSection = document.createElement('div');
     programmeSliderSection.className = 'home-programme-section';
     const programmeDaySlides = await buildHomeProgrammeSliderDaySlidesHTML();
+    const displayProgramme = await fetchHomeDisplayProgrammeFromFirestore();
     const programmeSliderTrackInner = programmeDaySlides.join('');
+    const programmeSliderClassName =
+        'programme-slider' + (displayProgramme ? '' : ' home-carousel--minimal');
     const programmeDotsHTML = programmeDaySlides
         .map(
             (_, i) =>
@@ -3688,7 +3869,9 @@ async function displayNewsGrid(records) {
     programmeSliderSection.innerHTML =
         '<div class="programme-section home-stage-hidden" id="home-programme-title" role="region" aria-label="Programme">' +
         '<div class="programmeslider-innerwrapper">' +
-        '<div class="programme-slider">' +
+        '<div class="' +
+        programmeSliderClassName +
+        '">' +
         programmeSliderTrackInner +
         '</div>' +
         '<div class="home-introslider-scrollbar" aria-hidden="true">' +
@@ -3726,13 +3909,14 @@ async function displayNewsGrid(records) {
         }
 
         const registrationOuter = homeSection.querySelector(':scope > .registration-section');
-        const ondemandSectionEl = homeSection.querySelector(':scope > .ondemand-section');
         if (registrationOuter) {
-            if (ondemandSectionEl) {
-                ondemandSectionEl.insertAdjacentElement('afterend', registrationOuter);
-            } else if (programmeSection) {
-                programmeSection.insertAdjacentElement('afterend', registrationOuter);
+            const registrationAnchor = speakersSliderWrapper || programmeSection;
+            if (registrationAnchor) {
+                registrationAnchor.insertAdjacentElement('afterend', registrationOuter);
             }
+        }
+        if (programmeSection) {
+            programmeSection.classList.remove('home-stage-hidden');
         }
     } else {
         feedContent.appendChild(programmeSliderSection);
@@ -4986,7 +5170,7 @@ const HOME_NAV_SCROLL_INSTANT_THRESHOLD_PX = 2;
 
 /**
  * Scroll-spy: highlight nav tabs (yellow .active) for the home section currently at the navbar anchor line.
- * Order matches DOM: feed → event section → sponsors → speakers → programme → on-demand → registration.
+ * Order matches DOM: feed → event section → sponsors → speakers → programme → registration.
  */
 function syncHomeNavSectionFromScroll() {
     if (!document.body.classList.contains('home-view')) return;

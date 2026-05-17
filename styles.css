@@ -242,18 +242,6 @@ body.home-view .navbar {
     color: rgba(255, 255, 255, 0.78);
 }
 
-.home-section > .registration-section .registration-submit-btn {
-    background-color: #FFD700;
-    color: #003153;
-    border-color: #FFD700;
-}
-
-.home-section > .registration-section .registration-submit-btn:hover {
-    background-color: #e6c200;
-    border-color: #e6c200;
-    color: #001f38;
-}
-
 /* Registration form layout */
 .registration-form {
     display: flex;
@@ -478,32 +466,13 @@ body.home-view .navbar {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    align-items: flex-start;
-}
-
-.registration-submit-btn {
-    appearance: none;
-    -webkit-appearance: none;
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.5rem 1.2rem;
-    border-radius: 5px;
-    border: 1px solid #003153;
-    background-color: #003153;
-    color: #FFD700;
-    font-weight: 500;
-    font-size: 0.95rem;
-    cursor: pointer;
-}
-
-.registration-submit-btn:hover {
-    background-color: #001f38;
-    border-color: #001f38;
+    width: 100%;
 }
 
 .registration-smallprint {
-    font-size: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.6;
     color: #374151;
     margin: 0;
 }
@@ -728,6 +697,64 @@ body.home-view .navbar {
     }
 }
 
+/* Shared Register / Apply pill (navbar + registration form) */
+.nav-register-pill,
+.nav-item-register-desktop .nav-link[data-view="register"],
+.registration-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 400 !important;
+    line-height: normal;
+    cursor: pointer;
+    background-color: #FFD700;
+    color: #003153;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin: 0;
+    white-space: nowrap;
+    box-sizing: border-box;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button.registration-submit-btn,
+button.nav-register-pill {
+    font-weight: 400 !important;
+}
+
+.nav-register-pill:hover,
+.nav-register-pill:focus-visible,
+.nav-item-register-desktop .nav-link[data-view="register"]:hover,
+.registration-submit-btn:hover,
+.registration-submit-btn:focus-visible {
+    background: #003153;
+    color: #FFD700;
+    outline: none;
+}
+
+.nav-register-pill.active,
+.nav-item-register-desktop .nav-link[data-view="register"].active {
+    background: #003153;
+    color: #FFD700;
+    font-weight: 500;
+}
+
+@media (min-width: 769px) {
+    .nav-register-pill,
+    .nav-item-register-desktop .nav-link[data-view="register"],
+    .registration-submit-btn {
+        font-size: 1.2rem;
+    }
+}
+
 /* Mobile-only top tabs: "Talks" + text Register (desktop uses .nav-past-desktop + yellow pill) */
 .nav-past-mobile,
 .nav-register-mobile-top {
@@ -904,6 +931,8 @@ body.home-view .hero {
 .home-section {
     /* Programme day strip + speakers slider: same slide width (see speakerslider-track / programme-slider) */
     --home-carousel-slide-width: 600px;
+    /* Minimal programme/speaker slides: A3 portrait (same as introslider panels) */
+    --home-carousel-minimal-aspect-ratio: 297 / 420;
     padding-bottom: 0;
     padding-left: 0;
     padding-right: 0;
@@ -1022,10 +1051,13 @@ body.home-view .home-section > .event-section,
 body.home-view .home-section > .sponsors-section,
 body.home-view .home-section > .speaker-section,
 body.home-view .home-section > .registration-section,
-body.home-view .home-section > .programme-section,
-body.home-view .home-section > .ondemand-section {
+body.home-view .home-section > .programme-section {
     position: relative;
     z-index: 2;
+}
+
+body.home-view .home-section > .ondemand-section {
+    display: none !important;
 }
 
 /* Feed band slightly above speakers so the load-more chevron can straddle the seam */
@@ -1238,7 +1270,7 @@ body.home-view .home-section > .speaker-section {
     width: 70%;
     max-width: 70%;
     height: auto;
-    margin: 0 auto;
+    margin: 8px auto 0;
     padding: 0;
 }
 
@@ -1703,6 +1735,125 @@ body.home-view .home-section > .speaker-section {
 
 .home-section .speaker-card.speaker-card--speakerinfo .speaker-card-bio-main {
     white-space: normal;
+}
+
+.home-section .speaker-card.speaker-card--tba > .speaker-card-inner-wrapper {
+    min-height: 0;
+}
+
+/* Do not stretch every slide to the tallest peer (info HTML can be very tall). */
+.home-section .speaker-section.home-carousel--minimal .speakerslider-track {
+    align-items: flex-start;
+}
+
+.home-section .speaker-section.home-carousel--minimal .speakerslider-track > .speaker-card {
+    aspect-ratio: var(--home-carousel-minimal-aspect-ratio);
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    align-self: flex-start;
+}
+
+.home-section .speaker-section.home-carousel--minimal .speakerslider-track > .speaker-card > .speaker-card-inner-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.home-section .programme-section .programme-slider.home-carousel--minimal,
+.home-programme-section .programme-slider.home-carousel--minimal {
+    align-items: flex-start;
+}
+
+.home-section .programme-section .programme-slider.home-carousel--minimal > *,
+.home-programme-section .programme-slider.home-carousel--minimal > * {
+    aspect-ratio: var(--home-carousel-minimal-aspect-ratio);
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+}
+
+.home-section .programme-section .programme-slider.home-carousel--minimal .programme-day-content,
+.home-programme-section .programme-slider.home-carousel--minimal .programme-day-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Shared TBA title placement (speakers + programme when Settings = No) */
+.home-carousel--minimal .home-carousel-tba-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+.home-carousel--minimal .home-carousel-tba-title {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    width: 100%;
+}
+
+.home-section .programme-slider.home-carousel--minimal > .programme-tba .home-carousel-tba-title,
+.home-programme-section .programme-slider.home-carousel--minimal > .programme-tba .home-carousel-tba-title {
+    color: #ffffff;
+}
+
+.home-section .speaker-section.home-carousel--minimal .speakerslider-track > .speaker-card.speaker-card--tba {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.home-section .speaker-section.home-carousel--minimal .speaker-card--tba > .speaker-card-inner-wrapper {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    box-sizing: border-box;
+}
+
+.home-section .speaker-section.home-carousel--minimal .speaker-card--tba > .speaker-card-inner-wrapper > .speaker-content.home-carousel-tba-body {
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.home-section .speaker-section.home-carousel--minimal .speaker-card--tba .speaker-card-name.home-carousel-tba-title,
+.home-section .speaker-section.home-carousel--minimal .speaker-card--tba .home-carousel-tba-title {
+    color: #000000;
+    text-align: center !important;
+    width: 100%;
 }
 
 .home-section .speaker-card > .speaker-card-inner-wrapper > .speaker-image {
@@ -2918,6 +3069,34 @@ body.home-view .home-section > .home-social-row-container {
     overflow: visible;
 }
 
+/* Minimal slides: keep A3 ratio and internal scroll (beats programme-slider stretch/overflow below) */
+.home-section .speaker-section.home-carousel--minimal .speakerslider-track > .speaker-card > .speaker-card-inner-wrapper,
+.home-section .speaker-section.home-carousel--minimal .speaker-card > .speaker-card-inner-wrapper > .speaker-content,
+.home-section .programme-slider.home-carousel--minimal .programme-day-content,
+.home-programme-section .programme-slider.home-carousel--minimal .programme-day-content,
+.home-section .programme-slider.home-carousel--minimal .programme-info,
+.home-section .programme-slider.home-carousel--minimal .programme-tba,
+.home-programme-section .programme-slider.home-carousel--minimal .programme-info,
+.home-programme-section .programme-slider.home-carousel--minimal .programme-tba {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow: auto;
+}
+
+@media (min-width: 769px) {
+    .home-section .speaker-section.home-carousel--minimal .speakerslider-track > .speaker-card,
+    .home-section .programme-section .programme-slider.home-carousel--minimal > *,
+    .home-programme-section .programme-slider.home-carousel--minimal > * {
+        aspect-ratio: var(--home-carousel-minimal-aspect-ratio) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        align-self: flex-start !important;
+        overflow: hidden auto !important;
+    }
+}
+
 .programme-day-content p,
 .programme-tuesday .programmestyle p,
 .programme-wednesday .programmestyle p,
@@ -2979,6 +3158,20 @@ body.home-view .home-section > .home-social-row-container {
 .programme-slider .programmestyle h4 {
     color: #FFD700 !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Programme intro card (Firestore programmeinfo): left-aligned subheads, not day-card centering */
+.programme-info .programmestyle h3,
+.programme-info .programmestyle h4,
+.programme-info .programme-day-content h3,
+.programme-info .programme-day-content h4,
+.programme-slider .programme-info h3,
+.programme-slider .programme-info h4,
+.programme-slider .programme-info .programmestyle h3,
+.programme-slider .programme-info .programmestyle h4,
+.programme-info .about-title,
+.programme-slider .programme-info .about-title {
+    text-align: left !important;
 }
 
 .programme-slider .programmestyle p,
@@ -3924,6 +4117,11 @@ h2.section-titles {
     scroll-margin-top: calc(var(--navbar-height) + 12px);
 }
 
+/* Home Event welcome title: scroll target from introslider Event about-text */
+#home-event-welcome-heading {
+    scroll-margin-top: calc(var(--navbar-height) + 12px);
+}
+
 /* On-demand heading: scroll target (fixed nav) */
 #home-ondemand-heading {
     scroll-margin-top: calc(var(--navbar-height) + 12px);
@@ -4801,6 +4999,10 @@ h4 {
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
+    }
+
+    .home-carousel--minimal .home-carousel-tba-body {
+        justify-content: center;
     }
 
     .introslider::-webkit-scrollbar,
@@ -6379,21 +6581,20 @@ h4 {
         justify-content: center;
         appearance: none;
         -webkit-appearance: none;
-        font: inherit;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 1rem;
+        font-weight: 400 !important;
+        line-height: normal;
         cursor: pointer;
         background-color: #FFD700;
         color: #003153 !important;
         border: none;
         border-radius: 5px;
         padding: 4px 8px;
-        font-size: 1rem;
-        font-weight: 400;
         margin: 0;
         white-space: nowrap;
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
-        line-height: normal;
         text-align: center;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
@@ -6741,6 +6942,11 @@ h4 {
     flex-direction: row;
     align-items: flex-start;
     gap: 1rem;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 0;
+    box-sizing: border-box;
 }
 
 .speaker-container {

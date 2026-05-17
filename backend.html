@@ -52,6 +52,7 @@
         body.backend-page .content-editor,
         body.backend-page .content-viewer,
         body.backend-page .html-editor,
+        body.backend-page #texteditor .select-pre-set,
         body.backend-page .folder-emails .emailer-message-list {
             overscroll-behavior: none;
         }
@@ -118,6 +119,15 @@
             border: none;
             color: #003153;
             box-shadow: none;
+        }
+
+        body.backend-page #texteditor button.texteditor-day-btn:disabled,
+        body.backend-page #texteditor button.texteditor-snippet-btn:disabled {
+            background: #fef3c7;
+            border: none;
+            color: #94a3b8;
+            cursor: not-allowed;
+            filter: none;
         }
 
         body.backend-page button.add-speaker-button,
@@ -346,7 +356,8 @@
         .aspects .navigation #lodging-toggle:not(.is-active),
         .aspects .navigation #content-toggle:not(.is-active),
         .aspects .navigation #texteditor-toggle:not(.is-active),
-        .aspects .navigation #emailer-toggle:not(.is-active) {
+        .aspects .navigation #emailer-toggle:not(.is-active),
+        .aspects .navigation #settings-toggle:not(.is-active) {
             background: #fbcfe8;
             color: #9ca3af;
         }
@@ -384,7 +395,8 @@
         .guest-overview-section,
         .lodging-section,
         .content-editor-section,
-        .emailer-section {
+        .emailer-section,
+        .settings-section {
             display: none;
             margin-bottom: 16px;
             padding: 1rem 16px;
@@ -415,7 +427,8 @@
         .guest-overview-section.is-open,
         .lodging-section.is-open,
         .content-editor-section.is-open,
-        .emailer-section.is-open {
+        .emailer-section.is-open,
+        .settings-section.is-open {
             display: flex;
             padding-top: 0;
         }
@@ -703,6 +716,161 @@
             display: flex;
             gap: 8px;
             align-items: center;
+        }
+
+        .settings-section.is-open {
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            gap: 0;
+            min-height: 0;
+        }
+
+        .settings-body {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            align-content: flex-start;
+            gap: 16px;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            overflow: auto;
+        }
+
+        .settings-top-row,
+        .settings-site {
+            flex: 0 0 auto;
+        }
+
+        .settings-top-row {
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            height: 55px;
+            min-height: 55px;
+            box-sizing: border-box;
+            border: none;
+            background: transparent;
+        }
+
+        .settings-site {
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .settings-site-title {
+            margin: 0;
+            padding: 0.25rem var(--backend-table-cell-pad-x);
+            background: #ffffff;
+            color: #000000;
+            font-weight: 500;
+            font-size: 1.2rem;
+            font-family: 'Inter', sans-serif;
+            border-bottom: none;
+            line-height: 1.25;
+        }
+
+        .settings-site-toggles {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px var(--backend-table-cell-pad-x) 16px;
+            box-sizing: border-box;
+        }
+
+        .settings-site-toggle-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .settings-site-toggle-label-wrap {
+            flex: 0 0 12rem;
+            width: 12rem;
+            min-width: 12rem;
+            max-width: 12rem;
+            box-sizing: border-box;
+        }
+
+        .settings-site-toggle-label {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+
+        .settings-site-toggle {
+            display: inline-flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            border: 1px solid #003153;
+            border-radius: 5px;
+            overflow: hidden;
+            background: #ffffff;
+            box-sizing: border-box;
+        }
+
+        body.backend-page button.settings-site-toggle-option {
+            margin: 0;
+            padding: 0.35rem 0.85rem;
+            min-width: 3.25rem;
+            border: none;
+            border-radius: 0;
+            background: #ffffff;
+            color: #003153;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            cursor: pointer;
+            box-shadow: none;
+            box-sizing: border-box;
+        }
+
+        body.backend-page button.settings-site-toggle-option + .settings-site-toggle-option {
+            border-left: 1px solid #003153;
+        }
+
+        body.backend-page button.settings-site-toggle-option:hover:not(.is-active) {
+            background: #e0f2fe;
+        }
+
+        body.backend-page button.settings-site-toggle-option[data-value='yes'].is-active,
+        body.backend-page button.settings-site-toggle-option[data-value='yes'][aria-pressed='true'] {
+            background: #338a17;
+            color: #ffffff;
+        }
+
+        body.backend-page button.settings-site-toggle-option[data-value='no'].is-active,
+        body.backend-page button.settings-site-toggle-option[data-value='no'][aria-pressed='true'] {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        body.backend-page button.settings-site-toggle-option[data-value='yes'].is-active:hover,
+        body.backend-page button.settings-site-toggle-option[data-value='yes'][aria-pressed='true']:hover,
+        body.backend-page button.settings-site-toggle-option[data-value='no'].is-active:hover,
+        body.backend-page button.settings-site-toggle-option[data-value='no'][aria-pressed='true']:hover {
+            filter: brightness(1.08);
+        }
+
+        body.backend-page button.settings-site-toggle-option:focus-visible {
+            outline: 2px solid #003153;
+            outline-offset: 2px;
+            z-index: 1;
         }
 
         .emailer-status {
@@ -1599,6 +1767,7 @@
             width: 100%;
             align-self: stretch;
             box-sizing: border-box;
+            position: relative;
         }
 
         #guest-editor .guests-top-row .guests-actions {
@@ -2123,7 +2292,8 @@
             border: none;
         }
 
-        #speaker-editor .speaker-editor-empty {
+        #guest-editor .guest-editor-empty,
+        #speaker-editor .speaker-viewer > .speaker-editor-empty {
             position: absolute;
             inset: 0;
             z-index: 5;
@@ -2131,6 +2301,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            height: 100%;
             box-sizing: border-box;
             border-radius: 8px;
             background: #cbd5e1;
@@ -2141,13 +2313,16 @@
             font-weight: 700;
             line-height: 1.2;
             letter-spacing: 0;
+            text-align: center;
             pointer-events: none;
         }
 
-        #speaker-editor .speaker-editor-empty[hidden] {
+        #guest-editor .guest-editor-empty[hidden],
+        #speaker-editor .speaker-viewer > .speaker-editor-empty[hidden] {
             display: none !important;
         }
 
+        #guest-editor .guest-viewer--no-selection,
         #speaker-editor .speaker-viewer--no-selection {
             background: #e2e8f0;
         }
@@ -2158,39 +2333,20 @@
             display: none !important;
         }
 
-        #speaker-editor .speaker-viewer--no-selection .speaker-editor-shell,
+        #speaker-editor .speaker-viewer--no-selection .speaker-editor-shell {
+            flex: 1 1 0;
+            min-height: 0;
+            min-width: 0;
+            align-self: stretch;
+            background: transparent;
+            border: none;
+        }
+
         #speaker-editor .speaker-viewer--no-selection #speaker-editor-panel {
             flex: 0 0 auto;
             min-height: 0;
-        }
-
-        #guest-editor .guest-editor-empty {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-            border-radius: 8px;
-            background: #cbd5e1;
-            opacity: 0.95;
-            color: #64748b;
-            font-family: 'Inter', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: 0;
-            pointer-events: none;
-        }
-
-        #guest-editor .guest-editor-empty[hidden] {
-            display: none !important;
-        }
-
-        #guest-editor .guest-viewer--no-selection {
-            background: #e2e8f0;
+            border: none;
+            background: transparent;
         }
 
         #guest-editor .guest-viewer--no-selection .edit-guest-top,
@@ -3860,6 +4016,20 @@
             flex-shrink: 0;
         }
 
+        /* Padlock open (unlocked): same green as guest Accept / Send actions. */
+        body.backend-page button.guest-editor-padlock-btn[aria-pressed='true']:not(:disabled),
+        body.backend-page button.texteditor-padlock-btn[aria-pressed='true']:not(:disabled),
+        body.backend-page button.content-editor-padlock-btn[aria-pressed='true']:not(:disabled) {
+            background: #338a17;
+            color: #ffffff;
+        }
+
+        body.backend-page button.guest-editor-padlock-btn[aria-pressed='true']:not(:disabled):hover,
+        body.backend-page button.texteditor-padlock-btn[aria-pressed='true']:not(:disabled):hover,
+        body.backend-page button.content-editor-padlock-btn[aria-pressed='true']:not(:disabled):hover {
+            filter: brightness(1.08);
+        }
+
         #speaker-editor .speaker-editor-toolbar-trailing .texteditor-save-btn {
             flex: 0 0 var(--backend-gold-toolbar-btn-width);
             width: var(--backend-gold-toolbar-btn-width);
@@ -5062,21 +5232,6 @@
             align-items: stretch;
         }
 
-        .speakerpic {
-            flex-shrink: 1;
-            min-width: 0;
-            width: 25%;
-            max-width: 100%;
-            aspect-ratio: 1 / 1;
-            height: auto;
-            align-self: center;
-            box-sizing: border-box;
-            border: 1px solid #94a3b8;
-            border-radius: 5px;
-            background: #fafaf9;
-            pointer-events: none;
-        }
-
         .edit-speaker-name-first,
         .edit-speaker-name-last,
         .edit-guest-name-first,
@@ -5132,35 +5287,18 @@
             gap: 0.35rem;
         }
 
-        #speaker-editor .speaker-name-photo-row {
+        #speaker-editor .speaker-name-row {
             display: flex;
             flex-direction: row;
-            align-items: center;
+            align-items: stretch;
             gap: 1rem;
             width: 100%;
             min-width: 0;
         }
 
-        #speaker-editor .speaker-name-row {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.75rem;
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
         #speaker-editor .speaker-name-row .add-speaker-form-field {
+            flex: 1 1 0;
             min-width: 0;
-        }
-
-        #speaker-editor .speaker-name-photo-row .speakerpic {
-            flex: 0 0 auto;
-            flex-shrink: 0;
-            width: 25%;
-            max-width: 220px;
-            min-width: 100px;
-            align-self: center;
         }
 
         .add-speaker-form-field label,
@@ -5251,14 +5389,14 @@
             border: none;
             border-radius: 0;
             background: transparent;
-            overflow: hidden;
+            overflow: visible;
         }
 
         #speaker-editor .long-bio-highlight-backdrop {
             position: absolute;
             inset: 0;
             pointer-events: none;
-            overflow: hidden;
+            overflow: visible;
             background: transparent;
         }
 
@@ -5267,7 +5405,7 @@
             padding: 0.5rem 0.75rem;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
-            line-height: 1.4;
+            line-height: 1.5;
             white-space: pre-wrap;
             overflow-wrap: break-word;
             word-wrap: break-word;
@@ -5295,13 +5433,44 @@
             font-family: 'Inter', sans-serif;
             color: #0f172a;
             line-height: 1.5;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            resize: none;
         }
 
         #speaker-editor textarea#add-speaker-long-bio:focus {
             outline: none;
         }
 
-        .add-speaker-form-actions,
+        #speaker-editor .speaker-editor-bio .add-speaker-long-bio-field,
+        #speaker-editor .speaker-editor-bio .add-speaker-short-bio-field {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            box-sizing: border-box;
+        }
+
+        #speaker-editor .speaker-editor-bio textarea#add-speaker-short-bio {
+            display: block;
+            width: 100%;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            font-size: 1rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            line-height: 1.5;
+            resize: none;
+        }
+
+        #speaker-editor .speaker-editor-bio textarea#add-speaker-short-bio:focus {
+            outline: none;
+        }
+
         .add-content-form-actions {
             display: flex;
             flex-direction: row;
@@ -5462,7 +5631,7 @@
         .texteditor {
             display: none;
             margin-bottom: 16px;
-            padding: 1rem 16px;
+            padding: 0 16px 1rem;
             background: #ffffff;
             border: 1px solid #cbd5e1;
             outline: none;
@@ -5557,7 +5726,7 @@
         .texteditor-main {
             display: flex;
             flex-direction: row;
-            align-items: flex-start;
+            align-items: stretch;
             gap: 1rem;
             flex: 1 1 0;
             min-width: 0;
@@ -5565,7 +5734,8 @@
             overflow: hidden;
         }
 
-        .text-selection {
+        /* Pre-sets column (left rail in Pre-sets tab). */
+        .select-pre-set {
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -5578,6 +5748,10 @@
             overflow-y: auto;
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            padding: 0 8px;
         }
 
         .texteditor-section-heading {
@@ -5624,6 +5798,10 @@
         #texteditor .texteditor-main > .html-editor,
         #texteditor .texteditor-main > .renderbox {
             flex: 3 3 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            padding: 0 8px;
         }
 
         @media (max-width: 720px) {
@@ -5631,7 +5809,7 @@
                 flex-direction: column;
             }
 
-            .text-selection {
+            .select-pre-set {
                 flex: 0 0 auto;
                 max-width: none;
                 min-width: 0;
@@ -5821,7 +5999,7 @@
 
         .texteditor-column-title {
             margin: 0;
-            padding: 0;
+            padding: 0.25rem 0 0;
             font-family: 'Inter', sans-serif;
             font-size: 1.2rem;
             font-weight: 500;
@@ -5875,7 +6053,8 @@
         body.backend-page #guest-editor,
         body.backend-page #lodging-editor,
         body.backend-page #content-editor,
-        body.backend-page #emailer-editor {
+        body.backend-page #emailer-editor,
+        body.backend-page #settings-editor {
             flex: 1 1 0;
             min-height: 0;
             min-width: 0;
@@ -6404,7 +6583,7 @@
             </div>
             <div class="eventnavigation-aspects-spacer" aria-hidden="true"></div>
             <div class="aspects">
-                <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, lodging, snippets, content, and E-mailer">
+                <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, lodging, snippets, content, E-mailer, and Settings">
                     <span
                         class="backend-editor-link backend-editor-link--inactive"
                         id="overview-toggle"
@@ -6419,6 +6598,7 @@
                     <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                     <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
                     <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
+                    <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
                 </nav>
                 <p class="backend-content-count" id="backend-content-count" hidden aria-live="polite">Content items 0</p>
             </div>
@@ -6438,7 +6618,7 @@
                     </div>
                 </div>
                 <div class="texteditor-main">
-                <div class="text-selection">
+                <div class="select-pre-set">
                     <p class="texteditor-column-title">Select pre-set</p>
                     <div class="texteditor-programme-toolbar texteditor-home-toolbar">
                         <p class="texteditor-programme-heading">Home:</p>
@@ -6495,6 +6675,15 @@
                                 id="texteditor-preset-request-lodging-btn"
                                 aria-pressed="false"
                             >Request lodging</button>
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                id="texteditor-preset-speaker-brief-btn"
+                                disabled
+                                aria-disabled="true"
+                                aria-pressed="false"
+                                title="Coming soon"
+                            >Speaker brief</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -6620,7 +6809,6 @@
                             </div>
                             <div class="speaker-editor-bottom-panes">
                             <div class="speaker-editor-bio" id="speaker-editor-bio">
-                            <div class="speaker-name-photo-row">
                             <div class="speaker-name-row">
                                 <div class="add-speaker-form-field">
                                     <label for="add-speaker-first-name">First name</label>
@@ -6631,17 +6819,15 @@
                                     <input type="text" id="add-speaker-last-name" name="lastName" autocomplete="family-name" spellcheck="false">
                                 </div>
                             </div>
-                            <div class="speakerpic" id="speakerpic" aria-hidden="true"></div>
-                            </div>
                             <div class="add-speaker-form-field">
                                 <label for="add-speaker-email">E-mail</label>
                                 <input type="email" id="add-speaker-email" name="email" autocomplete="email" spellcheck="false">
                             </div>
-                            <div class="add-speaker-form-field">
+                            <div class="add-speaker-form-field add-speaker-short-bio-field">
                                 <label for="add-speaker-short-bio">Short bio</label>
                                 <textarea id="add-speaker-short-bio" name="shortBio" rows="4" spellcheck="true"></textarea>
                             </div>
-                            <div class="add-speaker-form-field">
+                            <div class="add-speaker-form-field add-speaker-long-bio-field">
                                 <label for="add-speaker-long-bio" class="add-speaker-long-bio-label">
                                     <span>Long bio</span>
                                     <span id="add-speaker-long-bio-letter-counter" class="add-speaker-long-bio-letter-counter">0/1000 characters</span>
@@ -6652,9 +6838,6 @@
                                     </div>
                                     <textarea id="add-speaker-long-bio" name="longBio" class="add-speaker-form-field--long-bio" rows="8" spellcheck="true"></textarea>
                                 </div>
-                            </div>
-                            <div class="add-speaker-form-actions">
-                                <button type="button" class="texteditor-save-btn" id="add-speaker-save-btn" disabled aria-disabled="true">Save</button>
                             </div>
                             <div class="speaker-editor-meta" aria-live="polite">
                                 <p class="speaker-editor-meta-line" id="speaker-editor-collection" hidden aria-hidden="true">Collection: tbs/Speakers/{speakerId}/item</p>
@@ -7290,6 +7473,44 @@
                             <div class="emailer-actions">
                                 <button type="button" class="emailer-action-btn" id="emailer-save-draft-btn" disabled>Save as Gmail draft</button>
                                 <p class="emailer-status" id="emailer-editor-status"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-section" id="settings-editor" aria-hidden="true" aria-label="Settings" data-name="settings-editor">
+                <div class="settings-body">
+                    <div class="settings-top-row" id="settings-top-row"></div>
+                    <div class="settings-site" id="settings-site">
+                        <h3 class="settings-site-title">Site</h3>
+                        <div class="settings-site-toggles">
+                            <div class="settings-site-toggle-row">
+                                <div class="settings-site-toggle-label-wrap">
+                                    <span class="settings-site-toggle-label" id="settings-display-speakers-label">Display speakers?</span>
+                                </div>
+                                <div class="settings-site-toggle" role="group" aria-labelledby="settings-display-speakers-label">
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displaySpeakers" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displaySpeakers" data-value="yes" aria-pressed="true">Yes</button>
+                                </div>
+                            </div>
+                            <div class="settings-site-toggle-row">
+                                <div class="settings-site-toggle-label-wrap">
+                                    <span class="settings-site-toggle-label" id="settings-display-programme-label">Display programme?</span>
+                                </div>
+                                <div class="settings-site-toggle" role="group" aria-labelledby="settings-display-programme-label">
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayProgramme" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayProgramme" data-value="yes" aria-pressed="true">Yes</button>
+                                </div>
+                            </div>
+                            <div class="settings-site-toggle-row">
+                                <div class="settings-site-toggle-label-wrap">
+                                    <span class="settings-site-toggle-label" id="settings-password-protect-home-label">Password for homepage?</span>
+                                </div>
+                                <div class="settings-site-toggle" role="group" aria-labelledby="settings-password-protect-home-label">
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="passwordProtectHome" data-value="no" aria-pressed="true">No</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="passwordProtectHome" data-value="yes" aria-pressed="false">Yes</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -8930,6 +9151,17 @@
             textEl.style.height = textEl.scrollHeight + 'px';
         }
 
+        /** Grow long bio to full content height (no inner scroll / crop). */
+        function autosizeAddSpeakerLongBio() {
+            var textEl = document.getElementById('add-speaker-long-bio');
+            if (!textEl) return;
+            textEl.style.height = 'auto';
+            var h = textEl.scrollHeight;
+            var minPx = parseFloat(window.getComputedStyle(textEl).minHeight) || 0;
+            if (h < minPx) h = minPx;
+            textEl.style.height = h + 'px';
+        }
+
         function autosizeContentLongTextareas() {
             autosizeContentTextarea('edit-content-excerpt');
             autosizeContentTextarea('edit-content-body');
@@ -8959,6 +9191,8 @@
             } else {
                 contentEl.innerHTML = '<span>' + safe(within || ' ') + '</span>';
             }
+            syncLongBioOverflowScroll();
+            autosizeAddSpeakerLongBio();
             syncLongBioOverflowScroll();
         }
 
@@ -8992,7 +9226,16 @@
             syncSpeakerEditorBioMeta();
         }
 
+        function ensureSpeakerEditorEmptyInViewer() {
+            var viewer = document.getElementById('speaker-viewer');
+            var emptyEl = document.getElementById('speaker-editor-empty');
+            if (viewer && emptyEl && emptyEl.parentElement !== viewer) {
+                viewer.appendChild(emptyEl);
+            }
+        }
+
         function setSpeakerEditorEmptyState(isEmpty) {
+            ensureSpeakerEditorEmptyInViewer();
             var panel = document.getElementById('speaker-editor-panel');
             var viewer = document.getElementById('speaker-viewer');
             var emptyEl = document.getElementById('speaker-editor-empty');
@@ -9280,6 +9523,120 @@
                 }
             }
             return [];
+        }
+
+        /** Document `tbs/Settings`: site visibility toggles (`Yes` / `No` strings). */
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
+        var FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
+        var siteSettingsSaveInFlight = false;
+
+        function tbsSettingsFirestoreFieldForSettingKey(settingKey) {
+            if (settingKey === 'displaySpeakers') return FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD;
+            if (settingKey === 'displayProgramme') return FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD;
+            if (settingKey === 'passwordProtectHome') return FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD;
+            return '';
+        }
+
+        /** UI toggle value `yes` | `no` from Firestore scalar. */
+        function normalizeSettingsYesNoUi(value, defaultYes) {
+            var s = guestStringFromFirestoreValue(value).toLowerCase();
+            if (s === 'no' || s === 'n') return 'no';
+            if (s === 'yes' || s === 'y') return 'yes';
+            return defaultYes !== false ? 'yes' : 'no';
+        }
+
+        function settingsYesNoUiToFirestore(uiValue) {
+            return normalizeSettingsYesNoUi(uiValue, true) === 'no' ? 'No' : 'Yes';
+        }
+
+        function setSettingsSiteToggleUi(settingKey, yesNoUi) {
+            var want = normalizeSettingsYesNoUi(yesNoUi, true);
+            document
+                .querySelectorAll(
+                    '#settings-site button.settings-site-toggle-option[data-setting-key="' + settingKey + '"]'
+                )
+                .forEach(function (opt) {
+                    var optVal = String(opt.getAttribute('data-value') || '').toLowerCase();
+                    var isSelected = optVal === want;
+                    opt.classList.toggle('is-active', isSelected);
+                    opt.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+                });
+        }
+
+        async function loadSiteSettingsFromFirestore() {
+            var db = getFirestore();
+            var snap = await db.collection('tbs').doc('Settings').get();
+            var data = snap && snap.exists ? snap.data() || {} : {};
+            setSettingsSiteToggleUi(
+                'displaySpeakers',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displayProgramme',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'passwordProtectHome',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD], false)
+            );
+        }
+
+        async function saveSiteSettingToFirestore(settingKey, yesNoUi) {
+            var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
+            if (!field) throw new Error('Unknown site setting.');
+            var db = getFirestore();
+            var patch = {};
+            patch[field] = settingsYesNoUiToFirestore(yesNoUi);
+            await db.collection('tbs').doc('Settings').set(patch, { merge: true });
+        }
+
+        async function onSettingsSiteToggleClick(btn) {
+            var group = btn.closest('.settings-site-toggle');
+            if (!group) return;
+            var settingKey = btn.getAttribute('data-setting-key');
+            var uiValue = String(btn.getAttribute('data-value') || '').toLowerCase();
+            if (!settingKey || (uiValue !== 'yes' && uiValue !== 'no')) return;
+
+            var wasActive = btn.classList.contains('is-active');
+            group.querySelectorAll('.settings-site-toggle-option').forEach(function (opt) {
+                var isSelected = opt === btn;
+                opt.classList.toggle('is-active', isSelected);
+                opt.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
+            if (wasActive) return;
+
+            if (siteSettingsSaveInFlight) return;
+            siteSettingsSaveInFlight = true;
+            try {
+                if (typeof showStatus === 'function') showStatus('loading', 'Saving site setting…');
+                await saveSiteSettingToFirestore(settingKey, uiValue);
+                if (typeof showStatus === 'function') {
+                    if (uiValue === 'no') {
+                        if (settingKey === 'displaySpeakers') {
+                            showStatus('info', 'Speakers are no longer displayed on the site.');
+                        } else if (settingKey === 'displayProgramme') {
+                            showStatus('info', 'Programme is no longer displayed on the site.');
+                        } else if (settingKey === 'passwordProtectHome') {
+                            showStatus('info', 'Homepage is no longer password protected.');
+                        }
+                    } else {
+                        showStatus('success', 'Site setting saved.');
+                    }
+                }
+            } catch (err) {
+                console.error('saveSiteSettingToFirestore:', err);
+                try {
+                    await loadSiteSettingsFromFirestore();
+                } catch (reloadErr) {
+                    console.error('loadSiteSettingsFromFirestore:', reloadErr);
+                }
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to save site setting.');
+                }
+            } finally {
+                siteSettingsSaveInFlight = false;
+            }
         }
 
         /** Document `tbs/Settings`: field `Current event` (and aliases). */
@@ -10130,6 +10487,12 @@
                 bottom.classList.toggle('is-showing-log', nextPane === 'log');
             }
             syncSpeakerEditorToolbarForBottomScroll();
+            if (nextPane === 'bio') {
+                requestAnimationFrame(function () {
+                    autosizeAddSpeakerLongBio();
+                    syncLongBioOverflowScroll();
+                });
+            }
         }
 
         function isSpeakerEditorBottomShowingManagement() {
@@ -10211,6 +10574,8 @@
             });
             updateAddSpeakerSaveButtonState();
             updateAddSpeakerDeleteButtonState();
+            autosizeAddSpeakerLongBio();
+            syncLongBioOverflowScroll();
         }
 
         function scrollSpeakerEditorBottomToBio() {
@@ -14696,22 +15061,26 @@
             const isEditor = panel === 'editor';
             const isContent = panel === 'content';
             const isEmailer = panel === 'emailer';
+            const isSettings = panel === 'settings';
             const isGuests = panel === 'guests';
             const isLodging = panel === 'lodging';
             const isSpeakers =
-                panel === 'speakers' || (!isEditor && !isContent && !isEmailer && !isGuests && !isLodging);
+                panel === 'speakers' ||
+                (!isEditor && !isContent && !isEmailer && !isSettings && !isGuests && !isLodging);
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
             const emailerSection = document.getElementById('emailer-editor');
+            const settingsSection = document.getElementById('settings-editor');
             const editorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
             const emailerToggle = document.getElementById('emailer-toggle');
+            const settingsToggle = document.getElementById('settings-toggle');
             if (texteditorSection) {
                 texteditorSection.classList.toggle('is-open', isEditor);
                 texteditorSection.setAttribute('aria-hidden', isEditor ? 'false' : 'true');
@@ -14736,6 +15105,10 @@
                 emailerSection.classList.toggle('is-open', isEmailer);
                 emailerSection.setAttribute('aria-hidden', isEmailer ? 'false' : 'true');
             }
+            if (settingsSection) {
+                settingsSection.classList.toggle('is-open', isSettings);
+                settingsSection.setAttribute('aria-hidden', isSettings ? 'false' : 'true');
+            }
             if (editorToggle) {
                 editorToggle.setAttribute('aria-expanded', isEditor ? 'true' : 'false');
                 editorToggle.classList.toggle('is-active', isEditor);
@@ -14759,6 +15132,10 @@
             if (emailerToggle) {
                 emailerToggle.setAttribute('aria-expanded', isEmailer ? 'true' : 'false');
                 emailerToggle.classList.toggle('is-active', isEmailer);
+            }
+            if (settingsToggle) {
+                settingsToggle.setAttribute('aria-expanded', isSettings ? 'true' : 'false');
+                settingsToggle.classList.toggle('is-active', isSettings);
             }
             var backendContentCountEl = document.getElementById('backend-content-count');
             if (backendContentCountEl) {
@@ -14797,6 +15174,14 @@
                 var emailerStatusEl = document.getElementById('emailer-editor-status');
                 if (emailerStatusEl) emailerStatusEl.textContent = 'Editing creates a Gmail draft copy.';
             }
+            if (isSettings) {
+                void loadSiteSettingsFromFirestore().catch(function (err) {
+                    console.error('loadSiteSettingsFromFirestore:', err);
+                    if (typeof showStatus === 'function') {
+                        showStatus('error', err && err.message ? err.message : 'Failed to load site settings.');
+                    }
+                });
+            }
         }
 
         function updateBackendEditorVisibility() {
@@ -14807,12 +15192,14 @@
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
             const emailerToggle = document.getElementById('emailer-toggle');
+            const settingsToggle = document.getElementById('settings-toggle');
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
             const emailerSection = document.getElementById('emailer-editor');
+            const settingsSection = document.getElementById('settings-editor');
             const hasEvent = Boolean(selectedevent && String(selectedevent).trim());
             if (navigationEl) {
                 navigationEl.classList.toggle('navigation--no-event', !hasEvent);
@@ -14821,6 +15208,11 @@
                 emailerToggle.setAttribute('aria-hidden', 'false');
                 emailerToggle.setAttribute('tabindex', '0');
                 emailerToggle.setAttribute('aria-disabled', 'false');
+            }
+            if (settingsToggle) {
+                settingsToggle.setAttribute('aria-hidden', 'false');
+                settingsToggle.setAttribute('tabindex', '0');
+                settingsToggle.setAttribute('aria-disabled', 'false');
             }
             if (editorToggle) {
                 editorToggle.setAttribute('aria-hidden', 'false');
@@ -14872,6 +15264,10 @@
                     emailerSection.classList.remove('is-open');
                     emailerSection.setAttribute('aria-hidden', 'true');
                 }
+                if (settingsSection) {
+                    settingsSection.classList.remove('is-open');
+                    settingsSection.setAttribute('aria-hidden', 'true');
+                }
                 if (editorToggle) {
                     editorToggle.setAttribute('aria-expanded', 'false');
                     editorToggle.classList.remove('is-active');
@@ -14895,6 +15291,10 @@
                 if (emailerToggle) {
                     emailerToggle.setAttribute('aria-expanded', 'false');
                     emailerToggle.classList.remove('is-active');
+                }
+                if (settingsToggle) {
+                    settingsToggle.setAttribute('aria-expanded', 'false');
+                    settingsToggle.classList.remove('is-active');
                 }
                 var backendContentCountElNoEvent = document.getElementById('backend-content-count');
                 if (backendContentCountElNoEvent) backendContentCountElNoEvent.hidden = true;
@@ -16473,6 +16873,18 @@
                     setBackendPanel('emailer');
                 });
             }
+            const settingsToggle = document.getElementById('settings-toggle');
+            if (settingsToggle) {
+                settingsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setBackendPanel('settings');
+                });
+            }
+            document.querySelectorAll('#settings-site .settings-site-toggle-option').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    void onSettingsSiteToggleClick(btn);
+                });
+            });
             var emailerConnectBtn = document.getElementById('emailer-connect-btn');
             if (emailerConnectBtn) {
                 emailerConnectBtn.addEventListener('click', function() {
@@ -17840,15 +18252,15 @@
                     }
                 }
             });
-            var addSpeakerSaveBtn = document.getElementById('add-speaker-save-btn');
-            if (addSpeakerSaveBtn && addSpeakerForm) {
-                addSpeakerSaveBtn.addEventListener('click', function() {
-                    if (addSpeakerSaveBtn.disabled) return;
-                    saveSpeakerFromEditor().catch(function(err) {
-                        console.error('add-speaker-save-btn:', err);
-                    });
+            var speakerLongBioResizeRaf = 0;
+            window.addEventListener('resize', function () {
+                if (speakerLongBioResizeRaf) cancelAnimationFrame(speakerLongBioResizeRaf);
+                speakerLongBioResizeRaf = requestAnimationFrame(function () {
+                    speakerLongBioResizeRaf = 0;
+                    autosizeAddSpeakerLongBio();
+                    syncLongBioOverflowScroll();
                 });
-            }
+            });
             var addSpeakerDeleteBtn = document.getElementById('add-speaker-delete-btn');
             if (addSpeakerDeleteBtn) {
                 addSpeakerDeleteBtn.addEventListener('click', function() {
@@ -18033,7 +18445,7 @@
             }
             function onTexteditorSnippetSelectorsClick(e) {
                 var btn = e.target.closest('.texteditor-snippet-btn');
-                if (!btn) return;
+                if (!btn || btn.disabled) return;
                 var key = btn.getAttribute('data-snippet-key') || '';
                 if (!key) return;
                 loadHomeSnippetFromFirestoreIntoEditor(key).then(function(loadedHome) {
