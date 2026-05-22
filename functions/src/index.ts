@@ -100,6 +100,14 @@ function guestLogPrefixYyMmDd(): string {
 }
 
 /**
+ * First log line when a guest applies via the public registration form.
+ * @return {string} e.g. `260522: Application received`.
+ */
+function guestLogApplicationReceivedLine(): string {
+  return `${guestLogPrefixYyMmDd()}: Application received`;
+}
+
+/**
  * Human-readable calendar date for guest invoice records.
  * @param {Date} date Invoice send timestamp.
  * @return {string} Date string such as 2026-05-11.
@@ -574,11 +582,15 @@ export const submitRegistrationHttp = onRequest({
       return;
     }
     if (!cityRegion || !country || !employer1) {
-      res.status(400).json({error: "City/region, country, and employer 1 are required."});
+      res.status(400).json({
+        error: "City/region, country, and employer 1 are required.",
+      });
       return;
     }
     if (!baseSpeciality.length) {
-      res.status(400).json({error: "Select at least one base medical speciality."});
+      res.status(400).json({
+        error: "Select at least one base medical speciality.",
+      });
       return;
     }
     if (!trainingLevel) {
@@ -605,11 +617,11 @@ export const submitRegistrationHttp = onRequest({
     const baseGuestId = buildRegistrationGuestId(event, firstName, lastName);
     let guestId = baseGuestId;
     let suffix = 0;
-    while (true) {
-      const itemSnap = await parentRef.collection(guestId).doc("item").get();
-      if (!itemSnap.exists) break;
+    let itemSnap = await parentRef.collection(guestId).doc("item").get();
+    while (itemSnap.exists) {
       suffix += 1;
       guestId = `${baseGuestId}${suffix}`.slice(0, 150);
+      itemSnap = await parentRef.collection(guestId).doc("item").get();
     }
     const guestsCol = parentRef.collection(guestId);
 
@@ -635,6 +647,7 @@ export const submitRegistrationHttp = onRequest({
       "Invoiced": "No",
       "Paid": "No",
       "Read": "No",
+      "Log": [guestLogApplicationReceivedLine()],
     };
 
     await guestsCol.doc("item").set(itemPayload, {merge: false});

@@ -1,6 +1,6 @@
 /* Reset and Base Styles */
 
-/* Global rem base: 1rem = 18px. Change this to scale all rem values site-wide. */
+/* Global rem base: 1rem = 18px (narrow); 20px from 769px up. Change :root font-size to scale rem site-wide. */
 :root {
     font-size: 18px;
     /* Fixed navbar horizontal inset from viewport (narrow on small screens below) */
@@ -249,11 +249,19 @@ body.home-view .navbar {
 .registration-form {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 0;
     background: transparent;
     border-radius: 5px;
     border: none;
     padding: 0;
+}
+
+.registration-form > * + * {
+    margin-top: 24px;
+}
+
+.registration-form > .section-titles.registration-section-title + .registration-manifesto {
+    margin-top: 0;
 }
 
 .registration-form > .section-titles.registration-section-title {
@@ -261,6 +269,10 @@ body.home-view .navbar {
     margin: 0;
     padding: 0;
     scroll-margin-top: calc(var(--navbar-height) + 12px);
+}
+
+.home-section > .registration-section .registration-form > .registration-manifesto {
+    margin: 0;
 }
 
 .registration-form-row {
@@ -521,7 +533,7 @@ body.home-view .navbar {
     font-size: 1rem;
     line-height: 1.6;
     color: #374151;
-    margin: 0;
+    margin: 16px 0 0 0;
 }
 
 /* Flyer page: same max-width/centering as nav-container (+ horizontal padding here) */
@@ -740,6 +752,7 @@ body.home-view .navbar {
 
 @media (min-width: 769px) {
     :root {
+        font-size: 20px;
         --tbs-register-pill-width: 7.125rem;
     }
 
@@ -1290,10 +1303,21 @@ body.home-view .home-section > .speaker-section {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
-    gap: 0;
+    gap: 0.5rem;
     background: #003153;
     border-radius: 0 !important;
     padding: 0 16px 0 16px;
+}
+
+.home-section > .sponsors-section .sponsors-section-title {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 8px 0 4px 0;
+    color: var(--tbs-icy-blue) !important;
+    text-align: left;
+    align-self: flex-start;
+    width: 100%;
+    scroll-margin-top: calc(var(--navbar-height) + 12px);
 }
 
 /* One row, full width; script sets identical `height` on every <img> from row width + gaps + aspect ratios. */
@@ -1603,7 +1627,8 @@ body.home-view .home-section > .speaker-section {
     display: block;
 }
 
-@media (max-width: 768px) {
+/* Narrow: title “WELCOME TO TBS27” wraps beside video — stack copy then trailer full width */
+@media (max-width: 1100px) {
     .home-section > .event-section .event-section-inner-wrapper {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -1629,6 +1654,7 @@ body.home-view .home-section > .speaker-section {
     .home-section > .event-section .event-section-inner-wrapper > .trailer-embed {
         width: 100%;
         max-width: 100%;
+        align-self: stretch;
     }
 }
 
@@ -4417,7 +4443,8 @@ h2.section-titles {
 .feed-section-inner-wrapper > h2.section-titles,
 .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title,
 .home-section > .ondemand-section .ondemand-inner-wrapper > h2.section-titles.ondemand-section-title,
-.home-section > .event-section .location-contents > .event-section-title {
+.home-section > .event-section .location-contents > .event-section-title,
+.home-section > .sponsors-section .sponsors-section-title {
     padding-top: 0;
     padding-bottom: 0;
 }
@@ -4512,6 +4539,10 @@ h2.section-titles {
     .home-section > .event-section .location-contents > .event-section-title {
         font-size: 1.7rem !important;
         padding-top: 8px;
+    }
+
+    .home-section > .sponsors-section .sponsors-section-title {
+        font-size: 1.7rem !important;
     }
 }
 
@@ -5268,7 +5299,8 @@ h4 {
 
     .feed-section-inner-wrapper > h2.section-titles,
     .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title,
-    .home-section > .ondemand-section .ondemand-inner-wrapper > h2.section-titles.ondemand-section-title {
+    .home-section > .ondemand-section .ondemand-inner-wrapper > h2.section-titles.ondemand-section-title,
+    .home-section > .sponsors-section .sponsors-section-title {
         padding-top: 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -5293,11 +5325,16 @@ h4 {
         row-gap: var(--sponsor-logo-gap);
     }
 
-    /* Three slots per row; basis subtracts two column gaps so items do not overflow */
+    /* Two logos per row; Heine alone on the bottom row */
     .home-section > .sponsors-section .sponsor-logo-slot {
-        flex: 0 1 calc((100% - 2 * var(--sponsor-logo-gap)) / 3);
-        max-width: calc((100% - 2 * var(--sponsor-logo-gap)) / 3);
+        flex: 0 1 calc((100% - var(--sponsor-logo-gap)) / 2);
+        max-width: calc((100% - var(--sponsor-logo-gap)) / 2);
         min-width: 0;
+    }
+
+    .home-section > .sponsors-section .sponsor-logo-slot--solo {
+        flex: 0 1 100%;
+        max-width: 100%;
     }
 
     .home-section > .sponsors-section .sponsor-logo-slot .sponsors-logo-image {
@@ -5311,6 +5348,12 @@ h4 {
         padding-bottom: 4px !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
+        color: var(--tbs-icy-blue) !important;
+    }
+
+    .home-section > .sponsors-section .sponsors-section-title {
+        padding-top: 8px !important;
+        padding-bottom: 4px !important;
         color: var(--tbs-icy-blue) !important;
     }
 
@@ -6844,6 +6887,19 @@ h4 {
     margin-bottom: 24px;
 }
 
+.footer-section-contact .footer-contact-email {
+    color: #FFD700 !important;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer-section-contact .footer-contact-email:hover,
+.footer-section-contact .footer-contact-email:focus-visible {
+    color: #ffffff !important;
+    text-decoration: underline;
+    outline: none;
+}
+
 .footer-section ul {
     list-style: none;
 }
@@ -7168,6 +7224,26 @@ h4 {
     .past-talks-search-input {
         padding: 3px 10px;
         font-size: 0.9rem;
+    }
+
+    .past-talks-section {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .past-talks-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .viewer-section {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .viewer-section-inner-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
     }
 
     .past-talks-section .blog-card {
@@ -7757,8 +7833,108 @@ h4 {
         gap: 1rem; 
     }
     .viewer-section {
-        padding: 0 8px;
+        padding-left: 0;
+        padding-right: 0;
     }
+
+    .viewer-section-inner-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+/* Home: password gate when `tbs/Settings.passwordprotecthome` is Yes */
+body.home-password-locked .header,
+body.home-password-locked .everything,
+body.home-password-locked .footer {
+    visibility: hidden;
+}
+
+.home-password-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background: #003153;
+    box-sizing: border-box;
+}
+
+.home-password-gate-panel {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background: #fafafa;
+    border-radius: 5px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.home-password-gate-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #003153;
+    text-align: center;
+}
+
+.home-password-gate-subtitle {
+    margin: 0 0 1.5rem 0;
+    color: #64748b;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.home-password-gate-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.home-password-gate-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #003153;
+}
+
+.home-password-gate-input {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.home-password-gate-input:focus {
+    outline: 2px solid #003153;
+    outline-offset: 1px;
+    border-color: #003153;
+}
+
+.home-password-gate-error {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #b91c1c;
+}
+
+.home-password-gate-submit {
+    margin-top: 0.5rem;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #003153;
+    background: #ffd700;
+    border: 2px solid #ffd700;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.home-password-gate-submit:hover {
+    filter: brightness(0.95);
 }
 
 /* Authentication Styles */
@@ -8156,8 +8332,10 @@ h4 {
     }
     .video-layout > .morevideos {
         position: static;
-        width: 100%;
+        width: calc(100% + 16px);
         height: auto !important;
+        margin-left: -8px;
+        margin-right: -8px;
         margin-bottom: 0.5rem;
     }
     .video-layout .morevideos-cards {
@@ -8165,6 +8343,10 @@ h4 {
         overflow-x: auto;
         overflow-y: hidden;
         flex-wrap: nowrap;
+        gap: 8px;
+        padding-left: 8px;
+        padding-right: 8px;
+        box-sizing: border-box;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;

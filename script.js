@@ -23,7 +23,9 @@ const firestoreHomeCache = {
     /** `tbs/Settings` field `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
     /** `tbs/Settings` field `displayprogramme` (`Yes` / `No`). */
-    siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null }
+    siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null },
+    /** `tbs/Settings` field `passwordprotecthome` (`Yes` / `No`). */
+    siteSettingsPasswordProtectHome: { value: false, fetchedAt: 0, promise: null }
 };
 
 function isFreshFirestoreCacheEntry(entry) {
@@ -97,6 +99,8 @@ let postsToShow = 4;
 
 /** Past talks: load N full rows of cards per batch (grid columns × this). */
 const PAST_TALKS_ROWS_PER_BATCH = 4;
+/** Past talks on mobile (≤768px): cards per initial load / “load more” batch. */
+const PAST_TALKS_MOBILE_POSTS_PER_BATCH = 16;
 
 /** Column count for #blogGrid (matches CSS grid-template-columns / minmax(350px)). */
 function getPastTalksBlogGridColumnCount() {
@@ -115,6 +119,9 @@ function getPastTalksBlogGridColumnCount() {
 }
 
 function getPastTalksPostsPerBatch() {
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) {
+        return PAST_TALKS_MOBILE_POSTS_PER_BATCH;
+    }
     return Math.max(1, getPastTalksBlogGridColumnCount() * PAST_TALKS_ROWS_PER_BATCH);
 }
 
@@ -1489,8 +1496,9 @@ ${ABOUT_SOCIAL_INNER_HTML}
 
 /** Home: sponsors band (direct child of `.home-section`, directly below Event band, above Latest feed). */
 const HOME_SPONSORS_SECTION_HTML = `
-                <div class="sponsors-section" role="region" aria-label="Sponsors">
+                <div class="sponsors-section" role="region" aria-labelledby="home-sponsors-heading">
                     <div class="sponsors-section-inner-wrapper">
+                        <h2 class="section-titles sponsors-section-title" id="home-sponsors-heading">Presented by</h2>
                         <div class="sponsor-logos">
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/corpulsgold.png" alt="Corpuls" class="sponsors-logo-image" loading="eager" decoding="async">
@@ -1499,13 +1507,13 @@ const HOME_SPONSORS_SECTION_HTML = `
                                 <img src="images/Sponsors/hamiltongold.png" alt="Hamilton" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
                             <div class="sponsor-logo-slot">
-                                <img src="images/Sponsors/heinegold.png" alt="Heine" class="sponsors-logo-image" loading="eager" decoding="async">
-                            </div>
-                            <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/intersurgicalgold.png" alt="Intersurgical" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/qinflowgold.png" alt="Qinflow" class="sponsors-logo-image" loading="eager" decoding="async">
+                            </div>
+                            <div class="sponsor-logo-slot sponsor-logo-slot--solo">
+                                <img src="images/Sponsors/heinegold.png" alt="Heine" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
                         </div>
                     </div>
@@ -1552,7 +1560,7 @@ function layoutHomeSponsorLogosRowApply(sponsorsSectionEl) {
     const gapPx = sponsorLogosRowGapPx(row);
     const maxH = homeSponsorLogosMaxHeightPx();
     const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
-    const maxPerRow = isMobile ? 3 : images.length;
+    const maxPerRow = isMobile ? 2 : images.length;
 
     for (let start = 0; start < images.length; start += maxPerRow) {
         const rowImages = images.slice(start, start + maxPerRow);
@@ -1683,7 +1691,7 @@ const HOME_LOCATION_TRAILER_EMBED_SRC_HTML =
     '?rel=0&amp;modestbranding=1&amp;playsinline=1&amp;autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=' +
     HOME_LOCATION_TRAILER_VIDEO_ID;
 
-/** Home: Event band — inner Prussian panel: `.eventintroduction` left, `.trailer-embed` right. */
+/** Home: Event band — inner Prussian panel: `.eventintroduction` left, `.trailer-embed` right (stacks below on narrow widths). */
 const HOME_LOCATION_SECTION_HTML =
     `
                 <div class="event-section" role="region" aria-label="Event introduction">
@@ -2501,6 +2509,7 @@ function revealHomeStageBandsBelowIntro(homeSection) {
 
 // Show the feed content (different from blog posts)
 async function showFeedContent() {
+    await ensureHomePasswordAccess();
     document.body.classList.add('home-view');
     setPastTalksOpenState(false);
     const main = document.querySelector('.everything');
@@ -3078,6 +3087,10 @@ const TBS27_HOME_PROGRAMME_EVENT_ID = 'TBS27';
 const HOME_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
+const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
+/** Site password when `passwordprotecthome` is `Yes` (client-side gate only). */
+const HOME_PASSWORD_PROTECT_VALUE = 'VilleTrollkarl';
+const HOME_PASSWORD_SESSION_STORAGE_KEY = 'tbs-home-password-ok';
 /** Placeholder slides when Settings hide speakers/programme roster (after optional info card). */
 const HOME_CAROUSEL_TBA_CARD_COUNT = 2;
 
@@ -3097,16 +3110,112 @@ function normalizeHomeDisplayProgrammeSetting(value) {
     return true;
 }
 
+/** @returns {boolean} true when the public home page requires a password (default No). */
+function normalizeHomePasswordProtectSetting(value) {
+    const s = String(value == null ? '' : value).trim().toLowerCase();
+    return s === 'yes' || s === 'y';
+}
+
+function isHomePasswordSessionUnlocked() {
+    try {
+        return sessionStorage.getItem(HOME_PASSWORD_SESSION_STORAGE_KEY) === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+let homePasswordGatePromise = null;
+
+/** Modal gate until the site password is entered (when Settings enable protection). */
+function showHomePasswordGate() {
+    return new Promise(function (resolve) {
+        document.body.classList.add('home-password-locked');
+        let gate = document.getElementById('homePasswordGate');
+        if (!gate) {
+            gate = document.createElement('div');
+            gate.id = 'homePasswordGate';
+            gate.className = 'home-password-gate';
+            gate.setAttribute('role', 'dialog');
+            gate.setAttribute('aria-modal', 'true');
+            gate.setAttribute('aria-labelledby', 'home-password-gate-title');
+            gate.innerHTML =
+                '<div class="home-password-gate-panel">' +
+                '<h2 class="home-password-gate-title" id="home-password-gate-title">TBS Zermatt</h2>' +
+                '<p class="home-password-gate-subtitle">Enter the site password to continue.</p>' +
+                '<form id="homePasswordForm" class="home-password-gate-form" autocomplete="off">' +
+                '<label class="home-password-gate-label" for="homePasswordInput">Password</label>' +
+                '<input type="password" id="homePasswordInput" class="home-password-gate-input" ' +
+                'required autocomplete="current-password">' +
+                '<p class="home-password-gate-error" hidden role="alert"></p>' +
+                '<button type="submit" class="home-password-gate-submit">Continue</button>' +
+                '</form>' +
+                '</div>';
+            document.body.appendChild(gate);
+        }
+        const input = gate.querySelector('#homePasswordInput');
+        const form = gate.querySelector('#homePasswordForm');
+        const errorEl = gate.querySelector('.home-password-gate-error');
+
+        function tryUnlock() {
+            const val = String(input && input.value ? input.value : '').trim();
+            if (val !== HOME_PASSWORD_PROTECT_VALUE) {
+                if (errorEl) {
+                    errorEl.textContent = 'Incorrect password. Please try again.';
+                    errorEl.hidden = false;
+                }
+                if (input) input.select();
+                return;
+            }
+            try {
+                sessionStorage.setItem(HOME_PASSWORD_SESSION_STORAGE_KEY, '1');
+            } catch (storeErr) {
+                /* sessionStorage unavailable */
+            }
+            document.body.classList.remove('home-password-locked');
+            gate.remove();
+            homePasswordGatePromise = null;
+            resolve();
+        }
+
+        if (form && !form._homePasswordBound) {
+            form._homePasswordBound = true;
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                tryUnlock();
+            });
+        }
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+        if (errorEl) errorEl.hidden = true;
+    });
+}
+
+/** Blocks home load until password is accepted when `passwordprotecthome` is `Yes`. */
+async function ensureHomePasswordAccess() {
+    if (isHomePasswordSessionUnlocked()) return;
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    if (!settings.passwordProtectHome) return;
+    if (!homePasswordGatePromise) {
+        homePasswordGatePromise = showHomePasswordGate();
+    }
+    await homePasswordGatePromise;
+}
+
 async function fetchHomeSiteSettingsFromFirestore() {
     const speakersCached = firestoreHomeCache.siteSettingsDisplaySpeakers;
     const programmeCached = firestoreHomeCache.siteSettingsDisplayProgramme;
+    const passwordCached = firestoreHomeCache.siteSettingsPasswordProtectHome;
     if (
         isFreshFirestoreCacheEntry(speakersCached) &&
-        isFreshFirestoreCacheEntry(programmeCached)
+        isFreshFirestoreCacheEntry(programmeCached) &&
+        isFreshFirestoreCacheEntry(passwordCached)
     ) {
         return {
             displaySpeakers: !!speakersCached.value,
-            displayProgramme: !!programmeCached.value
+            displayProgramme: !!programmeCached.value,
+            passwordProtectHome: !!passwordCached.value
         };
     }
     if (speakersCached && speakersCached.promise) {
@@ -3115,7 +3224,15 @@ async function fetchHomeSiteSettingsFromFirestore() {
             programmeCached && programmeCached.promise
                 ? await programmeCached.promise
                 : !!programmeCached.value;
-        return { displaySpeakers: !!displaySpeakers, displayProgramme: !!displayProgramme };
+        const passwordProtectHome =
+            passwordCached && passwordCached.promise
+                ? await passwordCached.promise
+                : !!passwordCached.value;
+        return {
+            displaySpeakers: !!displaySpeakers,
+            displayProgramme: !!displayProgramme,
+            passwordProtectHome: !!passwordProtectHome
+        };
     }
 
     const promise = (async function () {
@@ -3129,11 +3246,14 @@ async function fetchHomeSiteSettingsFromFirestore() {
                 ),
                 displayProgramme: normalizeHomeDisplayProgrammeSetting(
                     data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD]
+                ),
+                passwordProtectHome: normalizeHomePasswordProtectSetting(
+                    data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD]
                 )
             };
         } catch (e) {
             console.error('fetchHomeSiteSettingsFromFirestore', e);
-            return { displaySpeakers: true, displayProgramme: true };
+            return { displaySpeakers: true, displayProgramme: true, passwordProtectHome: false };
         }
     })();
 
@@ -3147,6 +3267,11 @@ async function fetchHomeSiteSettingsFromFirestore() {
         fetchedAt: programmeCached ? Number(programmeCached.fetchedAt || 0) : 0,
         promise: promise.then((s) => s.displayProgramme)
     };
+    firestoreHomeCache.siteSettingsPasswordProtectHome = {
+        value: passwordCached ? passwordCached.value : false,
+        fetchedAt: passwordCached ? Number(passwordCached.fetchedAt || 0) : 0,
+        promise: promise.then((s) => s.passwordProtectHome)
+    };
     const settings = await promise;
     const now = Date.now();
     firestoreHomeCache.siteSettingsDisplaySpeakers = {
@@ -3156,6 +3281,11 @@ async function fetchHomeSiteSettingsFromFirestore() {
     };
     firestoreHomeCache.siteSettingsDisplayProgramme = {
         value: settings.displayProgramme,
+        fetchedAt: now,
+        promise: null
+    };
+    firestoreHomeCache.siteSettingsPasswordProtectHome = {
+        value: settings.passwordProtectHome,
         fetchedAt: now,
         promise: null
     };
@@ -3752,6 +3882,26 @@ function appendHomeSpeakerTbaCard(track, stripeIndex) {
     track.appendChild(article);
 }
 
+/** Prefer long bio on home speaker cards (short bio reserved for future expand UI). */
+function homeSpeakerBioContentForCard(speaker) {
+    const longText = String(speaker.longBio || '').trim();
+    const shortText = String(speaker.shortBio || '').trim();
+    return longText || shortText;
+}
+
+function fillHomeSpeakerCardBioMain(bioMain, speaker) {
+    const content = homeSpeakerBioContentForCard(speaker);
+    if (!content) {
+        bioMain.textContent = '';
+        return;
+    }
+    if (/<\s*\/?[a-z][\s\S]*>/i.test(content)) {
+        bioMain.innerHTML = content;
+    } else {
+        bioMain.textContent = content;
+    }
+}
+
 /**
  * @param {boolean} expandableLongBio — same rule as former per-card chevron: first real speaker when there is no
  * `speakerinfo` card has no long-bio expand. Cards with this flag toggle short/long bio on press.
@@ -3773,7 +3923,7 @@ function appendHomeSpeakerCard(track, speaker, expandableLongBio, stripeIndex) {
     bioEl.className = 'speaker-card-bio about-text';
     const bioMain = document.createElement('div');
     bioMain.className = 'speaker-card-bio-main';
-    bioMain.appendChild(document.createTextNode(String(speaker.shortBio || '')));
+    fillHomeSpeakerCardBioMain(bioMain, speaker);
     bioEl.appendChild(bioMain);
     contentWrap.appendChild(nameEl);
     contentWrap.appendChild(bioEl);
@@ -3997,8 +4147,7 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
             appendHomeSpeakerinfoCard(track, speakerinfoHtml);
         }
         speakers.forEach(function (s, i) {
-            const expandable = String(s.longBio || '').trim().length > 0;
-            appendHomeSpeakerCard(track, s, expandable, hasInfoCard ? i + 1 : i);
+            appendHomeSpeakerCard(track, s, false, hasInfoCard ? i + 1 : i);
         });
     } finally {
         delete speakersWrapperEl.dataset.speakersScrollbarWired;

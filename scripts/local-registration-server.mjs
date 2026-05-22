@@ -88,6 +88,19 @@ function formatApplicationDate(date) {
     return `${yyyy}-${mm}-${dd}`;
 }
 
+/** `YYMMDD` prefix for guest **Log** lines (matches backend guest roster). */
+function guestLogYyMmDdPrefix() {
+    const d = new Date();
+    const yy = String(d.getFullYear()).slice(-2);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yy}${mm}${dd}`;
+}
+
+function guestLogApplicationReceivedLine() {
+    return `${guestLogYyMmDdPrefix()}: Application received`;
+}
+
 function setCors(res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -162,6 +175,7 @@ async function handleSubmitRegistration(body) {
         Invoiced: 'No',
         Paid: 'No',
         Read: 'No',
+        Log: [guestLogApplicationReceivedLine()],
     };
 
     await parentRef.collection(guestId).doc('item').set(itemPayload, { merge: false });

@@ -22,6 +22,13 @@
 
         /* ===== LAYOUT STYLES ===== */
         body.backend-page {
+            /* Guests roster + Speakers roster: Yes / No / Ready pill colours */
+            --backend-roster-status-yes-bg: #338a17;
+            --backend-roster-status-yes-color: #ffffff;
+            --backend-roster-status-no-bg: #ff0000;
+            --backend-roster-status-no-color: #ffffff;
+            --backend-roster-status-ready-bg: #ffd007;
+            --backend-roster-status-ready-color: #000000;
             --backend-square-btn-size: 35px;
             /* Rounded rectangles (labels, multi-icon controls, table cells) */
             --backend-square-btn-radius: 5px;
@@ -3705,8 +3712,8 @@
         body.backend-page button.speaker-roster-tag--travel-no,
         body.backend-page button.speaker-roster-tag--refunded-no,
         body.backend-page button.speaker-roster-tag--cme-no {
-            background: #ba1e45;
-            color: #ffffff;
+            background: var(--backend-roster-status-no-bg);
+            color: var(--backend-roster-status-no-color);
         }
 
         body.backend-page button.speaker-roster-tag--lodging-own,
@@ -3720,16 +3727,16 @@
         body.backend-page button.speaker-roster-tag--invite-confirmed,
         body.backend-page button.speaker-roster-tag--invite-invited,
         body.backend-page button.speaker-roster-tag--cme-sent {
-            background: #338a17;
-            color: #ffffff;
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
         }
 
         body.backend-page button.speaker-roster-tag--lodging-requested,
         body.backend-page button.speaker-roster-tag--bio-received,
         body.backend-page button.speaker-roster-tag--brief-first,
         body.backend-page button.speaker-roster-tag--cme-ready {
-            background: #ffd007;
-            color: #000000;
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
         }
 
         body.backend-page button.speaker-roster-tag--presented-no,
@@ -3755,15 +3762,15 @@
             color: #16a34a;
         }
 
-        /* Explicit Bio status colours */
+        /* Bio status uses the same roster Yes / No / Ready colours as guests */
         body.backend-page button.speaker-roster-tag--bio-no {
-            background: #ba1e45;
-            color: #ffffff;
+            background: var(--backend-roster-status-no-bg);
+            color: var(--backend-roster-status-no-color);
         }
 
         body.backend-page button.speaker-roster-tag--bio-received {
-            background: #ffd007;
-            color: #000000;
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
         }
 
         .speaker-roster-row:hover,
@@ -4994,13 +5001,13 @@
 
         /* Guests roster: Read / Invited / Invoiced cells */
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-yes {
-            background: #338a17;
-            color: #ffffff;
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-no {
-            background: #ff0000;
-            color: #ffffff;
+            background: var(--backend-roster-status-no-bg);
+            color: var(--backend-roster-status-no-color);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-neutral {
@@ -5015,8 +5022,8 @@
 
         /* Guests CME sent: Ready (same yellow as speaker “first brief” / CME ready). */
         #guest-editor .guests-list-table .content-badge.content-badge--guest-cme-ready {
-            background: #ffd007;
-            color: #000000;
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-reserve {
