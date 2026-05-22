@@ -5653,8 +5653,8 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-end;
-            gap: 16px;
+            justify-content: flex-start;
+            gap: 1rem;
             flex: 0 0 auto;
             width: 100%;
             min-width: 0;
@@ -5663,16 +5663,30 @@
             min-height: 55px;
         }
 
-        #texteditor .snippets-top-row-trailing {
+        #texteditor .snippets-top-row-col {
             display: flex;
             flex-direction: row;
             align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            flex: 0 0 auto;
+            min-width: 0;
+            box-sizing: border-box;
+            padding: 0 8px;
         }
 
-        #texteditor .snippets-top-row .texteditor-padlock-btn {
+        #texteditor .snippets-top-row-col--presets {
+            flex: 1 1 0;
+        }
+
+        #texteditor .snippets-top-row-col--source {
+            flex: 3 3 0;
+            justify-content: flex-start;
+        }
+
+        #texteditor .snippets-top-row-col--render {
+            flex: 3 3 0;
+            justify-content: flex-end;
+        }
+
+        #texteditor .snippets-top-row-col--source .texteditor-padlock-btn {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -5684,22 +5698,22 @@
             padding: 0;
         }
 
-        #texteditor .snippets-top-row .texteditor-padlock-btn svg {
+        #texteditor .snippets-top-row-col--source .texteditor-padlock-btn svg {
             flex-shrink: 0;
         }
 
-        #texteditor .snippets-top-row .texteditor-padlock-btn:disabled {
+        #texteditor .snippets-top-row-col--source .texteditor-padlock-btn:disabled {
             opacity: 0.45;
             cursor: not-allowed;
             filter: none;
         }
 
-        #texteditor .snippets-top-row .texteditor-padlock-btn:disabled:hover {
+        #texteditor .snippets-top-row-col--source .texteditor-padlock-btn:disabled:hover {
             filter: none;
         }
 
         /* Match Content / Lodging toolbar Save: fixed size, monospace label; colors from body.backend-page button */
-        #texteditor .snippets-top-row .texteditor-save-btn {
+        #texteditor .snippets-top-row-col--render .texteditor-save-btn {
             flex: 0 0 var(--backend-gold-toolbar-btn-width);
             width: var(--backend-gold-toolbar-btn-width);
             min-width: var(--backend-gold-toolbar-btn-width);
@@ -5719,8 +5733,32 @@
             text-align: center;
         }
 
-        #texteditor .snippets-top-row .texteditor-save-btn:hover:not(:disabled) {
+        #texteditor .snippets-top-row-col--render .texteditor-save-btn:hover:not(:disabled) {
             filter: brightness(0.92);
+        }
+
+        @media (max-width: 720px) {
+            #texteditor .snippets-top-row {
+                flex-direction: column;
+                align-items: stretch;
+                height: auto;
+                min-height: 0;
+                gap: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            #texteditor .snippets-top-row-col--presets {
+                display: none;
+            }
+
+            #texteditor .snippets-top-row-col--source,
+            #texteditor .snippets-top-row-col--render {
+                flex: 0 0 auto;
+            }
+
+            #texteditor .snippets-top-row-col--render {
+                justify-content: flex-end;
+            }
         }
 
         .texteditor-main {
@@ -5932,6 +5970,20 @@
             color: #ffffff !important;
         }
 
+        /* Programme intro preview: same padding as day cards, no background image */
+        .texteditor-render-html .programme-info {
+            background-color: transparent;
+            background-image: none !important;
+            padding: 1.25rem 8px;
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #6b7280;
+            border-radius: 0 !important;
+            box-sizing: border-box;
+            box-shadow: none;
+        }
+
         .renderbox--idle .texteditor-render-html:empty {
             min-height: 120px;
         }
@@ -6013,7 +6065,7 @@
             flex-direction: column;
             flex-wrap: nowrap;
             gap: 0.5rem;
-            align-items: stretch;
+            align-items: flex-start;
             min-width: 0;
             flex: 0 0 auto;
             width: 100%;
@@ -6022,8 +6074,10 @@
 
         .texteditor-day-btn {
             flex-shrink: 0;
-            width: 100%;
+            width: auto;
+            max-width: 100%;
             box-sizing: border-box;
+            text-align: left;
         }
 
         /* ===== CONTAINER STYLES ===== */
@@ -6604,8 +6658,9 @@
             </div>
 
             <section class="texteditor" id="texteditor" aria-hidden="true" data-name="texteditor">
-                <div class="snippets-top-row" role="toolbar" aria-label="Snippet editor actions">
-                    <div class="snippets-top-row-trailing">
+                <div class="snippets-top-row" aria-label="Snippet editor toolbar">
+                    <div class="snippets-top-row-col snippets-top-row-col--presets" aria-hidden="true"></div>
+                    <div class="snippets-top-row-col snippets-top-row-col--source" role="toolbar" aria-label="Source editor lock">
                         <button type="button" class="add-speaker-button texteditor-padlock-btn" id="texteditor-padlock-btn" aria-label="Lock pre-set" title="Lock" disabled aria-disabled="true">
                             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                 <path
@@ -6614,6 +6669,8 @@
                                 />
                             </svg>
                         </button>
+                    </div>
+                    <div class="snippets-top-row-col snippets-top-row-col--render">
                         <button type="button" class="texteditor-save-btn" id="texteditor-save-btn" disabled aria-disabled="true">Save</button>
                     </div>
                 </div>
@@ -6624,6 +6681,7 @@
                         <p class="texteditor-programme-heading">Home:</p>
                         <div class="texteditor-selectors" id="texteditor-home-selectors" role="group" aria-label="Home page snippets">
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:eventinfo" id="texteditor-home-event-btn" aria-pressed="false">Event</button>
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:locationinfo" id="texteditor-home-location-btn" aria-pressed="false">Location</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:speakers" id="texteditor-home-speakers-btn" aria-pressed="false">Speakers</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:registration" id="texteditor-home-registration-btn" aria-pressed="false">Registration</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:programmeinfo" id="texteditor-home-programmeinfo-btn" aria-pressed="false">Programme intro</button>
@@ -12854,6 +12912,7 @@
         }
         /** localStorage keys (must match `data-snippet-key` on home snippet buttons). */
         var TBS_TEXTEDITOR_HOME_EVENT_INFO_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:eventinfo';
+        var TBS_TEXTEDITOR_HOME_LOCATIONINFO_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:locationinfo';
         var TBS_TEXTEDITOR_HOME_SPEAKERS_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:speakers';
         var TBS_TEXTEDITOR_HOME_REGISTRATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:registration';
         var TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:programmeinfo';
@@ -12862,6 +12921,7 @@
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var FIRESTORE_TBS_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
+        var FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD = 'Locationinfo';
         var FIRESTORE_TBS_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
         var FIRESTORE_TBS_SNIPPETS_REGISTRATION_FIELD = 'Registration';
         var FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD = 'Programmeinfo';
@@ -12888,6 +12948,16 @@
                     loadOk: 'Event loaded from Firestore (tbs/Snippets.Eventinfo) into the editor.',
                     saveOk: 'Event saved to Firestore (tbs/Snippets.Eventinfo).',
                     saveErr: 'Failed to save Event to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_HOME_LOCATIONINFO_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD,
+                    metaLabel: 'Home — Location',
+                    loadOk: 'Location loaded from Firestore (tbs/Snippets.Locationinfo) into the editor.',
+                    saveOk: 'Location saved to Firestore (tbs/Snippets.Locationinfo).',
+                    saveErr: 'Failed to save Location to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -12980,6 +13050,9 @@
                     : await db.collection('events').doc(selectedevent).get();
                 var d = snap.exists ? (snap.data() || {}) : {};
                 var raw = d[spec.field];
+                if ((raw == null || String(raw).trim() === '') && spec.field === FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD) {
+                    raw = d.locationinfo != null ? d.locationinfo : '';
+                }
                 var html = raw != null ? String(raw) : '';
                 try {
                     localStorage.setItem(key, html);
@@ -13201,6 +13274,7 @@
                 }
                 key = TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY;
                 label = 'Programme intro';
+                html = texteditorPreviewHtmlForProgrammeInfo(html);
             } else {
                 if (!dateStr) return;
                 try {
@@ -13354,9 +13428,40 @@
             }
         }
 
+        function wrapProgrammeInfoSlideHtml(innerHtml) {
+            return (
+                '<div class="programme-info">' +
+                '<div class="programme-day-content programmestyle">' +
+                innerHtml +
+                '</div></div>'
+            );
+        }
+
+        function texteditorPreviewHtmlForProgrammeInfo(html) {
+            var t = String(html != null ? html : '').trim();
+            if (!t) return '';
+            try {
+                var doc = new DOMParser().parseFromString(t, 'text/html');
+                var body = doc.body;
+                if (body.children.length === 1) {
+                    var el = body.children[0];
+                    if (el.classList && el.classList.contains('programme-info')) {
+                        var inner = el.querySelector('.programme-day-content');
+                        return wrapProgrammeInfoSlideHtml(inner ? inner.innerHTML.trim() : el.innerHTML.trim());
+                    }
+                }
+                return wrapProgrammeInfoSlideHtml(body.innerHTML.trim());
+            } catch (e) {
+                return wrapProgrammeInfoSlideHtml(t);
+            }
+        }
+
         function texteditorPreviewHtmlForRender(raw, storageKey) {
             var html = raw != null ? raw : '';
             var key = storageKey || '';
+            if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
+                return texteditorPreviewHtmlForProgrammeInfo(html);
+            }
             if (!parseEventProgrammeKey(key)) {
                 return html;
             }
@@ -13422,6 +13527,9 @@
                 } catch (err) {
                     console.warn('Text editor localStorage read:', err);
                 }
+            }
+            if (nextKey === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
+                effectiveHtml = texteditorPreviewHtmlForProgrammeInfo(effectiveHtml);
             }
             ta.value = effectiveHtml != null ? effectiveHtml : '';
             if (nextKey) {
@@ -18337,6 +18445,9 @@
                     var ta = document.getElementById('texteditor-code');
                     var key = ta && ta.dataset.storageKey;
                     if (!ta || !key || texteditorSaveBtn.disabled || !texteditorPadlockIsOpen) return;
+                    if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
+                        ta.value = texteditorPreviewHtmlForProgrammeInfo(ta.value);
+                    }
                     try {
                         localStorage.setItem(key, ta.value);
                     } catch (err) {

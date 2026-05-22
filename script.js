@@ -1181,7 +1181,7 @@ function wireOneIntrostyleSlider(wrapper) {
         if (!introsliderEl || !indicatorsEl) return;
         const dots = indicatorsEl.querySelectorAll('.introslider-dot');
         if (!dots.length) return;
-        /** Active slide when slides are narrower than the viewport (e.g. 95vw cards + peek). */
+        /** Active slide when slides are narrower than the viewport (e.g. full-width cards + peek). */
         function nearestSlideIndex() {
             const sl = introsliderEl.scrollLeft;
             const kids = introsliderEl.children;
@@ -1384,7 +1384,7 @@ const ABOUT_EVENT_INNER_HTML = `
 /** Location body for home Location slide */
 const ABOUT_LOCATION_INNER_HTML = `
                                 <h3 class="about-title introslider-title">Location</h3>
-                                <p>TBS is held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection. The iconic four-star <a href="${TBS_HOTEL_ALEX_URL}" target="_blank" rel="noopener noreferrer">Hotel Alex</a> is the venue and the heart of the event.<br><br></p>
+                                <p>TBS is held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection.<br><br></p>
 `;
 
 /** Register body for home Register slide */
@@ -1549,26 +1549,44 @@ function layoutHomeSponsorLogosRowApply(sponsorsSectionEl) {
     const w = row.clientWidth;
     if (!(w > 0)) return;
 
-    let sumWoverH = 0;
-    for (let i = 0; i < images.length; i++) {
-        const im = images[i];
-        if (!im.naturalWidth || !im.naturalHeight) return;
-        sumWoverH += im.naturalWidth / im.naturalHeight;
-    }
-    if (!(sumWoverH > 0)) return;
-
     const gapPx = sponsorLogosRowGapPx(row);
-    const gapsWidth = Math.max(0, images.length - 1) * gapPx;
     const maxH = homeSponsorLogosMaxHeightPx();
-    const hFit = (w - gapsWidth) / sumWoverH;
-    const hUsed = Math.max(8, Math.min(maxH, hFit));
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+    const maxPerRow = isMobile ? 3 : images.length;
 
-    for (let i = 0; i < images.length; i++) {
-        const im = images[i];
-        im.style.height = hUsed + 'px';
-        im.style.width = 'auto';
-        im.style.maxWidth = 'none';
-        im.style.maxHeight = 'none';
+    for (let start = 0; start < images.length; start += maxPerRow) {
+        const rowImages = images.slice(start, start + maxPerRow);
+        let sumWoverH = 0;
+        for (let i = 0; i < rowImages.length; i++) {
+            const im = rowImages[i];
+            if (!im.naturalWidth || !im.naturalHeight) return;
+            sumWoverH += im.naturalWidth / im.naturalHeight;
+        }
+        if (!(sumWoverH > 0)) return;
+
+        const gapsWidth = Math.max(0, rowImages.length - 1) * gapPx;
+        const hFit = (w - gapsWidth) / sumWoverH;
+        let hUsed = Math.max(8, Math.min(maxH, hFit));
+        const slotWidth = rowImages.length > 0 ? (w - gapsWidth) / rowImages.length : w;
+
+        for (let i = 0; i < rowImages.length; i++) {
+            const im = rowImages[i];
+            if (isMobile && im.naturalWidth && im.naturalHeight && slotWidth > 0) {
+                const aspect = im.naturalWidth / im.naturalHeight;
+                const hCap = slotWidth / aspect;
+                if (Number.isFinite(hCap) && hCap > 0) {
+                    hUsed = Math.min(hUsed, hCap);
+                }
+            }
+        }
+
+        for (let i = 0; i < rowImages.length; i++) {
+            const im = rowImages[i];
+            im.style.height = hUsed + 'px';
+            im.style.width = 'auto';
+            im.style.maxWidth = isMobile ? '100%' : 'none';
+            im.style.maxHeight = 'none';
+        }
     }
 }
 
@@ -1720,7 +1738,7 @@ const HOME_ONDEMAND_SECTION_HTML = `
 const HOME_REGISTRATION_OUTER_HTML = `
                 <div class="registration-section" role="region" aria-labelledby="home-registration-heading">
                     <div class="registration-section-inner-wrapper">
-                            <form class="registration-form" novalidate onsubmit="return false;" aria-label="Registration preview form">
+                            <form class="registration-form" novalidate aria-label="Registration form">
                                 <h3 class="section-titles registration-section-title" id="home-registration-heading">Registration</h3>
                                 <p class="registration-manifesto">In order to facilitate interaction between participants TBS is intentionally kept small. Attendance is limited.</p>
                                 <div class="registration-form-row registration-form-row--two-up">
@@ -1889,16 +1907,55 @@ const HOME_REGISTRATION_OUTER_HTML = `
                                 </div>
                                 <div class="registration-form-row">
                                     <div class="registration-field">
+                                    <fieldset class="registration-fieldset" aria-label="Clinical context">
+                                        <legend>Clinical context <span class="registration-required-asterisk">*</span></legend>
+                                        <div class="registration-checkbox-group registration-checkbox-group--speciality">
+                                            <label class="registration-speciality-option" for="reg-clinical-emergency-department">
+                                                <input id="reg-clinical-emergency-department" name="clinicalContext" type="checkbox" value="Emergency Department">
+                                                <span class="registration-speciality-box" aria-hidden="true"></span>
+                                                <span>Emergency Department</span>
+                                            </label>
+                                            <label class="registration-speciality-option" for="reg-clinical-icu">
+                                                <input id="reg-clinical-icu" name="clinicalContext" type="checkbox" value="Intensive Care Unit">
+                                                <span class="registration-speciality-box" aria-hidden="true"></span>
+                                                <span>Intensive Care Unit</span>
+                                            </label>
+                                            <label class="registration-speciality-option" for="reg-clinical-prehospital">
+                                                <input id="reg-clinical-prehospital" name="clinicalContext" type="checkbox" value="Prehospital">
+                                                <span class="registration-speciality-box" aria-hidden="true"></span>
+                                                <span>Prehospital</span>
+                                            </label>
+                                            <label class="registration-speciality-option" for="reg-clinical-operating-theatres">
+                                                <input id="reg-clinical-operating-theatres" name="clinicalContext" type="checkbox" value="Operating theatres">
+                                                <span class="registration-speciality-box" aria-hidden="true"></span>
+                                                <span>Operating theatres</span>
+                                            </label>
+                                            <label class="registration-speciality-option" for="reg-clinical-tactical-austere">
+                                                <input id="reg-clinical-tactical-austere" name="clinicalContext" type="checkbox" value="Tactical/Austere">
+                                                <span class="registration-speciality-box" aria-hidden="true"></span>
+                                                <span>Tactical/Austere</span>
+                                            </label>
+                                            <label class="registration-speciality-option" for="reg-clinical-other">
+                                                <input id="reg-clinical-other" name="clinicalContext" type="checkbox" value="Other">
+                                                <span class="registration-speciality-box" aria-hidden="true"></span>
+                                                <span>Other</span>
+                                            </label>
+                                        </div>
+                                    </fieldset>
+                                    </div>
+                                </div>
+                                <div class="registration-form-row">
+                                    <div class="registration-field">
                                         <label for="reg-very-brief-bio">Very brief bio</label>
                                         <textarea id="reg-very-brief-bio" name="veryBriefBio" rows="4"></textarea>
                                     </div>
                                 </div>
                                 <div class="registration-form-row">
                                     <fieldset class="registration-fieldset" aria-label="Have you attended TBS in the past">
-                                        <legend>Have you attended TBS in the past?</legend>
+                                        <legend>Have you attended TBS in the past? <span class="registration-required-asterisk">*</span></legend>
                                         <div class="registration-checkbox-group">
                                             <label for="reg-attended-tbs-yes">
-                                                <input id="reg-attended-tbs-yes" name="attendedTbsPast" type="radio" value="Yes">
+                                                <input id="reg-attended-tbs-yes" name="attendedTbsPast" type="radio" value="Yes" required>
                                                 <span>Yes</span>
                                             </label>
                                             <label for="reg-attended-tbs-no">
@@ -1909,7 +1966,14 @@ const HOME_REGISTRATION_OUTER_HTML = `
                                     </fieldset>
                                 </div>
                                 <div class="registration-form-row registration-form-row--actions">
-                                    <button type="submit" class="registration-submit-btn nav-register-pill">Apply</button>
+                                    <div class="registration-success-check" hidden aria-hidden="true">
+                                        <svg class="registration-success-check-icon" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false">
+                                            <circle class="registration-success-check-ring" cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="3"/>
+                                            <path class="registration-success-check-mark" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M18 33 L28 43 L46 22"/>
+                                        </svg>
+                                        <span class="visually-hidden">Application sent successfully</span>
+                                    </div>
+                                    <button type="submit" class="registration-submit-btn nav-register-pill" disabled aria-disabled="true">Apply</button>
                                     <p class="registration-smallprint">Submitting this form registers your interest in attending TBS. We'll be in touch shortly.</p>
                                 </div>
                             </form>
@@ -1928,29 +1992,192 @@ ${ABOUT_EVENT_LOCATION_INNER_HTML}
                         </div>
 `;
 
-function setupRegistrationEmailConfirmValidation(root) {
-    if (!root) return;
-    const emailInput = root.querySelector('#reg-email');
-    const confirmInput = root.querySelector('#reg-email-confirm');
-    if (!emailInput || !confirmInput) return;
+function isRegistrationFormReady(form) {
+    if (!form) return false;
+    const fieldValue = (selector) => String(form.querySelector(selector)?.value || '').trim();
 
-    const syncConfirmEmailState = () => {
-        const emailValue = String(emailInput.value || '').trim().toLowerCase();
-        const confirmValue = String(confirmInput.value || '').trim().toLowerCase();
-        const emailsMatch = emailValue !== '' && confirmValue !== '' && emailValue === confirmValue;
-        const hasMismatch = !emailsMatch;
+    if (!fieldValue('#reg-first-name')) return false;
+    if (!fieldValue('#reg-last-name')) return false;
 
-        confirmInput.classList.toggle('registration-email-mismatch', hasMismatch);
-        if (hasMismatch) {
-            confirmInput.setCustomValidity('Email addresses must match.');
-        } else {
-            confirmInput.setCustomValidity('');
+    const email = fieldValue('#reg-email');
+    const confirmEmail = fieldValue('#reg-email-confirm');
+    if (!email || !confirmEmail || email !== confirmEmail) return false;
+
+    if (!fieldValue('#reg-city-region')) return false;
+    if (!fieldValue('#reg-country')) return false;
+    if (!fieldValue('#reg-employer-1')) return false;
+
+    if (!form.querySelector('input[name="baseSpeciality"]:checked')) return false;
+    if (!form.querySelector('input[name="trainingLevel"]:checked')) return false;
+    if (!form.querySelector('input[name="clinicalContext"]:checked')) return false;
+    if (!form.querySelector('input[name="attendedTbsPast"]:checked')) return false;
+
+    return true;
+}
+
+/** Registration submit URL: local dev API on 127.0.0.1, else Cloud Function. */
+function registrationSubmitFunctionUrl() {
+    if (typeof location !== 'undefined') {
+        const host = String(location.hostname || '').toLowerCase();
+        if (host === '127.0.0.1' || host === 'localhost') {
+            return `${location.origin}/api/submitRegistration`;
         }
+    }
+    const projectId = String(firebaseConfig?.projectId || '').trim();
+    if (!projectId) return '';
+    return `https://us-central1-${projectId}.cloudfunctions.net/submitRegistrationHttp`;
+}
+
+function showRegistrationSubmitSuccess(form) {
+    if (!form) return;
+    form.dataset.registrationSubmitted = '1';
+    form.classList.add('registration-form--submitted');
+    const check = form.querySelector('.registration-success-check');
+    if (check) {
+        check.hidden = false;
+        check.setAttribute('aria-hidden', 'false');
+    }
+    form.querySelectorAll('input, select, textarea, button').forEach((el) => {
+        if (el.classList.contains('registration-submit-btn')) return;
+        el.disabled = true;
+    });
+    const submitBtn = form.querySelector('.registration-submit-btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.setAttribute('aria-disabled', 'true');
+    }
+}
+
+function hideRegistrationSubmitSuccess(form) {
+    if (!form) return;
+    delete form.dataset.registrationSubmitted;
+    form.classList.remove('registration-form--submitted');
+    const check = form.querySelector('.registration-success-check');
+    if (check) {
+        check.hidden = true;
+        check.setAttribute('aria-hidden', 'true');
+    }
+    form.querySelectorAll('input, select, textarea, button').forEach((el) => {
+        if (el.classList.contains('registration-submit-btn')) return;
+        el.disabled = false;
+    });
+}
+
+function collectRegistrationFormPayload(form) {
+    const fieldValue = (selector) => String(form.querySelector(selector)?.value || '').trim();
+    const checkedValues = (name) =>
+        Array.from(form.querySelectorAll(`input[name="${name}"]:checked`))
+            .map((el) => String(el.value || '').trim())
+            .filter(Boolean);
+    const training = form.querySelector('input[name="trainingLevel"]:checked');
+    const pastTbs = form.querySelector('input[name="attendedTbsPast"]:checked');
+    return {
+        firstName: fieldValue('#reg-first-name'),
+        lastName: fieldValue('#reg-last-name'),
+        email: fieldValue('#reg-email'),
+        emailConfirm: fieldValue('#reg-email-confirm'),
+        cityRegion: fieldValue('#reg-city-region'),
+        country: fieldValue('#reg-country'),
+        employer1: fieldValue('#reg-employer-1'),
+        employer2: fieldValue('#reg-emplyer-2'),
+        baseSpeciality: checkedValues('baseSpeciality'),
+        trainingLevel: training ? String(training.value || '').trim() : '',
+        clinicalContext: checkedValues('clinicalContext'),
+        veryBriefBio: fieldValue('#reg-very-brief-bio'),
+        pastTbs: pastTbs ? String(pastTbs.value || '').trim() : ''
+    };
+}
+
+function setupRegistrationFormValidation(root) {
+    if (!root) return;
+    const form = root.querySelector('.registration-form');
+    if (!form) return;
+    const submitBtn = form.querySelector('.registration-submit-btn');
+    const statusEl = form.querySelector('.registration-smallprint');
+    const emailInput = form.querySelector('#reg-email');
+    const confirmInput = form.querySelector('#reg-email-confirm');
+    if (!submitBtn) return;
+
+    if (form.dataset.registrationSubmitInit !== '1') {
+        form.dataset.registrationSubmitInit = '1';
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isRegistrationFormReady(form) || submitBtn.disabled) return;
+
+            const fnUrl = registrationSubmitFunctionUrl();
+            if (!fnUrl) {
+                if (statusEl) statusEl.textContent = 'Registration is unavailable (missing project configuration).';
+                return;
+            }
+
+            const payload = collectRegistrationFormPayload(form);
+            const prevLabel = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-disabled', 'true');
+            submitBtn.textContent = 'Submitting…';
+            if (statusEl) statusEl.textContent = 'Sending your application…';
+
+            try {
+                const res = await fetch(fnUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    const msg = data && data.error ? String(data.error) : `Registration failed (${res.status}).`;
+                    throw new Error(msg);
+                }
+                form.reset();
+                showRegistrationSubmitSuccess(form);
+                if (statusEl) {
+                    statusEl.textContent =
+                        'Thank you — your application has been received. We will be in touch shortly.';
+                }
+            } catch (err) {
+                hideRegistrationSubmitSuccess(form);
+                const msg = err instanceof Error ? err.message : 'Registration could not be sent.';
+                if (statusEl) statusEl.textContent = msg;
+                submitBtn.textContent = prevLabel;
+                syncRegistrationFormState();
+            } finally {
+                if (form.dataset.registrationSubmitted !== '1') {
+                    submitBtn.textContent = prevLabel;
+                }
+            }
+        });
+    }
+
+    const syncRegistrationFormState = () => {
+        const email = String(emailInput?.value || '').trim();
+        const confirmEmail = String(confirmInput?.value || '').trim();
+        const emailsFilled = email !== '' && confirmEmail !== '';
+        const emailsMatch = emailsFilled && email === confirmEmail;
+        const showEmailMismatch = emailsFilled && !emailsMatch;
+
+        if (confirmInput) {
+            confirmInput.classList.toggle('registration-email-mismatch', showEmailMismatch);
+            if (showEmailMismatch) {
+                confirmInput.setCustomValidity('Email addresses must match.');
+            } else {
+                confirmInput.setCustomValidity('');
+            }
+        }
+
+        if (form.dataset.registrationSubmitted === '1') {
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-disabled', 'true');
+            return;
+        }
+
+        const ready = isRegistrationFormReady(form);
+        submitBtn.disabled = !ready;
+        submitBtn.setAttribute('aria-disabled', ready ? 'false' : 'true');
     };
 
-    emailInput.addEventListener('input', syncConfirmEmailState);
-    confirmInput.addEventListener('input', syncConfirmEmailState);
-    syncConfirmEmailState();
+    form.addEventListener('input', syncRegistrationFormState);
+    form.addEventListener('change', syncRegistrationFormState);
+    syncRegistrationFormState();
 }
 
 /** Snow overlay on home hero poster `<picture>`; respects prefers-reduced-motion. */
@@ -2331,7 +2558,7 @@ ${HOME_REGISTRATION_OUTER_HTML}
         `;
 
         const homeSection = main.querySelector('.home-section');
-        setupRegistrationEmailConfirmValidation(homeSection);
+        setupRegistrationFormValidation(homeSection);
         const pictureEl = homeSection && homeSection.querySelector(':scope > picture');
         const introWrap = homeSection && homeSection.querySelector(':scope > .introslider-wrapper');
         const feedWrap = homeSection && homeSection.querySelector(':scope > .feed-section');
@@ -2839,8 +3066,8 @@ const PROGRAMME_INDEX_DAY_ORDER = ['tuesday', 'wednesday', 'thursday', 'friday']
 /** Same prefix as backend.html text editor (localStorage per programme day). */
 const TBS_TEXTEDITOR_PROGRAMME_LS_PREFIX = 'tbsBackend:texteditor:programme:';
 
-/** Home Location band: localStorage key (backend editor / cross-tab); Firestore `events/{id}` field `locationinfo` is preferred on load. */
-const TBS_TEXTEDITOR_HOME_LOCATION_LS_KEY = 'tbsBackend:texteditor:home:location-text';
+/** Home Location band: localStorage key (backend editor / cross-tab); Firestore `tbs/Snippets.Locationinfo` is preferred on load. */
+const TBS_TEXTEDITOR_HOME_LOCATION_LS_KEY = 'tbsBackend:texteditor:home:locationinfo';
 
 /** Default copy for the home Location band (left column) when Firestore and localStorage are empty. */
 const HOME_LOCATION_BAND_DEFAULT_HTML = `<p>Getting to Zermatt is fairly straightforward. Those of you travelling from abroad are likely to come in through Geneva or Zurich airports. From there you simply take the train, via Visp, to get to Zermatt.</p><p>The four-star <a href="${TBS_HOTEL_ALEX_URL}" target="_blank" rel="noopener noreferrer">Hotel Alex</a> is the venue and the heart of the event. It is only a minute's walk from the Zermatt railway station.</p><p>All lecture sessions will be held in the Alex main conference facility. With the exception of the occasional off-site session, most workshops happen here as well.</p>`;
@@ -3045,6 +3272,15 @@ async function fetchHomeProgrammeDayHtmlFromFirebase(dayKey) {
     return value || '';
 }
 
+function wrapProgrammeInfoSlideHtml(innerHtml) {
+    return (
+        '<div class="programme-info">' +
+        '<div class="programme-day-content programmestyle">' +
+        innerHtml +
+        '</div></div>'
+    );
+}
+
 function normalizeProgrammeInfoSlideHtml(htmlString) {
     const t = (htmlString || '').trim();
     if (!t) return '';
@@ -3054,12 +3290,13 @@ function normalizeProgrammeInfoSlideHtml(htmlString) {
         if (body.children.length === 1) {
             const el = body.children[0];
             if (el.classList && el.classList.contains('programme-info')) {
-                return el.outerHTML;
+                const inner = el.querySelector('.programme-day-content');
+                return wrapProgrammeInfoSlideHtml(inner ? inner.innerHTML.trim() : el.innerHTML.trim());
             }
         }
-        return '<div class="programme-info programme-friday"><div class="programme-day-content programmestyle">' + body.innerHTML.trim() + '</div></div>';
+        return wrapProgrammeInfoSlideHtml(body.innerHTML.trim());
     } catch (e) {
-        return '<div class="programme-info programme-friday"><div class="programme-day-content programmestyle">' + t + '</div></div>';
+        return wrapProgrammeInfoSlideHtml(t);
     }
 }
 
@@ -3468,9 +3705,13 @@ function appendHomeSpeakerPlaceholder(track, message) {
 }
 
 /** Slide that only shows HTML from `events/{id}` field `speakerinfo` (always before real speaker cards). */
+function homeSpeakerStripeClass(index) {
+    return index % 2 === 0 ? 'speaker-card--stripe-a' : 'speaker-card--stripe-b';
+}
+
 function appendHomeSpeakerinfoCard(track, html) {
     const article = document.createElement('article');
-    article.className = 'speaker-card speaker-card--speakerinfo';
+    article.className = 'speaker-card speaker-card--speakerinfo speaker-card--stripe-a';
     article.setAttribute('aria-label', 'Speaker information');
 
     const innerWrap = document.createElement('div');
@@ -3492,9 +3733,9 @@ function appendHomeSpeakerinfoCard(track, html) {
 }
 
 /** Placeholder speaker slide when `tbs/Settings.displayspeakers` is `No`. */
-function appendHomeSpeakerTbaCard(track) {
+function appendHomeSpeakerTbaCard(track, stripeIndex) {
     const article = document.createElement('article');
-    article.className = 'speaker-card speaker-card--tba';
+    article.className = 'speaker-card speaker-card--tba ' + homeSpeakerStripeClass(stripeIndex != null ? stripeIndex : 0);
     article.setAttribute('aria-label', 'Speakers to be announced');
 
     const innerWrap = document.createElement('div');
@@ -3515,9 +3756,9 @@ function appendHomeSpeakerTbaCard(track) {
  * @param {boolean} expandableLongBio — same rule as former per-card chevron: first real speaker when there is no
  * `speakerinfo` card has no long-bio expand. Cards with this flag toggle short/long bio on press.
  */
-function appendHomeSpeakerCard(track, speaker, expandableLongBio) {
+function appendHomeSpeakerCard(track, speaker, expandableLongBio, stripeIndex) {
     const article = document.createElement('article');
-    article.className = 'speaker-card';
+    article.className = 'speaker-card ' + homeSpeakerStripeClass(stripeIndex != null ? stripeIndex : 0);
     const name =
         `${String(speaker.firstName || '').trim()} ${String(speaker.lastName || '').trim()}`.trim() || 'Speaker';
 
@@ -3729,7 +3970,7 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
                 appendHomeSpeakerinfoCard(track, speakerinfoHtml);
             }
             for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
-                appendHomeSpeakerTbaCard(track);
+                appendHomeSpeakerTbaCard(track, hasInfoCard ? tbaIdx + 1 : tbaIdx);
             }
             return;
         }
@@ -3757,7 +3998,7 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
         }
         speakers.forEach(function (s, i) {
             const expandable = String(s.longBio || '').trim().length > 0;
-            appendHomeSpeakerCard(track, s, expandable);
+            appendHomeSpeakerCard(track, s, expandable, hasInfoCard ? i + 1 : i);
         });
     } finally {
         delete speakersWrapperEl.dataset.speakersScrollbarWired;

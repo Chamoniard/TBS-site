@@ -4,7 +4,7 @@ import {onRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
-import {FieldValue, getFirestore} from "firebase-admin/firestore";
+import {FieldValue, Firestore, getFirestore} from "firebase-admin/firestore";
 import {getStorage} from "firebase-admin/storage";
 import Stripe from "stripe";
 
@@ -458,6 +458,199 @@ export const uploadContentImageHttp = onRequest({
     logger.error("uploadContentImageHttp failed", {err});
     res.status(500).json({
       error: err instanceof Error ? err.message : "Failed to upload image.",
+    });
+  }
+});
+
+/**
+ * Slug for guest id segments (event + first + last name).
+ * @param {unknown} input Raw string.
+ * @return {string} Alphanumeric slug segment.
+ */
+function registrationSlugPart(input: unknown): string {
+  let t = String(input ?? "")
+    .trim()
+    .replace(/[\s/]+/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "");
+  if (!t) t = "x";
+  return t.slice(0, 80);
+}
+
+/**
+ * Builds base guest document id: event + first + last (no separators).
+ * @param {string} event Current event label.
+ * @param {string} firstName Guest first name.
+ * @param {string} lastName Guest last name.
+ * @return {string} Firestore subcollection id.
+ */
+function buildRegistrationGuestId(
+  event: string,
+  firstName: string,
+  lastName: string,
+): string {
+  const ev = registrationSlugPart(event);
+  const first = registrationSlugPart(firstName);
+  const last = registrationSlugPart(lastName);
+  const id = `${ev}${first}${last}`.slice(0, 150);
+  return id || "guest";
+}
+
+/**
+ * Reads `Current event` from `tbs/Settings`.
+ * @param {Firestore} db Admin Firestore.
+ * @return {Promise<string>} Event id/label.
+ */
+async function loadCurrentEventFromSettings(db: Firestore): Promise<string> {
+  const snap = await db.collection("tbs").doc("Settings").get();
+  const data = (snap.data() || {}) as Record<string, unknown>;
+  const keys = ["Current event", "currentEvent", "Current Event"];
+  for (const k of keys) {
+    const v = String(data[k] || "").trim();
+    if (v) return v;
+  }
+  return "TBS27";
+}
+
+/**
+ * YYYY-MM-DD for Application date.
+ * @param {Date} date Submit timestamp.
+ * @return {string} Date string.
+ */
+function formatApplicationDate(date: Date): string {
+  const yyyy = String(date.getFullYear());
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+/**
+ * Public registration: writes `tbs/Guests/{guestId}/item` and updates manifest.
+ * Expects JSON body with form fields (no reCAPTCHA).
+ */
+export const submitRegistrationHttp = onRequest({
+  cors: true,
+  invoker: "public",
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  try {
+    const body = (req.body || {}) as Record<string, unknown>;
+    const firstName = String(body.firstName || "").trim();
+    const lastName = String(body.lastName || "").trim();
+    const email = String(body.email || "").trim();
+    const emailConfirm = String(body.emailConfirm || "").trim();
+    const cityRegion = String(body.cityRegion || "").trim();
+    const country = String(body.country || "").trim();
+    const employer1 = String(body.employer1 || "").trim();
+    const employer2 = String(body.employer2 || "").trim();
+    const trainingLevel = String(body.trainingLevel || "").trim();
+    const veryBriefBio = String(body.veryBriefBio || "").trim();
+    const pastTbs = String(body.pastTbs || "").trim();
+
+    const baseSpeciality = Array.isArray(body.baseSpeciality) ?
+      body.baseSpeciality.map((v) => String(v || "").trim()).filter(Boolean) :
+      [];
+    const clinicalContext = Array.isArray(body.clinicalContext) ?
+      body.clinicalContext.map((v) => String(v || "").trim()).filter(Boolean) :
+      [];
+
+    if (!firstName || !lastName) {
+      res.status(400).json({error: "First and last name are required."});
+      return;
+    }
+    if (!email || !email.includes("@")) {
+      res.status(400).json({error: "A valid email is required."});
+      return;
+    }
+    if (email !== emailConfirm) {
+      res.status(400).json({error: "Email addresses must match."});
+      return;
+    }
+    if (!cityRegion || !country || !employer1) {
+      res.status(400).json({error: "City/region, country, and employer 1 are required."});
+      return;
+    }
+    if (!baseSpeciality.length) {
+      res.status(400).json({error: "Select at least one base medical speciality."});
+      return;
+    }
+    if (!trainingLevel) {
+      res.status(400).json({error: "Level of training is required."});
+      return;
+    }
+    if (!clinicalContext.length) {
+      res.status(400).json({error: "Select at least one clinical context."});
+      return;
+    }
+    if (pastTbs !== "Yes" && pastTbs !== "No") {
+      res.status(400).json({
+        error: "Please indicate whether you have attended TBS in the past.",
+      });
+      return;
+    }
+
+    const db = getFirestore();
+    const event = await loadCurrentEventFromSettings(db);
+    const submittedAt = new Date();
+    const applicationDate = formatApplicationDate(submittedAt);
+
+    const parentRef = db.collection("tbs").doc("Guests");
+    const baseGuestId = buildRegistrationGuestId(event, firstName, lastName);
+    let guestId = baseGuestId;
+    let suffix = 0;
+    while (true) {
+      const itemSnap = await parentRef.collection(guestId).doc("item").get();
+      if (!itemSnap.exists) break;
+      suffix += 1;
+      guestId = `${baseGuestId}${suffix}`.slice(0, 150);
+    }
+    const guestsCol = parentRef.collection(guestId);
+
+    const itemPayload: Record<string, unknown> = {
+      "Name": firstName,
+      "Last Name": lastName,
+      "E-mail": email,
+      "City/region": cityRegion,
+      "Country": country,
+      "Employer 1": employer1,
+      "Employer 2": employer2,
+      "Base medical speciality": baseSpeciality,
+      "Level of Training": trainingLevel,
+      "Clinical context": clinicalContext,
+      "Brief bio": veryBriefBio,
+      "Past TBS?": pastTbs,
+      "Application date": applicationDate,
+      "Attended": false,
+      "Briefed": "No",
+      "CME sent": "No",
+      "Event": event,
+      "Invited": "No",
+      "Invoiced": "No",
+      "Paid": "No",
+      "Read": "No",
+    };
+
+    await guestsCol.doc("item").set(itemPayload, {merge: false});
+    await parentRef.set(
+      {guestIds: FieldValue.arrayUnion(guestId)},
+      {merge: true},
+    );
+
+    logger.info("submitRegistrationHttp ok", {guestId, event, email});
+    res.status(200).json({ok: true, guestId, event});
+  } catch (err) {
+    logger.error("submitRegistrationHttp failed", {err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Registration could not be saved.",
     });
   }
 });
