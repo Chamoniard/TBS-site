@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="dns-prefetch" href="https://api.airtable.com">
     <style>
         /* Critical CSS for above-the-fold content */
@@ -25,8 +26,8 @@
         .nav-link:hover { color: #FFD700; }
         .nav-link.active { color: #FFD700; font-weight: 500; }
         @media (min-width: 769px) { .nav-link { font-size: 1.2rem; } }
-        :root { font-size: 18px; --navbar-height: calc(16px + 58.32px + (1rem * 1.2) + 16px); }
-        @media (max-width: 768px) { :root { font-size: 16px; --navbar-height: calc(8px + (0.45rem * 2 + 1.2 * 1rem) + 8px); } }
+        :root { font-size: 20px; --navbar-height: calc(16px + 58.32px + (1rem * 1.2) + 16px); }
+        @media (max-width: 768px) { :root { font-size: 20px; --navbar-height: calc(8px + (0.45rem * 2 + 1.2 * 1rem) + 8px); } }
         .hero { background: #f8fafc; color: #333; height: calc(var(--navbar-height) - 2px); min-height: calc(var(--navbar-height) - 2px); text-align: left; position: relative; width: 100%; margin: 0 0 8px 0; }
         @media (max-width: 768px) { .hero { margin: 0 !important; } }
         body.home-view .home-section { padding-top: 0 !important; margin-top: 0 !important; background-color: transparent !important; }
@@ -40,7 +41,7 @@
         @media (max-width: 768px) { .home-section > picture { height: 1016px; } }
         .container { max-width: 1500px; margin: 0 auto; padding: 0 20px; }
     </style>
-    <link rel="stylesheet" href="styles.css?v=20260422-event-no-social">
+    <link rel="stylesheet" href="styles.css?v=20260523-rem-mobile">
     <!-- LCP: preload optimized hero poster variants used by the home <picture> -->
     <link rel="preload" as="image" href="images/poster_narrow_q72.jpg" media="(max-width: 768px)">
     <link rel="preload" as="image" href="images/poster_wide_q72.jpg" media="(min-width: 769px)">
@@ -120,15 +121,12 @@
                 text-align: center !important;
             }
             .nav-register-mobile-top .nav-register-pill:hover,
-            .nav-register-mobile-top .nav-register-pill:focus-visible {
-                background: #003153 !important;
-                color: #FFD700 !important;
-                outline: none !important;
-            }
+            .nav-register-mobile-top .nav-register-pill:focus-visible,
             .nav-register-mobile-top .nav-register-pill.active {
-                background: #003153 !important;
-                color: #FFD700 !important;
-                font-weight: 500 !important;
+                background-color: #FFD700 !important;
+                color: #003153 !important;
+                font-weight: 400 !important;
+                outline: none !important;
             }
             .nav-menu .mobile-top-tab-link {
                 font-size: 1rem !important;
@@ -282,7 +280,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260522-home-password" defer></script>
+    <script src="script.js?v=20260523-home-perf" defer></script>
     <script>
         // Show loading state immediately
         document.addEventListener('DOMContentLoaded', function() {

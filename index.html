@@ -86,12 +86,16 @@
             position: static;
             margin: 0;
             padding-left: 5px;
-            color: #e5e7eb;
+            color: #a8e6ff; /* --tbs-icy-blue, same as sponsors “Presented by” title */
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 2rem;
             font-weight: 500;
             line-height: 1.1;
             letter-spacing: 0.01em;
+        }
+
+        .index-standby-title:not(.is-ready) {
+            visibility: hidden;
         }
 
         @media (max-width: 768px) {
@@ -122,8 +126,11 @@
         </picture>
         <div class="index-brand">
             <img src="images/logo.png" alt="TBS Zermatt" class="index-logo">
-            <p class="index-standby-title">Stand by...</p>
+            <p class="index-standby-title" id="index-standby-title" aria-live="polite"></p>
         </div>
     </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="index.js?v=20260522-standby-setting" defer></script>
 </body>
 </html>

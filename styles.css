@@ -1,8 +1,9 @@
 /* Reset and Base Styles */
 
-/* Global rem base: 1rem = 18px (narrow); 20px from 769px up. Change :root font-size to scale rem site-wide. */
-:root {
-    font-size: 18px;
+/* Global rem base: 1rem = 20px site-wide. Change :root font-size to scale rem site-wide. */
+:root,
+html {
+    font-size: 20px;
     /* Fixed navbar horizontal inset from viewport (narrow on small screens below) */
     --navbar-margin-inline: 193px;
 }
@@ -220,7 +221,6 @@ body.home-view .navbar {
     box-sizing: border-box;
     background-color: #003153 !important;
     border-radius: 0;
-    border-bottom: 1px solid #ffffff;
     color: #f1f5f9;
     overflow: hidden;
 }
@@ -524,9 +524,17 @@ body.home-view .navbar {
     }
 }
 
-.registration-form--submitted .registration-submit-btn:disabled {
-    background-color: #9ca3af;
-    color: #4b5563;
+.registration-form--submitted .registration-submit-btn {
+    display: none !important;
+}
+
+.registration-form--inactive {
+    opacity: 0.55;
+}
+
+.registration-form--inactive,
+.registration-section--closed .registration-form {
+    pointer-events: none;
 }
 
 .registration-smallprint {
@@ -741,18 +749,12 @@ body.home-view .navbar {
     font-weight: 500;
 }
 
-/* Desktop Register pill: active state without outline ring */
-.nav-item-register-desktop .nav-link[data-view="register"].active {
-    font-weight: 600;
-}
-
 .nav-link[data-view="feed"] {
     padding-left: 1.625rem; /* 10px + 1rem = 26px total */
 }
 
 @media (min-width: 769px) {
     :root {
-        font-size: 20px;
         --tbs-register-pill-width: 7.125rem;
     }
 
@@ -797,9 +799,6 @@ button.nav-register-pill {
     font-weight: 400 !important;
 }
 
-.nav-register-pill:hover,
-.nav-register-pill:focus-visible,
-.nav-item-register-desktop .nav-link[data-view="register"]:hover,
 .registration-submit-btn:hover:not(:disabled),
 .registration-submit-btn:focus-visible:not(:disabled) {
     background: #003153;
@@ -814,11 +813,31 @@ button.nav-register-pill {
     opacity: 1;
 }
 
-.nav-register-pill.active,
-.nav-item-register-desktop .nav-link[data-view="register"].active {
-    background: #003153;
-    color: #FFD700;
-    font-weight: 500;
+/* Navbar Register pill: always gold — no hover or scroll-spy color change */
+.navbar .nav-register-pill,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"],
+.navbar .nav-register-mobile-top .nav-register-pill {
+    background-color: #FFD700 !important;
+    color: #003153 !important;
+}
+
+.navbar .nav-register-pill:hover,
+.navbar .nav-register-pill:focus,
+.navbar .nav-register-pill:focus-visible,
+.navbar .nav-register-pill.active,
+.navbar .nav-link.nav-register-pill.active,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"]:hover,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"]:focus,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"]:focus-visible,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"].active,
+.navbar .nav-register-mobile-top .nav-register-pill:hover,
+.navbar .nav-register-mobile-top .nav-register-pill:focus,
+.navbar .nav-register-mobile-top .nav-register-pill:focus-visible,
+.navbar .nav-register-mobile-top .nav-register-pill.active {
+    background-color: #FFD700 !important;
+    color: #003153 !important;
+    font-weight: 400 !important;
+    outline: none;
 }
 
 @media (min-width: 769px) {
@@ -1112,6 +1131,12 @@ body.home-view .home-section > picture::after {
     );
 }
 
+@media (max-width: 768px) {
+    body.home-view .home-section > picture::after {
+        height: 40%;
+    }
+}
+
 /* Hero carousel only: sits on the lower poster so glass panels blur the image */
 body.home-view .home-section > .introslider-wrapper {
     margin-top: calc((-1 * var(--home-hero-introslider-poster-overlap)) - 1px);
@@ -1119,22 +1144,31 @@ body.home-view .home-section > .introslider-wrapper {
     position: relative;
 }
 
-/* Wide screens: Prussian-blue fade + band behind hero introslider */
+/* Wide screens: transparent track so poster shows through; frosted glass on each slide card. */
 @media (min-width: 769px) {
     body.home-view .home-section > .introslider-wrapper::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: -50px;
-        height: 50px;
-        pointer-events: none;
-        z-index: 1;
-        background: linear-gradient(to bottom, rgba(0, 49, 83, 0) 0%, #003153 100%);
+        display: none;
+        content: none;
     }
 
     body.home-view .home-section > .introslider-wrapper {
-        background-color: #003153;
+        background-color: transparent;
+    }
+
+    /* Softer, taller poster bottom wash where introslider overlaps the hero image. */
+    body.home-view .home-section > picture::after {
+        height: 42%;
+        background: linear-gradient(
+            to top,
+            #003153 0%,
+            rgba(0, 49, 83, 0.94) 12%,
+            rgba(0, 49, 83, 0.78) 28%,
+            rgba(0, 49, 83, 0.58) 44%,
+            rgba(0, 49, 83, 0.38) 58%,
+            rgba(0, 49, 83, 0.2) 72%,
+            rgba(0, 49, 83, 0.08) 86%,
+            rgba(0, 49, 83, 0) 100%
+        );
     }
 }
 
@@ -1313,7 +1347,7 @@ body.home-view .home-section > .speaker-section {
     flex-shrink: 0;
     margin: 0;
     padding: 8px 0 4px 0;
-    color: var(--tbs-icy-blue) !important;
+    color: #ffffff !important;
     text-align: left;
     align-self: flex-start;
     width: 100%;
@@ -1373,12 +1407,30 @@ body.home-view .home-section > .speaker-section {
     border-radius: 0 !important;
 }
 
-.home-section > .event-section > .event-section-divider {
+.home-section > .event-section > .event-section-divider,
+.home-section > .event-section-divider {
     display: block;
     width: 70%;
     max-width: 70%;
     height: auto;
     margin: 8px auto 0;
+    padding: 0;
+}
+
+.home-section > .home-section-divider-band {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background-color: #003153;
+    padding: 8px 8px;
+}
+
+.home-section > .home-section-divider-band > .event-section-divider {
+    display: block;
+    width: 70%;
+    max-width: 70%;
+    height: auto;
+    margin: 0 auto;
     padding: 0;
 }
 
@@ -1453,9 +1505,22 @@ body.home-view .home-section > .speaker-section {
 
 .home-section > .event-section .event-contents {
     min-width: 0;
-    font-size: 0.95rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: #F4F0E8;
+}
+
+/* Firestore / text-editor HTML: inherit rem-based body copy (inline px stripped on inject). */
+.home-section > .event-section .event-contents .home-rich-html,
+.home-section > .event-section .location-text-body .home-rich-html {
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.home-section > .event-section .home-rich-html :where(p, li, td, th, span, div, a, strong, em, blockquote) {
+    font-size: inherit;
+    line-height: inherit;
 }
 
 .home-section > .event-section .event-contents p {
@@ -1485,16 +1550,6 @@ body.home-view .home-section > .speaker-section {
     padding: 8px 0 4px 0;
     text-transform: none;
     line-height: 1.3;
-}
-
-@media (max-width: 1249px) {
-    .home-section > .event-section .event-contents > * {
-        display: none;
-    }
-
-    .home-section > .event-section .event-contents > p:first-of-type {
-        display: block;
-    }
 }
 
 .home-section > .event-section .event-texts > .location-contents {
@@ -1535,7 +1590,7 @@ body.home-view .home-section > .speaker-section {
 }
 
 .home-section > .event-section .location-content {
-    font-size: 0.95rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.95);
     display: flex;
@@ -1603,7 +1658,7 @@ body.home-view .home-section > .speaker-section {
 .home-section > .event-section .trailer {
     min-width: 0;
     box-sizing: border-box;
-    border: 1px solid #9ca3af;
+    border: 1px solid #ffffff;
     border-radius: 5px;
     background: rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -1728,6 +1783,13 @@ body.home-view .home-section > .speaker-section {
     padding: 0;
     padding-top: 16px;
     padding-bottom: 16px;
+    min-height: min(50vh, 420px);
+}
+
+@media (min-width: 769px) {
+    .home-section > .speaker-section .speakers-inner-wrapper {
+        padding-bottom: 24px;
+    }
 }
 
 .home-section .speakerslider {
@@ -1755,6 +1817,9 @@ body.home-view .home-section > .speaker-section {
     box-sizing: border-box;
     padding-left: 0;
     padding-right: 0;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    scroll-behavior: smooth;
 }
 
 .home-section .speakerslider-track > .speaker-placeholder {
@@ -2483,7 +2548,7 @@ body.home-view .home-section > .speaker-section {
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 16px;
+        bottom: 24px;
         width: auto;
         margin: 0;
         padding: 0;
@@ -2500,6 +2565,7 @@ body.home-view .home-section > .speaker-section {
     .home-section .speaker-section:hover .speakers-inner-wrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
     .home-section .speaker-section:focus-within .speakers-inner-wrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow) {
         opacity: 1;
+        pointer-events: auto;
     }
     .home-introslider-scrollbar--nooverflow {
         visibility: hidden;
@@ -2597,6 +2663,89 @@ body.home-view .home-section > .speaker-section {
     border-radius: 5px !important;
 }
 
+/* Programme day slides (home Tue–Fri + backend editor): shared card chrome */
+.programme-slider > .programme-day-slide,
+#programme-editor .programme-editor-day.programme-day-slide {
+    flex: 0 0 var(--introslider-column-width);
+    width: var(--introslider-column-width);
+    min-width: var(--introslider-column-width);
+    min-height: 0;
+    align-self: flex-start;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+    background-color: transparent;
+    background-image: url('images/starrynight.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #D1D5DB;
+    border-right: none;
+    border-radius: 0;
+    padding: 1.25rem 8px;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    box-shadow: none;
+}
+
+.programme-slider > .programme-day-slide {
+    align-self: stretch;
+}
+
+#programme-editor .programme-editor-day.programme-day-slide {
+    aspect-ratio: var(--home-carousel-minimal-aspect-ratio);
+    cursor: pointer;
+}
+
+.programme-slider > .programme-day-slide:last-child,
+.programme-slider > .programme-day-slide:only-child,
+#programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide:last-child,
+#programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide:only-child {
+    border-right: 1px solid #D1D5DB;
+}
+
+.programme-slider > .programme-day-slide:not(:first-child),
+#programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide:not(:first-child) {
+    border-left-color: #ffffff;
+}
+
+.programme-slider > .programme-day-slide:first-child:not(:only-child),
+#programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide:first-child:not(:only-child) {
+    border-radius: 5px 0 0 5px;
+}
+
+.programme-slider > .programme-day-slide:last-child:not(:first-child),
+#programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide:last-child:not(:first-child) {
+    border-radius: 0 5px 5px 0;
+}
+
+.programme-slider > .programme-day-slide:only-child,
+#programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide:only-child {
+    border-radius: 5px;
+}
+
+#programme-editor .programme-editor-day.programme-day-slide.is-selected {
+    border: 3px solid magenta;
+    border-right: 3px solid magenta;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+@media (min-width: 769px) {
+    .home-section .programme-section .programme-slider.home-carousel--minimal > .programme-day-slide,
+    .home-programme-section .programme-slider.home-carousel--minimal > .programme-day-slide,
+    #programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide {
+        aspect-ratio: var(--home-carousel-minimal-aspect-ratio) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        align-self: flex-start !important;
+        overflow: hidden auto !important;
+    }
+}
+
 /* Introslider cards: requested bottom breathing space */
 .introslider > * {
     padding-bottom: 8px;
@@ -2623,9 +2772,12 @@ body.home-view .home-section > .speaker-section {
 .introslider h6,
 .programme-slider h1,
 .programme-slider h2,
-.programme-slider h4,
 .programme-slider h5,
-.programme-slider h6 {
+.programme-slider h6,
+.programme-day-slide h1,
+.programme-day-slide h2,
+.programme-day-slide h5,
+.programme-day-slide h6 {
     font-size: 1.7rem;
     font-weight: 600;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -3257,7 +3409,7 @@ body.home-view .home-section > .home-social-row-container {
 
 .home-section .programme-slider > *:last-child,
 .home-programme-section .programme-slider > *:last-child {
-    margin-right: 0 !important;
+    margin-right: 16px !important;
 }
 
 /* TBS27 daily programme boxes */
@@ -3327,6 +3479,7 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 .programme-day-content,
+.programme-day-slide .programmestyle,
 .programme-tuesday .programmestyle,
 .programme-wednesday .programmestyle,
 .programme-thursday .programmestyle,
@@ -3342,20 +3495,34 @@ body.home-view .home-section > .home-social-row-container {
 
 /* Programme slider: fill stretched card; no inner scrollbar (row height = tallest slide) */
 .programme-slider .programme-day-content,
+.programme-slider .programme-day-slide .programme-day-content,
+.programme-slider .programme-day-slide .programmestyle,
 .programme-slider .programme-tuesday .programmestyle,
 .programme-slider .programme-wednesday .programmestyle,
 .programme-slider .programme-thursday .programmestyle,
-.programme-slider .programme-friday .programmestyle {
+.programme-slider .programme-friday .programmestyle,
+#programme-editor .programme-editor-day.programme-day-slide .programme-day-content.programmestyle {
     flex: 1 1 auto;
     min-height: 0;
     overflow: visible;
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+}
+
+/* Home programme slider + backend day cards: base copy size (h4/p also set explicitly below) */
+.programme-slider .programme-day-slide .programme-day-content,
+.programme-slider .programme-day-slide .programmestyle {
+    font-size: 1rem;
 }
 
 /* Minimal slides: internal scroll (1080×1920 ratio set on home carousel cards above) */
 .home-section .speaker-section.home-carousel--minimal .speakerslider-track > .speaker-card > .speaker-card-inner-wrapper,
 .home-section .speaker-section.home-carousel--minimal .speaker-card > .speaker-card-inner-wrapper > .speaker-content,
 .home-section .programme-slider.home-carousel--minimal .programme-day-content,
+.home-section .programme-slider.home-carousel--minimal .programme-day-slide .programme-day-content,
 .home-programme-section .programme-slider.home-carousel--minimal .programme-day-content,
+.home-programme-section .programme-slider.home-carousel--minimal .programme-day-slide .programme-day-content,
 .home-section .programme-slider.home-carousel--minimal .programme-info,
 .home-section .programme-slider.home-carousel--minimal .programme-tba,
 .home-programme-section .programme-slider.home-carousel--minimal .programme-info,
@@ -3380,6 +3547,10 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 .programme-day-content p,
+.programme-slider .programme-day-slide .programme-day-content p,
+.programme-slider .programme-day-slide .programmestyle p,
+.programme-day-slide .programmestyle p,
+#programme-editor .programme-editor-day.programme-day-slide .programmestyle p,
 .programme-tuesday .programmestyle p,
 .programme-wednesday .programmestyle p,
 .programme-thursday .programmestyle p,
@@ -3396,6 +3567,7 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 .programme-day-content p:last-child,
+.programme-day-slide .programmestyle p:last-child,
 .programme-tuesday .programmestyle p:last-child,
 .programme-wednesday .programmestyle p:last-child,
 .programme-thursday .programmestyle p:last-child,
@@ -3404,6 +3576,7 @@ body.home-view .home-section > .home-social-row-container {
     margin-bottom: 0;
 }
 
+.programme-day-slide .programmestyle h2,
 .programme-tuesday .programmestyle h2,
 .programme-wednesday .programmestyle h2,
 .programme-thursday .programmestyle h2,
@@ -3414,6 +3587,7 @@ body.home-view .home-section > .home-social-row-container {
     color: #FFD700;
 }
 
+.programme-day-slide .programmestyle h3,
 .programme-tuesday .programmestyle h3,
 .programme-wednesday .programmestyle h3,
 .programme-thursday .programmestyle h3,
@@ -3426,18 +3600,21 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 /* Programme slider: titles on top of patterned backgrounds */
-.programme-slider .programmestyle h2 {
+.programme-slider .programmestyle h2,
+.programme-day-slide .programmestyle h2 {
     color: #FFD700;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-.programme-slider .programmestyle h3 {
+.programme-slider .programmestyle h3,
+.programme-day-slide .programmestyle h3 {
     font-weight: 600;
     color: #ffffff;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-.programme-slider .programmestyle h4 {
+.programme-slider .programmestyle h4,
+.programme-day-slide .programmestyle h4 {
     color: #FFD700 !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
@@ -3456,7 +3633,7 @@ body.home-view .home-section > .home-social-row-container {
     text-align: left !important;
 }
 
-/* Programme intro card: gold h2 and h3 (day programme cards use centered white h3) */
+/* Programme intro card: white h2 and h3 (day programme cards use centered white h3) */
 .programme-info .programmestyle h2,
 .programme-info .programme-day-content h2,
 .programme-slider .programme-info .programmestyle h2,
@@ -3464,7 +3641,7 @@ body.home-view .home-section > .home-social-row-container {
 .programme-slider .programme-info h2,
 .texteditor-render-html .programme-info .programmestyle h2,
 .texteditor-render-html .programme-info .programme-day-content h2 {
-    color: #FFD700 !important;
+    color: #ffffff !important;
     text-align: left;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
@@ -3476,7 +3653,7 @@ body.home-view .home-section > .home-social-row-container {
 .programme-slider .programme-info h3,
 .texteditor-render-html .programme-info .programmestyle h3,
 .texteditor-render-html .programme-info .programme-day-content h3 {
-    color: #FFD700 !important;
+    color: #ffffff !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
@@ -3502,11 +3679,18 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 .programme-slider .programmestyle p,
-.programme-slider .programme-day-content p {
+.programme-slider .programme-day-content p,
+.programme-day-slide .programmestyle p,
+.programme-day-slide .programme-day-content p {
     color: #F4F0E8;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+.programme-slider .programme-day-slide .programmestyle h4,
+.programme-slider .programme-day-slide .programme-day-content h4,
+.programme-day-slide .programmestyle h4,
+#programme-editor .programme-editor-day.programme-day-slide .programmestyle h4,
+#programme-editor .programme-editor-day .programme-day-session,
 .programme-tuesday .programmestyle h4,
 .programme-wednesday .programmestyle h4,
 .programme-thursday .programmestyle h4,
@@ -3514,6 +3698,111 @@ body.home-view .home-section > .home-social-row-container {
 .texteditor-render-html .programmestyle h4 {
     font-size: 1rem;
     color: #FFD700;
+}
+
+/* Programme slots (backend editor + home slider): icy blue times, white name */
+.programme-slider .programme-day-slot-time,
+.programme-slider .programme-day-slot-time-sep,
+.programme-slider .programme-day-slot-starttime,
+.programme-slider .programme-day-slot-endtime,
+.programme-day-slide .programme-day-slot-time,
+.programme-day-slide .programme-day-slot-time-sep,
+.programme-day-slide .programme-day-slot-starttime,
+.programme-day-slide .programme-day-slot-endtime,
+#programme-editor .programme-day-slot-time,
+#programme-editor .programme-day-slot-time-sep,
+#programme-editor .programme-day-slot-starttime,
+#programme-editor .programme-day-slot-endtime {
+    color: var(--tbs-icy-blue);
+}
+
+.programme-slider .programme-day-slot-detail,
+.programme-day-slide .programme-day-slot-detail,
+#programme-editor .programme-day-slot-detail {
+    color: #ffffff;
+}
+
+.programme-slider .programme-day-slot,
+.programme-day-slide .programme-day-slot {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Programme day sessions/slots layout (home slider + backend editor) */
+.programme-slider > .programme-day-slide .programme-day-sessions,
+#programme-editor .programme-editor-day .programme-day-sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 0;
+    min-width: 0;
+}
+
+.programme-slider > .programme-day-slide .programme-day-session-block,
+#programme-editor .programme-day-session-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.programme-slider > .programme-day-slide .programme-day-session-slots,
+#programme-editor .programme-day-session-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0;
+    min-width: 0;
+}
+
+.programme-slider > .programme-day-slide .programme-day-slot,
+#programme-editor .programme-day-slot {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 0.2rem 0.45rem;
+    font-size: 1rem;
+}
+
+.programme-slider > .programme-day-slide .programme-day-slot-time,
+#programme-editor .programme-day-slot-time {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.programme-slider > .programme-day-slide .programme-day-slot-time-sep,
+#programme-editor .programme-day-slot-time-sep {
+    flex-shrink: 0;
+    user-select: none;
+    pointer-events: none;
+}
+
+.programme-slider > .programme-day-slide .programme-day-slot-starttime,
+.programme-slider > .programme-day-slide .programme-day-slot-endtime,
+#programme-editor .programme-day-slot-starttime,
+#programme-editor .programme-day-slot-endtime {
+    flex-shrink: 0;
+}
+
+.programme-slider > .programme-day-slide .programme-day-slot-detail,
+#programme-editor .programme-day-slot-detail {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.programme-slider > .programme-day-slide .programme-day-session,
+#programme-editor .programme-day-session {
+    margin: 0;
 }
 
 /* Location slide: white background (same A3 as .introslider > *) */
@@ -4925,6 +5214,13 @@ h2.section-titles {
     font-size: inherit;
 }
 
+/* Category lives in title badges on desktop; meta copy is mobile-only */
+@media (min-width: 769px) {
+    .news-card-meta .news-card-category {
+        display: none;
+    }
+}
+
 .news-card-date {
     color: #64748b;
     font-size: 0.9rem;
@@ -5222,12 +5518,36 @@ h4 {
     }
 
     .news-card-title {
-        font-size: 0.9rem !important;
+        font-size: 1rem !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
-        max-height: calc(2 * 0.9rem * 1.25) !important;
+        max-height: calc(2 * 1rem * 1.25) !important;
         -webkit-line-clamp: 2 !important;
         line-clamp: 2 !important;
+    }
+
+    /* Category in meta row (date left, category right); hidden in title badges on mobile */
+    .news-card-title-row .news-card-category {
+        display: none !important;
+    }
+
+    .news-card-meta {
+        justify-content: space-between;
+        width: 100%;
+        min-width: 0;
+        gap: 0.5rem;
+    }
+
+    .news-card-meta .news-card-date {
+        flex: 0 1 auto;
+        min-width: 0;
+    }
+
+    .news-card-meta .news-card-category {
+        display: inline-block;
+        flex: 0 0 auto;
+        margin-left: auto;
+        text-align: right;
     }
 
     .news-card .news-card-text {
@@ -5307,11 +5627,24 @@ h4 {
         padding-bottom: 4px !important;
     }
 
-    /* Sponsors: title above logos when narrow */
+    /* CMS body copy: override legacy inline px from saved editor HTML */
+    .home-section > .event-section .event-contents,
+    .home-section > .event-section .event-contents .home-rich-html,
+    .home-section > .event-section .location-text-body .home-rich-html {
+        font-size: 1rem !important;
+    }
+
+    .home-section > .event-section .home-rich-html :where(p, li, td, th, span, div, a, strong, em) {
+        font-size: inherit !important;
+    }
+
+    /* Sponsors: title above logos when narrow; edge-to-edge logo row */
     .home-section > .sponsors-section .sponsors-section-inner-wrapper {
         flex-direction: column !important;
         align-items: stretch !important;
         gap: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .home-section > .sponsors-section .sponsor-logos {
@@ -5325,7 +5658,7 @@ h4 {
         row-gap: var(--sponsor-logo-gap);
     }
 
-    /* Two logos per row; Heine alone on the bottom row */
+    /* Two logos per row; Heine alone on the center row */
     .home-section > .sponsors-section .sponsor-logo-slot {
         flex: 0 1 calc((100% - var(--sponsor-logo-gap)) / 2);
         max-width: calc((100% - var(--sponsor-logo-gap)) / 2);
@@ -5354,7 +5687,7 @@ h4 {
     .home-section > .sponsors-section .sponsors-section-title {
         padding-top: 8px !important;
         padding-bottom: 4px !important;
-        color: var(--tbs-icy-blue) !important;
+        color: #ffffff !important;
     }
 
     /* Type badges 30% smaller on mobile */
@@ -6514,6 +6847,115 @@ h4 {
     50% { opacity: 0.8; }
 }
 
+/* Home: skeleton placeholders (CSS-only; no extra network) */
+.home-section .feed-section-inner-wrapper .home-skeleton-feed {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 24px;
+    margin-bottom: 0;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.home-section .skeleton-card--home-feed.news-card {
+    --news-media-width: 288px;
+    --news-media-height: 192px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    pointer-events: none;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    background: #fafafa;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 0;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.home-section .skeleton-card--home-feed .skeleton-image--news-thumb {
+    flex: 0 0 var(--news-media-width);
+    width: var(--news-media-width);
+    min-width: var(--news-media-width);
+    max-width: var(--news-media-width);
+    height: var(--news-media-height);
+    margin: 0;
+    border-radius: 0;
+}
+
+.home-section .skeleton-card--home-feed .skeleton-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.home-section > .event-section .home-skeleton-event-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.home-section > .event-section .home-skeleton-event-contents .skeleton-title,
+.home-section > .event-section .home-skeleton-event-contents .skeleton-text {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 25%,
+        rgba(255, 255, 255, 0.22) 50%,
+        rgba(255, 255, 255, 0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+.home-section > .event-section .home-skeleton-event-contents .skeleton-title--event-h3 {
+    height: 1.5rem;
+    width: 72%;
+    max-width: 20rem;
+    margin: 8px 0 4px;
+}
+
+.home-section .speakerslider-track > .speaker-card--skeleton {
+    pointer-events: none;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.home-section .speaker-card--skeleton .skeleton-title,
+.home-section .speaker-card--skeleton .skeleton-text {
+    background: linear-gradient(90deg, #dce8f5 25%, #c5d9ee 50%, #dce8f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 5px;
+}
+
+.home-section .speaker-card--skeleton .skeleton-title--speaker-name {
+    height: 1.25rem;
+    width: 58%;
+    margin: 0 0 0.75rem;
+}
+
+.home-section .speaker-card--skeleton .skeleton-text {
+    height: 0.85rem;
+    margin-bottom: 0.45rem;
+}
+
+.home-section .speaker-card--skeleton .skeleton-text.short {
+    width: 45%;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .home-section .skeleton-card--home-feed.news-card {
+        --news-media-width: 168px;
+        --news-media-height: 115.2px;
+    }
+}
+
 .footer-section .newsletter-form input {
     flex: 1;
     padding: 10px 12px;
@@ -7103,19 +7545,6 @@ h4 {
         -webkit-tap-highlight-color: transparent;
         text-align: center;
         transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .nav-register-mobile-top .nav-register-pill:hover,
-    .nav-register-mobile-top .nav-register-pill:focus-visible {
-        background: #003153;
-        color: #FFD700 !important;
-        outline: none;
-    }
-
-    .nav-register-mobile-top .nav-register-pill.active {
-        background: #003153;
-        color: #FFD700 !important;
-        font-weight: 500;
     }
 
     .nav-menu .mobile-top-tab-link {

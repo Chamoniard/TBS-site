@@ -12,7 +12,9 @@ const firebaseConfig = {
 let firestoreDb = null;
 const FIRESTORE_HOME_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const firestoreHomeCache = {
-    programmeDayByIsoDate: new Map(), // isoDate -> { value, fetchedAt, promise } — tbs/Programme/{isoDate}/Programme.html (home day cards)
+    programmeDayByIsoDate: new Map(), // isoDate -> { value, fetchedAt, promise } — legacy html field (fallback)
+    programmeDaySlideByIsoDate: new Map(), // isoDate -> { value, fetchedAt, promise } — rendered day slide HTML
+    programmeIsoDates: { value: [], fetchedAt: 0, promise: null }, // sorted ISO dates under tbs/Programme
     speakersByEventId: new Map(), // eventId -> { value, fetchedAt, promise }
     speakerInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — events/{id} field speakerinfo (first card bio HTML)
     locationInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — events/{id} field locationinfo (home Location band body)
@@ -25,7 +27,9 @@ const firestoreHomeCache = {
     /** `tbs/Settings` field `displayprogramme` (`Yes` / `No`). */
     siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null },
     /** `tbs/Settings` field `passwordprotecthome` (`Yes` / `No`). */
-    siteSettingsPasswordProtectHome: { value: false, fetchedAt: 0, promise: null }
+    siteSettingsPasswordProtectHome: { value: false, fetchedAt: 0, promise: null },
+    /** `tbs/Settings` field `registrationopen` (boolean). */
+    siteSettingsRegistrationOpen: { value: true, fetchedAt: 0, promise: null }
 };
 
 function isFreshFirestoreCacheEntry(entry) {
@@ -298,7 +302,6 @@ function prefetchBlogPostThumbnailsIntoCache(posts) {
 
 function scheduleBackgroundPastTalksWarmup() {
     const run = () => {
-        // Warm up data for Past talks without delaying initial home interactivity.
         void loadPostsFromFirebase();
     };
     if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
@@ -306,6 +309,43 @@ function scheduleBackgroundPastTalksWarmup() {
         return;
     }
     setTimeout(run, 400);
+}
+
+function warmHomePageFirestoreCache() {
+    try {
+        void fetchHomeSiteSettingsFromFirestore();
+        void fetchNewsFeed();
+        void prefetchHomeProgrammeSliderData();
+    } catch (e) {
+        console.warn('warmHomePageFirestoreCache:', e);
+    }
+}
+
+let homeProgrammeSliderPrefetchPromise = null;
+
+/** Start programme slider Firestore reads early (cached; safe to call multiple times). */
+function prefetchHomeProgrammeSliderData() {
+    if (homeProgrammeSliderPrefetchPromise) return homeProgrammeSliderPrefetchPromise;
+    if (typeof firebase === 'undefined') return Promise.resolve();
+    homeProgrammeSliderPrefetchPromise = (async function () {
+        try {
+            const isoDates = await fetchHomeProgrammeIsoDatesFromFirebase();
+            await Promise.all([
+                fetchHomeDisplayProgrammeFromFirestore(),
+                resolveHomeProgrammeInfoSlideHtml(),
+                isoDates.length
+                    ? Promise.all(
+                          isoDates.map(function (isoDate) {
+                              return fetchHomeProgrammeDaySlideHtmlFromFirebase(isoDate);
+                          })
+                      )
+                    : Promise.resolve()
+            ]);
+        } catch (e) {
+            console.warn('prefetchHomeProgrammeSliderData:', e);
+        }
+    })();
+    return homeProgrammeSliderPrefetchPromise;
 }
 
 // Show loading state
@@ -549,8 +589,9 @@ function showPostModal(postId) {
 // Global function to go back to feed (can be called from HTML onclick)
 async function goBackToFeed() {
     try {
+        const instantJump = document.body.classList.contains('past-talks-open');
         await showFeedContent();
-        scrollHomeToTop();
+        scrollHomeToTop({ instant: instantJump });
         setTimeout(() => {
             monitorFeaturedTitleBreak();
         }, 100);
@@ -1372,11 +1413,12 @@ function wireSpeakersSliderScrollbar() {
 function wireSliderIndicators() {
     const main = document.querySelector('.everything');
     if (!main) return;
-    main.querySelectorAll('.introslider-wrapper, .programme-section, .speaker-section').forEach((wrapper) => {
+    main.querySelectorAll('.introslider-wrapper, .programme-section').forEach((wrapper) => {
         wireOneIntrostyleSlider(wrapper);
     });
     wireHomeIntrosliderScrollbar();
     wireProgrammeSliderScrollbar();
+    wireSpeakersSliderScrollbar();
 }
 
 /** Hotel Alex — same URL in introslider Location slide and home Location band. */
@@ -1391,13 +1433,13 @@ const ABOUT_EVENT_INNER_HTML = `
 /** Location body for home Location slide */
 const ABOUT_LOCATION_INNER_HTML = `
                                 <h3 class="about-title introslider-title">Location</h3>
-                                <p>TBS is held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection.<br><br></p>
+                                <p>Held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection.<br><br></p>
 `;
 
 /** Register body for home Register slide */
 const ABOUT_REGISTER_INNER_HTML = `
                                 <h3 class="about-title introslider-title">Register</h3>
-                                <p>TBS is kept small to facilitate sustained interaction between participants, both within and beyond the formal programme. TBS is not designed to scale. Attendance is limited. Participation is expected.</p>
+                                <p>Kept small to facilitate sustained interaction between participants. Attendance is limited. Participation is expected.</p>
 `;
 
 /** Past talks body for home Past talks slide */
@@ -1451,7 +1493,7 @@ ${ABOUT_REGISTER_INNER_HTML}
 /** Programme overview copy: hero introslider + first card of home programme band (not per-day schedule HTML). */
 const HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML = `
                                 <h3 class="about-title introslider-title">Programme</h3>
-                                <p>We base ourselves on themed sessions in the mornings and evenings in the Hotel Alex conference room. Between sessions we have the afternoon workshops.</p>
+                                <p>Four immersive days of expert talks, hands-on workshops and small group discussions.</p>
 `;
 
 /** Home introslider: Programme teaser → scroll to programme band */
@@ -1469,7 +1511,7 @@ const FEATURED_ABOUT_SPEAKERS_SLIDER_HTML = `
                     <div class="about-speakers introslider-clickable" role="button" tabindex="0" aria-label="Scroll to speakers section">
                         <div class="about-text">
                                 <h3 class="about-title introslider-title">Speakers</h3>
-                                <p>Carefully selected from the cutting edge of critical care, resuscitation and cognitive sciences. We ask them to go above and beyond the studies and the guidelines.</p>
+                                <p>The cutting edge of critical care, resuscitation and cognitive sciences. Asked to go above and beyond the studies and the guidelines.</p>
                             </div>
                         <h3 class="featured-bottom-title introslider-title">Speakers</h3>
                         </div>
@@ -1506,14 +1548,14 @@ const HOME_SPONSORS_SECTION_HTML = `
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/hamiltongold.png" alt="Hamilton" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
+                            <div class="sponsor-logo-slot sponsor-logo-slot--solo">
+                                <img src="images/Sponsors/heinegold.png" alt="Heine" class="sponsors-logo-image" loading="eager" decoding="async">
+                            </div>
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/intersurgicalgold.png" alt="Intersurgical" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/qinflowgold.png" alt="Qinflow" class="sponsors-logo-image" loading="eager" decoding="async">
-                            </div>
-                            <div class="sponsor-logo-slot sponsor-logo-slot--solo">
-                                <img src="images/Sponsors/heinegold.png" alt="Heine" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
                         </div>
                     </div>
@@ -1533,6 +1575,74 @@ function sponsorLogosRowGapPx(rowEl) {
     const first = String(raw).trim().split(/\s+/)[0];
     const x = parseFloat(first);
     return Number.isFinite(x) ? x : 0;
+}
+
+/** Mobile wrap layout: pairs of slots, optional full-width `--solo` row (e.g. Heine). */
+function sponsorLogoMobileRowGroups(row) {
+    const slots = Array.from(row.querySelectorAll(':scope > .sponsor-logo-slot'));
+    const groups = [];
+    for (let i = 0; i < slots.length; i++) {
+        const slot = slots[i];
+        const img = slot.querySelector('img.sponsors-logo-image');
+        if (!img) continue;
+        if (slot.classList.contains('sponsor-logo-slot--solo')) {
+            groups.push([img]);
+            continue;
+        }
+        const nextSlot = slots[i + 1];
+        const nextImg =
+            nextSlot && !nextSlot.classList.contains('sponsor-logo-slot--solo')
+                ? nextSlot.querySelector('img.sponsors-logo-image')
+                : null;
+        if (nextImg) {
+            groups.push([img, nextImg]);
+            i += 1;
+        } else {
+            groups.push([img]);
+        }
+    }
+    return groups;
+}
+
+/**
+ * Max uniform height for a horizontal group at `rowWidth` (width: auto on each img preserves aspect).
+ * @returns {number | null} null when intrinsic size is not ready
+ */
+function sponsorLogoUniformHeightForGroup(rowImages, rowWidth, gapPx, maxH, capBySlotWidth) {
+    if (!rowImages.length || !(rowWidth > 0)) return maxH;
+    let sumWoverH = 0;
+    for (let i = 0; i < rowImages.length; i++) {
+        const im = rowImages[i];
+        if (!im.naturalWidth || !im.naturalHeight) return null;
+        sumWoverH += im.naturalWidth / im.naturalHeight;
+    }
+    if (!(sumWoverH > 0)) return null;
+
+    const gapsWidth = Math.max(0, rowImages.length - 1) * gapPx;
+    const hFit = (rowWidth - gapsWidth) / sumWoverH;
+    let hUsed = Math.max(8, Math.min(maxH, hFit));
+    if (capBySlotWidth) {
+        const slotWidth = (rowWidth - gapsWidth) / rowImages.length;
+        for (let i = 0; i < rowImages.length; i++) {
+            const im = rowImages[i];
+            const aspect = im.naturalWidth / im.naturalHeight;
+            const hCap = slotWidth / aspect;
+            if (Number.isFinite(hCap) && hCap > 0) {
+                hUsed = Math.min(hUsed, hCap);
+            }
+        }
+    }
+    return hUsed;
+}
+
+function applySponsorLogoUniformHeight(images, hUsed, isMobile) {
+    for (let i = 0; i < images.length; i++) {
+        const im = images[i];
+        im.style.height = hUsed + 'px';
+        im.style.width = 'auto';
+        im.style.maxWidth = isMobile ? '100%' : 'none';
+        im.style.maxHeight = 'none';
+    }
 }
 
 /** One shared rendered height for every logo; scales down so the row fits `row.clientWidth` (aspect ratios preserved). */
@@ -1560,42 +1670,23 @@ function layoutHomeSponsorLogosRowApply(sponsorsSectionEl) {
     const gapPx = sponsorLogosRowGapPx(row);
     const maxH = homeSponsorLogosMaxHeightPx();
     const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
-    const maxPerRow = isMobile ? 2 : images.length;
 
-    for (let start = 0; start < images.length; start += maxPerRow) {
-        const rowImages = images.slice(start, start + maxPerRow);
-        let sumWoverH = 0;
-        for (let i = 0; i < rowImages.length; i++) {
-            const im = rowImages[i];
-            if (!im.naturalWidth || !im.naturalHeight) return;
-            sumWoverH += im.naturalWidth / im.naturalHeight;
+    if (isMobile) {
+        const groups = sponsorLogoMobileRowGroups(row);
+        if (!groups.length) return;
+        let hUsed = maxH;
+        for (let g = 0; g < groups.length; g++) {
+            const hRow = sponsorLogoUniformHeightForGroup(groups[g], w, gapPx, maxH, true);
+            if (hRow == null) return;
+            hUsed = Math.min(hUsed, hRow);
         }
-        if (!(sumWoverH > 0)) return;
-
-        const gapsWidth = Math.max(0, rowImages.length - 1) * gapPx;
-        const hFit = (w - gapsWidth) / sumWoverH;
-        let hUsed = Math.max(8, Math.min(maxH, hFit));
-        const slotWidth = rowImages.length > 0 ? (w - gapsWidth) / rowImages.length : w;
-
-        for (let i = 0; i < rowImages.length; i++) {
-            const im = rowImages[i];
-            if (isMobile && im.naturalWidth && im.naturalHeight && slotWidth > 0) {
-                const aspect = im.naturalWidth / im.naturalHeight;
-                const hCap = slotWidth / aspect;
-                if (Number.isFinite(hCap) && hCap > 0) {
-                    hUsed = Math.min(hUsed, hCap);
-                }
-            }
-        }
-
-        for (let i = 0; i < rowImages.length; i++) {
-            const im = rowImages[i];
-            im.style.height = hUsed + 'px';
-            im.style.width = 'auto';
-            im.style.maxWidth = isMobile ? '100%' : 'none';
-            im.style.maxHeight = 'none';
-        }
+        applySponsorLogoUniformHeight(images, hUsed, true);
+        return;
     }
+
+    const hDesktop = sponsorLogoUniformHeightForGroup(images, w, gapPx, maxH, false);
+    if (hDesktop == null) return;
+    applySponsorLogoUniformHeight(images, hDesktop, false);
 }
 
 function wireHomeSponsorLogosRowLayout(sponsorsSectionEl) {
@@ -1718,7 +1809,7 @@ const HOME_LOCATION_SECTION_HTML =
 
 /** Home: speakers carousel (after sponsors); programme slider inserted after this row by displayNewsGrid */
 const HOME_SPEAKERS_SLIDER_HTML = `
-                <div class="speaker-section" id="speakers-section">
+                <div class="speaker-section" id="speakers-section" role="region" aria-label="Speakers">
                     <div class="speakers-inner-wrapper">
                         <div class="speakerslider" aria-label="Speakers">
                             <div class="speakerslider-track">
@@ -1989,6 +2080,13 @@ const HOME_REGISTRATION_OUTER_HTML = `
                 </div>
 `;
 
+/** Divider between registration and site footer (same asset as event section). */
+const HOME_REGISTRATION_FOOTER_DIVIDER_HTML = `
+                <div class="home-section-divider-band" aria-hidden="true">
+                    <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async">
+                </div>
+`;
+
 /** About copy (TBS27 programme flyer — introslider slide 2) */
 const ABOUT_SECTION_HTML_PROGRAMME = `
                         <div class="about">
@@ -2110,6 +2208,7 @@ function setupRegistrationFormValidation(root) {
         form.dataset.registrationSubmitInit = '1';
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (form.dataset.registrationOpen === '0') return;
             if (!isRegistrationFormReady(form) || submitBtn.disabled) return;
 
             const fnUrl = registrationSubmitFunctionUrl();
@@ -2157,6 +2256,12 @@ function setupRegistrationFormValidation(root) {
     }
 
     const syncRegistrationFormState = () => {
+        if (form.dataset.registrationOpen === '0') {
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-disabled', 'true');
+            return;
+        }
+
         const email = String(emailInput?.value || '').trim();
         const confirmEmail = String(confirmInput?.value || '').trim();
         const emailsFilled = email !== '' && confirmEmail !== '';
@@ -2324,6 +2429,13 @@ function scrollHomeToTop(opts) {
     window.scrollTo({ top: 0, left: 0, behavior });
 }
 
+function scrollHomeTargetIntoView(el, opts) {
+    if (!el) return;
+    const instant = opts && opts.instant === true;
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: instant || reduce ? 'auto' : 'smooth', block: 'start' });
+}
+
 /** Hide video/post viewer and collapse Past talks when returning to the home feed (same pattern as showBlogFeed). */
 function collapseViewerAndPastTalksForHome() {
     const main = document.querySelector('.everything');
@@ -2427,17 +2539,8 @@ function waitForDoubleAnimationFrame() {
 async function waitForHomePosterPictureReady(pictureEl) {
     if (!pictureEl) return;
     try {
-        await withTimeout(
-            (async function () {
-                const main = pictureEl.querySelector('img.home-poster-wide') || pictureEl.querySelector('img');
-                await waitForHomeImageDecode(main);
-                const logo = pictureEl.querySelector('.mobile-poster-logo-img');
-                await waitForHomeImageDecode(logo);
-                await waitForDoubleAnimationFrame();
-            })(),
-            25000,
-            'Home poster images'
-        );
+        const main = pictureEl.querySelector('img.home-poster-wide') || pictureEl.querySelector('img');
+        await withTimeout(waitForHomeImageDecode(main), 12000, 'Home poster');
     } catch (e) {
         /* huge hero on slow links — still show rest of home */
     }
@@ -2497,7 +2600,8 @@ function revealHomeStageBandsBelowIntro(homeSection) {
         homeSection.querySelector(':scope > .feed-section'),
         homeSection.querySelector(':scope > .speaker-section'),
         homeSection.querySelector(':scope > .programme-section'),
-        homeSection.querySelector(':scope > .registration-section')
+        homeSection.querySelector(':scope > .registration-section'),
+        homeSection.querySelector(':scope > .registration-section + .home-section-divider-band')
     ].forEach(function (el) {
         if (el) el.classList.remove('home-stage-hidden');
     });
@@ -2562,6 +2666,7 @@ ${HOME_SPONSORS_SECTION_HTML}
 ${HOME_SPEAKERS_SLIDER_HTML}
 ${HOME_ONDEMAND_SECTION_HTML}
 ${HOME_REGISTRATION_OUTER_HTML}
+${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
             </section>
             <section class="past-talks-section is-collapsed" hidden aria-hidden="true"></section>
         `;
@@ -2575,11 +2680,34 @@ ${HOME_REGISTRATION_OUTER_HTML}
         const sponsorsWrap = homeSection && homeSection.querySelector(':scope > .sponsors-section');
         const speakersWrap = homeSection && homeSection.querySelector(':scope > .speaker-section');
         const regWrap = homeSection && homeSection.querySelector(':scope > .registration-section');
-        [introWrap, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, regWrap].forEach((el) => {
+        const regDivider = homeSection && homeSection.querySelector(':scope > .registration-section + .home-section-divider-band');
+        [introWrap, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
 
-        await injectHomeEventInfoBodyHtml(homeSection);
+        mountHomeEventContentsSkeleton(homeSection);
+        void prefetchHomeProgrammeSliderData();
+        mountHomeProgrammeSliderShell(homeSection);
+        const eventInfoPromise = injectHomeEventInfoBodyHtml(homeSection);
+        const newsFeedPromise = loadNewsFeed();
+        const speakersPromise = speakersWrap
+            ? populateHomeSpeakersSliderFromFirebase(speakersWrap).catch(function (err) {
+                  console.error('populateHomeSpeakersSliderFromFirebase', err);
+                  finalizeHomeSpeakersSection(speakersWrap);
+              })
+            : Promise.resolve();
+        const registrationManifestoPromise = regWrap
+            ? fetchHomeRegistrationManifestoFromFirebase()
+            : Promise.resolve('');
+        const registrationOpenPromise = regWrap
+            ? fetchHomeRegistrationOpenFromFirestore().catch(function (err) {
+                  console.error('fetchHomeRegistrationOpenFromFirestore', err);
+                  return true;
+              })
+            : Promise.resolve(true);
+        void registrationOpenPromise.then(function (isOpen) {
+            if (regWrap) applyRegistrationFormOpenState(regWrap, isOpen);
+        });
 
         wireSliderIndicators();
         setupHomeViewNavbarScroll();
@@ -2660,23 +2788,38 @@ ${HOME_REGISTRATION_OUTER_HTML}
             await waitForHomePosterPictureReady(pictureEl);
             if (introWrap) introWrap.classList.remove('home-stage-hidden');
             revealHomeStageBandsBelowIntro(homeSection);
+            mountHomeFeedSkeleton();
+            if (speakersWrap) {
+                mountHomeSpeakersSkeleton(speakersWrap);
+                finalizeHomeSpeakersSection(speakersWrap);
+            }
             setupHomeHeroIntrosliderPosterGap(8);
-            requestAnimationFrame(function () {
-                initPosterSnow();
-            });
+            if (typeof requestIdleCallback === 'function') {
+                requestIdleCallback(function () {
+                    initPosterSnow();
+                }, { timeout: 2000 });
+            } else {
+                requestAnimationFrame(function () {
+                    initPosterSnow();
+                });
+            }
 
-            // Start heavy data work in parallel; bands are already visible (see revealHomeStageBandsBelowIntro).
-            const newsFeedPromise = loadNewsFeed();
-            const speakersPromise = speakersWrap ? populateHomeSpeakersSliderFromFirebase(speakersWrap) : Promise.resolve();
-            const registrationManifestoPromise = regWrap
-                ? fetchHomeRegistrationManifestoFromFirebase()
-                : Promise.resolve('');
-
-            const results = await Promise.all([newsFeedPromise, speakersPromise, registrationManifestoPromise]);
+            const results = await Promise.all([
+                newsFeedPromise,
+                Promise.race([
+                    speakersPromise,
+                    new Promise(function (resolve) {
+                        setTimeout(resolve, 15000);
+                    })
+                ]),
+                registrationManifestoPromise,
+                eventInfoPromise
+            ]);
             const registrationManifestoHtml = results && results.length >= 3 ? results[2] : '';
 
             const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
             if (programmeWrap) programmeWrap.classList.remove('home-stage-hidden');
+            finalizeHomeSpeakersSection(speakersWrap);
 
             if (regWrap) {
                 const manifestoEl = regWrap.querySelector('p.registration-manifesto');
@@ -2691,6 +2834,7 @@ ${HOME_REGISTRATION_OUTER_HTML}
             });
         } finally {
             revealStuckHomeStageBands(homeSection);
+            finalizeHomeSpeakersSection(speakersWrap);
             requestAnimationFrame(() => {
                 syncHomeNavSectionFromScroll();
             });
@@ -2698,21 +2842,18 @@ ${HOME_REGISTRATION_OUTER_HTML}
     }
 }
 
-/** Register nav / introslider Register slide: load home (if needed) and smooth-scroll to the Registration title. */
+/** Register nav / introslider Register slide: load home (if needed) and scroll to the Registration title. */
 async function goToHomeRegistration(e) {
     if (e) e.preventDefault();
+    const instantJump = document.body.classList.contains('past-talks-open');
     setPastTalksOpenState(false);
+    collapseViewerAndPastTalksForHome();
     if (!document.body.classList.contains('home-view')) {
         await showFeedContent();
     }
     setActiveNavView('register');
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const el = document.getElementById('home-registration-heading');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
+    requestAnimationFrame(function () {
+        scrollHomeTargetIntoView(document.getElementById('home-registration-heading'), { instant: instantJump });
     });
 }
 
@@ -2721,39 +2862,33 @@ async function goToHomeLocation(e) {
     await goToHomeProgramme(e);
 }
 
-/** Programme nav: load home (if needed) and smooth-scroll to the Programme section title. */
+/** Programme nav: load home (if needed) and scroll to the Programme section title. */
 async function goToHomeProgramme(e) {
     if (e) e.preventDefault();
+    const instantJump = document.body.classList.contains('past-talks-open');
     setPastTalksOpenState(false);
+    collapseViewerAndPastTalksForHome();
     if (!document.body.classList.contains('home-view')) {
         await showFeedContent();
     }
     setActiveNavView('flyer');
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const el = document.getElementById('home-programme-title');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
+    requestAnimationFrame(function () {
+        scrollHomeTargetIntoView(document.getElementById('home-programme-title'), { instant: instantJump });
     });
 }
 
-/** Speakers nav / introslider Speakers slide: load home (if needed) and smooth-scroll to the Speakers row. */
+/** Speakers nav / introslider Speakers slide: load home (if needed) and scroll to the Speakers row. */
 async function goToHomeSpeakers(e) {
     if (e) e.preventDefault();
+    const instantJump = document.body.classList.contains('past-talks-open');
     setPastTalksOpenState(false);
+    collapseViewerAndPastTalksForHome();
     if (!document.body.classList.contains('home-view')) {
         await showFeedContent();
     }
     setActiveNavView('speakers');
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const el = document.getElementById('speakers-section');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
+    requestAnimationFrame(function () {
+        scrollHomeTargetIntoView(document.getElementById('speakers-section'), { instant: instantJump });
     });
 }
 
@@ -2954,6 +3089,62 @@ async function showFallbackNewsContent() {
 const HOME_FEED_INITIAL_COUNT = 5;
 const HOME_FEED_PAGE_SIZE = 5;
 
+/** Placeholder lines in `.event-contents` until `injectHomeEventInfoBodyHtml` completes. */
+function mountHomeEventContentsSkeleton(homeSectionRoot) {
+    const el = homeSectionRoot && homeSectionRoot.querySelector('.event-contents');
+    if (!el || el.querySelector('.home-skeleton-event-contents')) return;
+    el.innerHTML =
+        '<div class="home-skeleton-event-contents" aria-hidden="true">' +
+        '<div class="skeleton-title skeleton-title--event-h3"></div>' +
+        '<div class="skeleton-text"></div>' +
+        '<div class="skeleton-text short"></div>' +
+        '</div>';
+}
+
+/** Placeholder feed cards until `displayNewsGrid` runs (skip if `loadNewsFeed` already painted loading UI). */
+function mountHomeFeedSkeleton() {
+    const feedContent = document.querySelector('.feed-section-inner-wrapper');
+    if (!feedContent) return;
+    if (
+        feedContent.querySelector('.home-skeleton-feed') ||
+        feedContent.querySelector('.news-grid') ||
+        feedContent.querySelector('.feed-loading')
+    ) {
+        return;
+    }
+    const cards = Array.from({ length: HOME_FEED_INITIAL_COUNT }, function () {
+        return (
+            '<article class="news-card skeleton-card--home-feed" aria-hidden="true">' +
+            '<div class="skeleton-image skeleton-image--news-thumb"></div>' +
+            '<div class="skeleton-content">' +
+            '<div class="skeleton-title"></div>' +
+            '<div class="skeleton-text"></div>' +
+            '<div class="skeleton-text short"></div>' +
+            '</div></article>'
+        );
+    }).join('');
+    feedContent.innerHTML = '<div class="home-skeleton-feed">' + cards + '</div>';
+}
+
+/** Placeholder speaker cards until `populateHomeSpeakersSliderFromFirebase` fills the track. */
+function mountHomeSpeakersSkeleton(speakersWrapperEl) {
+    const track = speakersWrapperEl && speakersWrapperEl.querySelector('.speakerslider-track');
+    if (!track || track.children.length > 0) return;
+    for (let i = 0; i < 3; i++) {
+        const article = document.createElement('article');
+        article.className = 'speaker-card speaker-card--skeleton';
+        article.setAttribute('aria-hidden', 'true');
+        article.innerHTML =
+            '<div class="speaker-card-inner-wrapper">' +
+            '<div class="speaker-content">' +
+            '<div class="skeleton-title skeleton-title--speaker-name"></div>' +
+            '<div class="skeleton-text"></div>' +
+            '<div class="skeleton-text short"></div>' +
+            '</div></div>';
+        track.appendChild(article);
+    }
+}
+
 // Show loading state for feed
 function showFeedLoadingState() {
     const feedContent = document.querySelector('.feed-section-inner-wrapper');
@@ -3087,6 +3278,7 @@ const TBS27_HOME_PROGRAMME_EVENT_ID = 'TBS27';
 const HOME_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
+const FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
 const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
 /** Site password when `passwordprotecthome` is `Yes` (client-side gate only). */
 const HOME_PASSWORD_PROTECT_VALUE = 'VilleTrollkarl';
@@ -3114,6 +3306,47 @@ function normalizeHomeDisplayProgrammeSetting(value) {
 function normalizeHomePasswordProtectSetting(value) {
     const s = String(value == null ? '' : value).trim().toLowerCase();
     return s === 'yes' || s === 'y';
+}
+
+/** @returns {boolean} true when registration is open (default Yes). */
+function normalizeHomeRegistrationOpenSetting(value) {
+    if (value === true || value === false) return value;
+    const s = String(value == null ? '' : value).trim().toLowerCase();
+    if (s === 'no' || s === 'n' || s === 'false' || s === '0') return false;
+    if (s === 'yes' || s === 'y' || s === 'true' || s === '1') return true;
+    return true;
+}
+
+function applyRegistrationFormOpenState(root, isOpen) {
+    const section =
+        root && root.classList && root.classList.contains('registration-section')
+            ? root
+            : root && root.querySelector
+              ? root.querySelector(':scope > .registration-section') || root.querySelector('.registration-section')
+              : null;
+    const form = section && section.querySelector('.registration-form');
+    if (!form) return;
+
+    const active = isOpen !== false;
+    form.classList.toggle('registration-form--inactive', !active);
+    form.dataset.registrationOpen = active ? '1' : '0';
+
+    form.querySelectorAll('input, textarea, select, button').forEach((el) => {
+        el.disabled = !active;
+        el.setAttribute('aria-disabled', active ? 'false' : 'true');
+    });
+    form.querySelectorAll('fieldset').forEach((fieldset) => {
+        fieldset.disabled = !active;
+    });
+
+    if (section) {
+        section.classList.toggle('registration-section--closed', !active);
+        section.setAttribute('aria-disabled', active ? 'false' : 'true');
+    }
+
+    if (active) {
+        form.dispatchEvent(new Event('input', { bubbles: true }));
+    }
 }
 
 function isHomePasswordSessionUnlocked() {
@@ -3207,15 +3440,18 @@ async function fetchHomeSiteSettingsFromFirestore() {
     const speakersCached = firestoreHomeCache.siteSettingsDisplaySpeakers;
     const programmeCached = firestoreHomeCache.siteSettingsDisplayProgramme;
     const passwordCached = firestoreHomeCache.siteSettingsPasswordProtectHome;
+    const registrationOpenCached = firestoreHomeCache.siteSettingsRegistrationOpen;
     if (
         isFreshFirestoreCacheEntry(speakersCached) &&
         isFreshFirestoreCacheEntry(programmeCached) &&
-        isFreshFirestoreCacheEntry(passwordCached)
+        isFreshFirestoreCacheEntry(passwordCached) &&
+        isFreshFirestoreCacheEntry(registrationOpenCached)
     ) {
         return {
             displaySpeakers: !!speakersCached.value,
             displayProgramme: !!programmeCached.value,
-            passwordProtectHome: !!passwordCached.value
+            passwordProtectHome: !!passwordCached.value,
+            registrationOpen: !!registrationOpenCached.value
         };
     }
     if (speakersCached && speakersCached.promise) {
@@ -3228,17 +3464,26 @@ async function fetchHomeSiteSettingsFromFirestore() {
             passwordCached && passwordCached.promise
                 ? await passwordCached.promise
                 : !!passwordCached.value;
+        const registrationOpen =
+            registrationOpenCached && registrationOpenCached.promise
+                ? await registrationOpenCached.promise
+                : !!registrationOpenCached.value;
         return {
             displaySpeakers: !!displaySpeakers,
             displayProgramme: !!displayProgramme,
-            passwordProtectHome: !!passwordProtectHome
+            passwordProtectHome: !!passwordProtectHome,
+            registrationOpen: !!registrationOpen
         };
     }
 
     const promise = (async function () {
         try {
             const db = getFirestore();
-            const snap = await db.collection('tbs').doc('Settings').get();
+            const snap = await withTimeout(
+                db.collection('tbs').doc('Settings').get(),
+                10000,
+                'Firestore tbs/Settings'
+            );
             const data = snap && snap.exists ? snap.data() || {} : {};
             return {
                 displaySpeakers: normalizeHomeDisplaySpeakersSetting(
@@ -3249,11 +3494,19 @@ async function fetchHomeSiteSettingsFromFirestore() {
                 ),
                 passwordProtectHome: normalizeHomePasswordProtectSetting(
                     data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD]
+                ),
+                registrationOpen: normalizeHomeRegistrationOpenSetting(
+                    data[FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD]
                 )
             };
         } catch (e) {
             console.error('fetchHomeSiteSettingsFromFirestore', e);
-            return { displaySpeakers: true, displayProgramme: true, passwordProtectHome: false };
+            return {
+                displaySpeakers: true,
+                displayProgramme: true,
+                passwordProtectHome: false,
+                registrationOpen: true
+            };
         }
     })();
 
@@ -3272,6 +3525,11 @@ async function fetchHomeSiteSettingsFromFirestore() {
         fetchedAt: passwordCached ? Number(passwordCached.fetchedAt || 0) : 0,
         promise: promise.then((s) => s.passwordProtectHome)
     };
+    firestoreHomeCache.siteSettingsRegistrationOpen = {
+        value: registrationOpenCached ? registrationOpenCached.value : true,
+        fetchedAt: registrationOpenCached ? Number(registrationOpenCached.fetchedAt || 0) : 0,
+        promise: promise.then((s) => s.registrationOpen)
+    };
     const settings = await promise;
     const now = Date.now();
     firestoreHomeCache.siteSettingsDisplaySpeakers = {
@@ -3289,6 +3547,11 @@ async function fetchHomeSiteSettingsFromFirestore() {
         fetchedAt: now,
         promise: null
     };
+    firestoreHomeCache.siteSettingsRegistrationOpen = {
+        value: settings.registrationOpen,
+        fetchedAt: now,
+        promise: null
+    };
     return settings;
 }
 
@@ -3300,6 +3563,11 @@ async function fetchHomeDisplaySpeakersFromFirestore() {
 async function fetchHomeDisplayProgrammeFromFirestore() {
     const settings = await fetchHomeSiteSettingsFromFirestore();
     return settings.displayProgramme;
+}
+
+async function fetchHomeRegistrationOpenFromFirestore() {
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    return settings.registrationOpen;
 }
 /** Home registration manifesto HTML: Firestore `tbs/Snippets` field `Registration`. */
 const HOME_SNIPPETS_TEGISTRATION_FIELD = 'Registration';
@@ -3319,6 +3587,348 @@ const HOME_PROGRAMME_FIREBASE_DATE_BY_DAY = {
     /** Friday day card: `tbs/Programme/2027-02-12/Programme` field `html`. */
     friday: '2027-02-12'
 };
+
+/** Fallback when `listCollections` returns no ISO day collections. */
+const HOME_PROGRAMME_FALLBACK_ISO_DATES = [
+    '2027-02-09',
+    '2027-02-10',
+    '2027-02-11',
+    '2027-02-12'
+];
+
+function homeEscapeHtml(value) {
+    return String(value != null ? value : '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function homeTbsProgrammeDayCollection(db, isoDate) {
+    return db.collection('tbs').doc('Programme').collection(String(isoDate || '').trim());
+}
+
+function homeIsProgrammeSessionDocId(docId) {
+    return String(docId || '').indexOf('Session') === 0;
+}
+
+function homeProgrammeSlotTimestampToDate(ts) {
+    if (!ts) return null;
+    if (typeof ts.toDate === 'function') return ts.toDate();
+    if (ts instanceof Date) return ts;
+    if (typeof ts === 'object' && ts.seconds != null) {
+        return new Date(Number(ts.seconds) * 1000 + Number(ts.nanoseconds || 0) / 1e6);
+    }
+    return null;
+}
+
+function homeProgrammeSlotTimestampMillis(ts) {
+    const date = homeProgrammeSlotTimestampToDate(ts);
+    return date ? date.getTime() : 0;
+}
+
+function homeFormatProgrammeSlotTimestampToHhmm(ts) {
+    const date = homeProgrammeSlotTimestampToDate(ts);
+    if (!date) return '0000';
+    const h = date.getHours();
+    const m = date.getMinutes();
+    return String(h).padStart(2, '0') + String(m).padStart(2, '0');
+}
+
+function homeParseProgrammeSessionOrderFromData(data) {
+    if (!data) return null;
+    const raw = data.Order != null ? data.Order : data.order;
+    if (raw == null || raw === '') return null;
+    const n = Number(raw);
+    if (typeof n !== 'number' || isNaN(n) || n < 1) return null;
+    return Math.floor(n);
+}
+
+function homeCompareProgrammeSessionsByOrder(a, b) {
+    const ao = a.order != null ? a.order : 999999;
+    const bo = b.order != null ? b.order : 999999;
+    if (ao !== bo) return ao - bo;
+    return String(a.id).localeCompare(String(b.id));
+}
+
+function homeSortProgrammeSessions(sessions) {
+    if (!sessions || !sessions.length) return [];
+    return sessions.slice().sort(homeCompareProgrammeSessionsByOrder);
+}
+
+function homeNormalizeProgrammeSessionName(value) {
+    const t = String(value != null ? value : '').trim();
+    return t || 'TBA';
+}
+
+function homeNormalizeProgrammeSlotName(value) {
+    const t = String(value != null ? value : '').trim();
+    return t || 'TBA';
+}
+
+function homeIsIsoProgrammeDateId(id) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(id || '').trim());
+}
+
+async function homeLoadProgrammeSlotsForSession(db, isoDate, sessionId) {
+    const slotsRef = homeTbsProgrammeDayCollection(db, isoDate)
+        .doc(String(sessionId || '').trim())
+        .collection('slots');
+    const snap = await withTimeout(slotsRef.get(), 10000, 'Firestore programme slots');
+    const slots = [];
+    snap.forEach(function (docSnap) {
+        const data = docSnap.data() || {};
+        slots.push({
+            id: docSnap.id,
+            starttime: data.starttime,
+            endtime: data.endtime,
+            name: data.name != null && String(data.name).trim() !== '' ? String(data.name) : 'TBA'
+        });
+    });
+    slots.sort(function (a, b) {
+        const diff = homeProgrammeSlotTimestampMillis(a.starttime) - homeProgrammeSlotTimestampMillis(b.starttime);
+        return diff !== 0 ? diff : String(a.id).localeCompare(String(b.id));
+    });
+    return slots;
+}
+
+async function homeLoadProgrammeSessionsForDay(db, isoDate) {
+    const colRef = homeTbsProgrammeDayCollection(db, isoDate);
+    const snap = await withTimeout(colRef.get(), 10000, 'Firestore programme sessions');
+    const sessions = [];
+    snap.forEach(function (docSnap) {
+        const docId = docSnap.id || '';
+        if (!homeIsProgrammeSessionDocId(docId)) return;
+        const data = docSnap.data() || {};
+        sessions.push({
+            id: docId,
+            name: data.name != null && String(data.name).trim() !== '' ? String(data.name) : 'TBA',
+            order: homeParseProgrammeSessionOrderFromData(data),
+            slots: []
+        });
+    });
+    const sorted = homeSortProgrammeSessions(sessions);
+    if (sorted.length) {
+        await Promise.all(
+            sorted.map(function (session) {
+                return homeLoadProgrammeSlotsForSession(db, isoDate, session.id).then(function (slots) {
+                    session.slots = slots;
+                });
+            })
+        );
+    }
+    return sorted;
+}
+
+async function homeLoadProgrammeDayMeta(db, isoDate) {
+    const metaSnap = await withTimeout(
+        homeTbsProgrammeDayCollection(db, isoDate).doc('Programme').get(),
+        10000,
+        'Firestore programme day meta'
+    );
+    let name = isoDate;
+    if (metaSnap.exists) {
+        const data = metaSnap.data() || {};
+        if (data.name != null && String(data.name).trim() !== '') {
+            name = String(data.name);
+        }
+    }
+    return { isoDate: isoDate, name: name };
+}
+
+function homeProgrammeDaySlotsHtml(isoDate, session) {
+    const slots = session && session.slots ? session.slots : [];
+    if (!slots.length) return '';
+    const sessionId = session.id;
+    return (
+        '<div class="programme-day-session-slots">' +
+        slots
+            .map(function (slot) {
+                const slotAttrs =
+                    ' data-slot-id="' +
+                    homeEscapeHtml(slot.id) +
+                    '" data-session-id="' +
+                    homeEscapeHtml(sessionId) +
+                    '" data-programme-date="' +
+                    homeEscapeHtml(isoDate) +
+                    '"';
+                const startLabel = homeFormatProgrammeSlotTimestampToHhmm(slot.starttime);
+                const endLabel = homeFormatProgrammeSlotTimestampToHhmm(slot.endtime);
+                const slotName = homeNormalizeProgrammeSlotName(slot.name);
+                return (
+                    '<div class="programme-day-slot"' +
+                    slotAttrs +
+                    '>' +
+                    '<div class="programme-day-slot-time">' +
+                    '<span class="programme-day-slot-starttime">' +
+                    homeEscapeHtml(startLabel) +
+                    '</span>' +
+                    '<span class="programme-day-slot-time-sep">-</span>' +
+                    '<span class="programme-day-slot-endtime">' +
+                    homeEscapeHtml(endLabel) +
+                    '</span>' +
+                    '</div>' +
+                    '<div class="programme-day-slot-detail">' +
+                    homeEscapeHtml(slotName) +
+                    '</div>' +
+                    '</div>'
+                );
+            })
+            .join('') +
+        '</div>'
+    );
+}
+
+function homeProgrammeDaySessionsHtml(isoDate, sessions) {
+    const sorted = homeSortProgrammeSessions(sessions);
+    if (!sorted.length) return '';
+    return (
+        '<div class="programme-day-sessions">' +
+        sorted
+            .map(function (session) {
+                const sessionName = homeNormalizeProgrammeSessionName(session.name);
+                const sessionAttrs =
+                    ' data-session-id="' +
+                    homeEscapeHtml(session.id) +
+                    '" data-programme-date="' +
+                    homeEscapeHtml(isoDate) +
+                    '"';
+                return (
+                    '<div class="programme-day-session-block"' +
+                    sessionAttrs +
+                    '>' +
+                    '<h4 class="programme-day-session"' +
+                    sessionAttrs +
+                    '>' +
+                    homeEscapeHtml(sessionName) +
+                    '</h4>' +
+                    homeProgrammeDaySlotsHtml(isoDate, session) +
+                    '</div>'
+                );
+            })
+            .join('') +
+        '</div>'
+    );
+}
+
+function buildHomeProgrammeDaySlideHtml(isoDate, name, sessions) {
+    const dayName = String(name != null && String(name).trim() !== '' ? name : isoDate);
+    return (
+        '<div class="programme-day-slide" data-programme-date="' +
+        homeEscapeHtml(isoDate) +
+        '">' +
+        '<div class="programme-day-content programmestyle">' +
+        '<div class="programme-day-name"><h3>' +
+        homeEscapeHtml(dayName) +
+        '</h3></div>' +
+        homeProgrammeDaySessionsHtml(isoDate, sessions) +
+        '</div></div>'
+    );
+}
+
+async function fetchHomeProgrammeIsoDatesFromFirebase() {
+    const cached = firestoreHomeCache.programmeIsoDates;
+    if (isFreshFirestoreCacheEntry(cached)) return (cached.value || []).slice();
+    if (cached && cached.promise) return cached.promise;
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const programmeDocRef = db.collection('tbs').doc('Programme');
+            let dates = [];
+            if (typeof programmeDocRef.listCollections === 'function') {
+                const collections = await withTimeout(
+                    programmeDocRef.listCollections(),
+                    10000,
+                    'Firestore tbs/Programme listCollections'
+                );
+                dates = collections
+                    .map(function (col) {
+                        return col.id;
+                    })
+                    .filter(homeIsIsoProgrammeDateId)
+                    .sort();
+            }
+            if (!dates.length) {
+                const fromMap = Object.keys(HOME_PROGRAMME_FIREBASE_DATE_BY_DAY)
+                    .map(function (key) {
+                        return HOME_PROGRAMME_FIREBASE_DATE_BY_DAY[key];
+                    })
+                    .filter(homeIsIsoProgrammeDateId);
+                dates = fromMap.length ? fromMap.sort() : HOME_PROGRAMME_FALLBACK_ISO_DATES.slice();
+            }
+            return dates;
+        } catch (e) {
+            console.error('fetchHomeProgrammeIsoDatesFromFirebase', e);
+            return HOME_PROGRAMME_FALLBACK_ISO_DATES.slice();
+        }
+    })();
+    firestoreHomeCache.programmeIsoDates = {
+        value: cached ? cached.value : [],
+        fetchedAt: cached ? Number(cached.fetchedAt || 0) : 0,
+        promise: promise
+    };
+    const value = await promise;
+    firestoreHomeCache.programmeIsoDates = {
+        value: value || [],
+        fetchedAt: Date.now(),
+        promise: null
+    };
+    return (value || []).slice();
+}
+
+async function fetchHomeProgrammeDaySlideHtmlFromFirebase(isoDate) {
+    const dateStr = String(isoDate || '').trim();
+    if (!dateStr || !homeIsIsoProgrammeDateId(dateStr) || typeof firebase === 'undefined') return '';
+    const cached = firestoreHomeCache.programmeDaySlideByIsoDate.get(dateStr);
+    if (isFreshFirestoreCacheEntry(cached)) return cached.value || '';
+    if (cached && cached.promise) return cached.promise;
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const meta = await homeLoadProgrammeDayMeta(db, dateStr);
+            const sessions = await homeLoadProgrammeSessionsForDay(db, dateStr);
+            return buildHomeProgrammeDaySlideHtml(meta.isoDate, meta.name, sessions);
+        } catch (e) {
+            console.error('fetchHomeProgrammeDaySlideHtmlFromFirebase', dateStr, e);
+            return '';
+        }
+    })();
+    firestoreHomeCache.programmeDaySlideByIsoDate.set(dateStr, {
+        value: cached ? cached.value : '',
+        fetchedAt: cached ? Number(cached.fetchedAt || 0) : 0,
+        promise: promise
+    });
+    const value = await promise;
+    firestoreHomeCache.programmeDaySlideByIsoDate.set(dateStr, {
+        value: value || '',
+        fetchedAt: Date.now(),
+        promise: null
+    });
+    return value || '';
+}
+
+/** Wraps the day title/date `h3` in `.programme-day-name` when missing. */
+function wrapProgrammeDayNameContainer(html) {
+    const t = String(html != null ? html : '').trim();
+    if (!t) return t;
+    try {
+        const doc = new DOMParser().parseFromString('<div class="__tbs_prog_wrap">' + t + '</div>', 'text/html');
+        const root = doc.querySelector('.__tbs_prog_wrap');
+        if (!root) return t;
+        if (root.querySelector('.programme-day-name')) return t;
+        const h3 = root.querySelector(':scope > h3') || root.querySelector('.programme-day-content > h3');
+        if (!h3) return t;
+        const parent = h3.parentNode;
+        if (!parent) return t;
+        const wrap = doc.createElement('div');
+        wrap.className = 'programme-day-name';
+        parent.insertBefore(wrap, h3);
+        wrap.appendChild(h3);
+        return root.innerHTML;
+    } catch (e) {
+        return t;
+    }
+}
 
 /**
  * Ensures one slide = one flex child of .programme-slider with .programme-{day} card styles.
@@ -3342,6 +3952,12 @@ function normalizeProgrammeSlideHtml(dayKey, htmlString) {
     if (body.children.length === 1) {
         const el = body.children[0];
         if (el.classList && el.classList.contains(dayClass)) {
+            const inner = el.querySelector('.programme-day-content');
+            if (inner) {
+                inner.innerHTML = wrapProgrammeDayNameContainer(inner.innerHTML.trim());
+            } else {
+                el.innerHTML = wrapProgrammeDayNameContainer(el.innerHTML.trim());
+            }
             return el.outerHTML;
         }
     }
@@ -3349,12 +3965,13 @@ function normalizeProgrammeSlideHtml(dayKey, htmlString) {
 }
 
 function wrapProgrammeSlideCard(dayKey, innerHtml) {
+    const body = wrapProgrammeDayNameContainer(innerHtml);
     return (
         '<div class="programme-' +
         dayKey +
-        '">' +
+        ' programme-day-slide">' +
         '<div class="programme-day-content programmestyle">' +
-        innerHtml +
+        body +
         '</div>' +
         '</div>'
     );
@@ -3480,6 +4097,75 @@ function normalizeHomeSpeakerBioPublish(v) {
     return 'No';
 }
 
+/** Normalized event label for home speaker filtering (e.g. `TBS 2027` → `tbs2027`). */
+function homeSpeakerEventNorm(ev) {
+    return String(ev || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+}
+
+/** True when a speaker row belongs on the current home event carousel. */
+function homeSpeakerDocMatchesHomeEvent(d) {
+    const ev = String(
+        d.Event != null ? d.Event : d.event != null ? d.event : d.Events != null ? d.Events : ''
+    ).trim();
+    if (!ev) return true;
+    const norm = homeSpeakerEventNorm(ev);
+    if (!norm) return true;
+    if (norm.includes('tbs27') || norm.includes('tbs2027')) return true;
+    if (norm.includes('2027') && norm.includes('tbs')) return true;
+    if (/tbs20\d{2}/.test(norm) && !norm.includes('2027') && !norm.includes('27')) return false;
+    return true;
+}
+
+/** True when a speaker `item` doc should appear on the public home carousel. */
+function homeSpeakerDocVisibleOnHome(d) {
+    if (!d || typeof d !== 'object') return false;
+    const bioPublishRaw =
+        d.biopublish != null
+            ? d.biopublish
+            : d.BioPublish != null
+              ? d.BioPublish
+              : d['Bio publish'];
+    if (bioPublishRaw != null && String(bioPublishRaw).trim() !== '') {
+        if (normalizeHomeSpeakerBioPublish(bioPublishRaw) !== 'Yes') return false;
+    }
+    return homeSpeakerDocMatchesHomeEvent(d);
+}
+
+function homeSpeakerRowFromFirestoreItem(docId, d) {
+    return {
+        id: docId,
+        firstName: d['First Name'] != null ? String(d['First Name']) : d.firstName != null ? String(d.firstName) : '',
+        lastName: d['Last name'] != null ? String(d['Last name']) : d.lastName != null ? String(d.lastName) : '',
+        shortBio: d.Bio != null ? String(d.Bio) : d.shortBio != null ? String(d.shortBio) : '',
+        longBio: d.Bio_long != null ? String(d.Bio_long) : d.longBio != null ? String(d.longBio) : ''
+    };
+}
+
+async function discoverHomeSpeakerRowIdsViaItemCollectionGroup(db) {
+    try {
+        const snap = await withTimeout(db.collectionGroup('item').get(), 15000, 'Firestore speakers collectionGroup');
+        const ids = [];
+        const seen = Object.create(null);
+        snap.forEach(function (doc) {
+            const parts = String(doc.ref.path || '').split('/');
+            if (parts.length === 4 && parts[0] === 'tbs' && parts[1] === 'Speakers' && parts[2]) {
+                const rowId = parts[2];
+                if (!seen[rowId]) {
+                    seen[rowId] = true;
+                    ids.push(rowId);
+                }
+            }
+        });
+        return ids;
+    } catch (e) {
+        console.warn('discoverHomeSpeakerRowIdsViaItemCollectionGroup:', e);
+        return [];
+    }
+}
+
 function homeSpeakerIdsFromTbsParentData(data) {
     if (!data || typeof data !== 'object') return [];
     const arrayKeys = ['speakerIds', 'rowIds', 'ids', 'order', 'speakerOrder', 'documents'];
@@ -3512,7 +4198,17 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
             'Firestore tbs/Speakers parent'
         );
         const parentData = parentSnap && parentSnap.exists ? (parentSnap.data() || {}) : {};
-        const ids = homeSpeakerIdsFromTbsParentData(parentData);
+        let ids = homeSpeakerIdsFromTbsParentData(parentData);
+        if (!ids.length) {
+            ids = await discoverHomeSpeakerRowIdsViaItemCollectionGroup(db);
+            if (ids.length) {
+                try {
+                    await db.collection('tbs').doc('Speakers').set({ speakerIds: ids }, { merge: true });
+                } catch (manifestErr) {
+                    console.warn('fetchHomeSpeakersListFromFirebase manifest update:', manifestErr);
+                }
+            }
+        }
         if (!ids.length) return [];
         const list = [];
         const chunkSize = 12;
@@ -3530,24 +4226,16 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
                 const docSnap = snaps[j];
                 if (!docSnap || !docSnap.exists) continue;
                 const d = docSnap.data() || {};
-                const bioPublishRaw = d.biopublish != null
-                    ? d.biopublish
-                    : (d.BioPublish != null ? d.BioPublish : d['Bio publish']);
-                if (normalizeHomeSpeakerBioPublish(bioPublishRaw) !== 'Yes') continue;
-                list.push({
-                    id: rowId,
-                    firstName: d['First Name'] != null ? String(d['First Name']) : (d.firstName != null ? String(d.firstName) : ''),
-                    lastName: d['Last name'] != null ? String(d['Last name']) : (d.lastName != null ? String(d.lastName) : ''),
-                    shortBio: '',
-                    longBio: d.Bio_long != null ? String(d.Bio_long) : (d.longBio != null ? String(d.longBio) : '')
-                });
+                if (!homeSpeakerDocVisibleOnHome(d)) continue;
+                list.push(homeSpeakerRowFromFirestoreItem(rowId, d));
             }
         }
         list.sort(compareHomeSpeakersForSort);
-        return list;
+        if (list.length) return list;
+        return fetchHomeSpeakersListFromEventSubcollection(eventId);
     } catch (e) {
         console.error('fetchHomeSpeakersListFromFirebase', e);
-        return [];
+        return fetchHomeSpeakersListFromEventSubcollection(eventId);
     }
     })();
     firestoreHomeCache.speakersByEventId.set(cacheKey, {
@@ -3562,6 +4250,31 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
         promise: null
     });
     return Array.isArray(value) ? value : [];
+}
+
+/** Legacy path: `events/{eventId}/speakers` (used when `tbs/Speakers` is empty). */
+async function fetchHomeSpeakersListFromEventSubcollection(eventId) {
+    const eid = String(eventId || TBS27_HOME_PROGRAMME_EVENT_ID || 'TBS27').trim();
+    if (!eid || typeof firebase === 'undefined') return [];
+    try {
+        const db = getFirestore();
+        const snap = await withTimeout(
+            db.collection('events').doc(eid).collection('speakers').get(),
+            10000,
+            'Firestore events/{id}/speakers'
+        );
+        const list = [];
+        snap.forEach(function (doc) {
+            const d = doc.data() || {};
+            if (!homeSpeakerDocVisibleOnHome(d)) return;
+            list.push(homeSpeakerRowFromFirestoreItem(doc.id, d));
+        });
+        list.sort(compareHomeSpeakersForSort);
+        return list;
+    } catch (e) {
+        console.warn('fetchHomeSpeakersListFromEventSubcollection:', e);
+        return [];
+    }
 }
 
 /** HTML for first slider card from `tbs/snippets` field `Speakers`. */
@@ -3778,6 +4491,38 @@ async function fetchHomeEventEventInfoFromFirebase(eventId) {
     return typeof value === 'string' ? value : '';
 }
 
+/** Remove inline font-size from CMS HTML so home rem base (20px) controls body copy. */
+function normalizeHomeCmsHtml(html) {
+    const raw = String(html || '').trim();
+    if (!raw) return '';
+    try {
+        const doc = new DOMParser().parseFromString(`<div id="home-cms-root">${raw}</div>`, 'text/html');
+        const root = doc.getElementById('home-cms-root');
+        if (!root) return raw;
+        root.querySelectorAll('*').forEach((node) => {
+            if (node.style && node.style.fontSize) {
+                node.style.removeProperty('font-size');
+            }
+            const styleAttr = node.getAttribute('style');
+            if (styleAttr && /font-size\s*:/i.test(styleAttr)) {
+                const next = styleAttr.replace(/font-size\s*:\s*[^;]+;?/gi, '').trim();
+                if (next) node.setAttribute('style', next);
+                else node.removeAttribute('style');
+            }
+        });
+        return root.innerHTML;
+    } catch (e) {
+        console.warn('normalizeHomeCmsHtml:', e);
+        return raw.replace(/font-size\s*:\s*[^;"']+;?/gi, '');
+    }
+}
+
+function wrapHomeRichHtml(html) {
+    const body = normalizeHomeCmsHtml(html);
+    if (!body) return '';
+    return `<div class="home-rich-html">${body}</div>`;
+}
+
 /**
  * Fills `.event-contents` from Firestore `tbs/Snippets.Eventinfo` (empty when missing).
  * @param {ParentNode | null | undefined} homeSectionRoot
@@ -3791,7 +4536,7 @@ async function injectHomeEventInfoBodyHtml(homeSectionRoot) {
     } catch (e) {
         console.warn('Home eventinfo Firestore read failed:', e);
     }
-    el.innerHTML = String(fromCloud).trim() !== '' ? fromCloud : '';
+    el.innerHTML = String(fromCloud).trim() !== '' ? wrapHomeRichHtml(fromCloud) : '';
 }
 
 /**
@@ -3808,19 +4553,19 @@ async function injectHomeLocationBodyHtml(homeSectionRoot) {
         console.warn('Home location Firestore read failed:', e);
     }
     if (String(fromCloud).trim() !== '') {
-        el.innerHTML = fromCloud;
+        el.innerHTML = wrapHomeRichHtml(fromCloud);
         return;
     }
     try {
         const raw = localStorage.getItem(TBS_TEXTEDITOR_HOME_LOCATION_LS_KEY);
         if (raw != null && String(raw).trim() !== '') {
-            el.innerHTML = raw;
+            el.innerHTML = wrapHomeRichHtml(raw);
             return;
         }
     } catch (e) {
         console.warn('Home location localStorage read failed:', e);
     }
-    el.innerHTML = HOME_LOCATION_BAND_DEFAULT_HTML;
+    el.innerHTML = wrapHomeRichHtml(HOME_LOCATION_BAND_DEFAULT_HTML);
 }
 
 function appendHomeSpeakerPlaceholder(track, message) {
@@ -4088,22 +4833,30 @@ function wireHomeSpeakerCardBioExpandOnce() {
 }
 
 /**
- * Fills `.speakerslider-track`: optional first slide from `events/{id}` field `speakerinfo`, then all
- * `events/{id}/speakers` docs (each own card). Uses `TBS27_HOME_PROGRAMME_EVENT_ID` like the home programme row.
+ * Fills `.speakerslider-track`: optional intro card from `tbs/Snippets.Speakers`, then `tbs/Speakers/{id}/item`
+ * rows (fallback: `events/{id}/speakers`). Uses `TBS27_HOME_PROGRAMME_EVENT_ID` like the home programme row.
  */
 async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     if (!speakersWrapperEl) return;
+    finalizeHomeSpeakersSection(speakersWrapperEl);
     wireHomeSpeakerCardBioExpandOnce();
     const track = speakersWrapperEl.querySelector('.speakerslider-track');
     if (!track) return;
     try {
-        track.innerHTML = '';
         const eventId = TBS27_HOME_PROGRAMME_EVENT_ID;
-        const displaySpeakers = await fetchHomeDisplaySpeakersFromFirestore();
+        const displaySpeakers = await withTimeout(
+            fetchHomeDisplaySpeakersFromFirestore(),
+            10000,
+            'Firestore displayspeakers'
+        ).catch(function () {
+            return true;
+        });
         speakersWrapperEl.classList.toggle('home-carousel--minimal', !displaySpeakers);
         const speakerinfoRaw = await fetchHomeEventSpeakerInfoFromFirebase(eventId);
         const speakerinfoHtml = String(speakerinfoRaw || '').trim();
         const hasInfoCard = !!speakerinfoHtml;
+
+        track.innerHTML = '';
 
         if (!displaySpeakers) {
             const syntheticInfo = {
@@ -4147,12 +4900,41 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
             appendHomeSpeakerinfoCard(track, speakerinfoHtml);
         }
         speakers.forEach(function (s, i) {
-            appendHomeSpeakerCard(track, s, false, hasInfoCard ? i + 1 : i);
+            appendHomeSpeakerCard(track, s, hasInfoCard || i > 0, hasInfoCard ? i + 1 : i);
         });
+    } catch (err) {
+        console.error('populateHomeSpeakersSliderFromFirebase', err);
+        track.innerHTML = '';
+        appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
     } finally {
+        if (!track.children.length) {
+            appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
+        }
         delete speakersWrapperEl.dataset.speakersScrollbarWired;
         wireSpeakersSliderScrollbar();
+        finalizeHomeSpeakersSection(speakersWrapperEl);
     }
+}
+
+/** Ensure the home speakers band is visible and has at least one slide. */
+function finalizeHomeSpeakersSection(speakersWrap) {
+    if (!speakersWrap) return;
+    speakersWrap.classList.remove('home-stage-hidden');
+    speakersWrap.removeAttribute('hidden');
+    speakersWrap.setAttribute('aria-hidden', 'false');
+    const track = speakersWrap.querySelector('.speakerslider-track');
+    if (track && !track.children.length) {
+        appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
+    }
+    delete speakersWrap.dataset.speakersScrollbarWired;
+    wireSpeakersSliderScrollbar();
+    requestAnimationFrame(function () {
+        syncHomeSpeakerLongBioUniformHeight(speakersWrap, false);
+        const scrollTrack = speakersWrap.querySelector('.speakerslider-track');
+        if (scrollTrack) {
+            scrollTrack.dispatchEvent(new Event('scroll'));
+        }
+    });
 }
 
 const PROGRAMME_INDEX_SLIDE_DEFAULTS = [
@@ -4162,9 +4944,122 @@ const PROGRAMME_INDEX_SLIDE_DEFAULTS = [
     '<div class="programme-friday"><div class="programme-day-content programmestyle"><p>Programme details for Friday will appear here.</p></div></div>'
 ];
 
+const HOME_PROGRAMME_SHELL_SLIDE_HTML =
+    '<div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true">' +
+    '<div class="programme-day-content programmestyle">' +
+    '<div class="skeleton-title"></div>' +
+    '<div class="skeleton-text"></div>' +
+    '<div class="skeleton-text short"></div>' +
+    '</div></div>';
+
+function buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme) {
+    const programmeSliderSection = document.createElement('div');
+    programmeSliderSection.className = 'home-programme-section';
+    const programmeSliderTrackInner = programmeDaySlides.join('');
+    const programmeSliderClassName =
+        'programme-slider' + (displayProgramme ? '' : ' home-carousel--minimal');
+    const programmeDotsHTML = programmeDaySlides
+        .map(function (_, i) {
+            return (
+                '<button type="button" class="introslider-dot" data-index="' +
+                i +
+                '" aria-label="Programme slide ' +
+                (i + 1) +
+                '"></button>'
+            );
+        })
+        .join('');
+    programmeSliderSection.innerHTML =
+        '<div class="programme-section home-stage-hidden" id="home-programme-title" role="region" aria-label="Programme">' +
+        '<div class="programmeslider-innerwrapper">' +
+        '<div class="' +
+        programmeSliderClassName +
+        '">' +
+        programmeSliderTrackInner +
+        '</div>' +
+        '<div class="home-introslider-scrollbar" aria-hidden="true">' +
+        '<div class="home-introslider-scrollbar-track">' +
+        '<div class="home-introslider-scrollbar-thumb"></div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="introslider-indicators" aria-label="Programme slider position">' +
+        programmeDotsHTML +
+        '</div>' +
+        '</div>' +
+        '</div>';
+    return programmeSliderSection.querySelector('.programme-section');
+}
+
+function insertHomeProgrammeSection(programmeSection, homeSection) {
+    if (!programmeSection || !homeSection) return;
+    const existing = homeSection.querySelector(':scope > .programme-section');
+    if (existing) existing.remove();
+    homeSection
+        .querySelectorAll(':scope > .home-speakers-programme-spacer, :scope > .home-programme-after-spacer')
+        .forEach(function (el) {
+            el.remove();
+        });
+    const speakersSliderWrapper = homeSection.querySelector(':scope > .speaker-section');
+    const homeFeedBlock = homeSection.querySelector(':scope > .feed-section');
+    const heroIntrosliderWrapper = homeSection.querySelector(':scope > .introslider-wrapper');
+    if (speakersSliderWrapper) {
+        speakersSliderWrapper.insertAdjacentElement('beforebegin', programmeSection);
+    } else if (homeFeedBlock) {
+        homeSection.insertBefore(programmeSection, homeFeedBlock);
+    } else if (heroIntrosliderWrapper) {
+        homeSection.insertBefore(programmeSection, heroIntrosliderWrapper.nextSibling);
+    } else {
+        homeSection.appendChild(programmeSection);
+    }
+    const registrationOuter = homeSection.querySelector(':scope > .registration-section');
+    if (registrationOuter) {
+        const registrationAnchor = speakersSliderWrapper || programmeSection;
+        if (registrationAnchor) {
+            registrationAnchor.insertAdjacentElement('afterend', registrationOuter);
+        }
+    }
+}
+
+/** Placeholder programme row until Firestore day slides are ready. */
+function mountHomeProgrammeSliderShell(homeSection) {
+    if (!homeSection || homeSection.querySelector(':scope > .programme-section')) return;
+    const programmeSection = buildHomeProgrammeSectionElement([HOME_PROGRAMME_SHELL_SLIDE_HTML], true);
+    if (!programmeSection) return;
+    programmeSection.classList.add('home-stage-hidden');
+    insertHomeProgrammeSection(programmeSection, homeSection);
+}
+
+async function hydrateHomeProgrammeSlider(homeSection) {
+    if (!homeSection) return;
+    try {
+        const programmeDaySlides = await buildHomeProgrammeSliderDaySlidesHTML();
+        const displayProgramme = await fetchHomeDisplayProgrammeFromFirestore();
+        let programmeSection = homeSection.querySelector(':scope > .programme-section');
+        const freshSection = buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme);
+        if (!freshSection) return;
+        if (programmeSection) {
+            programmeSection.replaceWith(freshSection);
+        } else {
+            insertHomeProgrammeSection(freshSection, homeSection);
+        }
+        freshSection.classList.remove('home-stage-hidden');
+        finalizeHomeSpeakersSection(homeSection.querySelector(':scope > .speaker-section'));
+        wireSliderIndicators();
+    } catch (e) {
+        console.error('hydrateHomeProgrammeSlider', e);
+    }
+}
+
 async function buildHomeProgrammeSliderDaySlidesHTML() {
-    const displayProgramme = await fetchHomeDisplayProgrammeFromFirestore();
-    const infoSlide = await resolveHomeProgrammeInfoSlideHtml();
+    void prefetchHomeProgrammeSliderData();
+    const settingsBundle = await Promise.all([
+        fetchHomeDisplayProgrammeFromFirestore(),
+        resolveHomeProgrammeInfoSlideHtml(),
+        fetchHomeProgrammeIsoDatesFromFirebase()
+    ]);
+    const displayProgramme = settingsBundle[0];
+    const infoSlide = settingsBundle[1];
+    const isoDatesPrefetched = settingsBundle[2];
     if (!displayProgramme) {
         const parts = [];
         if (infoSlide) {
@@ -4176,8 +5071,31 @@ async function buildHomeProgrammeSliderDaySlidesHTML() {
         return parts;
     }
 
-    const source = document.getElementById('programme-index-source');
     const parts = [];
+    if (infoSlide) {
+        parts.push(infoSlide);
+    }
+
+    const isoDates = isoDatesPrefetched;
+    const daySlides = await Promise.all(
+        isoDates.map(function (isoDate) {
+            return fetchHomeProgrammeDaySlideHtmlFromFirebase(isoDate);
+        })
+    );
+    for (let di = 0; di < daySlides.length; di++) {
+        if (daySlides[di]) {
+            parts.push(daySlides[di]);
+        }
+    }
+
+    if (daySlides.some(function (slideHtml) {
+        return !!slideHtml;
+    })) {
+        return parts;
+    }
+
+    const fallbackParts = infoSlide ? [infoSlide] : [];
+    const source = document.getElementById('programme-index-source');
     const dayFetches = PROGRAMME_INDEX_DAY_ORDER.map(function (day) {
         if (HOME_PROGRAMME_FIREBASE_DATE_BY_DAY[day]) {
             return fetchHomeProgrammeDayHtmlFromFirebase(day);
@@ -4189,13 +5107,13 @@ async function buildHomeProgrammeSliderDaySlidesHTML() {
         const day = PROGRAMME_INDEX_DAY_ORDER[i];
         const fromFirebase = dayHtmlByIndex[i];
         if (fromFirebase) {
-            parts.push(normalizeProgrammeSlideHtml(day, fromFirebase));
+            fallbackParts.push(normalizeProgrammeSlideHtml(day, fromFirebase));
             continue;
         }
         try {
             const fromLs = localStorage.getItem(TBS_TEXTEDITOR_PROGRAMME_LS_PREFIX + day);
             if (fromLs != null && fromLs.length > 0) {
-                parts.push(normalizeProgrammeSlideHtml(day, fromLs));
+                fallbackParts.push(normalizeProgrammeSlideHtml(day, fromLs));
                 continue;
             }
         } catch (e) {
@@ -4204,16 +5122,13 @@ async function buildHomeProgrammeSliderDaySlidesHTML() {
         if (source) {
             const el = source.querySelector('.programme-' + day);
             if (el) {
-                parts.push(el.outerHTML);
+                fallbackParts.push(el.outerHTML);
                 continue;
             }
         }
-        parts.push(PROGRAMME_INDEX_SLIDE_DEFAULTS[i] || PROGRAMME_INDEX_SLIDE_DEFAULTS[0]);
+        fallbackParts.push(PROGRAMME_INDEX_SLIDE_DEFAULTS[i] || PROGRAMME_INDEX_SLIDE_DEFAULTS[0]);
     }
-    if (infoSlide) {
-        parts.unshift(infoSlide);
-    }
-    return parts;
+    return fallbackParts;
 }
 
 // Display news grid with records
@@ -4237,80 +5152,13 @@ async function displayNewsGrid(records) {
             '<p class="empty-feed-message">No published items to show yet.</p>';
     }
 
-    // Clear existing content, add title and grid
+    // Clear existing content and paint the feed immediately (programme hydrates in the background).
     feedContent.innerHTML = '';
-    const programmeSliderSection = document.createElement('div');
-    programmeSliderSection.className = 'home-programme-section';
-    const programmeDaySlides = await buildHomeProgrammeSliderDaySlidesHTML();
-    const displayProgramme = await fetchHomeDisplayProgrammeFromFirestore();
-    const programmeSliderTrackInner = programmeDaySlides.join('');
-    const programmeSliderClassName =
-        'programme-slider' + (displayProgramme ? '' : ' home-carousel--minimal');
-    const programmeDotsHTML = programmeDaySlides
-        .map(
-            (_, i) =>
-                '<button type="button" class="introslider-dot" data-index="' +
-                i +
-                '" aria-label="Programme slide ' +
-                (i + 1) +
-                '"></button>'
-        )
-        .join('');
-    programmeSliderSection.innerHTML =
-        '<div class="programme-section home-stage-hidden" id="home-programme-title" role="region" aria-label="Programme">' +
-        '<div class="programmeslider-innerwrapper">' +
-        '<div class="' +
-        programmeSliderClassName +
-        '">' +
-        programmeSliderTrackInner +
-        '</div>' +
-        '<div class="home-introslider-scrollbar" aria-hidden="true">' +
-        '<div class="home-introslider-scrollbar-track">' +
-        '<div class="home-introslider-scrollbar-thumb"></div>' +
-        '</div>' +
-        '</div>' +
-        '<div class="introslider-indicators" aria-label="Programme slider position">' +
-        programmeDotsHTML +
-        '</div>' +
-        '</div>' +
-        '</div>';
-    // On the home view, render the programme slider as a direct child of .home-section (before the speakers row).
     const homeSection = document.querySelector('body.home-view .home-section');
-    if (homeSection) {
-        const existing = homeSection.querySelector(':scope > .programme-section');
-        if (existing) existing.remove();
-        homeSection
-            .querySelectorAll(':scope > .home-speakers-programme-spacer, :scope > .home-programme-after-spacer')
-            .forEach((el) => el.remove());
-
-        const programmeSection = programmeSliderSection.querySelector('.programme-section');
-
-        const heroIntrosliderWrapper = homeSection.querySelector(':scope > .introslider-wrapper');
-        const homeFeedBlock = homeSection.querySelector(':scope > .feed-section');
-        const speakersSliderWrapper = homeSection.querySelector(':scope > .speaker-section');
-        if (programmeSection && speakersSliderWrapper) {
-            speakersSliderWrapper.insertAdjacentElement('beforebegin', programmeSection);
-        } else if (programmeSection && homeFeedBlock) {
-            homeSection.insertBefore(programmeSection, homeFeedBlock);
-        } else if (heroIntrosliderWrapper && programmeSection) {
-            homeSection.insertBefore(programmeSection, heroIntrosliderWrapper.nextSibling);
-        } else if (programmeSection) {
-            homeSection.appendChild(programmeSection);
-        }
-
-        const registrationOuter = homeSection.querySelector(':scope > .registration-section');
-        if (registrationOuter) {
-            const registrationAnchor = speakersSliderWrapper || programmeSection;
-            if (registrationAnchor) {
-                registrationAnchor.insertAdjacentElement('afterend', registrationOuter);
-            }
-        }
-        if (programmeSection) {
-            programmeSection.classList.remove('home-stage-hidden');
-        }
-    } else {
-        feedContent.appendChild(programmeSliderSection);
+    if (homeSection && !homeSection.querySelector(':scope > .programme-section')) {
+        mountHomeProgrammeSliderShell(homeSection);
     }
+    void hydrateHomeProgrammeSlider(homeSection);
     const feedTitle = document.createElement('h2');
     feedTitle.className = 'section-titles';
     feedTitle.id = 'home-feed-latest-heading';
@@ -4803,6 +5651,11 @@ async function createNewsCard(record) {
             : typeDisplayTrimmed.toLowerCase() === 'edit'
                 ? '<span class="news-card-new-badge">EDIT</span>'
                 : `<span class="news-card-category">${typeDisplayTrimmed}</span>`;
+    /* Mobile CSS hides .news-card-title-row .news-card-category; meta row copy is shown instead. */
+    const typeCategoryMetaHtml =
+        typeDisplayTrimmed && typeDisplayTrimmed.toLowerCase() !== 'edit'
+            ? `<span class="news-card-category">${typeDisplayTrimmed}</span>`
+            : '';
 
     // Check for URL in various possible field names
     const videoUrl = unifiedVideoUrl;
@@ -4860,6 +5713,7 @@ async function createNewsCard(record) {
                     </div>
                     <div class="news-card-meta">
                         <p class="news-card-date">${formattedDate}</p>
+                        ${typeCategoryMetaHtml}
                     </div>
                     <div class="news-card-text-row">
                         <div class="news-card-text">${truncatedText}</div>
@@ -4889,6 +5743,7 @@ async function createNewsCard(record) {
                     </div>
                     <div class="news-card-meta">
                         <p class="news-card-date">${formattedDate}</p>
+                        ${typeCategoryMetaHtml}
                     </div>
                     <div class="news-card-text-row">
                         <div class="news-card-text">${truncatedText}</div>
@@ -4920,6 +5775,7 @@ async function createNewsCard(record) {
                 </div>
                 <div class="news-card-meta">
                     <p class="news-card-date">${formattedDate}</p>
+                    ${typeCategoryMetaHtml}
                 </div>
                 <div class="news-card-text-row">
                     <div class="news-card-text">${truncatedText}</div>
@@ -5794,6 +6650,7 @@ if (typeof window !== 'undefined' && !window.__tbsHomeLocationStorageBound) {
 
 // Initialize the blog when page loads
 document.addEventListener('DOMContentLoaded', async function() {
+    warmHomePageFirestoreCache();
     // Setup initial event listeners first (non-blocking)
     setupEventListeners();
     setupNavbarTransparency();
