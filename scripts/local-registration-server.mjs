@@ -196,6 +196,14 @@ const MIME = {
     '.ico': 'image/x-icon',
 };
 
+const HOME_ROBOTS_HEADER_VALUE = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
+
+function isHomePageRequest(url, filePath) {
+    const p = url.pathname.toLowerCase();
+    if (p === '/' || p === '' || p === '/home.html' || p === '/home') return true;
+    return path.basename(filePath).toLowerCase() === 'home.html';
+}
+
 const server = http.createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://127.0.0.1:${PORT}`);
 
@@ -255,7 +263,11 @@ const server = http.createServer(async (req, res) => {
             return;
         }
         const ext = path.extname(filePath).toLowerCase();
-        res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+        const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+        if (isHomePageRequest(url, filePath)) {
+            headers['X-Robots-Tag'] = HOME_ROBOTS_HEADER_VALUE;
+        }
+        res.writeHead(200, headers);
         res.end(data);
     });
 });

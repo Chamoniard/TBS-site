@@ -46,8 +46,15 @@ h1, h2, h3, h4, h5, h6, p {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* Loading state */
+/* Loading state — no scroll until home init finishes (script removes .loading) */
+html.home-scroll-locked,
+html.home-scroll-locked body {
+    overflow: hidden !important;
+    height: 100%;
+}
+
 body.loading {
+    overflow: hidden !important;
     opacity: 0.7;
 }
 
@@ -97,8 +104,11 @@ body.loading::after {
     --tbs-pink-soft: #fc70d7;
     /* Home Event band: Location section title on Prussian */
     --tbs-icy-blue: #a8e6ff;
-    /* Register navbar pill + registration Apply button (sized for “Register” label) */
-    --tbs-register-pill-width: 6.375rem;
+    /* Register / Apply / More / Less — shared fixed width (sized for “Register”; 75% scale) */
+    --tbs-action-btn-width: 4.78125rem;
+    /* Programme + speaker carousel cards (home + backend Snippets preview) */
+    --home-carousel-slide-width: 600px;
+    --home-carousel-minimal-aspect-ratio: 1080 / 1920;
 }
 
 /* Header Styles */
@@ -226,7 +236,17 @@ body.home-view .navbar {
 }
 
 .home-section > .registration-section .registration-section-inner-wrapper .registration-manifesto {
-    color: #F4F0E8;
+    color: #ffffff;
+}
+
+.home-section > .registration-section .registration-form > .registration-manifesto,
+.home-section > .registration-section .registration-form > .registration-manifesto * {
+    color: #ffffff;
+}
+
+.home-section > .registration-section.registration-section--closed .registration-form > .registration-manifesto {
+    opacity: 1;
+    color: #ffffff !important;
 }
 
 .home-section > .registration-section .registration-section-inner-wrapper p,
@@ -529,6 +549,10 @@ body.home-view .navbar {
 }
 
 .registration-form--inactive {
+    pointer-events: none;
+}
+
+.registration-section--closed .registration-form > :not(.registration-section-title):not(.registration-manifesto) {
     opacity: 0.55;
 }
 
@@ -646,7 +670,9 @@ body.home-view .navbar {
     flex-direction: column;
     align-items: flex-start;
     cursor: pointer;
-    flex-shrink: 0; /* allow subtitle to grow without shrinking away */
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: min(38vw, 22rem);
 }
 
 .nav-logo:focus-visible {
@@ -681,6 +707,17 @@ body.home-view .navbar {
     white-space: nowrap;
 }
 
+@media (min-width: 769px) {
+    .nav-logo {
+        flex-shrink: 0;
+        max-width: none;
+    }
+
+    .nav-logo-subtitle {
+        font-size: 1rem;
+    }
+}
+
 .nav-logo h2 {
     color: #FFD700;
     font-weight: 600;
@@ -689,8 +726,7 @@ body.home-view .navbar {
 }
 
 @media (max-width: 768px) {
-    /* Keep mobile header compact */
-    .nav-logo-subtitle {
+    .nav-logo {
         display: none;
     }
 }
@@ -755,12 +791,23 @@ body.home-view .navbar {
 
 @media (min-width: 769px) {
     :root {
-        --tbs-register-pill-width: 7.125rem;
+        --tbs-action-btn-width: 5.34375rem;
     }
 
     .navbar .nav-link {
         font-size: 1.2rem;
     }
+}
+
+/* Shared width: Register, Apply, More, Less */
+.nav-register-pill,
+.nav-item-register-desktop .nav-link[data-view="register"],
+.registration-submit-btn,
+.feed-load-more-btn,
+.feed-load-less-btn {
+    width: var(--tbs-action-btn-width);
+    min-width: var(--tbs-action-btn-width);
+    max-width: var(--tbs-action-btn-width);
 }
 
 /* Shared Register / Apply pill (navbar + registration form) */
@@ -773,23 +820,21 @@ body.home-view .navbar {
     appearance: none;
     -webkit-appearance: none;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-weight: 400 !important;
-    line-height: normal;
     cursor: pointer;
     background-color: #FFD700;
     color: #003153;
     border: none;
     border-radius: 5px;
-    padding: 4px 8px;
+    min-height: 33px;
+    padding: 6px 12px;
     margin: 0;
     white-space: nowrap;
     box-sizing: border-box;
-    width: var(--tbs-register-pill-width);
-    min-width: var(--tbs-register-pill-width);
-    max-width: var(--tbs-register-pill-width);
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
+    line-height: 1.2;
     text-align: center;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -816,7 +861,8 @@ button.nav-register-pill {
 /* Navbar Register pill: always gold — no hover or scroll-spy color change */
 .navbar .nav-register-pill,
 .navbar .nav-item-register-desktop .nav-link[data-view="register"],
-.navbar .nav-register-mobile-top .nav-register-pill {
+.header .nav-register-mobile-top .nav-register-pill,
+.nav-register-mobile-top .nav-register-pill {
     background-color: #FFD700 !important;
     color: #003153 !important;
 }
@@ -830,10 +876,14 @@ button.nav-register-pill {
 .navbar .nav-item-register-desktop .nav-link[data-view="register"]:focus,
 .navbar .nav-item-register-desktop .nav-link[data-view="register"]:focus-visible,
 .navbar .nav-item-register-desktop .nav-link[data-view="register"].active,
-.navbar .nav-register-mobile-top .nav-register-pill:hover,
-.navbar .nav-register-mobile-top .nav-register-pill:focus,
-.navbar .nav-register-mobile-top .nav-register-pill:focus-visible,
-.navbar .nav-register-mobile-top .nav-register-pill.active {
+.header .nav-register-mobile-top .nav-register-pill:hover,
+.header .nav-register-mobile-top .nav-register-pill:focus,
+.header .nav-register-mobile-top .nav-register-pill:focus-visible,
+.header .nav-register-mobile-top .nav-register-pill.active,
+.nav-register-mobile-top .nav-register-pill:hover,
+.nav-register-mobile-top .nav-register-pill:focus,
+.nav-register-mobile-top .nav-register-pill:focus-visible,
+.nav-register-mobile-top .nav-register-pill.active {
     background-color: #FFD700 !important;
     color: #003153 !important;
     font-weight: 400 !important;
@@ -844,11 +894,11 @@ button.nav-register-pill {
     .nav-register-pill,
     .nav-item-register-desktop .nav-link[data-view="register"],
     .registration-submit-btn {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
     }
 }
 
-/* Mobile-only top tabs: "Talks" + text Register (desktop uses .nav-past-desktop + yellow pill) */
+/* Mobile-only top tabs: "Talks" (Register floats top-right; desktop uses .nav-past-desktop + yellow pill) */
 .nav-past-mobile,
 .nav-register-mobile-top {
     display: none;
@@ -883,14 +933,39 @@ button.nav-register-pill {
 
 /* Home view: poster starts at viewport top; fixed header overlays the image */
 body.home-view .home-section {
-    padding-top: 0 !important;
     margin-top: 0 !important;
-    /* Introslider track sits on transparent canvas; cards carry glass. Feed cards keep their own surfaces. */
-    background-color: transparent !important;
-    /* How far the hero introslider overlaps the bottom of the poster (direct child only; not programme row in feed). */
-    --home-hero-introslider-poster-overlap: clamp(6rem, 26vh, 18rem);
-    /* Matches setupHomeHeroIntrosliderPosterGap(desiredGapPx); offsets social bar so it does not sit on the poster. */
+    background-color: #003153 !important;
+    /* 1920×1300 scaled to max 1500px column width */
+    --home-poster-layout-height: 1016px;
+    --home-poster-event-spacer-height: 250px;
+    /* Pull bands below the fixed poster up so the spacer sits on the poster bottom */
+    --home-poster-content-pull: var(--home-poster-event-spacer-height);
     --home-hero-poster-slider-gap: 16px;
+}
+
+/* Deprecated layout aid — introslider moved below Event band */
+body.home-view .home-section > .introspacer {
+    display: none !important;
+}
+
+/* Poster → Event: gradient bridge (height = --home-poster-event-spacer-height) */
+body.home-view:not(.past-talks-open) .home-section > .poster-event-spacer {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: var(--home-poster-event-spacer-height);
+    min-height: var(--home-poster-event-spacer-height);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    flex-shrink: 0;
+    border: none;
+    background: linear-gradient(to bottom, transparent 0%, #003153 100%);
+}
+
+body.past-talks-open .home-section > .poster-event-spacer {
+    display: none !important;
 }
 
 body.home-view .hero {
@@ -1029,7 +1104,7 @@ body.home-view .hero {
     padding-bottom: 0;
     padding-left: 0;
     padding-right: 0;
-    max-width: 1500px;
+    max-width: min(1500px, 100%);
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -1040,6 +1115,7 @@ body.home-view .hero {
     gap: 0;
     margin-top: 0;
     min-width: 0; /* allow flex children to shrink to section width */
+    position: relative; /* contain absolute prelock / overlays inside the column */
 }
 
 /* Sequential home load: poster first; script removes .home-stage-hidden once each prior band is ready */
@@ -1047,7 +1123,26 @@ body.home-view .home-section > .home-stage-hidden {
     display: none !important;
 }
 
-/* Match introslider whether it is a direct child (initial HTML) or inside .introslider-wrapper (after feed JS) */
+/* Off-screen layout pass: measure introslider card heights before first visible paint (desktop) */
+@media (min-width: 769px) {
+    body.home-view .home-section > .introslider-inner-wrapper.home-introslider-prelock {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        z-index: -1 !important;
+        margin-top: 0;
+        overflow: hidden;
+    }
+}
+
+/* Match introslider whether it is a direct child (initial HTML) or inside .introslider-inner-wrapper (after feed JS) */
 .home-section > picture {
     position: relative;
     display: block;
@@ -1056,7 +1151,7 @@ body.home-view .home-section > .home-stage-hidden {
     outline: none;
 }
 
-/* Snow on hero poster — above image & bottom gradient (::after z-index 1), below mobile logo (z-index 3) */
+/* Snow on hero poster — above image, below bottom gradient + mobile logo */
 body.home-view .home-section > picture > .poster-snow-canvas {
     position: absolute;
     inset: 0;
@@ -1071,39 +1166,44 @@ body.past-talks-open .home-section > picture > .poster-snow-canvas {
     display: none !important;
 }
 
+/* Past talks open: hide Register (navbar pill + mobile floater) */
+body.past-talks-open .nav-register-mobile-top,
+body.past-talks-open .nav-item-register-desktop {
+    display: none !important;
+}
+
 /* When Past talks / video viewer is open, hide home chrome; only the top Prussian strip (picture) stays. */
+body.past-talks-open .home-section {
+    padding-top: 0 !important;
+}
+
 body.past-talks-open .home-section > :not(picture) {
     display: none !important;
 }
 
-/* Past talks / video viewer: no poster art — Prussian strip (fallback height; JS sets exact match to .navbar) */
+/* Past talks / video viewer: no poster art — Prussian top strip in normal flow (not fixed hero poster) */
 body.past-talks-open .home-section > picture {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: min(1500px, 100%);
     height: var(--navbar-height);
     min-height: var(--navbar-height);
     box-sizing: border-box;
     overflow: hidden;
     background-color: #003153;
     background-image: none;
+    pointer-events: none;
+    z-index: 1;
 }
 
 body.past-talks-open .home-section > picture img,
 body.past-talks-open .home-section > picture .mobile-poster-logo {
     display: none !important;
-}
-
-/* Home poster (wide screens): keep fixed height, crop horizontally from the right when width shrinks. */
-@media (min-width: 769px) {
-    .home-section > picture {
-        /* Based on the wide poster's intrinsic 1920x1300 aspect ratio at max-width 1500px. */
-        height: 1016px;
-        overflow: hidden;
-    }
-    .home-section > picture img.home-poster-wide {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover;
-        object-position: top left;
-    }
 }
 
 /* Past talks open: remove poster gradient overlay entirely */
@@ -1131,56 +1231,143 @@ body.home-view .home-section > picture::after {
     );
 }
 
-@media (max-width: 768px) {
-    body.home-view .home-section > picture::after {
-        height: 40%;
-    }
+/*
+ * Hero poster: fixed in the viewport; bands below scroll over it.
+ * Centered to match the 1500px home column (no horizontal bleed past .home-section).
+ */
+body.home-view:not(.past-talks-open) .home-section > picture {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: min(1500px, 100%);
+    height: var(--home-poster-layout-height);
+    box-sizing: border-box;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
 }
 
-/* Hero carousel only: sits on the lower poster so glass panels blur the image */
-body.home-view .home-section > .introslider-wrapper {
-    margin-top: calc((-1 * var(--home-hero-introslider-poster-overlap)) - 1px);
+body.home-view:not(.past-talks-open) .home-section > picture img.home-poster-wide {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top left;
+}
+
+body.home-view:not(.past-talks-open) .home-section {
+    padding-top: calc(var(--home-poster-layout-height) - var(--home-poster-content-pull)) !important;
+    overflow-x: hidden;
+    isolation: isolate;
+}
+
+body.home-view .everything {
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+}
+
+body.home-view:not(.past-talks-open) .home-section > :not(picture) {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Blend scrolling Event band into fixed poster */
+body.home-view:not(.past-talks-open) .home-section > .event-section {
+    z-index: 1;
+}
+
+/* Hero introslider: Prussian outer shell + white inner panel (below Sponsors). */
+body.home-view .home-section > .introslider-outer-wrapper.home-hero-introslider-outer {
+    margin: 0;
+    padding: 0 8px;
     z-index: 2;
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #003153;
+    background-color: #003153;
+    overflow-x: hidden;
 }
 
-/* Wide screens: transparent track so poster shows through; frosted glass on each slide card. */
-@media (min-width: 769px) {
-    body.home-view .home-section > .introslider-wrapper::before {
-        display: none;
-        content: none;
-    }
-
-    body.home-view .home-section > .introslider-wrapper {
-        background-color: transparent;
-    }
-
-    /* Softer, taller poster bottom wash where introslider overlaps the hero image. */
-    body.home-view .home-section > picture::after {
-        height: 42%;
-        background: linear-gradient(
-            to top,
-            #003153 0%,
-            rgba(0, 49, 83, 0.94) 12%,
-            rgba(0, 49, 83, 0.78) 28%,
-            rgba(0, 49, 83, 0.58) 44%,
-            rgba(0, 49, 83, 0.38) 58%,
-            rgba(0, 49, 83, 0.2) 72%,
-            rgba(0, 49, 83, 0.08) 86%,
-            rgba(0, 49, 83, 0) 100%
-        );
-    }
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider {
+    margin: 0;
+    padding: 24px 16px 12px;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border-radius: 5px 5px 0 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+    isolation: isolate;
 }
 
-/* Stack Event / Latest / following bands above poster (z-index 0) so the image never paints over them */
+/* Introslider inner wrappers: bottom corners should be square */
+body.home-view .home-section > .introslider-inner-wrapper {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+/* White canvas behind hero slides (track + chrome sit on inner wrapper, not outer blue). */
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider,
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .home-introslider-scrollbar,
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider-indicators {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+}
+
+.home-section > .introslider-inner-wrapper.home-hero-introslider .introslider-section-title {
+    flex-shrink: 0;
+    margin: 0;
+    margin-left: 16px !important;
+    margin-right: 0 !important;
+    padding-top: 0;
+    padding-right: 16px;
+    padding-bottom: 4px;
+    padding-left: 0 !important;
+    color: #003153 !important;
+    text-align: left;
+    align-self: flex-start;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    scroll-margin-top: calc(var(--navbar-height) + 12px);
+}
+
+body.home-view .home-section > .introslider-outer-wrapper::before,
+body.home-view .home-section > .introslider-inner-wrapper::before {
+    display: none;
+    content: none;
+}
+
 body.home-view .home-section > .feed-section,
 body.home-view .home-section > .event-section,
+body.home-view .home-section > .introslider-outer-wrapper,
 body.home-view .home-section > .sponsors-section,
 body.home-view .home-section > .speaker-section,
 body.home-view .home-section > .registration-section,
 body.home-view .home-section > .programme-section {
     position: relative;
-    z-index: 2;
+    z-index: 1;
+    max-width: 100%;
+    min-width: 0;
 }
 
 body.home-view .home-section > .ondemand-section {
@@ -1197,25 +1384,6 @@ body.home-view .home-section > .speaker-section {
     z-index: 4;
 }
 
-/* Mobile: Prussian-blue fade from poster into first band below (introslider hidden on mobile) */
-@media (max-width: 768px) {
-    body.home-view .home-section > .introslider-wrapper + * {
-        position: relative;
-    }
-
-    body.home-view .home-section > .introslider-wrapper + *::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: -50px;
-        height: 50px;
-        pointer-events: none;
-        z-index: 1;
-        background: linear-gradient(to bottom, rgba(0, 49, 83, 0) 0%, #003153 100%);
-    }
-}
-
 .home-section .home-poster-wide {
     display: block;
     width: 100%;
@@ -1230,49 +1398,74 @@ body.home-view .home-section > .speaker-section {
 }
 
 @media (max-width: 768px) {
-    /* Mobile: keep the wide poster's fixed height; crop horizontally instead of resizing height. */
-    .home-section > picture {
-        height: 1016px;
+    body.home-view .home-section > picture::after {
+        z-index: 3;
+        height: 38%;
+        background: linear-gradient(
+            to top,
+            #003153 0%,
+            rgba(0, 49, 83, 0.95) 18%,
+            rgba(0, 49, 83, 0.72) 40%,
+            rgba(0, 49, 83, 0.35) 65%,
+            rgba(0, 49, 83, 0) 100%
+        );
+    }
+
+    body.home-view .home-section > picture .mobile-poster-logo {
+        z-index: 4;
+    }
+
+    body.home-view .home-section > .introslider-outer-wrapper.home-hero-introslider-outer {
+        padding-top: 0;
+        padding-left: 8px;
+        padding-right: 8px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 24px 16px 12px;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border-radius: 5px 5px 0 0 !important;
         overflow: hidden;
     }
-    .home-section > picture img.home-poster-wide {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover;
-        object-position: top left;
+
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider {
+        gap: 8px;
+        background-color: #ffffff !important;
+        background: #ffffff !important;
     }
 
-    /* Mobile home poster should stay fixed while the rest scrolls over it. */
-    body.home-view:not(.past-talks-open) .home-section > picture {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 0;
-        pointer-events: none; /* avoid blocking scroll/taps */
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
+        background: #003153 !important;
+        background-color: #003153 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
-    /* Reserve the poster height in layout now that it's fixed out of flow. */
-    body.home-view:not(.past-talks-open) .home-section {
-        padding-top: 1016px !important;
+    body.home-view .home-section .introslider-inner-wrapper > .introslider {
+        width: 100%;
+        max-width: 100%;
+        margin-right: 0;
+        scroll-padding-left: 8px;
     }
 
-    /* Ensure every other home element is above the fixed poster. */
-    body.home-view:not(.past-talks-open) .home-section > :not(picture) {
-        position: relative;
-        z-index: 2;
+    body.home-view .home-section .introslider-inner-wrapper > .introslider > * {
+        scroll-snap-align: start;
     }
 
-    .home-section .home-poster-wide {
-        margin-bottom: 0;
-    }
-
-    body.home-view .home-section {
-        --home-hero-introslider-poster-overlap: 0px;
-    }
-
-    body.home-view .home-section > .introslider-wrapper {
-        display: none !important;
+    body.home-view .home-section .introslider-inner-wrapper .introslider-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 8px 0;
     }
 
     /* No overlap layout on mobile: keep social row in normal flow. */
@@ -1285,15 +1478,19 @@ body.home-view .home-section > .speaker-section {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    margin-right: 0;
     box-sizing: border-box;
     align-items: stretch;
+    align-self: stretch;
     background: transparent;
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
-.home-section .introslider-wrapper {
+.home-section .introslider-inner-wrapper {
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -1302,16 +1499,15 @@ body.home-view .home-section > .speaker-section {
     display: flex;
     flex-direction: column;
     gap: 0;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    overflow: visible;
-    background: transparent;
-    background-color: transparent;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    overflow-x: hidden;
+    overflow-y: visible;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
 }
 
-/* Home: sponsors row directly below Event band, above Latest feed (logo pixel heights set in script.js for uniform fit). */
+/* Home: sponsors row below Event band, above About introslider (logo heights set in script.js). */
 .home-section > .sponsors-section {
     width: 100%;
     max-width: 100%;
@@ -1321,7 +1517,8 @@ body.home-view .home-section > .speaker-section {
     display: flex;
     flex-direction: column;
     gap: 0;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: visible;
     background-color: #003153;
     padding: 0 8px 24px 8px;
     border-radius: 0 !important;
@@ -1340,7 +1537,7 @@ body.home-view .home-section > .speaker-section {
     gap: 0.5rem;
     background: #003153;
     border-radius: 0 !important;
-    padding: 0 16px 0 16px;
+    padding: 0;
 }
 
 .home-section > .sponsors-section .sponsors-section-title {
@@ -1401,7 +1598,8 @@ body.home-view .home-section > .speaker-section {
     display: flex;
     flex-direction: column;
     gap: 0;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: visible;
     background-color: #003153;
     padding: 0 8px;
     border-radius: 0 !important;
@@ -1781,7 +1979,7 @@ body.home-view .home-section > .speaker-section {
     background-color: #ffffff;
     border-radius: 0;
     padding: 0;
-    padding-top: 16px;
+    padding-top: 24px;
     padding-bottom: 16px;
     min-height: min(50vh, 420px);
 }
@@ -1956,11 +2154,13 @@ body.home-view .home-section > .speaker-section {
 .home-section .speakerslider-track > .speaker-card:last-child:not(:first-child),
 .home-section .speakerslider-track > .speaker-placeholder:last-child:not(:first-child) {
     border-radius: 0 5px 5px 0;
+    margin-right: 16px !important;
 }
 
 .home-section .speakerslider-track > .speaker-card:only-child,
 .home-section .speakerslider-track > .speaker-placeholder:only-child {
     border-radius: 5px;
+    margin-right: 16px !important;
 }
 
 /* Intro slide: HTML-only from Firestore `speakerinfo` — no photo column (markup omits `.speaker-image`). */
@@ -2300,29 +2500,29 @@ body.home-view .home-section > .speaker-section {
     margin: 0;
 }
 
-/* Wide screens: visible pink scrollbar (Chrome + Safari) */
+/* Wide screens: hide all scrollbars; overflow areas still scroll via wheel/trackpad */
 @media (min-width: 769px) {
     :root {
-        --horizontal-slider-scrollbar-height: 8px;
-        --horizontal-slider-scrollbar-radius: 4px;
+        --horizontal-slider-scrollbar-height: 0;
+        --horizontal-slider-scrollbar-radius: 0;
     }
 
     .introslider,
     .home-section .speakerslider-track {
-        overflow-x: scroll;
+        overflow-x: auto;
         overflow-y: hidden;
         padding-bottom: 0;
-        scrollbar-width: thin;
-        scrollbar-color: #FD3DB5 #f0e0eb;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         -webkit-overflow-scrolling: touch;
     }
 
     .programme-slider {
-        overflow-x: scroll;
+        overflow-x: auto;
         overflow-y: hidden;
         padding-bottom: 0;
-        scrollbar-width: thin;
-        scrollbar-color: #FD3DB5 #f0e0eb;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         -webkit-overflow-scrolling: touch;
         gap: 0;
     }
@@ -2345,270 +2545,128 @@ body.home-view .home-section > .speaker-section {
         overflow: visible;
     }
 
-    /* Chrome, Safari, Edge */
+    /* Native scrollbars: hidden on all horizontal carousels */
     .introslider::-webkit-scrollbar,
     .programme-slider::-webkit-scrollbar,
-    .home-section .speakerslider-track::-webkit-scrollbar {
-        height: var(--horizontal-slider-scrollbar-height);
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    /* Introslider: full-width track (Safari mis-draws inset/margins on horizontal bars) */
-    .introslider::-webkit-scrollbar-track {
-        background: #f0e0eb;
-        border-radius: var(--horizontal-slider-scrollbar-radius);
-        margin: 0;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    .programme-slider::-webkit-scrollbar-track,
-    .home-section .speakerslider-track::-webkit-scrollbar-track {
-        background: #f0e0eb;
-        border-radius: var(--horizontal-slider-scrollbar-radius);
-        margin: 0 4px;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    .introslider::-webkit-scrollbar-thumb,
-    .programme-slider::-webkit-scrollbar-thumb,
-    .home-section .speakerslider-track::-webkit-scrollbar-thumb {
-        background: #FD3DB5;
-        background-color: #FD3DB5;
-        border-radius: var(--horizontal-slider-scrollbar-radius);
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    .introslider::-webkit-scrollbar-thumb:hover,
-    .programme-slider::-webkit-scrollbar-thumb:hover,
-    .home-section .speakerslider-track::-webkit-scrollbar-thumb:hover {
-        background: #FC70D7;
-        background-color: #FC70D7;
-    }
-    /* Safari: remove default arrow/button slots that leave empty gaps */
-    .introslider::-webkit-scrollbar-button,
-    .programme-slider::-webkit-scrollbar-button,
-    .home-section .speakerslider-track::-webkit-scrollbar-button {
-        display: none;
-        width: 0;
-        min-width: 0;
-        height: 0;
-        min-height: 0;
-    }
-    .introslider::-webkit-scrollbar-corner,
-    .programme-slider::-webkit-scrollbar-corner,
-    .home-section .speakerslider-track::-webkit-scrollbar-corner {
-        background: transparent;
-    }
-
-    /* Home carousel: no painted track behind the row — glass lives on slides only */
-    .home-section .introslider::-webkit-scrollbar-track,
-    .home-section .speakerslider-track::-webkit-scrollbar-track {
-        background: transparent !important;
-        background-color: rgba(0, 0, 0, 0) !important;
-        box-shadow: none;
-        border-radius: 0;
-        margin: 0;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    /* Safari/WebKit: transparent track keyword is unreliable; rgba + !important keeps track clear */
-    .home-section .introslider::-webkit-scrollbar-thumb,
-    .home-section .speakerslider-track::-webkit-scrollbar-thumb {
-        background: #fd3db5 !important;
-        background-color: #fd3db5 !important;
-        border: none;
-        box-shadow: none;
-    }
-    .home-section .introslider::-webkit-scrollbar-thumb:hover,
-    .home-section .speakerslider-track::-webkit-scrollbar-thumb:hover {
-        background: #fc70d7 !important;
-        background-color: #fc70d7 !important;
-    }
-
-    /* Home programme row: same transparent native track as home introslider (if bar is visible) */
-    .home-section .programme-slider::-webkit-scrollbar-track,
-    .home-programme-section .programme-slider::-webkit-scrollbar-track {
-        background: transparent !important;
-        background-color: rgba(0, 0, 0, 0) !important;
-        box-shadow: none;
-        border-radius: 0;
-        margin: 0;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    .home-section .programme-slider::-webkit-scrollbar-thumb,
-    .home-programme-section .programme-slider::-webkit-scrollbar-thumb {
-        background: #fd3db5 !important;
-        background-color: #fd3db5 !important;
-        border: none;
-        box-shadow: none;
-    }
-
-    .home-section .programme-slider::-webkit-scrollbar-thumb:hover,
-    .home-programme-section .programme-slider::-webkit-scrollbar-thumb:hover {
-        background: #fc70d7 !important;
-        background-color: #fc70d7 !important;
-    }
-
-    .home-section .introslider,
-    .home-section .speakerslider-track,
-    .home-section .programme-slider,
-    .home-programme-section .programme-slider {
-        /* Firefox + Safari 17.4+; use rgba track — Safari often ignores `transparent` here */
-        scrollbar-color: #fd3db5 rgba(0, 0, 0, 0);
-    }
-
-    /*
-     * All horizontal carousels: hide native scrollbar until wrapper hover / focus-within.
-     * Home hero introslider: native bar stays hidden; custom bar matches height + hover (see below).
-     */
-    .introslider-wrapper:not(:hover):not(:focus-within) > .introslider::-webkit-scrollbar,
-    .speaker-section:not(:hover):not(:focus-within) .speakerslider-track::-webkit-scrollbar {
-        height: 0;
-    }
-
-    .introslider-wrapper:not(:hover):not(:focus-within) > .introslider,
-    .speaker-section:not(:hover):not(:focus-within) .speakerslider-track {
-        scrollbar-width: none;
-    }
-
-    .introslider-wrapper:hover > .introslider,
-    .introslider-wrapper:focus-within > .introslider,
-    .speaker-section:hover .speakerslider-track,
-    .speaker-section:focus-within .speakerslider-track {
-        scrollbar-width: thin;
-    }
-
-    /*
-     * Home introslider: WebKit overlay scrollbars — hide native bar; custom track matches --horizontal-slider-scrollbar-height.
-     */
-    .home-section .introslider-wrapper > .introslider {
-        scrollbar-width: none !important;
-        -ms-overflow-style: none;
-    }
-    .home-section .introslider-wrapper > .introslider::-webkit-scrollbar {
+    .home-section .speakerslider-track::-webkit-scrollbar,
+    .flyer-section .introslider::-webkit-scrollbar {
         display: none !important;
         width: 0 !important;
         height: 0 !important;
     }
 
-    /* Home programme row: native bar hidden; custom .home-introslider-scrollbar in .programmeslider-innerwrapper */
+    .home-section .introslider-inner-wrapper > .introslider,
     .home-section .programmeslider-innerwrapper .programme-slider,
-    .home-programme-section .programmeslider-innerwrapper .programme-slider {
-        scrollbar-width: none !important;
-        -ms-overflow-style: none;
-    }
-    .home-section .programmeslider-innerwrapper .programme-slider::-webkit-scrollbar,
-    .home-programme-section .programmeslider-innerwrapper .programme-slider::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-    }
-
-    /* Speakers row: same native bar suppression + custom thumb under `.speakers-inner-wrapper` */
+    .home-programme-section .programmeslider-innerwrapper .programme-slider,
     .home-section .speakers-inner-wrapper .speakerslider-track {
         scrollbar-width: none !important;
         -ms-overflow-style: none;
     }
+
+    .home-section .introslider-inner-wrapper > .introslider::-webkit-scrollbar,
+    .home-section .programmeslider-innerwrapper .programme-slider::-webkit-scrollbar,
+    .home-programme-section .programmeslider-innerwrapper .programme-slider::-webkit-scrollbar,
     .home-section .speakers-inner-wrapper .speakerslider-track::-webkit-scrollbar {
         display: none !important;
         width: 0 !important;
         height: 0 !important;
     }
 
-    .home-introslider-scrollbar {
-        flex-shrink: 0;
-        width: 100%;
-        max-width: 100%;
-        height: var(--horizontal-slider-scrollbar-height);
-        box-sizing: border-box;
-        padding: 0;
-        margin: 6px 0 0 0;
-        opacity: 0;
-        transition: opacity 0.22s ease;
-        pointer-events: none;
-    }
-    .home-section .programmeslider-innerwrapper .home-introslider-scrollbar,
-    .home-programme-section .programmeslider-innerwrapper .home-introslider-scrollbar {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 16px;
-        width: auto;
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        background-color: transparent;
-        z-index: 3;
-    }
-
-    .home-section .speakers-inner-wrapper .home-introslider-scrollbar {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 24px;
-        width: auto;
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        z-index: 2;
-    }
-
-    .home-section .introslider-wrapper:hover .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-section .introslider-wrapper:focus-within .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-section .programme-section:hover .programmeslider-innerwrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-section .programme-section:focus-within .programmeslider-innerwrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-programme-section .programme-section:hover .programmeslider-innerwrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-programme-section .programme-section:focus-within .programmeslider-innerwrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-section .speaker-section:hover .speakers-inner-wrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow),
-    .home-section .speaker-section:focus-within .speakers-inner-wrapper .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow) {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .home-introslider-scrollbar--nooverflow {
-        visibility: hidden;
-        height: 0;
-        margin: 0;
-        overflow: hidden;
-        opacity: 0 !important;
-    }
-
-    .home-introslider-scrollbar-track {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        border-radius: var(--horizontal-slider-scrollbar-radius);
-        background-color: rgba(0, 0, 0, 0);
-    }
+    /* Custom pink scrollbar UI (Safari fallback): disabled on wide screens */
+    .home-introslider-scrollbar,
+    .home-introslider-scrollbar-track,
     .home-introslider-scrollbar-thumb {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        min-width: 22px;
-        border-radius: var(--horizontal-slider-scrollbar-radius);
-        background: #fd3db5;
-        background-color: #fd3db5;
-        pointer-events: none;
-        box-sizing: border-box;
-        will-change: transform, width;
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        overflow: hidden !important;
+    }
+
+    /* Inner slide overflow (tall copy): hide scrollbars on wide screens */
+    .introslider > *,
+    .programme-slider > *,
+    .programme-day-slide {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .introslider > *::-webkit-scrollbar,
+    .programme-slider > *::-webkit-scrollbar,
+    .programme-day-slide::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
+    /* Site-wide scrollbar suppression (wide screens only) */
+    html,
+    body {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
+    * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
     }
 }
 
-/* Introslider slides: fixed width + A3 aspect; horizontal scroll when narrow */
+/* Introslider slides: fixed width; horizontal scroll when narrow */
 .introslider > * {
     flex: 0 0 var(--introslider-column-width);
     width: var(--introslider-column-width);
     min-width: var(--introslider-column-width);
-    aspect-ratio: 297 / 420; /* A3 portrait */
     overflow: auto;
     position: relative;
     border: none;
     border-bottom: none !important;
-    border-radius: 5px 5px 0 0 !important;
+    border-radius: 5px !important;
     box-shadow: none !important;
+}
+
+/* A3 poster ratio — flyer + legacy introsliders only (not home hero About band) */
+.flyer-section .introslider > *,
+.introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > * {
+    aspect-ratio: 297 / 420;
+}
+
+/* Home hero About: equal row height via --home-introslider-card-height (set in script.js) */
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
+    aspect-ratio: auto !important;
+    height: var(--home-introslider-card-height, auto) !important;
+    min-height: var(--home-introslider-card-height, auto) !important;
+    max-height: var(--home-introslider-card-height, none) !important;
+    align-self: flex-start !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* Introslider left edge breathing space (requested) */
+.introslider > *:first-child {
+    margin-left: 16px;
+}
+
+/* Introslider right edge breathing space (requested) */
+.introslider > *:last-child {
+    margin-right: 16px;
 }
 
 /* Programme slides: fixed width; stretch to common row height; no borders */
@@ -2787,12 +2845,25 @@ body.home-view .home-section > .speaker-section {
     display: none;
 }
 
-.about,
-.location,
-.pasttalks,
-.register,
-.about-programme,
-.tbsonsocial {
+/* Introslider slide shells — exclude home hero About (white panel at end of file). */
+.flyer-section .introslider .about,
+.flyer-section .introslider .location,
+.flyer-section .introslider .pasttalks,
+.flyer-section .introslider .register,
+.flyer-section .introslider .about-programme,
+.flyer-section .introslider .tbsonsocial,
+.introslider-inner-wrapper:not(.home-hero-introslider) .about,
+.introslider-inner-wrapper:not(.home-hero-introslider) .location,
+.introslider-inner-wrapper:not(.home-hero-introslider) .pasttalks,
+.introslider-inner-wrapper:not(.home-hero-introslider) .register,
+.introslider-inner-wrapper:not(.home-hero-introslider) .about-programme,
+.introslider-inner-wrapper:not(.home-hero-introslider) .tbsonsocial,
+.introslider-wrapper .about,
+.introslider-wrapper .location,
+.introslider-wrapper .pasttalks,
+.introslider-wrapper .register,
+.introslider-wrapper .about-programme,
+.introslider-wrapper .tbsonsocial {
     background-color: #003153;
     padding: 16px 8px;
     display: flex;
@@ -2924,12 +2995,18 @@ body.home-view .home-section > .home-social-row-container {
 @media (max-width: 768px) {
     body.home-view .home-section > picture .mobile-poster-logo {
         display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 6px;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        top: calc(var(--navbar-height) + 8px + 55px);
+        top: calc(8px + 55px);
         z-index: 3;
-        pointer-events: none; /* purely decorative; avoids blocking poster scroll */
+        pointer-events: none;
+        max-width: min(92vw, 22rem);
+        text-align: center;
     }
 
     body.home-view .home-section > picture .mobile-poster-logo-img {
@@ -2938,6 +3015,20 @@ body.home-view .home-section > .home-social-row-container {
         max-width: calc(288px * 1.2);
         object-fit: contain;
         filter: brightness(0) invert(1); /* white */
+    }
+
+    body.home-view .home-section > picture .mobile-poster-logo-subtitle,
+    body.home-view .home-section > picture .nav-logo-subtitle {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        font-size: clamp(0.7rem, 3.1vw, 1rem);
+        font-weight: 400;
+        line-height: 1.25;
+        color: #ffffff;
+        text-align: center;
+        white-space: nowrap;
+        max-width: 100%;
     }
 
     /* Mobile: move social icons into a Prussian-blue bar below the poster logo */
@@ -3412,6 +3503,11 @@ body.home-view .home-section > .home-social-row-container {
     margin-right: 16px !important;
 }
 
+.home-section .speakerslider-track > .speaker-card:last-child,
+.home-section .speakerslider-track > .speaker-placeholder:last-child {
+    margin-right: 16px !important;
+}
+
 /* TBS27 daily programme boxes */
 .programme-tuesday,
 .programme-wednesday,
@@ -3433,11 +3529,8 @@ body.home-view .home-section > .home-social-row-container {
     box-shadow: none;
 }
 
-/* Programme intro slide (home programme-section only): full-bleed artwork via ::before (card size = 1080×1920 ratio) */
-.home-section .programme-section .programme-slider > .programme-info,
-.home-programme-section .programme-section .programme-slider > .programme-info,
-.home-section .programme-slider > .programme-info,
-.home-programme-section .programme-slider > .programme-info {
+/* Programme intro card — single source (home carousel + backend Snippets render preview) */
+.programme-info {
     position: relative;
     isolation: isolate;
     overflow: hidden !important;
@@ -3452,12 +3545,18 @@ body.home-view .home-section > .home-social-row-container {
     border-radius: 5px 0 0 5px !important;
     box-sizing: border-box;
     box-shadow: none;
+    flex: 0 0 var(--home-carousel-slide-width, 600px) !important;
+    width: var(--home-carousel-slide-width, 600px) !important;
+    min-width: var(--home-carousel-slide-width, 600px) !important;
+    max-width: var(--home-carousel-slide-width, 600px) !important;
+    aspect-ratio: var(--home-carousel-minimal-aspect-ratio, 1080 / 1920);
+    height: auto !important;
+    align-self: flex-start !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
 }
 
-.home-section .programme-section .programme-slider > .programme-info::before,
-.home-programme-section .programme-section .programme-slider > .programme-info::before,
-.home-section .programme-slider > .programme-info::before,
-.home-programme-section .programme-slider > .programme-info::before {
+.programme-info::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -3469,13 +3568,23 @@ body.home-view .home-section > .home-social-row-container {
     pointer-events: none;
 }
 
-.home-section .programme-section .programme-slider > .programme-info > .programme-day-content,
-.home-programme-section .programme-section .programme-slider > .programme-info > .programme-day-content,
-.home-section .programme-slider > .programme-info > .programme-day-content,
-.home-programme-section .programme-slider > .programme-info > .programme-day-content {
+.programme-info > .programme-day-content {
     position: relative;
     z-index: 1;
     background-color: transparent;
+}
+
+/* Backend Snippets: layout wrapper only — visual design lives on `.programme-info` */
+.texteditor-render-html .programme-slider--programme-info-preview {
+    display: inline-flex;
+    align-items: flex-start;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
 }
 
 .programme-day-content,
@@ -4025,7 +4134,7 @@ body.home-view .home-section > .home-social-row-container {
     padding: 0;
 }
 
-/* Keep Event/Location headings typographically aligned with Featured video title */
+/* Home introslider card titles — same size/weight as feed `.post-title` */
 .home-section .introslider > .about .about-title,
 .home-section .introslider > .location .about-title,
 .home-section .introslider > .pasttalks .about-title,
@@ -4033,13 +4142,15 @@ body.home-view .home-section > .home-social-row-container {
 .home-section .introslider > .about-programme .about-title,
 .home-section .introslider > .about-speakers .about-title,
 .home-section .introslider > .tbsonsocial .about-title,
+.home-section .introslider .introslider-title,
+.home-section .introslider .about-title.introslider-title,
 .flyer-section .introslider > .about .about-title,
 .home-section .programme-slider > .about .about-title,
 .home-programme-section .programme-slider > .about .about-title {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
-    font-size: 1.7rem !important;
+    font-size: 1.3rem !important;
     font-weight: 500 !important;
-    line-height: 1.3 !important;
+    line-height: 1.25 !important;
     margin: 0 !important;
     padding: 0 !important;
     text-transform: none !important;
@@ -4136,16 +4247,18 @@ body.home-view .home-section > .home-social-row-container {
     background-color: blue;
 }
 
-.home-section .introslider > .about,
-.home-section .introslider > .location,
-.home-section .introslider > .pasttalks,
-.home-section .introslider > .register,
-.home-section .introslider > .about-programme,
-.home-section .introslider > .about-speakers,
-.home-section .introslider > .tbsonsocial,
-.home-section .introslider > .featured-video,
-.home-section .introslider > .featured-b,
-.home-section .introslider > .featured-pasttalks {
+@media (max-width: 768px) {
+/* Non-hero introsliders only (hero About band uses solid blue cards — see end of file). */
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .about,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .location,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .pasttalks,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .register,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .about-programme,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .about-speakers,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .tbsonsocial,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .featured-video,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .featured-b,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > .featured-pasttalks {
     flex: 0 0 var(--introslider-column-width) !important;
     width: var(--introslider-column-width) !important;
     max-width: none !important;
@@ -4153,7 +4266,6 @@ body.home-view .home-section > .home-social-row-container {
     aspect-ratio: auto !important;
     height: auto !important;
     min-height: 0;
-    /* Solid opaque panel (no blur / no transparency) */
     background: #003153 !important;
     border-radius: 5px !important;
     box-shadow: none !important;
@@ -4161,26 +4273,88 @@ body.home-view .home-section > .home-social-row-container {
     -webkit-backdrop-filter: none !important;
     border: none !important;
 }
+}
 
 /* Wide screens: restore frosted glass effect */
 @media (min-width: 769px) {
-    .home-section .introslider > .about,
-    .home-section .introslider > .location,
-    .home-section .introslider > .pasttalks,
-    .home-section .introslider > .register,
-    .home-section .introslider > .about-programme,
-    .home-section .introslider > .about-speakers,
-    .home-section .introslider > .tbsonsocial,
-    .home-section .introslider > .featured-video,
-    .home-section .introslider > .featured-b,
-    .home-section .introslider > .featured-pasttalks {
-        /* Prussian blue (#003153) frosted glass */
+    .home-section .introslider-inner-wrapper > .introslider {
+        /*
+         * Hero introslider width (wide screens): change ONLY this value.
+         * Outer card = copy width + 2px (1px border each side). All slides use these tokens.
+         */
+        --home-introslider-copy-width: 450px;
+        --home-introslider-card-width: calc(var(--home-introslider-copy-width) + 2px);
+        --introslider-column-width: var(--home-introslider-card-width);
+    }
+
+    .home-section .introslider-inner-wrapper > .introslider {
+        align-items: flex-start;
+    }
+
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider {
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+    }
+
+    /* Non-hero introslider slides: frosted glass (hero About uses solid blue cards below). */
+    .home-section .introslider-inner-wrapper:not(.home-hero-introslider) > .introslider > * {
+        flex: 0 0 auto !important;
+        width: var(--home-introslider-card-width) !important;
+        min-width: var(--home-introslider-card-width) !important;
+        max-width: var(--home-introslider-card-width) !important;
+        height: var(--home-introslider-card-height, auto) !important;
+        min-height: var(--home-introslider-card-height, auto) !important;
+        max-height: var(--home-introslider-card-height, auto) !important;
+        aspect-ratio: unset !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
         background: rgba(0, 49, 83, 0.52) !important;
         border-radius: 5px !important;
         box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 3px 12px rgba(0, 0, 0, 0.14) !important;
         backdrop-filter: blur(5px) !important;
         -webkit-backdrop-filter: blur(5px) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Hero About band: solid Prussian cards, equal height per row */
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
+        flex: 0 0 auto !important;
+        width: var(--home-introslider-card-width) !important;
+        min-width: var(--home-introslider-card-width) !important;
+        max-width: var(--home-introslider-card-width) !important;
+        height: var(--home-introslider-card-height, auto) !important;
+        min-height: var(--home-introslider-card-height, auto) !important;
+        max-height: var(--home-introslider-card-height, none) !important;
+        aspect-ratio: unset !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #003153 !important;
+        background-color: #003153 !important;
+        border-radius: 5px !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+    }
+
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > * .about-text {
+        flex: 1 1 auto !important;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .home-section .introslider-inner-wrapper > .introslider > * .about-text {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     .home-section .introslider > .featured-video .featured-video-text {
@@ -4201,7 +4375,6 @@ body.home-view .home-section > .home-social-row-container {
 
 .home-section .introslider > .about .about-text {
     border-radius: 0 !important;
-    padding-bottom: 0 !important;
 }
 
 /* Clickable home introslider slides: same discrete cue as home social icons (pink-soft → pink via border) */
@@ -4230,8 +4403,12 @@ body.home-view .home-section > .home-social-row-container {
     justify-content: flex-start;
 }
 
-.home-section > .introslider-wrapper > .introslider > .about:first-child {
-    margin-left: 8px;
+.home-section > .introslider-inner-wrapper > .introslider > .location:first-child {
+    margin-left: 16px;
+}
+
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > .location:first-child {
+    margin-left: 16px !important;
 }
 
 .home-section .introslider > .about .about-text,
@@ -4247,45 +4424,141 @@ body.home-view .home-section > .home-social-row-container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 16px;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 16px;
+    padding: 16px;
     box-sizing: border-box;
 }
 
-/* Home introslider: frosted glass panels; yellow titles and white body; gold links (location panel overrides below) */
-.home-section .introslider > .about .about-title,
-.home-section .introslider > .location .about-title,
-.home-section .introslider > .pasttalks .about-title,
-.home-section .introslider > .register .about-title,
-.home-section .introslider > .about-speakers .about-title,
-.home-section .introslider > .tbsonsocial .about-title {
+/* Copy inset on .about-text only — direct children have no padding */
+.home-section .introslider .about-text > * {
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+/* Wide screens: copy column width (must follow padding rule above) */
+@media (min-width: 769px) {
+    .home-section .introslider-inner-wrapper > .introslider .about-text {
+        width: var(--home-introslider-copy-width);
+        max-width: var(--home-introslider-copy-width);
+        box-sizing: border-box;
+    }
+}
+
+/* Non-hero home introslider: Prussian glass panels + light copy */
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about .about-title,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .location .about-title,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .pasttalks .about-title,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .register .about-title,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-speakers .about-title,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .tbsonsocial .about-title {
     color: #ffd700 !important;
 }
 
-.home-section .introslider > .about-programme .about-title {
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-programme .about-title {
     color: #ffffff !important;
 }
 
-.home-section .introslider > .about .about-text,
-.home-section .introslider > .location .about-text,
-.home-section .introslider > .pasttalks .about-text,
-.home-section .introslider > .register .about-text,
-.home-section .introslider > .about-programme .about-text,
-.home-section .introslider > .about-speakers .about-text,
-.home-section .introslider > .tbsonsocial .about-text {
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .location .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .pasttalks .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .register .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-programme .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-speakers .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .tbsonsocial .about-text,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about .about-text p,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .location .about-text p,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .pasttalks .about-text p,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .register .about-text p,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-programme .about-text p,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-speakers .about-text p,
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .tbsonsocial .about-text p {
     color: #F4F0E8 !important;
 }
 
-.home-section .introslider > .about .about-text p,
-.home-section .introslider > .location .about-text p,
-.home-section .introslider > .pasttalks .about-text p,
-.home-section .introslider > .register .about-text p,
-.home-section .introslider > .about-programme .about-text p,
-.home-section .introslider > .about-speakers .about-text p,
-.home-section .introslider > .tbsonsocial .about-text p {
-    color: #F4F0E8 !important;
+/* Hero About band: yellow slide titles; body copy stays white */
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .introslider-title,
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-title.introslider-title {
+    color: #ffd700 !important;
+}
+
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-title:not(.introslider-title),
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .featured-bottom-title {
+    color: #ffffff !important;
+}
+
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text,
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text p {
+    color: #ffffff !important;
+}
+
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text a {
+    color: var(--tbs-pink) !important;
+}
+
+/*
+ * Introslider card with image: put <img> (or .introslider-card-image) then <h3 class="about-title"> then <p>.
+ * Title is overlaid bottom-left on the image; paragraph sits below.
+ */
+.home-section .introslider .about-text:has(> img + .about-title),
+.home-section .introslider .about-text:has(> .introslider-card-image + .about-title) {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+}
+
+.home-section .introslider .about-text:has(> img + .about-title)::before,
+.home-section .introslider .about-text:has(> .introslider-card-image + .about-title)::before {
+    content: '';
+    grid-row: 1;
+    grid-column: 1;
+    align-self: end;
+    width: 100%;
+    min-height: 45%;
+    background: linear-gradient(to top, rgba(0, 49, 83, 0.88) 0%, rgba(0, 49, 83, 0.35) 45%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.home-section .introslider .about-text:has(> img + .about-title) > img,
+.home-section .introslider .about-text:has(> img + .about-title) > .introslider-card-image,
+.home-section .introslider .about-text:has(> .introslider-card-image + .about-title) > img,
+.home-section .introslider .about-text:has(> .introslider-card-image + .about-title) > .introslider-card-image {
+    grid-row: 1;
+    grid-column: 1;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.home-section .introslider .about-text:has(> img + .about-title) > .about-title,
+.home-section .introslider .about-text:has(> .introslider-card-image + .about-title) > .about-title {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: end;
+    justify-self: start;
+    margin: 0;
+    max-width: 100%;
+    z-index: 2;
+    text-align: left;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+}
+
+.home-section .introslider .about-text:has(> img + .about-title) > p,
+.home-section .introslider .about-text:has(> .introslider-card-image + .about-title) > p {
+    grid-row: 2;
+    grid-column: 1;
+    margin-top: 0.75rem;
+}
+
+.home-section .introslider > .register .introslider-register-image,
+.home-section .introslider .introslider-card-image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    box-sizing: border-box;
 }
 
 .home-section .introslider > .about .about-text a,
@@ -4378,9 +4651,7 @@ body.home-view .home-section > .home-social-row-container {
     display: none !important;
 }
 
-.home-section .featured-video,
-.home-section .featured-b,
-.home-section .featured-pasttalks,
+/* Past-talks grid featured cards only (not hero introslider) */
 .past-talks-section .featured-video,
 .past-talks-section .featured-b,
 .past-talks-section .featured-pasttalks {
@@ -4633,13 +4904,11 @@ body.home-view .home-section > .home-social-row-container {
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
-    padding: 24px 16px 24px 16px;
+    padding: 24px 16px 0 16px;
     max-width: 100%;
     background-color: #ffffff;
     border: none;
-    border-radius: 5px 5px 0 0 !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
+    border-radius: 0 !important;
     overflow: hidden;
 }
 
@@ -4697,19 +4966,9 @@ body.home-view .home-section > .home-social-row-container {
         border-radius: 0 !important;
     }
 
-    .home-section .programme-section .programme-slider > .programme-info,
-    .home-programme-section .programme-section .programme-slider > .programme-info,
-    .home-section .programme-slider > .programme-info,
-    .home-programme-section .programme-slider > .programme-info {
-        padding-left: 8px !important;
-        padding-right: 50px !important;
-        padding-bottom: 16px !important;
-        border-radius: 0 !important;
-    }
-
     .home-section .speakerslider-track > .speaker-card--speakerinfo {
         padding-left: 8px !important;
-        padding-right: 50px !important;
+        padding-right: 30px !important;
         padding-bottom: 16px !important;
         border-radius: 0 !important;
     }
@@ -4728,24 +4987,37 @@ h2.section-titles {
     text-transform: none;
 }
 
-/* Latest + Registration white-card headings — same vertical rhythm (8px top, 4px bottom) */
-.feed-section-inner-wrapper > h2.section-titles,
+/* Section headings — same vertical rhythm (8px top, 4px bottom); left inset where noted */
 .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title,
 .home-section > .ondemand-section .ondemand-inner-wrapper > h2.section-titles.ondemand-section-title,
 .home-section > .event-section .location-contents > .event-section-title,
-.home-section > .sponsors-section .sponsors-section-title {
+.home-section > .sponsors-section .sponsors-section-title,
+.home-section > .introslider-inner-wrapper.home-hero-introslider .introslider-section-title {
     padding-top: 0;
     padding-bottom: 0;
+    padding-left: 16px !important;
 }
 
 .feed-section-inner-wrapper > h2.section-titles,
 .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title {
-    padding-left: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0 !important;
 }
 
 /* Home Speakers band: anchor for nav scroll (targets #speakers-section in goToHomeSpeakers) */
-#speakers-section {
+#speakers-section,
+#home-speakers-heading {
     scroll-margin-top: calc(var(--navbar-height) + 12px);
+}
+
+.home-section .speaker-card--speakerinfo .speakers-section-title {
+    flex-shrink: 0;
+    margin: 0 0 0.5rem 0;
+    padding: 0;
+    color: #003153 !important;
+    text-align: left;
+    width: 100%;
 }
 
 /* Home programme block: anchor for nav scroll */
@@ -4771,6 +5043,7 @@ h2.section-titles {
 /* Latest feed heading: scroll target from load-less chevron */
 #home-feed-latest-heading {
     scroll-margin-top: calc(var(--navbar-height) + 12px);
+    padding-left: 0 !important;
 }
 
 /* Home: same link pink as outer programme band */
@@ -4796,6 +5069,11 @@ h2.section-titles {
     margin: 0;
     color: #ffffff !important;
     scroll-margin-top: calc(var(--navbar-height) + 12px);
+}
+
+.home-section > .registration-section.registration-section--closed .registration-form > h3.section-titles.registration-section-title {
+    color: #ffffff !important;
+    opacity: 1;
 }
 
 /* Event / Location / Latest — desktop (≥769px); mobile keeps existing .about-title & .section-titles rules */
@@ -4852,45 +5130,28 @@ h2.section-titles {
     background-color: #ffffff;
 }
 
-/* Home Latest: load more (↓) / collapse (↑) — inside last card’s `.news-card-controls` only */
-.home-section .feed-section-inner-wrapper:has(.feed-latest-chevron-row) {
-    overflow: visible;
-    z-index: 1;
-}
-
-.home-section .feed-section-inner-wrapper .news-card-controls .feed-latest-chevron-row {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-    position: static;
-}
-
-/* Hidden / collapsed on every card except where JS removes this class on the last visible row */
+/* Home Latest: More / Less — below the white feed wrapper, inside `.feed-section` */
 .home-section .feed-section-inner-wrapper .news-card-controls--collapsed {
     display: none !important;
 }
 
-/* Fallback: orphan row not in a card */
-.home-section .feed-section-inner-wrapper > .feed-latest-chevron-row {
+.home-section .feed-section > .feed-latest-chevron-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 10px;
-    margin: 12px 0 0 0;
-    padding: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0 0 24px;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    box-sizing: border-box;
 }
 
-/* Force home feed wrapper corners: top rounded, bottom square */
 .home-section .feed-section-inner-wrapper {
-    border-top-left-radius: 5px !important;
-    border-top-right-radius: 5px !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
+    border-radius: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 /* Fallback / non-home: keep in-flow chevron row */
@@ -4902,6 +5163,8 @@ h2.section-titles {
     gap: 12px;
     margin: 0;
     padding: 0;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
 }
 
 .feed-load-more-btn,
@@ -4911,25 +5174,22 @@ h2.section-titles {
     justify-content: center;
     appearance: none;
     -webkit-appearance: none;
-    font: inherit;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     cursor: pointer;
-    /* Match Hotel Alex link pinks; white chevron (see .location .about-text a) */
-    background-color: var(--tbs-pink-soft);
+    /* Same magenta as `.filter-btn.active` (#FD3DB5) */
+    background-color: var(--tbs-pink);
     color: #ffffff !important;
-    border: none;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0;
-    font-size: 1rem;
-    font-weight: 400;
+    border: 1.5px solid var(--tbs-pink);
+    border-radius: 5px;
+    min-height: 33px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
     margin: 0;
     box-sizing: border-box;
+    white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
-    line-height: normal;
+    line-height: 1.2;
     text-align: center;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.14),
@@ -4940,20 +5200,12 @@ h2.section-titles {
         box-shadow 0.3s ease;
 }
 
-.feed-load-more-btn .ui-chevron,
-.feed-load-less-btn .ui-chevron {
-    display: block;
-    width: 1.25rem;
-    height: 1.25rem;
-    flex-shrink: 0;
-    pointer-events: none;
-}
-
 .feed-load-more-btn:hover:not(:disabled),
 .feed-load-more-btn:focus-visible:not(:disabled),
 .feed-load-less-btn:hover:not(:disabled),
 .feed-load-less-btn:focus-visible:not(:disabled) {
     background-color: var(--tbs-pink);
+    border-color: var(--tbs-pink);
     color: #ffffff !important;
     box-shadow:
         0 4px 14px rgba(0, 0, 0, 0.18),
@@ -5100,7 +5352,7 @@ h2.section-titles {
 .news-card-content {
     flex: 1 1 auto;
     min-width: 0;
-    padding: 12px 0 12px 1rem;
+    padding: 12px 0 0 1rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -5156,32 +5408,74 @@ h2.section-titles {
     margin-bottom: 0;
 }
 
-/* Title + category/New badges on one row (badges flush right) */
+/* Title block + date + badges on one row (badges flush right) */
 .news-card-title-row {
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
+    justify-content: flex-start;
+    gap: 0.5rem 10px;
     width: 100%;
     min-width: 0;
 }
 
-.news-card-title-row .news-card-title {
+.news-card-title-block {
     flex: 1 1 auto;
     min-width: 0;
+    overflow: hidden;
+}
+
+.news-card-title-block .post-title {
     padding-right: 0;
+}
+
+/* Match `.blog-card-name` (Past talks cards) */
+.news-card-name {
+    font-size: 1rem;
+    font-weight: 400;
+    font-style: italic;
+    color: #3b82f6;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.news-card-title-row .news-card-date {
+    flex: 0 0 auto;
+    margin: 0;
+    align-self: flex-start;
 }
 
 .news-card-title-row .news-card-badges {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-end;
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    margin-left: auto;
     gap: 0.5rem;
-    max-width: 45%;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-self: flex-start;
+}
+
+/* Wider viewports: keep title on the same row; truncate with ellipsis instead of wrapping */
+@media (min-width: 769px) {
+    .news-card-title-row .post-title {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-height: none;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        -webkit-box-orient: unset;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
 }
 
 .news-card-meta {
@@ -5209,14 +5503,14 @@ h2.section-titles {
     align-items: center;
     gap: 0.5rem;
 }
-.news-card-meta .news-card-category,
+.news-card-meta .post-category,
 .news-card-meta .news-card-new-badge {
     font-size: inherit;
 }
 
-/* Category lives in title badges on desktop; meta copy is mobile-only */
+/* Category in title badges on desktop; meta copy is mobile-only (overlay / legacy cards) */
 @media (min-width: 769px) {
-    .news-card-meta .news-card-category {
+    .news-card-meta .post-category {
         display: none;
     }
 }
@@ -5235,12 +5529,12 @@ h2.section-titles {
     text-align: left;
 }
 
-.news-card-category {
+.post-category {
     background: #003153;
     color: white;
-    padding: 0.15rem 0.35rem;
+    padding: 0.1rem 0.35rem;
     border-radius: 5px;
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -5251,7 +5545,7 @@ h2.section-titles {
     color: #003153;
     padding: 0.15rem 0.35rem;
     border-radius: 5px;
-    font-size: 0.75rem;
+    font-size: 0.5rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -5328,11 +5622,11 @@ h2.section-titles {
     margin: 0.5rem 0 0 0;
 }
 
-/* Same programme / speaker-name h3 scale (1.3rem, 600); markup is `h3.news-card-title` from `createNewsCard`. */
-.news-card-title {
+/* Card / post headings (news feed, Past talks cards, video viewer) — `h3.post-title` */
+.post-title {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 1.3rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #000000;
     margin: 0;
     margin-top: 0;
@@ -5361,7 +5655,7 @@ h4 {
     font-weight: 600;
 }
 
-/* Block + max-height — not `-webkit-line-clamp`, which suppresses `<br>` line breaks in excerpts */
+/* Three-line excerpt with ellipsis when clipped (~3 × 1.6 line-height) */
 .news-card-text {
     color: #000000;
     line-height: 1.6;
@@ -5370,15 +5664,21 @@ h4 {
     padding-top: 0;
     padding-bottom: 0;
     margin: 0;
-    display: block !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     overflow: hidden !important;
-    max-height: 3.2rem !important; /* ~2 lines * 1.6 line-height */
+    text-overflow: ellipsis;
+    max-height: 4.8rem !important;
     word-wrap: break-word !important;
     word-break: break-word !important;
 }
 
 /* When title is 2 lines, give excerpt one text line of vertical space */
-.news-card-content:has(.news-card-title.two-lines) .news-card-text-row .news-card-text {
+.news-card-content:has(.post-title.two-lines) .news-card-text-row .news-card-text {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     max-height: 1.6rem !important;
 }
 
@@ -5413,24 +5713,21 @@ h4 {
         padding-right: 8px !important;
     }
 
-    .home-section .programme-section .programme-slider > .programme-info,
-    .home-programme-section .programme-section .programme-slider > .programme-info,
-    .home-section .programme-slider > .programme-info,
-    .home-programme-section .programme-slider > .programme-info {
+    .programme-info {
         padding-left: 8px !important;
         padding-right: 50px !important;
+        padding-bottom: 16px !important;
         border-radius: 0 !important;
     }
 
     .home-section .speakerslider-track > .speaker-card--speakerinfo {
         padding-left: 0 !important;
-        padding-right: 50px !important;
+        padding-right: 30px !important;
         border-radius: 0 !important;
     }
 
     .home-section > .speaker-section .speakers-inner-wrapper {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
+        padding: 0 !important;
     }
 
     .sponsors_wrapper {
@@ -5460,13 +5757,10 @@ h4 {
         padding-bottom: 0;
     }
 
-    /* About slides: horizontal inset on copy only (spacers stay full width) */
+    /* Programme about slides: horizontal inset on copy only (spacers stay full width) */
     .flyer-section .introslider > .about .about-text,
     .home-section .programme-slider > .about .about-text,
-    .home-programme-section .programme-slider > .about .about-text,
-    .home-section .introslider > .about .about-text,
-    .home-section .introslider > .location .about-text,
-    .home-section .introslider > .about-programme .about-text {
+    .home-programme-section .programme-slider > .about .about-text {
         padding-left: 8px;
         padding-right: 8px;
         box-sizing: border-box;
@@ -5514,43 +5808,51 @@ h4 {
         height: var(--news-media-height);
     }
     .news-card-content {
-        padding: 8px 0 8px 0.75rem;
+        justify-content: flex-start;
+        align-items: flex-start;
+        align-self: flex-start;
+        padding: 0 0 0 0.75rem;
     }
 
-    .news-card-title {
+    .news-card-title-row {
+        flex: 0 0 auto;
+        align-self: flex-start;
+        width: 100%;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .news-card-title-row .news-card-date,
+    .news-card-title-row .news-card-badges {
+        align-self: flex-start;
+    }
+
+    .news-card-title-row .post-title,
+    .news-card .news-card-title-row h3.post-title,
+    .feed-section-inner-wrapper .news-card h3.post-title,
+    .home-section .feed-section-inner-wrapper .news-card h3.post-title,
+    .blog-card h3.post-title,
+    .viewing h3.post-title {
+        align-self: flex-start;
+        margin: 0 !important;
+        padding-top: 0;
         font-size: 1rem !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
         line-height: 1.25 !important;
         max-height: calc(2 * 1rem * 1.25) !important;
         -webkit-line-clamp: 2 !important;
         line-clamp: 2 !important;
     }
 
-    /* Category in meta row (date left, category right); hidden in title badges on mobile */
-    .news-card-title-row .news-card-category {
+    .news-card .news-card-text-row {
         display: none !important;
     }
 
-    .news-card-meta {
-        justify-content: space-between;
-        width: 100%;
-        min-width: 0;
-        gap: 0.5rem;
-    }
-
-    .news-card-meta .news-card-date {
-        flex: 0 1 auto;
-        min-width: 0;
-    }
-
-    .news-card-meta .news-card-category {
-        display: inline-block;
-        flex: 0 0 auto;
-        margin-left: auto;
-        text-align: right;
-    }
-
     .news-card .news-card-text {
+        display: none !important;
+    }
+
+    .news-card-name {
         display: none !important;
     }
 
@@ -5588,10 +5890,12 @@ h4 {
     .home-section .introslider > .register .about-title,
     .home-section .introslider > .about-programme .about-title,
     .home-section .introslider > .about-speakers .about-title,
-    .home-section .introslider > .tbsonsocial .about-title {
-        font-size: 1.7rem !important;
+    .home-section .introslider > .tbsonsocial .about-title,
+    .home-section .introslider .introslider-title,
+    .home-section .introslider .about-title.introslider-title {
+        font-size: 1rem !important;
         font-weight: 500 !important;
-        line-height: 1.3 !important;
+        line-height: 1.25 !important;
         margin: 0 !important;
         text-transform: none !important;
     }
@@ -5612,9 +5916,13 @@ h4 {
         width: 100%;
     }
 
-    .section-titles {
+    .section-titles,
+    h1.section-titles,
+    h2.section-titles,
+    h3.section-titles {
         margin-bottom: 0 !important;
         padding: 0 !important;
+        text-align: center !important;
     }
 
     .feed-section-inner-wrapper > h2.section-titles,
@@ -5625,6 +5933,45 @@ h4 {
         padding-left: 0 !important;
         padding-right: 0 !important;
         padding-bottom: 4px !important;
+    }
+
+    .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider-section-title {
+        margin-left: 16px !important;
+        padding-left: 0 !important;
+        padding-right: 16px !important;
+        padding-top: 0 !important;
+        padding-bottom: 4px !important;
+        text-align: left !important;
+    }
+
+    .home-section > .sponsors-section .sponsors-section-title {
+        text-align: center !important;
+        align-self: center;
+        width: 100%;
+    }
+
+    .home-section > .event-section .location-contents > .event-section-title {
+        text-align: center !important;
+    }
+
+    /* Programme band: intro slide + day card main titles */
+    .programme-info .about-title,
+    .programme-slider .programme-info .about-title,
+    .home-section .programme-slider > .programme-info .about-title,
+    .home-programme-section .programme-slider > .programme-info .about-title,
+    .programme-info .programmestyle h2,
+    .programme-info .programme-day-content h2,
+    .programme-slider .programme-info h2,
+    .programme-slider .programme-info .programmestyle h2,
+    .programme-slider .programme-info .programme-day-content h2,
+    .home-section .programme-slider > .programme-day-slide .programmestyle h2,
+    .home-programme-section .programme-slider > .programme-day-slide .programmestyle h2 {
+        text-align: center !important;
+    }
+
+    /* Speakers intro card: section title */
+    .home-section .speaker-card--speakerinfo .speakers-section-title {
+        text-align: center !important;
     }
 
     /* CMS body copy: override legacy inline px from saved editor HTML */
@@ -5658,22 +6005,29 @@ h4 {
         row-gap: var(--sponsor-logo-gap);
     }
 
-    /* Two logos per row; Heine alone on the center row */
+    /* Two logos per row; Heine alone on the last row */
     .home-section > .sponsors-section .sponsor-logo-slot {
         flex: 0 1 calc((100% - var(--sponsor-logo-gap)) / 2);
         max-width: calc((100% - var(--sponsor-logo-gap)) / 2);
         min-width: 0;
+        order: 0;
     }
 
     .home-section > .sponsors-section .sponsor-logo-slot--solo {
         flex: 0 1 100%;
         max-width: 100%;
+        order: 99;
     }
 
     .home-section > .sponsors-section .sponsor-logo-slot .sponsors-logo-image {
         max-width: 100%;
         width: auto;
         height: auto;
+    }
+
+    .home-section > .event-section .event-section-inner-wrapper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .home-section > .event-section .location-contents > .event-section-title {
@@ -5690,10 +6044,9 @@ h4 {
         color: #ffffff !important;
     }
 
-    /* Type badges 30% smaller on mobile */
-    .news-card-category,
+    /* Type badges tighter padding on mobile */
+    .post-category,
     .news-card-new-badge {
-        font-size: 0.525rem !important;
         padding: 0.1rem 0.25rem !important;
         border-radius: 4px;
     }
@@ -5701,7 +6054,7 @@ h4 {
 
 @media (max-width: 768px) {
     .home-section {
-        --home-carousel-slide-width: 100vw;
+        --home-carousel-slide-width: 100%;
     }
 
     .home-introslider-scrollbar {
@@ -5718,8 +6071,7 @@ h4 {
     }
 
     .home-section .speakers-inner-wrapper {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
+        padding: 0 !important;
         box-sizing: border-box;
     }
 
@@ -5780,6 +6132,7 @@ h4 {
         border-radius: 0;
         gap: 0;
     }
+
     .home-section .introslider > * {
         border-radius: 5px;
     }
@@ -5794,9 +6147,16 @@ h4 {
         border: 1px solid #D1D5DB !important;
         border-right: none !important;
         padding-left: 16px !important;
-        padding-right: 16px !important;
         box-shadow: none !important;
         box-sizing: border-box !important;
+    }
+
+    .home-section .speakerslider-track > .speaker-placeholder {
+        padding-right: 16px !important;
+    }
+
+    .home-section .speakerslider-track > .speaker-card {
+        padding-right: 30px !important;
     }
 
     .home-section .speakerslider-track > .speaker-card:last-child,
@@ -5853,6 +6213,8 @@ h4 {
     }
 
     .introslider-wrapper,
+    .introslider-outer-wrapper,
+    .introslider-inner-wrapper,
     .programme-section,
     .speaker-section {
         position: relative;
@@ -5869,11 +6231,7 @@ h4 {
         padding: 0;
     }
 
-    /* Programme: dots sit 6px above the day cards (inner wrapper has 16px padding-bottom below the track) */
-    .home-section .programmeslider-innerwrapper > .introslider-indicators,
-    .home-programme-section .programmeslider-innerwrapper > .introslider-indicators {
-        bottom: calc(16px + 6px);
-    }
+    /* Programme row uses custom scrollbar only (no dot indicators). */
 
     .introslider-dot {
         width: 15px;
@@ -6306,6 +6664,13 @@ h4 {
     border-radius: 5px;
 }
 
+.past-talks-wrapper > .past-talks-section-title {
+    color: #003153;
+    text-align: left;
+    width: 100%;
+    margin: 0 0 16px 0;
+}
+
 /* Fixed background test - bright red to test if fixed positioning works */
 .fixed-background-test {
     position: fixed !important;
@@ -6610,16 +6975,6 @@ h4 {
     flex-grow: 1;
 }
 
-.blog-card-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #000000;
-    margin-bottom: 0;
-    line-height: 1.3;
-    padding: 4px 0 4px 0;
-}
-
 .blog-card-name {
     font-size: 1rem;
     font-weight: 400;
@@ -6720,7 +7075,7 @@ h4 {
     margin-bottom: 0;
 }
 
-/* Past talks “Load more” uses `.feed-load-more-btn` (same pill as home feed chevrons). */
+/* Past talks “More” uses `.feed-load-more-btn` (same magenta button as home feed). */
 
 .chevron {
     font-size: 2em;
@@ -7194,12 +7549,12 @@ h4 {
     transform: rotate(3deg) scale(1.05);
 }
 
-/* Footer - outer band white; inner block Prussian (matches site chrome) */
+/* Footer - outer band matches page; inner block Prussian (matches site chrome) */
 .footer {
-    background: #FAFAFA !important;
+    background: #F4F3F2 !important;
     color: #003153;
     padding: 0;
-    margin: 0;
+    margin: 0 0 50px 0;
     position: relative;
     z-index: 10; /* Ensure footer appears above background elements */
     font-weight: 500;
@@ -7447,15 +7802,87 @@ h4 {
 
 @media (max-width: 768px) {
     :root {
-        /* .navbar padding 8px 0 + tab row (links: 0.45rem vertical + ~1.2em line) */
-        font-size: 15px;
-        --navbar-height: calc(8px + (0.45rem * 2 + 1.2 * 1rem) + 8px);
-        --navbar-margin-inline: 16px;
+        /* Mobile: 1rem = 18px */
+        font-size: 18px;
+        --mobile-tab-bar-height: 45px;
+        --navbar-height: calc(var(--mobile-tab-bar-height) + env(safe-area-inset-bottom, 0px));
+        --navbar-margin-inline: 0px;
     }
 
+    /* Mobile: fixed 45px tab bar at bottom of the viewport */
+    .header {
+        top: auto !important;
+        bottom: 0;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: var(--navbar-height);
+        box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .header .navbar,
     .navbar {
-        padding-top: 8px;
-        padding-bottom: 8px;
+        top: auto !important;
+        bottom: env(safe-area-inset-bottom, 0px) !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: var(--mobile-tab-bar-height) !important;
+        min-height: var(--mobile-tab-bar-height) !important;
+        max-height: var(--mobile-tab-bar-height) !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    body.home-view .header:not(.post-view),
+    body.home-view .navbar {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: var(--mobile-tab-bar-height) !important;
+        min-height: var(--mobile-tab-bar-height) !important;
+        max-height: var(--mobile-tab-bar-height) !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        background: #003153 !important;
+        background-color: #003153 !important;
+    }
+
+    body.home-view .navbar {
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    body.home-view {
+        padding-bottom: var(--navbar-height);
+    }
+
+    #speakers-section,
+    #home-programme-title,
+    #home-location-heading,
+    #home-event-welcome-heading,
+    #home-ondemand-heading,
+    #home-feed-latest-heading,
+    #home-registration-heading {
+        scroll-margin-top: 12px;
+        scroll-margin-bottom: calc(var(--navbar-height) + 12px);
+    }
+
+    /* Card titles — repeat after :root shrink so 1rem wins over base 1.3rem h3 scale */
+    .news-card .news-card-title-row h3.post-title,
+    .feed-section-inner-wrapper .news-card h3.post-title,
+    .home-section .feed-section-inner-wrapper .news-card h3.post-title,
+    .blog-card h3.post-title,
+    .viewing h3.post-title {
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        line-height: 1.25 !important;
+        max-height: calc(2 * 1rem * 1.25) !important;
+        -webkit-line-clamp: 2 !important;
+        line-clamp: 2 !important;
     }
 
     .nav-logo {
@@ -7465,10 +7892,14 @@ h4 {
     .nav-container {
         justify-content: flex-start;
         align-items: center;
+        gap: 8px;
         width: 100%;
         max-width: none;
-        padding-left: 16px;
-        padding-right: 16px;
+        height: var(--mobile-tab-bar-height) !important;
+        min-height: var(--mobile-tab-bar-height) !important;
+        max-height: var(--mobile-tab-bar-height) !important;
+        padding: 0 16px !important;
+        box-sizing: border-box;
     }
 
     .hamburger {
@@ -7484,10 +7915,28 @@ h4 {
         display: flex !important;
     }
 
+    /* Video viewer or Past talks open: hide mobile Register floater */
+    body.home-view:has(.everything > .viewer-section:not(.is-collapsed):not([hidden])) .nav-register-mobile-top,
+    body.past-talks-open .nav-register-mobile-top {
+        display: none !important;
+    }
+
+    /* Register: fixed top-right floater (not in bottom tab bar) */
     .nav-register-mobile-top {
+        position: fixed;
+        top: calc(8px + env(safe-area-inset-top, 0px));
+        right: 12px;
+        left: auto;
+        bottom: auto;
+        z-index: 10050;
         display: flex !important;
-        flex: 0 0 auto;
+        align-items: center;
         justify-content: center;
+        margin: 0;
+        padding: 0;
+        pointer-events: auto;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
     }
 
     .nav-menu {
@@ -7500,27 +7949,33 @@ h4 {
         width: auto;
         max-width: none;
         flex-direction: row;
-        align-items: stretch;
+        flex-wrap: nowrap;
+        align-items: center;
         justify-content: center;
         background: transparent;
         box-shadow: none;
         padding: 0;
         margin: 0;
-        gap: 8px;
+        height: var(--mobile-tab-bar-height) !important;
+        min-height: var(--mobile-tab-bar-height) !important;
+        max-height: var(--mobile-tab-bar-height) !important;
+        gap: clamp(4px, 1.2vw, 8px);
         text-align: inherit;
         transition: none;
     }
 
-    .nav-menu > .nav-item:not(.nav-item-hidden):not(.nav-register-mobile-top) {
+    .nav-menu > .nav-item:not(.nav-item-hidden) {
         flex: 0 0 auto;
         min-width: 0;
+        height: var(--mobile-tab-bar-height);
         justify-content: center;
+        align-items: center;
+        font-size: 1rem !important;
     }
 
-    .nav-register-mobile-top {
-        flex: 0 0 auto;
-        min-width: 0;
-        justify-content: center;
+    .nav-menu > .nav-item:not(.nav-item-hidden) .nav-link,
+    .nav-menu > .nav-item:not(.nav-item-hidden) .mobile-top-tab-link {
+        font-size: 1rem !important;
     }
 
     .nav-register-mobile-top .nav-register-pill {
@@ -7530,15 +7985,19 @@ h4 {
         appearance: none;
         -webkit-appearance: none;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-size: 1rem;
+        font-size: 0.75rem !important;
         font-weight: 400 !important;
-        line-height: normal;
+        line-height: 1.2;
         cursor: pointer;
         background-color: #FFD700;
         color: #003153 !important;
         border: none;
         border-radius: 5px;
-        padding: 4px 8px;
+        min-height: 33px;
+        padding: 6px 12px;
+        width: var(--tbs-action-btn-width);
+        min-width: var(--tbs-action-btn-width);
+        max-width: var(--tbs-action-btn-width);
         margin: 0;
         white-space: nowrap;
         box-sizing: border-box;
@@ -7548,11 +8007,12 @@ h4 {
     }
 
     .nav-menu .mobile-top-tab-link {
-        font-size: 1rem;
+        font-size: 1rem !important;
         font-weight: 400;
         color: #ffffff !important;
-        padding: 0.45rem 0.15rem;
+        padding: 0 clamp(0.05rem, 0.4vw, 0.15rem);
         margin: 0;
+        line-height: 1.2 !important;
         text-align: center;
         -webkit-tap-highlight-color: transparent;
     }
@@ -7663,6 +8123,18 @@ h4 {
     .past-talks-wrapper {
         padding-left: 8px;
         padding-right: 8px;
+        border-radius: 0;
+    }
+
+    /* Past talks / viewer: no top Prussian strip on mobile */
+    body.past-talks-open .home-section > picture {
+        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+    }
+
+    body.past-talks-open .home-section {
+        display: none !important;
     }
 
     .viewer-section {
@@ -7671,14 +8143,119 @@ h4 {
     }
 
     .viewer-section-inner-wrapper {
+        padding-top: 0;
         padding-left: 8px;
         padding-right: 8px;
+        border-radius: 0 !important;
     }
 
     .past-talks-section .blog-card {
         box-shadow: none;
     }
 
+}
+
+/* Wide screens: top navbar with logo (undo mobile bottom tab bar layout) */
+@media (min-width: 769px) {
+    :root {
+        --navbar-height: calc(16px + 58.32px + (1rem * 1.2) + 16px);
+        --navbar-margin-inline: 193px;
+    }
+
+    body.home-view {
+        padding-bottom: 0 !important;
+    }
+
+    .header {
+        top: 0 !important;
+        bottom: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar {
+        top: 0 !important;
+        bottom: auto !important;
+        left: var(--navbar-margin-inline) !important;
+        right: var(--navbar-margin-inline) !important;
+        width: auto !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        padding: 16px 0 !important;
+        margin: 0 !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    body.home-view .header:not(.post-view) {
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    body.home-view .navbar {
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        --_home-nav-pad: 0px;
+        --_home-nav-avail: calc(100vw - 2 * var(--_home-nav-pad));
+        --_home-nav-w: min(1500px, var(--_home-nav-avail));
+        left: calc(var(--_home-nav-pad) + max(0px, (var(--_home-nav-avail) - var(--_home-nav-w)) / 2)) !important;
+        right: auto !important;
+        width: var(--_home-nav-w) !important;
+        max-width: var(--_home-nav-w);
+    }
+
+    .nav-logo {
+        display: flex !important;
+    }
+
+    .nav-container {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        max-width: 1500px;
+        align-items: center !important;
+        padding: 0 16px !important;
+    }
+
+    .nav-past-mobile,
+    .nav-register-mobile-top {
+        display: none !important;
+    }
+
+    .nav-past-desktop,
+    .nav-item-register-desktop {
+        display: flex !important;
+    }
+
+    .nav-menu {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        align-items: center !important;
+        gap: 2rem;
+    }
+
+    .nav-menu .mobile-top-tab-link {
+        line-height: inherit;
+        padding: 0;
+    }
+
+    #speakers-section,
+    #home-programme-title,
+    #home-location-heading,
+    #home-event-welcome-heading,
+    #home-ondemand-heading,
+    #home-feed-latest-heading,
+    #home-registration-heading {
+        scroll-margin-top: calc(var(--navbar-height) + 12px);
+        scroll-margin-bottom: 0;
+    }
 }
 
 @media (max-width: 480px) {
@@ -7727,6 +8304,11 @@ h4 {
     .footer-content {
         grid-template-columns: 1fr;
         text-align: center;
+        border-radius: 0;
+    }
+
+    .footer {
+        border-radius: 0;
     }
 
     /* Social + Contact stack: left-aligned rows; logo centered below */
@@ -7875,7 +8457,20 @@ h4 {
     outline: none;
     box-sizing: border-box;
     transform: scale(1.01);
-    transform-origin: top left;
+    transform-origin: center center;
+}
+
+.news-card-youtube-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: #000;
+    transform: scale(1.04);
+    transform-origin: center center;
 }
 
 
@@ -7902,6 +8497,13 @@ h4 {
     background: #ffffff;
     padding: 16px;
     box-sizing: border-box;
+    border-radius: 5px;
+}
+
+@media (min-width: 769px) {
+    .viewer-section-inner-wrapper {
+        padding-top: 24px;
+    }
 }
 
 .post-header {
@@ -7962,13 +8564,9 @@ h4 {
 .viewing .post-meta .post-category {
     flex: 0 0 auto;
     margin-left: auto;
-    padding: 0.25rem 8px 0.25rem 0.5rem;
+    padding: 0.1rem 8px 0.1rem 0.5rem;
     border: none;
     border-radius: 5px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
 }
 
 .viewing .post-meta .post-meta-right .post-category {
@@ -7990,17 +8588,17 @@ h4 {
     box-shadow: none !important;
 }
 
-/* Post title padding when inside viewing container */
+/* Video viewer: layout only (typography from `.post-title`) */
 .viewing .post-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin-top: 0;
-    padding-top: 0;
-    padding-left: 0;
+    padding: 0;
     padding-right: 0;
-    padding-bottom: 0;
-    font-size: 1.5rem !important;
-    font-weight: 600 !important;
-    line-height: 1.3;
+    max-height: none;
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
+    white-space: normal;
 }
 
 /* Post name padding when inside viewing container */
@@ -8132,15 +8730,6 @@ h4 {
     align-items: center;
 }
 
-.post-category {
-    background: #003153;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
 .post-topic {
     background: #003153;
     color: white;
@@ -8153,16 +8742,6 @@ h4 {
 .post-date {
     color: #64748b;
     font-size: 0.9rem;
-}
-
-.post-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #003153;
-    line-height: 1.2;
-    margin: 0;
-    padding-top: 1rem;
 }
 
 .post-name {
@@ -8226,38 +8805,7 @@ h4 {
     margin-bottom: 0.5rem;
 }
 
-.back-to-blog {
-    display: inline-flex !important;
-    align-items: center;
-    gap: 0.5rem;
-    color: #003153;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 1rem;
-    margin: 0 1rem 0 0 !important;
-    transition: color 0.3s ease;
-}
-
-.back-to-blog:hover {
-    color: #FFD700;
-}
-
-/* Back-to-blog link wrappers (h3) – no default heading margin */
-.top-links-container h3,
-.bottom-links-container h3,
-.viewer-section-inner-wrapper > h3 {
-    margin: 0;
-    font-size: inherit;
-    font-weight: inherit;
-}
-.viewer-section-inner-wrapper > h3 {
-    padding-top: 1rem;
-}
-
 @media (max-width: 768px) {
-    .post-title { 
-        font-size: 1.6rem; 
-    }
     .post-meta { 
         gap: 1rem; 
     }
@@ -8267,8 +8815,21 @@ h4 {
     }
 
     .viewer-section-inner-wrapper {
+        padding-top: 0;
         padding-left: 8px;
         padding-right: 8px;
+        border-radius: 0 !important;
+    }
+
+    /* Crop YouTube title bar / watermark chrome inside the iframe box */
+    .post-video .video-container iframe {
+        transform: scale(1.16);
+        transform-origin: center center;
+    }
+
+    .news-card-youtube-embed iframe {
+        transform: scale(1.22);
+        transform-origin: center center;
     }
 }
 
@@ -8614,33 +9175,6 @@ body.home-password-locked .footer {
     min-height: 0;
 }
 
-/* Top links container */
-.top-links-container {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-    padding-top: 0;
-    padding-bottom: 8px;
-    margin-bottom: 0;
-}
-
-/* Back to blog link in top container */
-.top-links-container .back-to-blog {
-    flex: 0 0 auto;
-}
-
-/* Bottom links container (viewer) */
-.bottom-links-container {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-    padding-top: 8px;
-    margin-top: 0;
-}
-.bottom-links-container .back-to-blog {
-    flex: 0 0 auto;
-}
-
 /* Morevideos title */
 .morevideos-title {
     font-weight: 600;
@@ -8767,6 +9301,11 @@ body.home-password-locked .footer {
         margin-right: -8px;
         margin-bottom: 0.5rem;
     }
+
+    .morevideos,
+    .morevideos-title {
+        border-radius: 0;
+    }
     .video-layout .morevideos-cards {
         flex-direction: row;
         overflow-x: auto;
@@ -8790,11 +9329,11 @@ body.home-password-locked .footer {
     }
 }
 
-/* Introslider: all card titles share one styling */
+/* Introslider: card titles match `.post-title` (home overrides colour per slide) */
 .introslider .introslider-title {
-    font-size: 1.7rem !important;
+    font-size: 1.3rem !important;
     font-weight: 500 !important;
-    line-height: 1.3 !important;
+    line-height: 1.25 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
     color: #ffd700 !important;
     margin: 0 !important;
@@ -8803,9 +9342,32 @@ body.home-password-locked .footer {
     font-style: normal !important;
 }
 
-/* Home introslider: keep Programme card titles on brand yellow only. */
-.home-section .introslider > .about-programme .introslider-title {
-    color: #FEDE3A !important;
+@media (max-width: 768px) {
+    .introslider .introslider-title {
+        font-size: 1rem !important;
+        line-height: 1.25 !important;
+    }
+}
+
+.introslider .about-title.introslider-title {
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+/* Non-hero: Programme card titles on brand yellow */
+.home-section .introslider-inner-wrapper:not(.home-hero-introslider) .introslider > .about-programme .introslider-title {
+    color: #ffd700 !important;
+}
+
+/* Hero About: yellow titles on solid blue cards (image-overlay titles — see :has rule above) */
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider .introslider-title,
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider .about-title.introslider-title {
+    color: #ffd700 !important;
+}
+
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider .about-text:has(> img + .about-title) > .about-title.introslider-title,
+body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider .about-text:has(> .introslider-card-image + .about-title) > .about-title.introslider-title {
+    color: #ffd700 !important;
 }
 
 /* Speaker / subtitle line under featured video title — not a primary title colour */
@@ -8815,5 +9377,68 @@ body.home-password-locked .footer {
 
 .home-section .introslider > .featured-video .featured-video-name.introslider-title {
     color: #ffffff !important;
+}
+
+/*
+ * Home hero About band — last in file so it wins `.location` / `.register` defaults.
+ * White inner panel; slide cards solid Prussian (#003153), no frosted glass.
+ */
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    background-image: none !important;
+    border-radius: 5px 5px 0 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .home-introslider-scrollbar,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider-indicators {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .location,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .pasttalks,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .register,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about-programme,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about-speakers,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .tbsonsocial {
+    aspect-ratio: auto !important;
+    height: var(--home-introslider-card-height, auto) !important;
+    min-height: var(--home-introslider-card-height, auto) !important;
+    max-height: var(--home-introslider-card-height, none) !important;
+    border-radius: 5px !important;
+    background-color: #003153 !important;
+    background: #003153 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .introslider-title,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-title.introslider-title {
+    color: #ffd700 !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text p {
+    color: #ffffff !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text a {
+    color: var(--tbs-pink) !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text a:hover {
+    color: #FC70D7 !important;
+}
+
+/* Force the hero About heading inset (id-based override so generic padding resets can't win). */
+body.home-view #home-about-introslider-heading {
+    padding-left: 16px !important;
+    margin-left: 0 !important;
 }
 

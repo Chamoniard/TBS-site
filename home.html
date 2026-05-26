@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <title>TBS Zermatt</title>
     <link rel="icon" href="images/emblem.png" type="image/png">
     <link rel="apple-touch-icon" href="images/emblem.png">
@@ -18,6 +21,10 @@
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #F4F3F2; margin: 0; padding: 0; }
         .header { background: #003153; backdrop-filter: none; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); position: fixed; top: 0; width: 100%; z-index: 1000; transition: all 0.3s ease; }
         .navbar { padding: 16px 0; margin-bottom: 0; }
+        @media (max-width: 768px) {
+            :root { --mobile-tab-bar-height: 45px; }
+            .navbar { padding: 0 !important; height: 45px !important; min-height: 45px !important; max-height: 45px !important; }
+        }
         .nav-container { max-width: 1500px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { display: flex; align-items: center; }
         .nav-logo .logo { height: 64.8px; width: auto; max-width: 324px; object-fit: contain; filter: brightness(0) invert(1); }
@@ -25,26 +32,72 @@
         .nav-link { text-decoration: none; color: #fff; font-weight: 400; font-size: 1rem; transition: color 0.3s ease; white-space: nowrap; }
         .nav-link:hover { color: #FFD700; }
         .nav-link.active { color: #FFD700; font-weight: 500; }
-        @media (min-width: 769px) { .nav-link { font-size: 1.2rem; } }
+        @media (min-width: 769px) {
+            .nav-link { font-size: 1.2rem; }
+            .header { top: 0 !important; bottom: auto !important; width: 100% !important; height: auto !important; }
+            .navbar { top: 0 !important; bottom: auto !important; padding: 16px 0 !important; height: auto !important; min-height: 0 !important; max-height: none !important; }
+            body.home-view { padding-bottom: 0 !important; }
+            .nav-logo { display: flex !important; }
+        }
         :root { font-size: 20px; --navbar-height: calc(16px + 58.32px + (1rem * 1.2) + 16px); }
-        @media (max-width: 768px) { :root { font-size: 20px; --navbar-height: calc(8px + (0.45rem * 2 + 1.2 * 1rem) + 8px); } }
+        @media (max-width: 768px) {
+            :root { font-size: 18px; --mobile-tab-bar-height: 45px; --navbar-height: calc(45px + env(safe-area-inset-bottom, 0px)); }
+            .header { top: auto !important; bottom: 0; left: 0 !important; right: 0 !important; width: 100% !important; }
+            body.home-view .header:not(.post-view), body.home-view .navbar { background: #003153 !important; box-shadow: none !important; }
+            body.home-view { padding-bottom: var(--navbar-height); }
+        }
         .hero { background: #f8fafc; color: #333; height: calc(var(--navbar-height) - 2px); min-height: calc(var(--navbar-height) - 2px); text-align: left; position: relative; width: 100%; margin: 0 0 8px 0; }
         @media (max-width: 768px) { .hero { margin: 0 !important; } }
-        body.home-view .home-section { padding-top: 0 !important; margin-top: 0 !important; background-color: transparent !important; }
+        body.home-view .home-section { margin-top: 0 !important; background-color: #003153 !important; }
         body.home-view .hero { display: none !important; }
         body.home-view .header:not(.post-view) { background: transparent !important; box-shadow: none !important; }
         body.home-view .navbar { background: transparent !important; box-shadow: none !important; }
         .everything { margin: 0; padding: 0; }
-        /* Reserve hero poster area before app JS swaps in full home markup. */
-        .home-section > picture { display: block; height: 1016px; overflow: hidden; position: relative; }
-        .home-section > picture .home-poster-wide { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
-        @media (max-width: 768px) { .home-section > picture { height: 1016px; } }
+        /* Reserve hero poster slot while fixed poster + scroll-over layout loads */
+        body.home-view:not(.past-talks-open) .home-section { padding-top: calc(1016px - 250px) !important; }
+        body.home-view:not(.past-talks-open) .home-section > picture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+            max-width: 1500px;
+            height: 1016px;
+            overflow: hidden;
+            z-index: 0;
+        }
+        body.past-talks-open .home-section { padding-top: 0 !important; }
+        body.past-talks-open .home-section > picture {
+            position: relative !important;
+            height: var(--navbar-height);
+            min-height: var(--navbar-height);
+            background-color: #003153;
+        }
+        body.home-view .home-section > picture .home-poster-wide {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top left;
+            display: block;
+        }
+        .nav-logo-subtitle { font-size: 1rem; color: #bff0ff; line-height: 1.2; }
+        @media (max-width: 768px) {
+            .home-section > picture .mobile-poster-logo-subtitle.nav-logo-subtitle {
+                font-size: clamp(0.7rem, 3.1vw, 1rem);
+                color: #ffffff;
+                text-align: center;
+                white-space: nowrap;
+            }
+        }
         .container { max-width: 1500px; margin: 0 auto; padding: 0 20px; }
     </style>
-    <link rel="stylesheet" href="styles.css?v=20260523-rem-mobile">
+    <link rel="preload" href="styles.css?v=20260526-speakerslider-margin" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260526-speakerslider-margin">
     <!-- LCP: preload optimized hero poster variants used by the home <picture> -->
-    <link rel="preload" as="image" href="images/poster_narrow_q72.jpg" media="(max-width: 768px)">
-    <link rel="preload" as="image" href="images/poster_wide_q72.jpg" media="(min-width: 769px)">
+    <link rel="preload" as="image" href="images/poster_narrow_q72.jpg" media="(max-width: 768px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/poster_wide_q72.jpg" media="(min-width: 769px)" fetchpriority="high">
     <!-- Mobile: tab row + Register; after main CSS for cascade -->
     <style>
         .nav-past-mobile,
@@ -52,6 +105,27 @@
             display: none !important;
         }
         @media (max-width: 768px) {
+            .header {
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: calc(45px + env(safe-area-inset-bottom, 0px)) !important;
+            }
+            .navbar {
+                top: auto !important;
+                bottom: env(safe-area-inset-bottom, 0px) !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: 45px !important;
+                min-height: 45px !important;
+                max-height: 45px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+            }
             .nav-logo {
                 display: none !important;
             }
@@ -60,9 +134,12 @@
                 align-items: center !important;
                 width: 100% !important;
                 max-width: none !important;
-                padding-left: 16px !important;
-                padding-right: 16px !important;
-                gap: 0 !important;
+                height: 45px !important;
+                min-height: 45px !important;
+                max-height: 45px !important;
+                padding: 0 16px !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
             }
             .nav-item-register-desktop,
             .nav-past-desktop {
@@ -72,6 +149,9 @@
             .nav-register-mobile-top {
                 display: flex !important;
             }
+            body.past-talks-open .nav-register-mobile-top {
+                display: none !important;
+            }
             .nav-menu {
                 display: flex !important;
                 position: static !important;
@@ -80,22 +160,40 @@
                 width: auto !important;
                 max-width: none !important;
                 flex-direction: row !important;
-                align-items: stretch !important;
+                align-items: center !important;
                 justify-content: center !important;
                 background: transparent !important;
                 box-shadow: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                height: 45px !important;
+                min-height: 45px !important;
+                max-height: 45px !important;
                 gap: 8px !important;
             }
-            .nav-menu > .nav-item:not(.nav-item-hidden):not(.nav-register-mobile-top) {
+            .nav-menu > .nav-item:not(.nav-item-hidden) {
                 flex: 0 0 auto !important;
                 min-width: 0 !important;
                 justify-content: center !important;
+                font-size: 1rem !important;
+            }
+            .nav-menu > .nav-item:not(.nav-item-hidden) .nav-link,
+            .nav-menu > .nav-item:not(.nav-item-hidden) .mobile-top-tab-link {
+                font-size: 1rem !important;
             }
             .nav-register-mobile-top {
-                flex: 0 0 auto !important;
+                position: fixed !important;
+                top: calc(8px + env(safe-area-inset-top, 0px)) !important;
+                right: 12px !important;
+                left: auto !important;
+                bottom: auto !important;
+                z-index: 10050 !important;
+                display: flex !important;
+                align-items: center !important;
                 justify-content: center !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                pointer-events: auto !important;
             }
             .nav-register-mobile-top .nav-register-pill {
                 display: inline-flex !important;
@@ -104,20 +202,23 @@
                 appearance: none !important;
                 -webkit-appearance: none !important;
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-                font-size: 1rem !important;
+                font-size: 0.75rem !important;
                 font-weight: 400 !important;
-                line-height: normal !important;
+                line-height: 1.2 !important;
                 cursor: pointer !important;
                 background-color: #FFD700 !important;
                 color: #003153 !important;
                 border: none !important;
                 border-radius: 5px !important;
-                padding: 4px 8px !important;
+                min-height: 33px !important;
+                padding: 6px 12px !important;
+                width: 4.78125rem !important;
+                min-width: 4.78125rem !important;
+                max-width: 4.78125rem !important;
                 margin: 0 !important;
                 white-space: nowrap !important;
                 box-sizing: border-box !important;
                 -webkit-tap-highlight-color: transparent !important;
-                line-height: normal !important;
                 text-align: center !important;
             }
             .nav-register-mobile-top .nav-register-pill:hover,
@@ -132,8 +233,9 @@
                 font-size: 1rem !important;
                 font-weight: 400 !important;
                 color: #ffffff !important;
-                padding: 0.45rem 0.15rem !important;
+                padding: 0 0.15rem !important;
                 margin: 0 !important;
+                line-height: 1.2 !important;
                 text-align: center !important;
                 -webkit-tap-highlight-color: transparent !important;
             }
@@ -141,16 +243,35 @@
                 color: #FFD700 !important;
                 font-weight: 500 !important;
             }
+            .home-section .feed-section-inner-wrapper h3.post-title,
+            .feed-section-inner-wrapper h3.post-title {
+                font-size: 1rem !important;
+                font-weight: 500 !important;
+                line-height: 1.25 !important;
+                max-height: calc(2 * 1rem * 1.25) !important;
+                -webkit-line-clamp: 2 !important;
+                line-clamp: 2 !important;
+            }
         }
     </style>
-    <!-- Single Google Fonts request (was three separate CSS round-trips). -->
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=League+Spartan:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
-    <!-- Font Awesome: Safari often never promotes preload+onload to a stylesheet; use a normal link so icons render reliably. -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
-    <script src="https://www.youtube.com/iframe_api" async></script>
+    <!-- Inter first (body/nav); secondary fonts load without blocking first paint -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap">
+    </noscript>
+    <!-- Footer social icons — non-blocking -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
+    </noscript>
 </head>
-<body class="home-view">
+<body class="home-view loading">
     <header class="header">
+        <div class="nav-register-mobile-top">
+            <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
+        </div>
         <nav class="navbar">
             <div class="nav-container">
                 <div class="nav-logo" role="button" tabindex="0" aria-label="Home">
@@ -177,9 +298,6 @@
                     <li class="nav-item nav-item-register-desktop">
                         <span class="nav-link nav-register-pill" data-view="register" style="cursor: pointer;">Register</span>
                     </li>
-                    <li class="nav-item nav-register-mobile-top">
-                        <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
-                    </li>
                     <li class="nav-item nav-item-hidden">
                         <a href="login.html" class="nav-link">Login</a>
                     </li>
@@ -201,27 +319,11 @@
                 <source media="(max-width: 768px)" srcset="images/poster_narrow_q72.jpg">
                 <img src="images/poster_wide_q72.jpg" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
                 <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
-                <div class="mobile-poster-logo" aria-hidden="true">
-                    <img src="images/logo.png" alt="" class="mobile-poster-logo-img" width="324" height="65" loading="eager" decoding="async" onerror="this.style.display='none';">
+                <div class="mobile-poster-logo">
+                    <img src="images/logo.png" alt="TBS Zermatt" class="mobile-poster-logo-img" width="324" height="65" loading="eager" decoding="async" onerror="this.style.display='none';">
+                    <p class="mobile-poster-logo-subtitle nav-logo-subtitle">TBS27, 9-12 February, Hotel Alex, Zermatt</p>
                 </div>
             </picture>
-            <div class="introslider-wrapper">
-                <div class="introslider">
-                </div>
-                <div class="home-introslider-scrollbar" aria-hidden="true">
-                    <div class="home-introslider-scrollbar-track">
-                        <div class="home-introslider-scrollbar-thumb"></div>
-                    </div>
-                </div>
-                <div class="introslider-indicators" aria-label="Slider position">
-                    <button type="button" class="introslider-dot" data-index="0" aria-label="Slide 1"></button>
-                    <button type="button" class="introslider-dot" data-index="1" aria-label="Slide 2"></button>
-                    <button type="button" class="introslider-dot" data-index="2" aria-label="Slide 3"></button>
-                    <button type="button" class="introslider-dot" data-index="3" aria-label="Slide 4"></button>
-                    <button type="button" class="introslider-dot" data-index="4" aria-label="Slide 5"></button>
-                    <button type="button" class="introslider-dot" data-index="5" aria-label="Slide 6"></button>
-                </div>
-            </div>
             <div class="feed-section">
                 <div class="feed-section-inner-wrapper">
                 </div>
@@ -280,18 +382,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260523-home-perf" defer></script>
-    <script>
-        // Show loading state immediately
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add loading class to body
-            document.body.classList.add('loading');
-            
-            // Hide loading state after page is fully loaded
-            window.addEventListener('load', function() {
-                document.body.classList.remove('loading');
-            });
-        });
-    </script>
+    <script src="script.js?v=20260526-load-perf2" defer></script>
 </body>
 </html>

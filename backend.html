@@ -6,7 +6,7 @@
     <title>Backend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=20260401-remove-live-nav">
+    <link rel="stylesheet" href="styles.css?v=20260526-programme-info-preview">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* After styles.css so this wins: 1rem = 16px on backend (overrides :root 18px site-wide). */
@@ -6044,9 +6044,9 @@
             min-height: 0;
             max-height: 100%;
             box-sizing: border-box;
-            background-color: #003153;
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background-color: #e2e8f0;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
             border-radius: 0 0 6px 6px;
             border-top-left-radius: 0;
             border-top-right-radius: 0;
@@ -6057,11 +6057,11 @@
         }
 
         .texteditor-render-surface .texteditor-render-loading {
-            color: rgba(255, 255, 255, 0.75);
+            color: #64748b;
         }
 
         .texteditor-render-surface .texteditor-render-error {
-            color: #fecaca;
+            color: #b91c1c;
         }
 
         .renderbox--idle .texteditor-render-surface {
@@ -6070,11 +6070,11 @@
             justify-content: center;
         }
 
-        /* Email template rows: preview on transparent surface (email HTML on light page). */
+        /* Email template rows: same gray surface; preview HTML stays dark-on-light. */
         .renderbox.renderbox--preset-email .texteditor-render-surface {
-            background-color: transparent;
+            background-color: #e2e8f0;
             color: #0f172a;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
         }
 
         .renderbox.renderbox--preset-email .texteditor-render-html {
@@ -6113,15 +6113,15 @@
             padding-right: 0;
             overflow: auto;
             -webkit-overflow-scrolling: touch;
-            color: #ffffff;
+            color: #0f172a;
         }
 
         .texteditor-render-surface .texteditor-render-html a {
-            color: #a8d8ff;
+            color: #0369a1;
         }
 
         .texteditor-render-surface .texteditor-render-html a:hover {
-            color: #ffffff;
+            color: #0c4a6e;
         }
 
         .texteditor-render-html .programme-day-content p,
@@ -6129,18 +6129,10 @@
             color: #ffffff !important;
         }
 
-        /* Programme intro preview: same padding as day cards, no background image */
-        .texteditor-render-html .programme-info {
-            background-color: transparent;
-            background-image: none !important;
-            padding: 1.25rem 0;
-            padding-top: 16px;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #6b7280;
-            border-radius: 0 !important;
-            box-sizing: border-box;
-            box-shadow: none;
+        /* Programme intro: typography/shell from shared `.programme-info` in styles.css */
+        .texteditor-render-html .programme-info .programme-day-content p,
+        .texteditor-render-html .programme-info .programmestyle p {
+            color: inherit !important;
         }
 
         .renderbox--idle .texteditor-render-html:empty {
@@ -6983,6 +6975,23 @@
                     <div class="texteditor-programme-toolbar">
                         <p class="texteditor-programme-heading">Programme:</p>
                         <div class="texteditor-selectors" id="texteditor-selectors" role="group" aria-label="Programme days"></div>
+                    </div>
+                    <div class="texteditor-programme-toolbar">
+                        <p class="texteditor-programme-heading">Miscellaneous:</p>
+                        <div
+                            class="texteditor-selectors"
+                            id="texteditor-miscellaneous-selectors"
+                            role="group"
+                            aria-label="Miscellaneous snippets"
+                        >
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                data-snippet-key="tbsBackend:texteditor:preset:scrapbook"
+                                id="texteditor-preset-scrapbook-btn"
+                                aria-pressed="false"
+                            >Scrapbook</button>
+                        </div>
                     </div>
                 </div>
                 <div class="html-editor">
@@ -14395,6 +14404,7 @@
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
+        var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
         var FIRESTORE_TBS_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
         var FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD = 'Locationinfo';
         var FIRESTORE_TBS_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
@@ -14405,6 +14415,7 @@
         var FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD = 'Guest sent to reserves';
         var FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD = 'Speakerinvitation';
         var FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD = 'Requestlodging';
+        var FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD = 'Scrapbook';
 
         /**
          * @returns {{
@@ -14514,6 +14525,16 @@
                     loadOk: 'Request lodging loaded from Firestore (tbs/Snippets.Requestlodging) into the editor.',
                     saveOk: 'Request lodging saved to Firestore (tbs/Snippets.Requestlodging).',
                     saveErr: 'Failed to save Request lodging to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD,
+                    metaLabel: 'Miscellaneous — Scrapbook',
+                    loadOk: 'Scrapbook loaded from Firestore (tbs/Snippets.Scrapbook) into the editor.',
+                    saveOk: 'Scrapbook saved to Firestore (tbs/Snippets.Scrapbook).',
+                    saveErr: 'Failed to save Scrapbook to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -14896,7 +14917,9 @@
             var idle = !key;
             wrap.classList.toggle('renderbox--idle', idle);
             var presetEmail = Boolean(key && key.indexOf(':preset:') !== -1);
+            var presetProgrammeInfo = key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY;
             wrap.classList.toggle('renderbox--preset-email', presetEmail && !idle);
+            wrap.classList.toggle('renderbox--programme-info', presetProgrammeInfo && !idle);
             if (idle) {
                 flushTexteditorStorageNow();
                 ta.value = '';
@@ -14923,6 +14946,14 @@
             );
         }
 
+        function wrapProgrammeInfoPreviewForRender(slideHtml) {
+            return (
+                '<div class="programme-slider programme-slider--programme-info-preview">' +
+                slideHtml +
+                '</div>'
+            );
+        }
+
         function texteditorPreviewHtmlForProgrammeInfo(html) {
             var t = String(html != null ? html : '').trim();
             if (!t) return '';
@@ -14946,7 +14977,7 @@
             var html = raw != null ? raw : '';
             var key = storageKey || '';
             if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
-                return texteditorPreviewHtmlForProgrammeInfo(html);
+                return wrapProgrammeInfoPreviewForRender(texteditorPreviewHtmlForProgrammeInfo(html));
             }
             if (!parseEventProgrammeKey(key)) {
                 return html;
@@ -20377,6 +20408,10 @@
             var texteditorSpeakerEmailTemplatesSelectorsEl = document.getElementById('texteditor-speaker-email-templates-selectors');
             if (texteditorSpeakerEmailTemplatesSelectorsEl) {
                 texteditorSpeakerEmailTemplatesSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
+            }
+            var texteditorMiscellaneousSelectorsEl = document.getElementById('texteditor-miscellaneous-selectors');
+            if (texteditorMiscellaneousSelectorsEl) {
+                texteditorMiscellaneousSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
             }
 
             showStatus('loading', 'Loading backend settings from Firestore…');

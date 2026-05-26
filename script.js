@@ -129,12 +129,6 @@ function getPastTalksPostsPerBatch() {
     return Math.max(1, getPastTalksBlogGridColumnCount() * PAST_TALKS_ROWS_PER_BATCH);
 }
 
-/** Inline SVG chevrons for feed / Past talks buttons (avoids Font Awesome webfont gaps in Safari). */
-const UI_CHEVRON_DOWN_SVG =
-    '<svg class="ui-chevron ui-chevron--down" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>';
-const UI_CHEVRON_UP_SVG =
-    '<svg class="ui-chevron ui-chevron--up" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>';
-
 function resetPastTalksPagination() {
     postsToShow = getPastTalksPostsPerBatch();
 }
@@ -251,7 +245,7 @@ function extractYouTubeId(url) {
     if (!url) return null;
     
     const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/,
         /youtube\.com\/watch\?.*v=([^&\n?#]+)/
     ];
     
@@ -260,6 +254,41 @@ function extractYouTubeId(url) {
         if (match) return match[1];
     }
     return null;
+}
+
+/** Build `/embed/` URL from common YouTube watch/shorts URLs. */
+function youTubeWatchUrlToEmbedUrl(watchUrl) {
+    if (!watchUrl) return '';
+    const s = String(watchUrl).trim();
+    if (s.includes('youtube.com/shorts/')) {
+        const videoId = s.split('shorts/')[1].split('?')[0];
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+    }
+    const id = extractYouTubeId(s);
+    return id ? `https://www.youtube.com/embed/${id}` : '';
+}
+
+/** Fewer logos/related-video chrome; `enablejsapi` when the card end listener needs it. */
+function youTubeEmbedUrlWithParams(embedUrl, options) {
+    if (!embedUrl) return embedUrl;
+    const opts = options || {};
+    let url;
+    try {
+        url = new URL(embedUrl, window.location.href);
+    } catch (e) {
+        return embedUrl;
+    }
+    const p = url.searchParams;
+    p.set('modestbranding', '1');
+    p.set('rel', '0');
+    p.set('playsinline', '1');
+    p.set('iv_load_policy', '3');
+    p.set('cc_load_policy', '0');
+    if (opts.enableJsApi !== false) {
+        p.set('enablejsapi', '1');
+        p.set('origin', window.location.origin);
+    }
+    return url.toString();
 }
 
 
@@ -476,7 +505,7 @@ function createPostElement(post) {
         return [s];
     })();
     const topicSpansHtml = topicBadgeTopics
-        .map((label) => `<span class="news-card-category">${label}</span>`)
+        .map((label) => `<span class="post-category">${label}</span>`)
         .join('');
     const metaBadgesHtml =
         editTypeBadgeHtml || topicSpansHtml
@@ -492,7 +521,7 @@ function createPostElement(post) {
                 <p class="blog-card-date">${formatDate(post.date)}</p>
                 ${metaBadgesHtml}
             </div>
-            <h3 class="blog-card-title">${post.title}</h3>
+            <h3 class="post-title">${post.title}</h3>
             ${post.name ? `<p class="blog-card-name">${post.name}</p>` : ''}
             <p class="blog-card-excerpt">${post.excerpt}</p>
         </div>
@@ -601,7 +630,7 @@ async function goBackToFeed() {
 }
 
 // Show post content on the same page
-function showPostOnSamePage(post, fromFeed = false) {
+function showPostOnSamePage(post) {
     document.body.classList.add('home-view');
     setPastTalksOpenState(true);
     setActiveNavView('past-talks');
@@ -621,7 +650,7 @@ function showPostOnSamePage(post, fromFeed = false) {
             youtubeEmbed = `
                 <div class="post-video">
                     <div class="video-container">
-                        <iframe src="https://www.youtube.com/embed/${videoId}" 
+                        <iframe src="${youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, { enableJsApi: false })}" 
                                 frameborder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                 allowfullscreen>
@@ -634,10 +663,6 @@ function showPostOnSamePage(post, fromFeed = false) {
     
     // Use content as-is (it can contain HTML)
     const formattedContent = post.content || '';
-    
-    // Create back link based on source
-    const backLinkText = fromFeed ? 'Back to home' : 'Back to talks';
-    const backLinkFunction = fromFeed ? 'goBackToFeed()' : 'showBlogFeed()';
 
     const viewerPostTypeKey = normalizePostTypeValue(post.type);
     const viewerEditBadgeHtml =
@@ -646,11 +671,6 @@ function showPostOnSamePage(post, fromFeed = false) {
     // Create viewer section HTML (inserted into existing .everything container)
     const viewerInnerHTML = `
             <div class="viewer-section-inner-wrapper">
-            <div class="top-links-container">
-                <h3><a href="javascript:void(0)" onclick="${backLinkFunction}" class="back-to-blog">
-                    <i class="fas fa-arrow-left"></i>${backLinkText}
-                </a></h3>
-            </div>
             <div class="video-layout">
                 <div class="viewing">
                     <div class="viewing-main-col">
@@ -676,11 +696,6 @@ function showPostOnSamePage(post, fromFeed = false) {
                         <!-- Cards will be populated here -->
                     </div>
                 </div>
-            </div>
-            <div class="bottom-links-container">
-                <h3><a href="javascript:void(0)" onclick="${backLinkFunction}" class="back-to-blog">
-                    <i class="fas fa-arrow-left"></i>${backLinkText}
-                </a></h3>
             </div>
             </div>
     `;
@@ -775,6 +790,7 @@ async function showBlogFeed() {
         setActiveNavView('past-talks');
         videoSection.innerHTML = `
                 <div class="past-talks-wrapper">
+                <h2 class="section-titles past-talks-section-title">Past talks</h2>
                 <div class="section-header">
                     <div class="past-talks-event-row">
                         <div class="filter-tabs" id="eventFilters">
@@ -792,7 +808,7 @@ async function showBlogFeed() {
                     <!-- Blog posts will be loaded here -->
                 </div>
                 <div class="load-more-container">
-                <button type="button" class="feed-load-more-btn" id="loadMoreBtn" aria-label="Load more">${UI_CHEVRON_DOWN_SVG}</button>
+                <button type="button" class="feed-load-more-btn" id="loadMoreBtn">More</button>
                 </div>
                 </div>
         `;
@@ -1266,7 +1282,7 @@ function wireOneIntrostyleSlider(wrapper) {
  * Desktop-only custom bar — transparent track, magenta thumb — synced to scroll position.
  */
 function wireHomeIntrosliderScrollbar() {
-    const wrapper = document.querySelector('.home-section .introslider-wrapper');
+    const wrapper = document.querySelector('.home-section .introslider-inner-wrapper');
     if (!wrapper || wrapper.dataset.homeScrollbarWired === '1') return;
     const scrollEl = wrapper.querySelector(':scope > .introslider');
     const bar = wrapper.querySelector(':scope > .home-introslider-scrollbar');
@@ -1413,7 +1429,7 @@ function wireSpeakersSliderScrollbar() {
 function wireSliderIndicators() {
     const main = document.querySelector('.everything');
     if (!main) return;
-    main.querySelectorAll('.introslider-wrapper, .programme-section').forEach((wrapper) => {
+    main.querySelectorAll('.introslider-inner-wrapper, .introslider-wrapper, .programme-section').forEach((wrapper) => {
         wireOneIntrostyleSlider(wrapper);
     });
     wireHomeIntrosliderScrollbar();
@@ -1459,16 +1475,6 @@ const ABOUT_EVENT_LOCATION_INNER_HTML = `
 ${ABOUT_EVENT_INNER_HTML}
 ${ABOUT_LOCATION_INNER_HTML}
 `;
-
-/** Home introslider: About panel before featured-video */
-const FEATURED_ABOUT_SLIDER_HTML = `
-                    <div class="about introslider-clickable" role="button" tabindex="0" aria-label="Scroll to Welcome to TBS27">
-                        <div class="about-text">
-${ABOUT_EVENT_INNER_HTML}
-                        </div>
-                        <h3 class="featured-bottom-title introslider-title">About</h3>
-            </div>
-        `;
 
 /** Home introslider: Location panel → scroll to programme section */
 const FEATURED_LOCATION_SLIDER_HTML = `
@@ -1536,7 +1542,7 @@ ${ABOUT_SOCIAL_INNER_HTML}
                     </div>
 `;
 
-/** Home: sponsors band (direct child of `.home-section`, directly below Event band, above Latest feed). */
+/** Home: sponsors band (direct child of `.home-section`, below Event, above About introslider). */
 const HOME_SPONSORS_SECTION_HTML = `
                 <div class="sponsors-section" role="region" aria-labelledby="home-sponsors-heading">
                     <div class="sponsors-section-inner-wrapper">
@@ -1577,19 +1583,22 @@ function sponsorLogosRowGapPx(rowEl) {
     return Number.isFinite(x) ? x : 0;
 }
 
-/** Mobile wrap layout: pairs of slots, optional full-width `--solo` row (e.g. Heine). */
+/** Mobile wrap layout: pairs of slots, optional full-width `--solo` row (e.g. Heine) last. */
 function sponsorLogoMobileRowGroups(row) {
     const slots = Array.from(row.querySelectorAll(':scope > .sponsor-logo-slot'));
+    const regular = slots.filter((s) => !s.classList.contains('sponsor-logo-slot--solo'));
+    const solo = slots.filter((s) => s.classList.contains('sponsor-logo-slot--solo'));
+    const orderedSlots = regular.concat(solo);
     const groups = [];
-    for (let i = 0; i < slots.length; i++) {
-        const slot = slots[i];
+    for (let i = 0; i < orderedSlots.length; i++) {
+        const slot = orderedSlots[i];
         const img = slot.querySelector('img.sponsors-logo-image');
         if (!img) continue;
         if (slot.classList.contains('sponsor-logo-slot--solo')) {
             groups.push([img]);
             continue;
         }
-        const nextSlot = slots[i + 1];
+        const nextSlot = orderedSlots[i + 1];
         const nextImg =
             nextSlot && !nextSlot.classList.contains('sponsor-logo-slot--solo')
                 ? nextSlot.querySelector('img.sponsors-logo-image')
@@ -1781,6 +1790,38 @@ const HOME_LOCATION_TRAILER_EMBED_SRC_HTML =
     HOME_LOCATION_TRAILER_VIDEO_ID +
     '?rel=0&amp;modestbranding=1&amp;playsinline=1&amp;autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=' +
     HOME_LOCATION_TRAILER_VIDEO_ID;
+
+/** Home hero introslider row (below Sponsors band, above Latest feed). */
+const HOME_HERO_INTROSLIDER_WRAPPER_HTML = `
+                <div class="introslider-outer-wrapper home-hero-introslider-outer" role="region" aria-labelledby="home-about-introslider-heading">
+                    <div class="introslider-inner-wrapper home-hero-introslider">
+                        <h2 class="section-titles introslider-section-title" id="home-about-introslider-heading">About</h2>
+                        <div class="introslider">
+                            ${FEATURED_LOCATION_SLIDER_HTML}
+                            ${FEATURED_ABOUT_SPEAKERS_SLIDER_HTML}
+                            ${FEATURED_ABOUT_PROGRAMME_SLIDER_HTML}
+                            ${FEATURED_PAST_TALKS_SLIDER_HTML}
+                            ${FEATURED_REGISTER_SLIDER_HTML}
+                        </div>
+                        <div class="home-introslider-scrollbar" aria-hidden="true">
+                            <div class="home-introslider-scrollbar-track">
+                                <div class="home-introslider-scrollbar-thumb"></div>
+                            </div>
+                        </div>
+                        <div class="introslider-indicators" aria-label="Slider position">
+                            <button type="button" class="introslider-dot" data-index="0" aria-label="Slide 1"></button>
+                            <button type="button" class="introslider-dot" data-index="1" aria-label="Slide 2"></button>
+                            <button type="button" class="introslider-dot" data-index="2" aria-label="Slide 3"></button>
+                            <button type="button" class="introslider-dot" data-index="3" aria-label="Slide 4"></button>
+                            <button type="button" class="introslider-dot" data-index="4" aria-label="Slide 5"></button>
+                        </div>
+                    </div>
+                </div>
+`;
+
+/** 250px Prussian gradient bridge between hero poster and Event band. */
+const HOME_POSTER_EVENT_SPACER_HTML =
+    '<div class="poster-event-spacer" aria-hidden="true"></div>\n';
 
 /** Home: Event band — inner Prussian panel: `.eventintroduction` left, `.trailer-embed` right (stacks below on narrow widths). */
 const HOME_LOCATION_SECTION_HTML =
@@ -2540,9 +2581,76 @@ async function waitForHomePosterPictureReady(pictureEl) {
     if (!pictureEl) return;
     try {
         const main = pictureEl.querySelector('img.home-poster-wide') || pictureEl.querySelector('img');
-        await withTimeout(waitForHomeImageDecode(main), 12000, 'Home poster');
+        await withTimeout(waitForHomeImageDecode(main), 3000, 'Home poster');
     } catch (e) {
         /* huge hero on slow links — still show rest of home */
+    }
+}
+
+/** Feed, speakers, event copy, etc. — after poster paint / scroll unlock. */
+function runHomePageBackgroundHydration(homeSection, ctx) {
+    const speakersWrap = ctx.speakersWrap;
+    const regWrap = ctx.regWrap;
+    const sponsorsWrap = ctx.sponsorsWrap;
+    const promises = ctx.promises;
+    if (!homeSection || !promises) return;
+
+    void Promise.all(promises)
+        .then(function (results) {
+            const registrationManifestoHtml = results && results.length >= 3 ? results[2] : '';
+            finalizeHomeSpeakersSection(speakersWrap);
+            if (regWrap) {
+                const manifestoEl = regWrap.querySelector('p.registration-manifesto');
+                if (manifestoEl && typeof registrationManifestoHtml === 'string') {
+                    manifestoEl.innerHTML = registrationManifestoHtml;
+                }
+            }
+            requestAnimationFrame(function () {
+                wireHomeSponsorLogosRowLayout(sponsorsWrap);
+                syncHomeNavSectionFromScroll();
+            });
+        })
+        .catch(function (err) {
+            console.error('runHomePageBackgroundHydration', err);
+        })
+        .finally(function () {
+            revealStuckHomeStageBands(homeSection);
+            finalizeHomeSpeakersSection(speakersWrap);
+            requestAnimationFrame(function () {
+                syncHomeNavSectionFromScroll();
+            });
+        });
+}
+
+/**
+ * Wait for fonts/images on hero introslider before reveal (desktop), then lock equal card heights.
+ */
+async function prepareHomeIntrosliderBeforeReveal(introWrap) {
+    if (!introWrap) return;
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        introWrap.classList.remove('home-stage-hidden');
+        return;
+    }
+
+    const track = introWrap.querySelector(':scope > .introslider');
+    if (!track) {
+        introWrap.classList.remove('home-stage-hidden');
+        return;
+    }
+
+    introWrap.classList.remove('home-stage-hidden');
+    introWrap.classList.add('home-introslider-prelock');
+    void introWrap.offsetHeight;
+
+    try {
+        if (document.fonts && document.fonts.ready) {
+            await withTimeout(document.fonts.ready, 1500, 'Introslider fonts');
+        }
+        await waitForImagesInElementTree(track, 3000);
+        await waitForDoubleAnimationFrame();
+        syncHomeIntrosliderCardHeights();
+    } finally {
+        introWrap.classList.remove('home-introslider-prelock');
     }
 }
 
@@ -2591,24 +2699,35 @@ function revealStuckHomeStageBands(homeSection) {
     });
 }
 
-/** Show home bands below the hero intro (do not wait on feed/Firestore). */
-function revealHomeStageBandsBelowIntro(homeSection) {
+/** Show home bands (optionally defer hero introslider until layout pass completes). */
+function revealHomeStageBands(homeSection, options) {
     if (!homeSection) return;
-    [
-        homeSection.querySelector(':scope > .event-section'),
-        homeSection.querySelector(':scope > .sponsors-section'),
-        homeSection.querySelector(':scope > .feed-section'),
-        homeSection.querySelector(':scope > .speaker-section'),
-        homeSection.querySelector(':scope > .programme-section'),
-        homeSection.querySelector(':scope > .registration-section'),
-        homeSection.querySelector(':scope > .registration-section + .home-section-divider-band')
-    ].forEach(function (el) {
+    const skipIntro = options && options.skipIntro;
+    const bandSelectors = [
+        ':scope > .poster-event-spacer',
+        ':scope > .event-section',
+        ':scope > .sponsors-section',
+        skipIntro ? null : ':scope > .introslider-outer-wrapper',
+        ':scope > .feed-section',
+        ':scope > .speaker-section',
+        ':scope > .programme-section',
+        ':scope > .registration-section',
+        ':scope > .registration-section + .home-section-divider-band'
+    ];
+    bandSelectors.forEach(function (selector) {
+        if (!selector) return;
+        const el = homeSection.querySelector(selector);
         if (el) el.classList.remove('home-stage-hidden');
     });
     requestAnimationFrame(function () {
         kickLocationTrailerEmbed(homeSection.querySelector('.event-section'));
         layoutHomeSponsorLogosRowApply(homeSection.querySelector('.sponsors-section'));
     });
+}
+
+/** Show all home bands including introslider. */
+function revealHomeStageBandsBelowIntro(homeSection) {
+    revealHomeStageBands(homeSection, { skipIntro: false });
 }
 
 // Show the feed content (different from blog posts)
@@ -2630,35 +2749,14 @@ async function showFeedContent() {
                     <source media="(max-width: 768px)" srcset="images/poster_narrow_q72.jpg">
                     <img src="images/poster_wide_q72.jpg" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
                     <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
-                    <div class="mobile-poster-logo" aria-hidden="true">
-                        <img src="images/logo.png" alt="" class="mobile-poster-logo-img" loading="eager" decoding="async" onerror="this.style.display='none';">
+                    <div class="mobile-poster-logo">
+                        <img src="images/logo.png" alt="TBS Zermatt" class="mobile-poster-logo-img" loading="eager" decoding="async" onerror="this.style.display='none';">
+                        <p class="mobile-poster-logo-subtitle nav-logo-subtitle">TBS27, 9-12 February, Hotel Alex, Zermatt</p>
                     </div>
                 </picture>
-                <div class="introslider-wrapper">
-                    <div class="introslider">
-                        ${FEATURED_ABOUT_SLIDER_HTML}
-                        ${FEATURED_LOCATION_SLIDER_HTML}
-                        ${FEATURED_ABOUT_SPEAKERS_SLIDER_HTML}
-                        ${FEATURED_ABOUT_PROGRAMME_SLIDER_HTML}
-                        ${FEATURED_PAST_TALKS_SLIDER_HTML}
-                        ${FEATURED_REGISTER_SLIDER_HTML}
-                </div>
-                    <div class="home-introslider-scrollbar" aria-hidden="true">
-                        <div class="home-introslider-scrollbar-track">
-                            <div class="home-introslider-scrollbar-thumb"></div>
-                        </div>
-                    </div>
-                    <div class="introslider-indicators" aria-label="Slider position">
-                        <button type="button" class="introslider-dot" data-index="0" aria-label="Slide 1"></button>
-                        <button type="button" class="introslider-dot" data-index="1" aria-label="Slide 2"></button>
-                        <button type="button" class="introslider-dot" data-index="2" aria-label="Slide 3"></button>
-                        <button type="button" class="introslider-dot" data-index="3" aria-label="Slide 4"></button>
-                        <button type="button" class="introslider-dot" data-index="4" aria-label="Slide 5"></button>
-                        <button type="button" class="introslider-dot" data-index="5" aria-label="Slide 6"></button>
-                    </div>
-                </div>
-${HOME_LOCATION_SECTION_HTML}
+${HOME_POSTER_EVENT_SPACER_HTML}${HOME_LOCATION_SECTION_HTML}
 ${HOME_SPONSORS_SECTION_HTML}
+${HOME_HERO_INTROSLIDER_WRAPPER_HTML}
                 <div class="feed-section">
                     <div class="feed-section-inner-wrapper">
                     </div>
@@ -2674,14 +2772,16 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
         const homeSection = main.querySelector('.home-section');
         setupRegistrationFormValidation(homeSection);
         const pictureEl = homeSection && homeSection.querySelector(':scope > picture');
-        const introWrap = homeSection && homeSection.querySelector(':scope > .introslider-wrapper');
+        const introOuter = homeSection && homeSection.querySelector(':scope > .introslider-outer-wrapper');
+        const introWrap = introOuter && introOuter.querySelector(':scope > .introslider-inner-wrapper');
         const feedWrap = homeSection && homeSection.querySelector(':scope > .feed-section');
         const eventSectionWrap = homeSection && homeSection.querySelector(':scope > .event-section');
         const sponsorsWrap = homeSection && homeSection.querySelector(':scope > .sponsors-section');
         const speakersWrap = homeSection && homeSection.querySelector(':scope > .speaker-section');
         const regWrap = homeSection && homeSection.querySelector(':scope > .registration-section');
         const regDivider = homeSection && homeSection.querySelector(':scope > .registration-section + .home-section-divider-band');
-        [introWrap, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
+        const posterEventSpacer = homeSection && homeSection.querySelector(':scope > .poster-event-spacer');
+        [posterEventSpacer, introOuter, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
 
@@ -2743,21 +2843,6 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
                 }
             });
         }
-        const aboutEventSlideEl = main.querySelector('.home-section .introslider > .about');
-        if (aboutEventSlideEl) {
-            aboutEventSlideEl.addEventListener('click', function(e) {
-                if (e.target.closest('a')) return;
-                e.preventDefault();
-                e.stopPropagation();
-                scrollToHomeEventWelcomeSection();
-            });
-            aboutEventSlideEl.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    scrollToHomeEventWelcomeSection();
-                }
-            });
-        }
         const locationSlideEl = main.querySelector('.home-section .introslider > .location');
         if (locationSlideEl) {
             locationSlideEl.addEventListener('click', function(e) {
@@ -2785,15 +2870,26 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
         }
 
         try {
-            await waitForHomePosterPictureReady(pictureEl);
-            if (introWrap) introWrap.classList.remove('home-stage-hidden');
-            revealHomeStageBandsBelowIntro(homeSection);
+            revealHomeStageBands(homeSection, { skipIntro: true });
             mountHomeFeedSkeleton();
             if (speakersWrap) {
                 mountHomeSpeakersSkeleton(speakersWrap);
                 finalizeHomeSpeakersSection(speakersWrap);
             }
             setupHomeHeroIntrosliderPosterGap(8);
+
+            if (introWrap) {
+                void prepareHomeIntrosliderBeforeReveal(introWrap).then(function () {
+                    if (introOuter) introOuter.classList.remove('home-stage-hidden');
+                });
+            } else if (introOuter) {
+                introOuter.classList.remove('home-stage-hidden');
+            }
+
+            void prefetchHomeProgrammeSliderData().then(function () {
+                void hydrateHomeProgrammeSlider(homeSection);
+            });
+
             if (typeof requestIdleCallback === 'function') {
                 requestIdleCallback(function () {
                     initPosterSnow();
@@ -2804,40 +2900,35 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
                 });
             }
 
-            const results = await Promise.all([
-                newsFeedPromise,
-                Promise.race([
-                    speakersPromise,
-                    new Promise(function (resolve) {
-                        setTimeout(resolve, 15000);
-                    })
-                ]),
-                registrationManifestoPromise,
-                eventInfoPromise
+            /* Unlock scroll as soon as poster is ready (do not wait for feed/speakers/Firestore). */
+            await Promise.race([
+                waitForHomePosterPictureReady(pictureEl),
+                new Promise(function (resolve) {
+                    setTimeout(resolve, 2000);
+                })
             ]);
-            const registrationManifestoHtml = results && results.length >= 3 ? results[2] : '';
+            setHomePageLoading(false);
 
-            const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
-            if (programmeWrap) programmeWrap.classList.remove('home-stage-hidden');
-            finalizeHomeSpeakersSection(speakersWrap);
-
-            if (regWrap) {
-                const manifestoEl = regWrap.querySelector('p.registration-manifesto');
-                if (manifestoEl && typeof registrationManifestoHtml === 'string') {
-                    manifestoEl.innerHTML = registrationManifestoHtml;
-                }
-            }
-
-            requestAnimationFrame(function () {
-                wireHomeSponsorLogosRowLayout(sponsorsWrap);
-                syncHomeNavSectionFromScroll();
+            runHomePageBackgroundHydration(homeSection, {
+                speakersWrap: speakersWrap,
+                regWrap: regWrap,
+                sponsorsWrap: sponsorsWrap,
+                promises: [
+                    newsFeedPromise,
+                    Promise.race([
+                        speakersPromise,
+                        new Promise(function (resolve) {
+                            setTimeout(resolve, 10000);
+                        })
+                    ]),
+                    registrationManifestoPromise,
+                    eventInfoPromise
+                ]
             });
-        } finally {
+        } catch (homePaintErr) {
+            console.error('showFeedContent home paint', homePaintErr);
             revealStuckHomeStageBands(homeSection);
-            finalizeHomeSpeakersSection(speakersWrap);
-            requestAnimationFrame(() => {
-                syncHomeNavSectionFromScroll();
-            });
+            setHomePageLoading(false);
         }
     }
 }
@@ -3180,10 +3271,12 @@ async function appendNewsCardsToGrid(newsGrid, recordsSlice) {
 }
 
 function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
-    feedContent.querySelectorAll('.feed-latest-chevron-row').forEach(function (el) {
+    const feedSection = feedContent.closest('.feed-section');
+    const loadMoreHost = feedSection || feedContent;
+    loadMoreHost.querySelectorAll('.feed-latest-chevron-row').forEach(function (el) {
         el.remove();
     });
-    feedContent.querySelectorAll('.feed-load-more-btn, .feed-load-less-btn').forEach((el) => el.remove());
+    loadMoreHost.querySelectorAll('.feed-load-more-btn, .feed-load-less-btn').forEach((el) => el.remove());
 
     let shownCount = Math.min(HOME_FEED_INITIAL_COUNT, validRecords.length);
     if (shownCount >= validRecords.length) return;
@@ -3191,23 +3284,14 @@ function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
     const row = document.createElement('div');
     row.className = 'feed-latest-chevron-row';
 
-    function syncChevronControls() {
+    function placeLoadMoreRow() {
         row.remove();
-        const cards = newsGrid.querySelectorAll(':scope > .news-card');
-        cards.forEach(function (card, index) {
-            const ctl = card.querySelector('.news-card-controls');
-            if (!ctl) return;
-            ctl.innerHTML = '';
-            const isLast = index === cards.length - 1;
-            if (!isLast) {
-                ctl.classList.add('news-card-controls--collapsed');
-                ctl.setAttribute('aria-hidden', 'true');
-                return;
-            }
-            ctl.classList.remove('news-card-controls--collapsed');
-            ctl.setAttribute('aria-hidden', 'false');
-            ctl.appendChild(row);
-        });
+        if (!row.childElementCount) return;
+        if (feedSection) {
+            feedSection.appendChild(row);
+            return;
+        }
+        feedContent.appendChild(row);
     }
 
     function syncChevronButtons() {
@@ -3216,8 +3300,7 @@ function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
             const lessBtn = document.createElement('button');
             lessBtn.type = 'button';
             lessBtn.className = 'feed-load-less-btn';
-            lessBtn.setAttribute('aria-label', 'Show only the first ' + HOME_FEED_INITIAL_COUNT + ' items');
-            lessBtn.innerHTML = UI_CHEVRON_UP_SVG;
+            lessBtn.textContent = 'Less';
             lessBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -3237,8 +3320,7 @@ function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
             const moreBtn = document.createElement('button');
             moreBtn.type = 'button';
             moreBtn.className = 'feed-load-more-btn';
-            moreBtn.setAttribute('aria-label', 'Load more');
-            moreBtn.innerHTML = UI_CHEVRON_DOWN_SVG;
+            moreBtn.textContent = 'More';
             moreBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -3254,7 +3336,7 @@ function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
             });
             row.appendChild(moreBtn);
         }
-        syncChevronControls();
+        placeLoadMoreRow();
     }
 
     syncChevronButtons();
@@ -4584,6 +4666,31 @@ function homeSpeakerStripeClass(index) {
     return index % 2 === 0 ? 'speaker-card--stripe-a' : 'speaker-card--stripe-b';
 }
 
+/** Remove a leading "Speakers" heading from Firestore intro HTML (canonical title is injected below). */
+function stripDuplicateSpeakersHeadingFromInfoHtml(html) {
+    const t = String(html || '').trim();
+    if (!t) return t;
+    try {
+        const doc = new DOMParser().parseFromString('<div id="speakerinfo-root">' + t + '</div>', 'text/html');
+        const root = doc.getElementById('speakerinfo-root');
+        if (!root) return t;
+        const first = root.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > .about-title');
+        if (first && /^speakers$/i.test(String(first.textContent || '').trim())) {
+            first.remove();
+        }
+        return root.innerHTML.trim();
+    } catch (e) {
+        return t;
+    }
+}
+
+function buildHomeSpeakerInfoCardInnerHtml(html) {
+    const body = stripDuplicateSpeakersHeadingFromInfoHtml(html);
+    const titleHtml =
+        '<h2 class="section-titles speakers-section-title" id="home-speakers-heading">Speakers</h2>';
+    return body ? titleHtml + body : titleHtml;
+}
+
 function appendHomeSpeakerinfoCard(track, html) {
     const article = document.createElement('article');
     article.className = 'speaker-card speaker-card--speakerinfo speaker-card--stripe-a';
@@ -4597,7 +4704,7 @@ function appendHomeSpeakerinfoCard(track, html) {
     bioEl.className = 'speaker-card-bio about-text';
     const bioMain = document.createElement('div');
     bioMain.className = 'speaker-card-bio-main';
-    bioMain.innerHTML = html != null ? String(html) : '';
+    bioMain.innerHTML = buildHomeSpeakerInfoCardInnerHtml(html);
     bioEl.appendChild(bioMain);
 
     contentWrap.appendChild(bioEl);
@@ -4958,17 +5065,6 @@ function buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme) 
     const programmeSliderTrackInner = programmeDaySlides.join('');
     const programmeSliderClassName =
         'programme-slider' + (displayProgramme ? '' : ' home-carousel--minimal');
-    const programmeDotsHTML = programmeDaySlides
-        .map(function (_, i) {
-            return (
-                '<button type="button" class="introslider-dot" data-index="' +
-                i +
-                '" aria-label="Programme slide ' +
-                (i + 1) +
-                '"></button>'
-            );
-        })
-        .join('');
     programmeSliderSection.innerHTML =
         '<div class="programme-section home-stage-hidden" id="home-programme-title" role="region" aria-label="Programme">' +
         '<div class="programmeslider-innerwrapper">' +
@@ -4981,9 +5077,6 @@ function buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme) 
         '<div class="home-introslider-scrollbar-track">' +
         '<div class="home-introslider-scrollbar-thumb"></div>' +
         '</div>' +
-        '</div>' +
-        '<div class="introslider-indicators" aria-label="Programme slider position">' +
-        programmeDotsHTML +
         '</div>' +
         '</div>' +
         '</div>';
@@ -5001,7 +5094,7 @@ function insertHomeProgrammeSection(programmeSection, homeSection) {
         });
     const speakersSliderWrapper = homeSection.querySelector(':scope > .speaker-section');
     const homeFeedBlock = homeSection.querySelector(':scope > .feed-section');
-    const heroIntrosliderWrapper = homeSection.querySelector(':scope > .introslider-wrapper');
+    const heroIntrosliderWrapper = homeSection.querySelector(':scope > .introslider-outer-wrapper');
     if (speakersSliderWrapper) {
         speakersSliderWrapper.insertAdjacentElement('beforebegin', programmeSection);
     } else if (homeFeedBlock) {
@@ -5171,24 +5264,47 @@ async function displayNewsGrid(records) {
 }
 
 
+let youtubeIframeApiPromise = null;
+
+/** Load YouTube IFrame API on demand (not on initial home paint). */
+function ensureYouTubeIframeApi() {
+    if (typeof YT !== 'undefined' && YT.Player) {
+        return Promise.resolve();
+    }
+    if (youtubeIframeApiPromise) {
+        return youtubeIframeApiPromise;
+    }
+    youtubeIframeApiPromise = new Promise(function (resolve) {
+        const previousReady = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+            if (typeof previousReady === 'function') {
+                previousReady();
+            }
+            resolve();
+        };
+        const script = document.createElement('script');
+        script.src = 'https://www.youtube.com/iframe_api';
+        script.async = true;
+        document.head.appendChild(script);
+    });
+    return youtubeIframeApiPromise;
+}
+
 // YouTube API event listener setup for individual cards
 function setupYouTubeCardListener(iframe, newsCard, originalEmbedUrl) {
-    // Wait for YouTube API to be ready
-    if (typeof YT !== 'undefined' && YT.Player) {
-        new YT.Player(iframe, {
-            events: {
-                'onStateChange': function(event) {
-                    // When video ends (state = 0), revert card to first frame
-                    if (event.data === YT.PlayerState.ENDED) {
-                        revertYouTubeCardToFirstFrame(newsCard, originalEmbedUrl);
+    void ensureYouTubeIframeApi().then(function () {
+        if (typeof YT !== 'undefined' && YT.Player) {
+            new YT.Player(iframe, {
+                events: {
+                    'onStateChange': function (event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            revertYouTubeCardToFirstFrame(newsCard, originalEmbedUrl);
+                        }
                     }
                 }
-            }
-        });
-    } else {
-        // Fallback: try again after a short delay
-        setTimeout(() => setupYouTubeCardListener(iframe, newsCard, originalEmbedUrl), 1000);
-    }
+            });
+        }
+    });
 }
 
 // Revert YouTube card to show YouTube thumbnail
@@ -5228,7 +5344,7 @@ function revertYouTubeCardToFirstFrame(newsCard, originalEmbedUrl) {
             // Reload the original iframe
             embedDiv.innerHTML = `
                 <iframe 
-                    src="${originalEmbedUrl}" 
+                    src="${youTubeEmbedUrlWithParams(originalEmbedUrl)}" 
                     width="100%" 
                     height="100%" 
                                 frameborder="0" 
@@ -5293,7 +5409,7 @@ function showVideoFromUrl(videoUrl) {
     
     if (videoPost) {
         // Show the video like in the blog, but indicate it's from the feed
-        showPostOnSamePage(videoPost, true); // true indicates it's from the feed
+        showPostOnSamePage(videoPost);
     } else {
         // If not found in blog posts, try to find in news feed data
         if (window.allNewsRecords && window.allNewsRecords.length > 0) {
@@ -5341,7 +5457,7 @@ function showVideoFromUrl(videoUrl) {
                     featured: false
                 };
                 
-                showPostOnSamePage(convertedPost, true); // true indicates it's from the feed
+                showPostOnSamePage(convertedPost);
                 return;
             }
         }
@@ -5561,12 +5677,13 @@ async function createNewsCard(record) {
     newsCard.className = 'news-card';
     newsCard.style.cursor = 'pointer';
     
-    // Get title, text, date, and type
+    // Get title, text, date, and type (Name is shown below the card title, not as a fallback headline)
     let title =
         record.fields.Title ||
-        record.fields.Name ||
-        pickFirstReadableStringField(record.fields, ['title', 'name', 'headline', 'subject']) ||
+        pickFirstReadableStringField(record.fields, ['headline', 'subject']) ||
         '';
+    let cardName =
+        typeof record.fields.Name === 'string' ? record.fields.Name.trim() : '';
     let text =
         record.fields.Excerpt ||
         record.fields.Content ||
@@ -5620,7 +5737,7 @@ async function createNewsCard(record) {
     }
 
     // Guard: hide truly empty records (no title/excerpt, no image, and for Video no URL)
-    const hasText = !!(title || text);
+    const hasText = !!(title || cardName || text);
     const hasImageFinal = !!imageUrl;
     const hasVideoUrl = !!(record.fields.URL || record.fields['Video URL'] || record.fields['YouTube URL'] || record.fields.Link || record.fields.Youtube);
     if (!hasText && !hasImageFinal && (!isVideoOrEditType(type) || !hasVideoUrl)) {
@@ -5650,12 +5767,30 @@ async function createNewsCard(record) {
             ? ''
             : typeDisplayTrimmed.toLowerCase() === 'edit'
                 ? '<span class="news-card-new-badge">EDIT</span>'
-                : `<span class="news-card-category">${typeDisplayTrimmed}</span>`;
-    /* Mobile CSS hides .news-card-title-row .news-card-category; meta row copy is shown instead. */
-    const typeCategoryMetaHtml =
-        typeDisplayTrimmed && typeDisplayTrimmed.toLowerCase() !== 'edit'
-            ? `<span class="news-card-category">${typeDisplayTrimmed}</span>`
-            : '';
+                : `<span class="post-category">${typeDisplayTrimmed}</span>`;
+    const titleBadgesInner =
+        (isNew ? newBadgeHtml : '') +
+        (isFeatured ? featuredBadgeHtml : '') +
+        typeBadgeHtml;
+    const titleBadgesHtml = titleBadgesInner
+        ? `<div class="news-card-badges">${titleBadgesInner}</div>`
+        : '';
+    if (!String(title || '').trim() && cardName) {
+        title = cardName;
+    }
+    const showNameBelow = cardName && cardName !== String(title || '').trim();
+    const nameHtml = showNameBelow ? `<p class="news-card-name">${cardName}</p>` : '';
+    const titleBlockHtml =
+        `<div class="news-card-title-block">` +
+        `<h3 class="post-title">${title}</h3>` +
+        nameHtml +
+        `</div>`;
+    const titleRowHtml =
+        `<div class="news-card-title-row">` +
+        titleBlockHtml +
+        `<p class="news-card-date">${formattedDate}</p>` +
+        titleBadgesHtml +
+        `</div>`;
 
     // Check for URL in various possible field names
     const videoUrl = unifiedVideoUrl;
@@ -5665,27 +5800,10 @@ async function createNewsCard(record) {
     
     // Check if this is a YouTube activity
     if (trimmedType && trimmedType.toLowerCase() === 'short' && videoUrl) {
-        // Convert YouTube URL to embed URL
-        let embedUrl = '';
-        const youtubeUrl = videoUrl;
-        
-        // Handle different YouTube URL formats
-        if (youtubeUrl.includes('youtube.com/watch?v=')) {
-            const videoId = youtubeUrl.split('v=')[1].split('&')[0];
-            embedUrl = `https://www.youtube.com/embed/${videoId}`;
-        } else if (youtubeUrl.includes('youtu.be/')) {
-            const videoId = youtubeUrl.split('youtu.be/')[1].split('?')[0];
-            embedUrl = `https://www.youtube.com/embed/${videoId}`;
-        } else if (youtubeUrl.includes('youtube.com/shorts/')) {
-            const videoId = youtubeUrl.split('shorts/')[1].split('?')[0];
-            embedUrl = `https://www.youtube.com/embed/${videoId}`;
-        } else if (youtubeUrl.includes('youtube.com/embed/')) {
-            embedUrl = youtubeUrl; // Already an embed URL
-        }
+        const embedUrl = youTubeWatchUrlToEmbedUrl(videoUrl);
         
         if (embedUrl) {
-            // Add API parameters to detect video end
-            const embedUrlWithAPI = embedUrl + (embedUrl.includes('?') ? '&' : '?') + 'enablejsapi=1&origin=' + encodeURIComponent(window.location.origin);
+            const embedUrlWithAPI = youTubeEmbedUrlWithParams(embedUrl);
             const uniqueId = `youtube-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             
             newsCard.innerHTML = `
@@ -5703,18 +5821,7 @@ async function createNewsCard(record) {
                     </div>
                 </div>
                 <div class="news-card-content">
-                    <div class="news-card-title-row">
-                        <h3 class="news-card-title">${title}</h3>
-                        <div class="news-card-badges">
-                            ${newBadgeHtml}
-                            ${featuredBadgeHtml}
-                            ${typeBadgeHtml}
-                        </div>
-                    </div>
-                    <div class="news-card-meta">
-                        <p class="news-card-date">${formattedDate}</p>
-                        ${typeCategoryMetaHtml}
-                    </div>
+                    ${titleRowHtml}
                     <div class="news-card-text-row">
                         <div class="news-card-text">${truncatedText}</div>
                         <div class="news-card-controls news-card-controls--collapsed" aria-hidden="true"></div>
@@ -5733,18 +5840,7 @@ async function createNewsCard(record) {
             // Fallback to regular card if URL is invalid - no image container
             newsCard.innerHTML = `
                 <div class="news-card-content">
-                    <div class="news-card-title-row">
-                        <h3 class="news-card-title">${title}</h3>
-                        <div class="news-card-badges">
-                            ${newBadgeHtml}
-                            ${featuredBadgeHtml}
-                            ${typeBadgeHtml}
-                        </div>
-                    </div>
-                    <div class="news-card-meta">
-                        <p class="news-card-date">${formattedDate}</p>
-                        ${typeCategoryMetaHtml}
-                    </div>
+                    ${titleRowHtml}
                     <div class="news-card-text-row">
                         <div class="news-card-text">${truncatedText}</div>
                         <div class="news-card-controls news-card-controls--collapsed" aria-hidden="true"></div>
@@ -5764,19 +5860,7 @@ async function createNewsCard(record) {
         newsCard.innerHTML = `
             ${imageContainer}
             <div class="news-card-content">
-                <div class="news-card-title-row">
-                    <h3 class="news-card-title">${title}</h3>
-                    ${isNew || isFeatured || typeBadgeHtml ? `
-                    <div class="news-card-badges">
-                        ${newBadgeHtml}
-                        ${featuredBadgeHtml}
-                        ${typeBadgeHtml}
-                    </div>` : ''}
-                </div>
-                <div class="news-card-meta">
-                    <p class="news-card-date">${formattedDate}</p>
-                    ${typeCategoryMetaHtml}
-                </div>
+                ${titleRowHtml}
                 <div class="news-card-text-row">
                     <div class="news-card-text">${truncatedText}</div>
                     <div class="news-card-controls news-card-controls--collapsed" aria-hidden="true"></div>
@@ -6152,12 +6236,18 @@ let homeNavbarResizeHandler = null;
 
 let pastTalksStripResizeHandler = null;
 
-/** Prussian strip height = full fixed .navbar (vertical padding + .nav-container + glass borders). */
+/** Prussian top strip height: desktop = top navbar; mobile = tab-bar height + safe-area (CSS). */
 function syncPastTalksPrussianStripToNavbar() {
     if (!document.body.classList.contains('past-talks-open')) return;
-    const nav = document.querySelector('.navbar');
     const picture = document.querySelector('.home-section > picture');
-    if (!nav || !picture) return;
+    if (!picture) return;
+    if (isMobileBottomNavbarLayout()) {
+        picture.style.removeProperty('height');
+        picture.style.removeProperty('min-height');
+        return;
+    }
+    const nav = document.querySelector('.navbar');
+    if (!nav) return;
     const h = nav.getBoundingClientRect().height;
     if (!(h > 0)) return;
     const px = `${Math.round(h * 100) / 100}px`;
@@ -6196,71 +6286,91 @@ function setupPastTalksPrussianStripSync() {
 }
 
 let homeHeroIntrosliderPosterGapResizeHandler = null;
+let homeHeroIntrosliderPosterGapResizeObserver = null;
 
+/** Hero About introslider: measure tallest slide and apply --home-introslider-card-height (desktop). */
+function syncHomeIntrosliderCardHeights() {
+    const track = document.querySelector(
+        'body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider'
+    );
+    if (!track) return;
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        track.style.removeProperty('--home-introslider-card-height');
+        return;
+    }
+
+    const slides = Array.from(track.children).filter(function (node) {
+        return node.nodeType === 1;
+    });
+    if (!slides.length) {
+        track.style.removeProperty('--home-introslider-card-height');
+        return;
+    }
+
+    track.style.removeProperty('--home-introslider-card-height');
+    void track.offsetHeight;
+
+    let maxHeight = 0;
+    slides.forEach(function (slide) {
+        const h = slide.getBoundingClientRect().height;
+        if (h > maxHeight) maxHeight = h;
+    });
+
+    if (maxHeight > 0) {
+        track.style.setProperty('--home-introslider-card-height', Math.ceil(maxHeight) + 'px');
+    }
+}
+
+/** Legacy hook: introslider sits in normal flow between Event and Sponsors (no poster overlap). */
 function syncHomeHeroIntrosliderPosterGap(desiredGapPx = 8) {
     if (!document.body.classList.contains('home-view')) return;
     const homeSection = document.querySelector('body.home-view .home-section');
     if (!homeSection) return;
-
-    // Use the same requested gap for mobile + desktop.
-    const effectiveGapPx = desiredGapPx;
-
-    // Direct child poster and hero introslider only (not the programme slider in the feed).
-    const posterImg = homeSection.querySelector(':scope > picture img.home-poster-wide, :scope > picture img');
-    const sliderWrapper = homeSection.querySelector(':scope > .introslider-wrapper');
-
-    if (!posterImg || !sliderWrapper) return;
-
-    // Slider wrapper sits in normal flow right after the poster; we shift it up via
-    // the overlap CSS variable so that:
-    //   posterBottom - sliderBottom = desiredGapPx
-    const sliderHeight = sliderWrapper.getBoundingClientRect().height;
-    const targetOverlapPx = sliderHeight + effectiveGapPx;
-    homeSection.style.setProperty('--home-hero-introslider-poster-overlap', `${targetOverlapPx}px`);
-    /* Same value as poster-bottom ↔ slider-bottom gap: pushes .home-social-row-container below the poster (it would otherwise sit on the image). */
-    homeSection.style.setProperty('--home-hero-poster-slider-gap', `${effectiveGapPx}px`);
-
-    // Second pass to correct for rounding / font settling.
-    requestAnimationFrame(() => {
-        const gap = posterImg.getBoundingClientRect().bottom - sliderWrapper.getBoundingClientRect().bottom;
-        const diff = effectiveGapPx - gap;
-        if (Math.abs(diff) > 0.5) {
-            homeSection.style.setProperty('--home-hero-introslider-poster-overlap', `${targetOverlapPx + diff}px`);
-        }
-    });
+    homeSection.style.setProperty('--home-hero-poster-slider-gap', `${desiredGapPx}px`);
 }
 
-function setupHomeHeroIntrosliderPosterGap(desiredGapPx = 8) {
-    // Debounced resize to re-measure intro panel height as widths/font metrics change.
+function teardownHomeHeroIntrosliderPosterGapSync() {
     if (homeHeroIntrosliderPosterGapResizeHandler) {
         window.removeEventListener('resize', homeHeroIntrosliderPosterGapResizeHandler);
         homeHeroIntrosliderPosterGapResizeHandler = null;
     }
+    if (homeHeroIntrosliderPosterGapResizeObserver) {
+        homeHeroIntrosliderPosterGapResizeObserver.disconnect();
+        homeHeroIntrosliderPosterGapResizeObserver = null;
+    }
+}
+
+function setupHomeHeroIntrosliderPosterGap(desiredGapPx = 8) {
+    teardownHomeHeroIntrosliderPosterGapSync();
 
     let resizeTimer = null;
     homeHeroIntrosliderPosterGapResizeHandler = function() {
         if (resizeTimer) clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
+            syncHomeIntrosliderCardHeights({ force: true });
             syncHomeHeroIntrosliderPosterGap(desiredGapPx);
         }, 120);
     };
     window.addEventListener('resize', homeHeroIntrosliderPosterGapResizeHandler, { passive: true });
 
-    const run = () => syncHomeHeroIntrosliderPosterGap(desiredGapPx);
-
-    // Wait for font/layout settlement if available.
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => requestAnimationFrame(run));
-    } else {
-        requestAnimationFrame(run);
-    }
-
-    // Also re-run once the poster image finishes loading.
     const homeSection = document.querySelector('body.home-view .home-section');
-    const posterImg = homeSection ? homeSection.querySelector(':scope > picture img.home-poster-wide, :scope > picture img') : null;
-    if (posterImg && !posterImg.complete) {
-        posterImg.addEventListener('load', () => syncHomeHeroIntrosliderPosterGap(desiredGapPx), { once: true });
+    const sliderWrapper =
+        homeSection && homeSection.querySelector(':scope > .introslider-outer-wrapper > .introslider-inner-wrapper');
+    const sliderTrack = sliderWrapper && sliderWrapper.querySelector(':scope > .introslider');
+
+    if (typeof ResizeObserver !== 'undefined' && sliderTrack) {
+        homeHeroIntrosliderPosterGapResizeObserver = new ResizeObserver(function() {
+            syncHomeIntrosliderCardHeights();
+            syncHomeHeroIntrosliderPosterGap(desiredGapPx);
+        });
+        homeHeroIntrosliderPosterGapResizeObserver.observe(sliderTrack);
     }
+
+    requestAnimationFrame(function () {
+        syncHomeIntrosliderCardHeights();
+        syncHomeHeroIntrosliderPosterGap(desiredGapPx);
+    });
 }
 
 function teardownHomeViewNavbarScroll() {
@@ -6272,10 +6382,7 @@ function teardownHomeViewNavbarScroll() {
         window.removeEventListener('resize', homeNavbarResizeHandler);
         homeNavbarResizeHandler = null;
     }
-    if (homeHeroIntrosliderPosterGapResizeHandler) {
-        window.removeEventListener('resize', homeHeroIntrosliderPosterGapResizeHandler);
-        homeHeroIntrosliderPosterGapResizeHandler = null;
-    }
+    teardownHomeHeroIntrosliderPosterGapSync();
     if (!document.body.classList.contains('home-view')) {
         resetNavHeaderToCssDefaults();
     }
@@ -6418,6 +6525,85 @@ const HOME_NAV_SCROLL_INSTANT_THRESHOLD_PX = 2;
  * Scroll-spy: highlight nav tabs (yellow .active) for the home section currently at the navbar anchor line.
  * Order matches DOM: feed → event section → sponsors → speakers → programme → registration.
  */
+function isMobileBottomNavbarLayout() {
+    return (
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(max-width: 768px)').matches
+    );
+}
+
+/** Remove mobile bottom-tab inline positioning so wide screens use top navbar CSS. */
+function clearMobileBottomNavbarInlineStyles() {
+    if (isMobileBottomNavbarLayout()) return;
+    const header = document.querySelector('.header');
+    const navbar = document.querySelector('.navbar');
+    const navContainer = document.querySelector('.nav-container');
+    const headerProps = ['top', 'bottom', 'left', 'right', 'width', 'height'];
+    const navbarProps = [
+        'top',
+        'bottom',
+        'left',
+        'right',
+        'width',
+        'height',
+        'min-height',
+        'max-height',
+        'padding',
+        'margin',
+        'box-sizing',
+    ];
+    const containerProps = ['height', 'min-height', 'max-height', 'padding', 'align-items'];
+    if (header) headerProps.forEach((p) => header.style.removeProperty(p));
+    if (navbar) navbarProps.forEach((p) => navbar.style.removeProperty(p));
+    if (navContainer) containerProps.forEach((p) => navContainer.style.removeProperty(p));
+}
+
+/** Mobile bottom tab bar content height (px). Safe-area is added separately on `.header`. */
+const MOBILE_TAB_BAR_HEIGHT_PX = 45;
+
+/** Enforce 45px bottom tab bar (wins over legacy inline nav padding / height: auto). */
+function applyMobileBottomNavbarLayout() {
+    if (!isMobileBottomNavbarLayout()) {
+        clearMobileBottomNavbarInlineStyles();
+        return;
+    }
+    const header = document.querySelector('.header');
+    const navbar = document.querySelector('.navbar');
+    const navContainer = document.querySelector('.nav-container');
+    if (header) {
+        header.style.setProperty('top', 'auto', 'important');
+        header.style.setProperty('bottom', '0', 'important');
+        header.style.setProperty('left', '0', 'important');
+        header.style.setProperty('right', '0', 'important');
+        header.style.setProperty('width', '100%', 'important');
+        header.style.setProperty(
+            'height',
+            `calc(${MOBILE_TAB_BAR_HEIGHT_PX}px + env(safe-area-inset-bottom, 0px))`,
+            'important'
+        );
+    }
+    if (navbar) {
+        navbar.style.removeProperty('top');
+        navbar.style.setProperty('bottom', 'env(safe-area-inset-bottom, 0px)', 'important');
+        navbar.style.setProperty('left', '0', 'important');
+        navbar.style.setProperty('right', '0', 'important');
+        navbar.style.setProperty('width', '100%', 'important');
+        navbar.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        navbar.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        navbar.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        navbar.style.setProperty('padding', '0', 'important');
+        navbar.style.setProperty('margin', '0', 'important');
+        navbar.style.setProperty('box-sizing', 'border-box', 'important');
+    }
+    if (navContainer) {
+        navContainer.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        navContainer.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        navContainer.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        navContainer.style.setProperty('padding', '0 16px', 'important');
+        navContainer.style.setProperty('align-items', 'center', 'important');
+    }
+}
+
 function syncHomeNavSectionFromScroll() {
     if (!document.body.classList.contains('home-view')) return;
     if (document.body.classList.contains('past-talks-open')) return;
@@ -6427,7 +6613,7 @@ function syncHomeNavSectionFromScroll() {
 
     const nav = document.querySelector('.navbar');
     const navH = nav ? nav.getBoundingClientRect().height : 0;
-    const anchorY = navH + 12;
+    const anchorY = isMobileBottomNavbarLayout() ? 12 : navH + 12;
 
     const speakersEl = document.getElementById('speakers-section');
     const programmeEl =
@@ -6450,6 +6636,18 @@ function syncHomeNavSectionFromScroll() {
 
 function syncHomeViewNavbarFromScroll() {
     if (!document.body.classList.contains('home-view')) return;
+    if (!isMobileBottomNavbarLayout()) {
+        clearMobileBottomNavbarInlineStyles();
+    }
+    /* Mobile: bottom tab bar stays solid Prussian blue (no top-of-page fade). */
+    if (isMobileBottomNavbarLayout()) {
+        applyMobileBottomNavbarLayout();
+        applyHomeHeroNavbarOpacity(1, { instant: true });
+        if (document.body.classList.contains('past-talks-open')) {
+            syncPastTalksPrussianStripToNavbar();
+        }
+        return;
+    }
     /* Past talks / video viewer: always full frosted nav (not scroll-gated at top). */
     if (document.body.classList.contains('past-talks-open')) {
         applyHomeHeroNavbarOpacity(1, { instant: true });
@@ -6479,6 +6677,7 @@ function setupHomeViewNavbarScroll() {
     };
     window.addEventListener('scroll', homeNavbarScrollHandler, { passive: true });
     window.addEventListener('resize', homeNavbarResizeHandler, { passive: true });
+    applyMobileBottomNavbarLayout();
     syncHomeViewNavbarFromScroll();
     syncHomeNavSectionFromScroll();
 }
@@ -6648,20 +6847,35 @@ if (typeof window !== 'undefined' && !window.__tbsHomeLocationStorageBound) {
     });
 }
 
+/** Lock document scroll while home page is loading (poster + feed + bands). */
+function setHomePageLoading(isLoading) {
+    const on = !!isLoading;
+    document.body.classList.toggle('loading', on);
+    document.documentElement.classList.toggle('home-scroll-locked', on);
+}
+
+/* Firestore warm as soon as this file runs (firebase-* defer scripts are listed above script.js in home.html). */
+try {
+    warmHomePageFirestoreCache();
+} catch (warmErr) {
+    console.warn('warmHomePageFirestoreCache on parse:', warmErr);
+}
+
 // Initialize the blog when page loads
 document.addEventListener('DOMContentLoaded', async function() {
-    warmHomePageFirestoreCache();
+    setHomePageLoading(true);
     // Setup initial event listeners first (non-blocking)
     setupEventListeners();
     setupNavbarTransparency();
     setupMobileMenu();
+    applyMobileBottomNavbarLayout();
 
-    // Bind header nav before home feed load so Past talks / Register work even if showFeedContent() throws or hangs
-    await setupNavigationListeners();
+    // Bind header nav in parallel with home paint (nav exists in home.html before feed inject).
+    const navigationReady = setupNavigationListeners();
 
     try {
         await Promise.race([
-            showFeedContent(),
+            Promise.all([navigationReady, showFeedContent()]),
             new Promise(function (_, reject) {
                 setTimeout(function () {
                     reject(
@@ -6674,9 +6888,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         ]);
     } catch (err) {
         console.error('showFeedContent failed or timed out:', err);
+    } finally {
+        revealStuckHomeStageBands(document.querySelector('.everything .home-section'));
+        scrollHomeToTop();
+        setHomePageLoading(false);
     }
-    revealStuckHomeStageBands(document.querySelector('.everything .home-section'));
-    scrollHomeToTop();
+
+    /* Safety: never leave scroll locked if showFeedContent returned early. */
+    setHomePageLoading(false);
 
     // Warm the Past talks dataset after first paint/interaction.
     scheduleBackgroundPastTalksWarmup();

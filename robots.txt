@@ -1,0 +1,4 @@
+# Home page is not for public search indexing.
+User-agent: *
+Disallow: /home.html
+Disallow: /
