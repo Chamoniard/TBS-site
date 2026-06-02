@@ -71,7 +71,7 @@ let blogGrid = document.getElementById('blogGrid');
 let filterBtns = document.querySelectorAll('.filter-btn');
 let loadMoreBtn = document.getElementById('loadMoreBtn');
 const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+const navMenu = document.querySelector('#site-nav-menu') || document.querySelector('.navbar--mobile-top .nav-menu');
 const newsletterForm = document.querySelector('.newsletter-form');
 
 /** Sync active state for all `.nav-link[data-view="…"]` (e.g. header tabs). */
@@ -144,6 +144,45 @@ function normalizePostTypeValue(val) {
     if (val == null || val === '') return '';
     const raw = Array.isArray(val) ? val[0] : val;
     return (raw != null ? String(raw) : '').toLowerCase().trim();
+}
+
+/** Topic labels for badges (excludes type-like tokens used as Type field). */
+function getPostTopicBadgeLabels(topic) {
+    if (!topic) return [];
+    const isTypeLike = (label) => {
+        const k = label.toLowerCase();
+        return k === 'general' || k === 'video' || k === 'edit';
+    };
+    if (Array.isArray(topic)) {
+        return topic
+            .map((x) => (x != null ? String(x).trim() : ''))
+            .filter(Boolean)
+            .filter((x) => !isTypeLike(x));
+    }
+    const s = String(topic).trim();
+    if (!s || isTypeLike(s)) return [];
+    return [s];
+}
+
+/** Video viewer meta: Event (category), then Type, then Topic badges. */
+function buildViewerPostMetaBadgesHtml(post) {
+    const parts = [];
+    const category = post.category != null ? String(post.category).trim() : '';
+    if (category) {
+        parts.push(`<span class="post-category">${category}</span>`);
+    }
+    const typeKey = normalizePostTypeValue(post.type);
+    const typeRaw = post.type != null ? (Array.isArray(post.type) ? post.type[0] : post.type) : '';
+    const typeDisplay = typeRaw != null ? String(typeRaw).trim() : '';
+    if (typeKey === 'edit') {
+        parts.push('<span class="news-card-new-badge">EDIT</span>');
+    } else if (typeDisplay) {
+        parts.push(`<span class="post-category">${typeDisplay}</span>`);
+    }
+    getPostTopicBadgeLabels(post.topic).forEach((label) => {
+        parts.push(`<span class="post-category">${label}</span>`);
+    });
+    return parts.join('');
 }
 
 // Load Past talks posts from Firebase feed source - deferred execution
@@ -268,7 +307,10 @@ function youTubeWatchUrlToEmbedUrl(watchUrl) {
     return id ? `https://www.youtube.com/embed/${id}` : '';
 }
 
-/** Fewer logos/related-video chrome; `enablejsapi` when the card end listener needs it. */
+/**
+ * Embed URL params. Viewer (`minimalUi`): rel=0, modestbranding=1, controls=0, fewer overlays.
+ * `enablejsapi` when the card end listener needs it.
+ */
 function youTubeEmbedUrlWithParams(embedUrl, options) {
     if (!embedUrl) return embedUrl;
     const opts = options || {};
@@ -284,6 +326,11 @@ function youTubeEmbedUrlWithParams(embedUrl, options) {
     p.set('playsinline', '1');
     p.set('iv_load_policy', '3');
     p.set('cc_load_policy', '0');
+    if (opts.minimalUi) {
+        p.set('controls', '0');
+        p.set('fs', '0');
+        p.set('disablekb', '1');
+    }
     if (opts.enableJsApi !== false) {
         p.set('enablejsapi', '1');
         p.set('origin', window.location.origin);
@@ -291,6 +338,104 @@ function youTubeEmbedUrlWithParams(embedUrl, options) {
     return url.toString();
 }
 
+/** Thumbnail for viewer / cards: post image when set, else YouTube still. */
+function getYouTubeThumbnailUrlForPost(post, videoId) {
+    const custom = post && post.image ? String(post.image).trim() : '';
+    if (custom) return custom;
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+/** Viewer main video: desktop = iframe immediately; mobile = thumbnail + preloading iframe. */
+function buildViewerYouTubeHtml(post) {
+    if (!post || !post.youtubeUrl) return '';
+    const videoId = extractYouTubeId(post.youtubeUrl);
+    if (!videoId) return '';
+
+    const embedUrl = youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, {
+        enableJsApi: false,
+        minimalUi: true,
+    });
+    const iframeAllow =
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+
+    if (isMobileBottomNavbarLayout()) {
+        const thumbUrl = getYouTubeThumbnailUrlForPost(post, videoId);
+        return `
+                <div class="post-video post-video--thumbnail-first" data-youtube-id="${videoId}">
+                    <div class="video-container" id="videoContainer">
+                        <button type="button" class="post-video-thumbnail-btn" aria-label="Play video">
+                            <img src="${thumbUrl}" alt="" class="post-video-thumbnail" loading="eager" decoding="async" referrerpolicy="no-referrer">
+                            <span class="post-video-play-overlay" aria-hidden="true"><i class="fas fa-play"></i></span>
+                        </button>
+                        <iframe class="post-video-iframe post-video-iframe--preload"
+                                title="YouTube video player"
+                                src="${embedUrl}"
+                                loading="lazy"
+                                tabindex="-1"
+                                aria-hidden="true"
+                                frameborder="0"
+                                allow="${iframeAllow}"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            `;
+    }
+
+    return `
+                <div class="post-video">
+                    <div class="video-container" id="videoContainer">
+                        <iframe src="${embedUrl}"
+                                frameborder="0"
+                                allow="${iframeAllow}"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            `;
+}
+
+function activateMobileViewerYouTube(postVideoEl) {
+    if (!postVideoEl) return;
+    const iframe = postVideoEl.querySelector('.post-video-iframe');
+    const videoId = postVideoEl.getAttribute('data-youtube-id');
+    if (!iframe || !videoId) return;
+
+    let embedUrl = youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, {
+        enableJsApi: false,
+        minimalUi: true,
+    });
+    try {
+        const url = new URL(embedUrl, window.location.href);
+        url.searchParams.set('autoplay', '1');
+        embedUrl = url.toString();
+    } catch (e) {
+        /* keep embedUrl */
+    }
+    if (iframe.getAttribute('src') !== embedUrl) {
+        iframe.setAttribute('src', embedUrl);
+    }
+    iframe.removeAttribute('aria-hidden');
+    iframe.removeAttribute('tabindex');
+    postVideoEl.classList.add('post-video--playing');
+}
+
+function initMobileViewerYouTubePlayer(viewerRoot) {
+    if (!isMobileBottomNavbarLayout()) return;
+    const root =
+        viewerRoot ||
+        document.querySelector('.viewer-section:not(.is-collapsed):not([hidden])');
+    if (!root) return;
+
+    const postVideo = root.querySelector('.post-video--thumbnail-first');
+    if (!postVideo || postVideo.dataset.viewerYoutubeInit === '1') return;
+    postVideo.dataset.viewerYoutubeInit = '1';
+
+    const playBtn = postVideo.querySelector('.post-video-thumbnail-btn');
+    if (!playBtn) return;
+
+    playBtn.addEventListener('click', () => activateMobileViewerYouTube(postVideo));
+}
 
 /**
  * Start loading unique post thumbnail URLs into the browser image cache as soon as
@@ -342,12 +487,46 @@ function scheduleBackgroundPastTalksWarmup() {
 
 function warmHomePageFirestoreCache() {
     try {
+        const eventId = TBS27_HOME_PROGRAMME_EVENT_ID;
         void fetchHomeSiteSettingsFromFirestore();
         void fetchNewsFeed();
         void prefetchHomeProgrammeSliderData();
+        void fetchHomeEventEventInfoFromFirebase(eventId);
+        void fetchHomeEventSpeakerInfoFromFirebase(eventId);
+        void fetchHomeSpeakersListFromFirebase(eventId);
+        void fetchHomeEventLocationInfoFromFirebase(eventId);
+        void fetchHomeRegistrationManifestoFromFirebase();
     } catch (e) {
         console.warn('warmHomePageFirestoreCache:', e);
     }
+}
+
+/** Max time the pink loader waits for the hero poster (feed / event / speakers hydrate after unlock). */
+const HOME_LOAD_POSTER_MAX_MS = 1200;
+const HOME_LOAD_SPEAKERS_MAX_MS = 8000;
+
+function extractFeedRecordImageUrl(fields) {
+    if (!fields || typeof fields !== 'object') return '';
+    const image = fields.Image;
+    if (typeof image === 'string') return image;
+    if (Array.isArray(image) && image.length > 0 && image[0] && image[0].url) {
+        return image[0].url;
+    }
+    if (image && typeof image === 'object' && image.url) return image.url;
+    return '';
+}
+
+/** Warm browser cache for first-screen feed thumbnails while the pink overlay is up. */
+function prefetchFeedThumbnailsForRecords(records, limit) {
+    const max = limit == null ? HOME_FEED_INITIAL_COUNT : limit;
+    if (!Array.isArray(records) || !max) return;
+    records.slice(0, max).forEach(function (record) {
+        const url = extractFeedRecordImageUrl(record && record.fields);
+        if (!url) return;
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = url;
+    });
 }
 
 let homeProgrammeSliderPrefetchPromise = null;
@@ -487,23 +666,7 @@ function createPostElement(post) {
     const editTypeBadgeHtml =
         postTypeKey === 'edit' ? '<span class="news-card-new-badge">EDIT</span>' : '';
 
-    const topicBadgeTopics = (() => {
-        const t = post.topic;
-        if (!t) return [];
-        const isTypeLike = (label) => {
-            const k = label.toLowerCase();
-            return k === 'general' || k === 'video' || k === 'edit';
-        };
-        if (Array.isArray(t)) {
-            return t
-                .map((x) => (x != null ? String(x).trim() : ''))
-                .filter(Boolean)
-                .filter((x) => !isTypeLike(x));
-        }
-        const s = String(t).trim();
-        if (!s || isTypeLike(s)) return [];
-        return [s];
-    })();
+    const topicBadgeTopics = getPostTopicBadgeLabels(post.topic);
     const topicSpansHtml = topicBadgeTopics
         .map((label) => `<span class="post-category">${label}</span>`)
         .join('');
@@ -642,31 +805,12 @@ function showPostOnSamePage(post) {
         pastTalksSection.setAttribute('aria-hidden', 'true');
     }
     
-    // Generate YouTube embed if URL exists
-    let youtubeEmbed = '';
-    if (post.youtubeUrl) {
-        const videoId = extractYouTubeId(post.youtubeUrl);
-        if (videoId) {
-            youtubeEmbed = `
-                <div class="post-video">
-                    <div class="video-container">
-                        <iframe src="${youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, { enableJsApi: false })}" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                        </iframe>
-                    </div>
-                </div>
-            `;
-        }
-    }
+    const youtubeEmbed = buildViewerYouTubeHtml(post);
     
     // Use content as-is (it can contain HTML)
     const formattedContent = post.content || '';
 
-    const viewerPostTypeKey = normalizePostTypeValue(post.type);
-    const viewerEditBadgeHtml =
-        viewerPostTypeKey === 'edit' ? '<span class="news-card-new-badge">EDIT</span>' : '';
+    const viewerMetaBadgesHtml = buildViewerPostMetaBadgesHtml(post);
 
     // Create viewer section HTML (inserted into existing .everything container)
     const viewerInnerHTML = `
@@ -679,7 +823,7 @@ function showPostOnSamePage(post) {
                 <div class="post-meta">
                     <span class="post-date">${formatDate(post.date)}</span>
                     <div class="post-meta-right">
-                        ${viewerEditBadgeHtml}<span class="post-category">${post.category}</span>
+                        ${viewerMetaBadgesHtml}
                     </div>
                 </div>
                 <div class="speaker-container">
@@ -687,7 +831,7 @@ function showPostOnSamePage(post) {
                     ${post.name ? `<p class="post-name">${post.name}</p>` : ''}
                 </div>
             </div>
-            ${formattedContent ? `<div class="post-content" style="padding-top: 16px; padding-bottom: 24px;">${formattedContent}</div>` : '<div class="post-content" style="padding-top: 16px; padding-bottom: 24px;"><p>No content available for this post.</p></div>'}
+            ${formattedContent ? `<div class="post-content" style="padding-top: 24px; padding-bottom: 24px;">${formattedContent}</div>` : '<div class="post-content" style="padding-top: 24px; padding-bottom: 24px;"><p>No content available for this post.</p></div>'}
                     <a href="https://www.youtube.com/@TBSZermatt" target="_blank" rel="noopener" class="youtubereminder" style="background-color: #BFF0FF !important; text-decoration: none;"><span class="youtubereminder-text">Find all recorded content from TBS on our Youtube channel.</span><span class="youtubereminder-icon" aria-hidden="true"><i class="fab fa-youtube"></i></span></a>
                     </div>
                 </div>
@@ -725,6 +869,8 @@ function showPostOnSamePage(post) {
         viewerSection.hidden = false;
         viewerSection.setAttribute('aria-hidden', 'false');
         viewerSection.innerHTML = viewerInnerHTML;
+
+        initMobileViewerYouTubePlayer(viewerSection);
         
         // When opening the video viewer (incl. Edit types), jump back to the top.
         requestAnimationFrame(() => scrollHomeToTop());
@@ -735,19 +881,6 @@ function showPostOnSamePage(post) {
         // Match morevideos container height to post content height
         setTimeout(() => {
             matchMoreVideosHeight();
-        }, 100);
-        
-        // Add click listener to video container for mobile fullscreen
-        setTimeout(() => {
-            const videoContainer = document.getElementById('videoContainer');
-            if (videoContainer) {
-                videoContainer.addEventListener('click', function() {
-                    // Only enter fullscreen on mobile devices
-                    if (window.innerWidth <= 768) {
-                        enterFullscreenVideo();
-                    }
-                });
-            }
         }, 100);
     }
 }
@@ -1241,7 +1374,9 @@ async function fetchNewsFeed() {
 function wireOneIntrostyleSlider(wrapper) {
     const introsliderEl = wrapper.querySelector('.speakerslider-track')
         || wrapper.querySelector('.introslider, .programme-slider, .speakerslider');
-        const indicatorsEl = wrapper.querySelector('.introslider-indicators');
+        const indicatorsEl =
+            wrapper.querySelector(':scope > .introslider-indicators') ||
+            wrapper.querySelector('.introslider-indicators');
         if (!introsliderEl || !indicatorsEl) return;
         const dots = indicatorsEl.querySelectorAll('.introslider-dot');
         if (!dots.length) return;
@@ -1324,6 +1459,62 @@ function wireHomeIntrosliderScrollbar() {
     }
     requestAnimationFrame(update);
     wrapper.dataset.homeScrollbarWired = '1';
+}
+
+/** Mobile: fixed dot row over slide track (cards scroll underneath). */
+function setupHomeHeroIntrosliderMobileLayout() {
+    const wrapper = document.querySelector(
+        '.home-section .introslider-inner-wrapper.home-hero-introslider'
+    );
+    if (!wrapper) return;
+
+    const introslider = wrapper.querySelector(':scope > .introslider');
+    const scrollbar = wrapper.querySelector(':scope > .home-introslider-scrollbar');
+    const indicators = wrapper.querySelector(':scope > .introslider-indicators');
+    if (!introslider || !indicators) return;
+
+    const mq = window.matchMedia('(max-width: 768px)');
+
+    function removePerCardIndicators() {
+        introslider.querySelectorAll('.introslider-indicators--per-card').forEach(function (el) {
+            el.remove();
+        });
+    }
+
+    function restoreIndicatorsToWrapper() {
+        if (indicators.parentElement !== wrapper) {
+            if (scrollbar) {
+                scrollbar.insertAdjacentElement('afterend', indicators);
+            } else {
+                wrapper.appendChild(indicators);
+            }
+        }
+    }
+
+    function apply() {
+        removePerCardIndicators();
+        restoreIndicatorsToWrapper();
+        indicators.classList.remove('introslider-indicators--master-hidden');
+        indicators.classList.remove('introslider-indicators--in-about-text');
+        indicators.classList.remove('introslider-indicators--in-track');
+        indicators.removeAttribute('aria-hidden');
+
+        if (mq.matches) {
+            indicators.classList.add('introslider-indicators--mobile-fixed');
+        } else {
+            indicators.classList.remove('introslider-indicators--mobile-fixed');
+        }
+    }
+
+    if (wrapper.dataset.homeHeroMobileLayoutWired !== '1') {
+        mq.addEventListener('change', apply);
+        window.addEventListener('resize', apply);
+        wrapper.dataset.homeHeroMobileLayoutWired = '1';
+    }
+    apply();
+    requestAnimationFrame(function () {
+        syncIntrosliderTextHeightsForTrack(introslider);
+    });
 }
 
 /**
@@ -1433,6 +1624,7 @@ function wireSliderIndicators() {
         wireOneIntrostyleSlider(wrapper);
     });
     wireHomeIntrosliderScrollbar();
+    setupHomeHeroIntrosliderMobileLayout();
     wireProgrammeSliderScrollbar();
     wireSpeakersSliderScrollbar();
 }
@@ -1440,35 +1632,52 @@ function wireSliderIndicators() {
 /** Hotel Alex — same URL in introslider Location slide and home Location band. */
 const TBS_HOTEL_ALEX_URL = 'https://www.hotelalexzermatt.com/en/';
 
+/** Title + body copy inside `.about-text` (hero introslider cards — no card images). */
+function introsliderTextBlock(titleAndParagraphHtml) {
+    return (
+        `
+                                <div class="introslider-text">` +
+        titleAndParagraphHtml +
+        `
+                                </div>`
+    );
+}
+
 /** Event body for home About slide */
-const ABOUT_EVENT_INNER_HTML = `
-                                <h3 class="about-title introslider-title">Event</h3>
-                                <p>TBS is a forum dedicated to the early management of critical illness. It is about first-hour critical care, physiology, behaviour and emerging technologies.<br><br></p>
-`;
+const ABOUT_EVENT_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">Event</h3>
+                                <p>TBS is dedicated to the first hours management of critical illness — the physiology that drives it, the behaviour that shapes it, and the technologies that will change it.</p>
+`);
 
 /** Location body for home Location slide */
-const ABOUT_LOCATION_INNER_HTML = `
-                                <h3 class="about-title introslider-title">Location</h3>
+const ABOUT_LOCATION_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">Location</h3>
                                 <p>Held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection.<br><br></p>
-`;
+`);
 
 /** Register body for home Register slide */
-const ABOUT_REGISTER_INNER_HTML = `
-                                <h3 class="about-title introslider-title">Register</h3>
+const ABOUT_REGISTER_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">Register</h3>
                                 <p>Kept small to facilitate sustained interaction between participants. Attendance is limited. Participation is expected.</p>
-`;
+`);
 
 /** Past talks body for home Past talks slide */
-const ABOUT_PAST_TALKS_INNER_HTML = `
-                                <h3 class="about-title introslider-title">Past talks</h3>
+const ABOUT_PAST_TALKS_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">Past talks</h3>
                                 <p>We are believers in the open access ethos and intend to bring TBS to a wider audience. Find all recorded talks here or on our social media.</p>
-`;
+`);
 
 /** TBS on Social body for home social slide */
-const ABOUT_SOCIAL_INNER_HTML = `
-                                <h3 class="about-title introslider-title">TBS on Social</h3>
+const ABOUT_SOCIAL_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">TBS on Social</h3>
                                 <p>Find all recorded content on the TBS YouTube channel or other platforms.</p>
-`;
+`);
+
+/** Speakers body for home Speakers slide */
+const ABOUT_SPEAKERS_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">Speakers</h3>
+                                <p>The cutting edge of critical care, resuscitation and cognitive sciences. Asked to go above and beyond the studies and the guidelines.</p>
+`);
 
 /** Event + Location body (programme .about slide) */
 const ABOUT_EVENT_LOCATION_INNER_HTML = `
@@ -1476,13 +1685,32 @@ ${ABOUT_EVENT_INNER_HTML}
 ${ABOUT_LOCATION_INNER_HTML}
 `;
 
+/** TBS27 + date/venue — left third of hero poster (.poster-maintitles). */
+const POSTER_HERO_TITLES_HTML = `
+                    <div class="poster-maintitles">
+                        <h1 class="section-titles maintitle-heading tbs27-card-maintitle" id="home-event-welcome-heading">TBS27</h1>
+                        <h2 class="section-titles tbs27-card-subtitle">9-12 February, 2027</h2>
+                        <h2 class="section-titles tbs27-card-subtitle">Hotel Alex, Zermatt</h2>
+                    </div>
+`;
+
+/** Home introslider: Event panel → scroll to Event welcome band */
+const FEATURED_EVENT_SLIDER_HTML = `
+                    <div class="about introslider-clickable" role="button" tabindex="0" aria-label="Scroll to event section">
+                        <div class="about-text">
+${ABOUT_EVENT_INNER_HTML}
+                        </div>
+                        <h3 class="section-titles featured-bottom-title introslider-title">Event</h3>
+            </div>
+        `;
+
 /** Home introslider: Location panel → scroll to programme section */
 const FEATURED_LOCATION_SLIDER_HTML = `
                     <div class="location introslider-clickable" role="button" tabindex="0" aria-label="Scroll to programme section">
                         <div class="about-text">
 ${ABOUT_LOCATION_INNER_HTML}
                         </div>
-                        <h3 class="featured-bottom-title introslider-title">Location</h3>
+                        <h3 class="section-titles featured-bottom-title introslider-title">Location</h3>
             </div>
         `;
 
@@ -1492,15 +1720,15 @@ const FEATURED_REGISTER_SLIDER_HTML = `
                         <div class="about-text">
 ${ABOUT_REGISTER_INNER_HTML}
                 </div>
-                        <h3 class="featured-bottom-title introslider-title">Register</h3>
+                        <h3 class="section-titles featured-bottom-title introslider-title">Register</h3>
                         </div>
 `;
 
 /** Programme overview copy: hero introslider + first card of home programme band (not per-day schedule HTML). */
-const HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML = `
-                                <h3 class="about-title introslider-title">Programme</h3>
+const HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML = introsliderTextBlock(`
+                                <h3 class="section-titles about-title introslider-title">Programme</h3>
                                 <p>Four immersive days of expert talks, hands-on workshops and small group discussions.</p>
-`;
+`);
 
 /** Home introslider: Programme teaser → scroll to programme band */
 const FEATURED_ABOUT_PROGRAMME_SLIDER_HTML = `
@@ -1508,7 +1736,7 @@ const FEATURED_ABOUT_PROGRAMME_SLIDER_HTML = `
                         <div class="about-text">
 ${HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML}
                             </div>
-                        <h3 class="featured-bottom-title introslider-title">Programme</h3>
+                        <h3 class="section-titles featured-bottom-title introslider-title">Programme</h3>
                         </div>
 `;
 
@@ -1516,10 +1744,9 @@ ${HOME_PROGRAMME_TEASER_ABOUT_INNER_HTML}
 const FEATURED_ABOUT_SPEAKERS_SLIDER_HTML = `
                     <div class="about-speakers introslider-clickable" role="button" tabindex="0" aria-label="Scroll to speakers section">
                         <div class="about-text">
-                                <h3 class="about-title introslider-title">Speakers</h3>
-                                <p>The cutting edge of critical care, resuscitation and cognitive sciences. Asked to go above and beyond the studies and the guidelines.</p>
+${ABOUT_SPEAKERS_INNER_HTML}
                             </div>
-                        <h3 class="featured-bottom-title introslider-title">Speakers</h3>
+                        <h3 class="section-titles featured-bottom-title introslider-title">Speakers</h3>
                         </div>
 `;
 
@@ -1529,7 +1756,7 @@ const FEATURED_PAST_TALKS_SLIDER_HTML = `
                         <div class="about-text">
 ${ABOUT_PAST_TALKS_INNER_HTML}
                     </div>
-                        <h3 class="featured-bottom-title introslider-title">Past talks</h3>
+                        <h3 class="section-titles featured-bottom-title introslider-title">Past talks</h3>
                     </div>
 `;
 
@@ -1542,12 +1769,8 @@ ${ABOUT_SOCIAL_INNER_HTML}
                     </div>
 `;
 
-/** Home: sponsors band (direct child of `.home-section`, below Event, above About introslider). */
-const HOME_SPONSORS_SECTION_HTML = `
-                <div class="sponsors-section" role="region" aria-labelledby="home-sponsors-heading">
-                    <div class="sponsors-section-inner-wrapper">
-                        <h2 class="section-titles sponsors-section-title" id="home-sponsors-heading">Presented by</h2>
-                        <div class="sponsor-logos">
+/** Shared sponsor logo slots (home sponsors band). */
+const HOME_SPONSOR_LOGO_SLOTS_HTML = `
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/corpulsgold.png" alt="Corpuls" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
@@ -1563,6 +1786,14 @@ const HOME_SPONSORS_SECTION_HTML = `
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/qinflowgold.png" alt="Qinflow" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
+`;
+
+/** Home: sponsors band (below hero introslider; see positionHomeSponsorsAfterIntroslider). */
+const HOME_SPONSORS_SECTION_HTML = `
+                <div class="sponsors-section" role="region" aria-label="Sponsors">
+                    <div class="sponsors-section-inner-wrapper">
+                        <div class="sponsor-logos">
+${HOME_SPONSOR_LOGO_SLOTS_HTML}
                         </div>
                     </div>
                 </div>
@@ -1570,7 +1801,8 @@ const HOME_SPONSORS_SECTION_HTML = `
 
 /** Max rendered logo height (px); row logic still scales down responsively as space shrinks. */
 function homeSponsorLogosMaxHeightPx() {
-    return 50;
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+    return isMobile ? 100 : 50;
 }
 
 function sponsorLogosRowGapPx(rowEl) {
@@ -1644,43 +1876,160 @@ function sponsorLogoUniformHeightForGroup(rowImages, rowWidth, gapPx, maxH, capB
     return hUsed;
 }
 
-function applySponsorLogoUniformHeight(images, hUsed, isMobile) {
+function applySponsorLogoUniformHeight(images, hUsed, isMobile, capImgMaxWidthOnMobile) {
+    const capMax =
+        capImgMaxWidthOnMobile === undefined ? isMobile : capImgMaxWidthOnMobile;
     for (let i = 0; i < images.length; i++) {
         const im = images[i];
         im.style.height = hUsed + 'px';
         im.style.width = 'auto';
-        im.style.maxWidth = isMobile ? '100%' : 'none';
+        im.style.maxWidth = capMax ? '100%' : 'none';
         im.style.maxHeight = 'none';
     }
 }
 
-/** One shared rendered height for every logo; scales down so the row fits `row.clientWidth` (aspect ratios preserved). */
-function layoutHomeSponsorLogosRowApply(sponsorsSectionEl) {
-    if (!sponsorsSectionEl) return;
-    const row = sponsorsSectionEl.querySelector('.sponsor-logos');
-    if (!row) return;
-    if (row.classList.contains('sponsor-logos-column')) {
-        const imagesCol = Array.from(row.querySelectorAll('img.sponsors-logo-image'));
-        for (let i = 0; i < imagesCol.length; i++) {
-            const im = imagesCol[i];
-            im.style.height = '';
-            im.style.width = '';
-            im.style.maxWidth = '';
-            im.style.maxHeight = '';
+/** Mobile sponsor row: constant scroll speed (px/s) for the auto-marquee. */
+const HOME_SPONSOR_MARQUEE_PX_PER_SEC = 48;
+
+function teardownHomeSponsorLogosMobileMarquee(row) {
+    if (!row || !row.classList.contains('sponsor-logos--marquee')) return;
+    const viewport = row.querySelector(':scope > .sponsor-logos-marquee-viewport');
+    const track = viewport && viewport.querySelector(':scope > .sponsor-logos-marquee-track');
+    if (track) {
+        const slots = Array.from(
+            track.querySelectorAll(':scope > .sponsor-logo-slot:not(.sponsor-logo-slot--marquee-clone)')
+        );
+        for (let i = 0; i < slots.length; i++) {
+            row.appendChild(slots[i]);
         }
+    }
+    if (viewport) viewport.remove();
+    row.classList.remove('sponsor-logos--marquee');
+    const trackEl = row.querySelector('.sponsor-logos-marquee-track');
+    if (trackEl) trackEl.style.removeProperty('--sponsor-marquee-duration');
+}
+
+function syncHomeSponsorLogosMarqueeClones(track) {
+    if (!track) return;
+    const originals = Array.from(
+        track.querySelectorAll(':scope > .sponsor-logo-slot:not(.sponsor-logo-slot--marquee-clone)')
+    );
+    const clones = track.querySelectorAll('.sponsor-logo-slot--marquee-clone');
+    if (clones.length === originals.length) return;
+    track.querySelectorAll('.sponsor-logo-slot--marquee-clone').forEach(function (el) {
+        el.remove();
+    });
+    for (let i = 0; i < originals.length; i++) {
+        const clone = originals[i].cloneNode(true);
+        clone.classList.add('sponsor-logo-slot--marquee-clone');
+        clone.setAttribute('aria-hidden', 'true');
+        const img = clone.querySelector('img.sponsors-logo-image');
+        if (img) img.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+    }
+}
+
+function mirrorHomeSponsorMarqueeCloneStyles(track) {
+    if (!track) return;
+    const originals = track.querySelectorAll(
+        ':scope > .sponsor-logo-slot:not(.sponsor-logo-slot--marquee-clone)'
+    );
+    const clones = track.querySelectorAll('.sponsor-logo-slot--marquee-clone');
+    for (let i = 0; i < originals.length && i < clones.length; i++) {
+        const origImg = originals[i].querySelector('img.sponsors-logo-image');
+        const cloneImg = clones[i].querySelector('img.sponsors-logo-image');
+        if (!origImg || !cloneImg) continue;
+        cloneImg.style.height = origImg.style.height;
+        cloneImg.style.width = origImg.style.width;
+        cloneImg.style.maxWidth = origImg.style.maxWidth;
+        cloneImg.style.maxHeight = origImg.style.maxHeight;
+    }
+}
+
+function ensureHomeSponsorLogosMobileMarquee(row) {
+    if (!row) return;
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) {
+        teardownHomeSponsorLogosMobileMarquee(row);
         return;
     }
-    const images = Array.from(row.querySelectorAll('img.sponsors-logo-image'));
+
+    row.classList.add('sponsor-logos--marquee');
+    let viewport = row.querySelector(':scope > .sponsor-logos-marquee-viewport');
+    let track = viewport && viewport.querySelector(':scope > .sponsor-logos-marquee-track');
+    if (!viewport) {
+        viewport = document.createElement('div');
+        viewport.className = 'sponsor-logos-marquee-viewport';
+        track = document.createElement('div');
+        track.className = 'sponsor-logos-marquee-track';
+        viewport.appendChild(track);
+        const slots = Array.from(row.querySelectorAll(':scope > .sponsor-logo-slot'));
+        for (let i = 0; i < slots.length; i++) {
+            track.appendChild(slots[i]);
+        }
+        row.appendChild(viewport);
+    }
+    syncHomeSponsorLogosMarqueeClones(track);
+}
+
+function updateHomeSponsorLogosMarqueeDuration(row) {
+    if (!row || !row.classList.contains('sponsor-logos--marquee')) return;
+    const track = row.querySelector('.sponsor-logos-marquee-track');
+    if (!track) return;
+    const loopWidth = track.scrollWidth / 2;
+    if (!(loopWidth > 0)) return;
+    const sec = loopWidth / HOME_SPONSOR_MARQUEE_PX_PER_SEC;
+    track.style.setProperty('--sponsor-marquee-duration', sec + 's');
+}
+
+function getHomeSponsorsInnerWrapper(homeSection) {
+    if (!homeSection) return null;
+    return homeSection.querySelector(':scope > .sponsors-section .sponsors-section-inner-wrapper');
+}
+
+/** Uniform logo height for one `.sponsor-logos-row` or legacy single `.sponsor-logos` row. */
+function layoutSponsorLogosRowElement(row) {
+    if (!row) return;
+    const images = Array.from(
+        row.matches('.sponsor-logos-row')
+            ? row.querySelectorAll(':scope > .sponsor-logo-slot img.sponsors-logo-image')
+            : row.querySelectorAll('img.sponsors-logo-image')
+    );
     if (!images.length) return;
 
     const w = row.clientWidth;
     if (!(w > 0)) return;
 
-    const gapPx = sponsorLogosRowGapPx(row);
+    const gapSource = row.classList.contains('sponsor-logos--marquee')
+        ? row.querySelector('.sponsor-logos-marquee-track') || row
+        : row;
+    const gapPx = sponsorLogosRowGapPx(gapSource);
     const maxH = homeSponsorLogosMaxHeightPx();
     const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+    const capBySlotWidth = isMobile && images.length > 1 && images.length <= 2;
 
-    if (isMobile) {
+    if (isMobile && row.classList.contains('sponsor-logos--marquee')) {
+        const track = row.querySelector('.sponsor-logos-marquee-track');
+        const originals = track
+            ? Array.from(
+                  track.querySelectorAll(
+                      ':scope > .sponsor-logo-slot:not(.sponsor-logo-slot--marquee-clone) img.sponsors-logo-image'
+                  )
+              )
+            : [];
+        const allImages = track
+            ? Array.from(track.querySelectorAll('img.sponsors-logo-image'))
+            : [];
+        if (!originals.length) return;
+        const hRow = sponsorLogoUniformHeightForGroup(originals, w, gapPx, maxH, false);
+        if (hRow == null) return;
+        applySponsorLogoUniformHeight(allImages, hRow, true, false);
+        if (track) mirrorHomeSponsorMarqueeCloneStyles(track);
+        updateHomeSponsorLogosMarqueeDuration(row);
+        return;
+    }
+
+    if (isMobile && !row.classList.contains('sponsor-logos-row') && !row.classList.contains('sponsor-logos--two-rows')) {
         const groups = sponsorLogoMobileRowGroups(row);
         if (!groups.length) return;
         let hUsed = maxH;
@@ -1693,37 +2042,33 @@ function layoutHomeSponsorLogosRowApply(sponsorsSectionEl) {
         return;
     }
 
-    const hDesktop = sponsorLogoUniformHeightForGroup(images, w, gapPx, maxH, false);
-    if (hDesktop == null) return;
-    applySponsorLogoUniformHeight(images, hDesktop, false);
+    const hRow = sponsorLogoUniformHeightForGroup(images, w, gapPx, maxH, capBySlotWidth);
+    if (hRow == null) return;
+    applySponsorLogoUniformHeight(images, hRow, isMobile);
 }
 
-function wireHomeSponsorLogosRowLayout(sponsorsSectionEl) {
-    if (!sponsorsSectionEl) return;
-    const row = sponsorsSectionEl.querySelector('.sponsor-logos');
-    if (!row) return;
+/** Scale sponsor logos so each row fits its container width (aspect ratios preserved). */
+function layoutHomeSponsorLogosRowApply(sponsorsRootEl) {
+    if (!sponsorsRootEl) return;
+    const logosContainer = sponsorsRootEl.classList.contains('sponsor-logos')
+        ? sponsorsRootEl
+        : sponsorsRootEl.querySelector('.sponsor-logos');
+    if (!logosContainer) return;
 
-    if (row.classList.contains('sponsor-logos-column')) {
-        if (row._homeSponsorLogoResizeObserver) {
-            row._homeSponsorLogoResizeObserver.disconnect();
-            row._homeSponsorLogoResizeObserver = null;
-        }
-        if (row._homeSponsorLogoMq && row._homeSponsorLogoMqListener) {
-            if (row._homeSponsorLogoMq.removeEventListener) {
-                row._homeSponsorLogoMq.removeEventListener('change', row._homeSponsorLogoMqListener);
-            } else if (row._homeSponsorLogoMq.removeListener) {
-                row._homeSponsorLogoMq.removeListener(row._homeSponsorLogoMqListener);
-            }
-            row._homeSponsorLogoMq = null;
-            row._homeSponsorLogoMqListener = null;
-        }
-        if (row._homeSponsorLogoImgLoadAbort) {
-            row._homeSponsorLogoImgLoadAbort.abort();
-            row._homeSponsorLogoImgLoadAbort = null;
-        }
-        layoutHomeSponsorLogosRowApply(sponsorsSectionEl);
+    const subRows = logosContainer.querySelectorAll(':scope > .sponsor-logos-row');
+    if (subRows.length) {
+        subRows.forEach(function (row) {
+            layoutSponsorLogosRowElement(row);
+        });
         return;
     }
+    layoutSponsorLogosRowElement(logosContainer);
+}
+
+function wireHomeSponsorLogosRowLayout(sponsorsRootEl) {
+    if (!sponsorsRootEl) return;
+    const row = sponsorsRootEl.querySelector('.sponsor-logos');
+    if (!row) return;
 
     if (row._homeSponsorLogoResizeObserver) {
         row._homeSponsorLogoResizeObserver.disconnect();
@@ -1748,7 +2093,8 @@ function wireHomeSponsorLogosRowLayout(sponsorsSectionEl) {
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(function () {
             raf = 0;
-            layoutHomeSponsorLogosRowApply(sponsorsSectionEl);
+            ensureHomeSponsorLogosMobileMarquee(row);
+            layoutHomeSponsorLogosRowApply(sponsorsRootEl);
         });
     }
 
@@ -1783,20 +2129,27 @@ function wireHomeSponsorLogosRowLayout(sponsorsSectionEl) {
     row._homeSponsorLogoMqListener = onMq;
 }
 
-/** Zermatt venue trailer in Location band; YouTube loop needs playlist=id when using loop=1 */
-const HOME_LOCATION_TRAILER_VIDEO_ID = 'mC-1x81FQ0U';
-const HOME_LOCATION_TRAILER_EMBED_SRC_HTML =
-    'https://www.youtube.com/embed/' +
-    HOME_LOCATION_TRAILER_VIDEO_ID +
-    '?rel=0&amp;modestbranding=1&amp;playsinline=1&amp;autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=' +
-    HOME_LOCATION_TRAILER_VIDEO_ID;
+/** Responsive divider: `narrowdivider.png` on mobile, sponsors divider on desktop. */
+const HOME_EVENT_SECTION_DIVIDER_HTML =
+    '<picture class="event-section-divider-picture">' +
+    '<source media="(max-width: 768px)" srcset="images/narrowdivider.png">' +
+    '<img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async" aria-hidden="true">' +
+    '</picture>';
 
-/** Home hero introslider row (below Sponsors band, above Latest feed). */
+/** Hero poster: divider directly below navbar (transparent overlay). */
+const POSTER_TOP_DIVIDER_HTML =
+    '<div class="poster-top-divider">' +
+    '<picture class="event-section-divider-picture">' +
+    '<source media="(max-width: 768px)" srcset="images/narrowdivider.png">' +
+    '<img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async" aria-hidden="true">' +
+    '</picture></div>';
+
+/** Home hero introslider row (below title band; sponsors band follows). */
 const HOME_HERO_INTROSLIDER_WRAPPER_HTML = `
-                <div class="introslider-outer-wrapper home-hero-introslider-outer" role="region" aria-labelledby="home-about-introslider-heading">
+                <div class="introslider-section home-hero-introslider-outer" role="region" aria-label="About">
                     <div class="introslider-inner-wrapper home-hero-introslider">
-                        <h2 class="section-titles introslider-section-title" id="home-about-introslider-heading">About</h2>
                         <div class="introslider">
+                            ${FEATURED_EVENT_SLIDER_HTML}
                             ${FEATURED_LOCATION_SLIDER_HTML}
                             ${FEATURED_ABOUT_SPEAKERS_SLIDER_HTML}
                             ${FEATURED_ABOUT_PROGRAMME_SLIDER_HTML}
@@ -1814,35 +2167,7 @@ const HOME_HERO_INTROSLIDER_WRAPPER_HTML = `
                             <button type="button" class="introslider-dot" data-index="2" aria-label="Slide 3"></button>
                             <button type="button" class="introslider-dot" data-index="3" aria-label="Slide 4"></button>
                             <button type="button" class="introslider-dot" data-index="4" aria-label="Slide 5"></button>
-                        </div>
-                    </div>
-                </div>
-`;
-
-/** 250px Prussian gradient bridge between hero poster and Event band. */
-const HOME_POSTER_EVENT_SPACER_HTML =
-    '<div class="poster-event-spacer" aria-hidden="true"></div>\n';
-
-/** Home: Event band — inner Prussian panel: `.eventintroduction` left, `.trailer-embed` right (stacks below on narrow widths). */
-const HOME_LOCATION_SECTION_HTML =
-    `
-                <div class="event-section" role="region" aria-label="Event introduction">
-                    <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async" aria-hidden="true">
-                    <div class="event-section-inner-wrapper">
-                        <div class="eventintroduction">
-                            <h1 class="section-titles maintitle-heading" id="home-event-welcome-heading">WELCOME TO TBS27</h1>
-                            <div class="event-texts">
-                                <div class="event-contents"></div>
-                            </div>
-                        </div>
-                        <div class="trailer-embed">
-                            <div class="embed-section" aria-label="Venue trailer video">
-                                <div class="trailer">
-                                    <div class="trailer-media">
-                                        <iframe width="560" height="315" title="Venue trailer video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="${HOME_LOCATION_TRAILER_EMBED_SRC_HTML}" data-embed-src="${HOME_LOCATION_TRAILER_EMBED_SRC_HTML}"></iframe>
-                                    </div>
-                                </div>
-                            </div>
+                            <button type="button" class="introslider-dot" data-index="5" aria-label="Slide 6"></button>
                         </div>
                     </div>
                 </div>
@@ -2124,7 +2449,7 @@ const HOME_REGISTRATION_OUTER_HTML = `
 /** Divider between registration and site footer (same asset as event section). */
 const HOME_REGISTRATION_FOOTER_DIVIDER_HTML = `
                 <div class="home-section-divider-band" aria-hidden="true">
-                    <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async">
+                    ${HOME_EVENT_SECTION_DIVIDER_HTML}
                 </div>
 `;
 
@@ -2505,16 +2830,12 @@ function scrollToHomeProgrammeSection() {
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
 }
 
-/** Home Event band welcome title (introslider Event about-text scroll target). */
+/** Home TBS27 introslider welcome title (introslider Event slide scroll target). */
 function getHomeEventWelcomeHeadingEl() {
-    return (
-        document.getElementById('home-event-welcome-heading') ||
-        document.querySelector('.home-section .event-section .maintitle-heading') ||
-        document.querySelector('.home-section .event-section')
-    );
+    return document.getElementById('home-event-welcome-heading');
 }
 
-/** Smooth scroll to home Event welcome title (Welcome to TBS27). */
+/** Smooth scroll to home Event welcome title on poster. */
 function scrollToHomeEventWelcomeSection() {
     const el = getHomeEventWelcomeHeadingEl();
     if (!el) return;
@@ -2579,9 +2900,12 @@ function waitForDoubleAnimationFrame() {
 
 async function waitForHomePosterPictureReady(pictureEl) {
     if (!pictureEl) return;
+    const main = pictureEl.querySelector('img.home-poster-wide') || pictureEl.querySelector('img');
+    if (main && main.complete && main.naturalWidth > 0) {
+        return;
+    }
     try {
-        const main = pictureEl.querySelector('img.home-poster-wide') || pictureEl.querySelector('img');
-        await withTimeout(waitForHomeImageDecode(main), 3000, 'Home poster');
+        await withTimeout(waitForHomeImageDecode(main), 2000, 'Home poster');
     } catch (e) {
         /* huge hero on slow links — still show rest of home */
     }
@@ -2597,11 +2921,12 @@ function runHomePageBackgroundHydration(homeSection, ctx) {
 
     void Promise.all(promises)
         .then(function (results) {
-            const registrationManifestoHtml = results && results.length >= 3 ? results[2] : '';
+            const registrationManifestoHtml =
+                results && results.length > 0 && typeof results[0] === 'string' ? results[0] : '';
             finalizeHomeSpeakersSection(speakersWrap);
             if (regWrap) {
                 const manifestoEl = regWrap.querySelector('p.registration-manifesto');
-                if (manifestoEl && typeof registrationManifestoHtml === 'string') {
+                if (manifestoEl && registrationManifestoHtml.trim()) {
                     manifestoEl.innerHTML = registrationManifestoHtml;
                 }
             }
@@ -2623,16 +2948,30 @@ function runHomePageBackgroundHydration(homeSection, ctx) {
 }
 
 /**
- * Wait for fonts/images on hero introslider before reveal (desktop), then lock equal card heights.
+ * Wait for fonts/images on hero introslider before reveal (desktop), then equalize card heights.
  */
 async function prepareHomeIntrosliderBeforeReveal(introWrap) {
     if (!introWrap) return;
+    const track = introWrap.querySelector(':scope > .introslider');
     if (window.matchMedia('(max-width: 768px)').matches) {
         introWrap.classList.remove('home-stage-hidden');
+        try {
+            if (document.fonts && document.fonts.ready) {
+                await withTimeout(document.fonts.ready, 500, 'Introslider fonts');
+            }
+            if (track) {
+                await waitForImagesInElementTree(track, 800);
+            }
+            await waitForDoubleAnimationFrame();
+        } catch (err) {
+            console.warn('introslider mobile pre-measure', err);
+        }
+        requestAnimationFrame(function () {
+            syncHomeIntrosliderLayout({ force: true });
+        });
         return;
     }
 
-    const track = introWrap.querySelector(':scope > .introslider');
     if (!track) {
         introWrap.classList.remove('home-stage-hidden');
         return;
@@ -2644,13 +2983,14 @@ async function prepareHomeIntrosliderBeforeReveal(introWrap) {
 
     try {
         if (document.fonts && document.fonts.ready) {
-            await withTimeout(document.fonts.ready, 1500, 'Introslider fonts');
+            await withTimeout(document.fonts.ready, 500, 'Introslider fonts');
         }
-        await waitForImagesInElementTree(track, 3000);
+        await waitForImagesInElementTree(track, 800);
         await waitForDoubleAnimationFrame();
-        syncHomeIntrosliderCardHeights();
+        syncHomeIntrosliderLayout({ force: true });
     } finally {
         introWrap.classList.remove('home-introslider-prelock');
+        requestAnimationFrame(fitHomeMaintitleHeadingFontSize);
     }
 }
 
@@ -2677,25 +3017,14 @@ async function goToHomeFeed(e) {
 }
 
 /** Remove `.home-stage-hidden` from any node still inside `.home-section` (used when staged load throws). */
-/** YouTube usually defers iframe loads inside `display:none`; assign src after Location is shown. */
-function kickLocationTrailerEmbed(locationSectionEl) {
-    if (!locationSectionEl) return;
-    const iframe = locationSectionEl.querySelector('.trailer-embed iframe');
-    if (!iframe) return;
-    const url = iframe.getAttribute('data-embed-src') || iframe.getAttribute('src');
-    if (!url || url === 'about:blank') return;
-    iframe.src = '';
-    iframe.src = url;
-}
-
 function revealStuckHomeStageBands(homeSection) {
     if (!homeSection) return;
     homeSection.querySelectorAll('.home-stage-hidden').forEach(function (el) {
         el.classList.remove('home-stage-hidden');
     });
     requestAnimationFrame(function () {
-        kickLocationTrailerEmbed(homeSection.querySelector('.event-section'));
-        layoutHomeSponsorLogosRowApply(homeSection.querySelector('.sponsors-section'));
+        layoutHomeSponsorLogosRowApply(getHomeSponsorsInnerWrapper(homeSection));
+        fitHomeMaintitleHeadingFontSize();
     });
 }
 
@@ -2704,13 +3033,11 @@ function revealHomeStageBands(homeSection, options) {
     if (!homeSection) return;
     const skipIntro = options && options.skipIntro;
     const bandSelectors = [
-        ':scope > .poster-event-spacer',
-        ':scope > .event-section',
+        skipIntro ? null : ':scope > .introslider-section',
         ':scope > .sponsors-section',
-        skipIntro ? null : ':scope > .introslider-outer-wrapper',
         ':scope > .feed-section',
-        ':scope > .speaker-section',
         ':scope > .programme-section',
+        ':scope > .speaker-section',
         ':scope > .registration-section',
         ':scope > .registration-section + .home-section-divider-band'
     ];
@@ -2720,14 +3047,166 @@ function revealHomeStageBands(homeSection, options) {
         if (el) el.classList.remove('home-stage-hidden');
     });
     requestAnimationFrame(function () {
-        kickLocationTrailerEmbed(homeSection.querySelector('.event-section'));
-        layoutHomeSponsorLogosRowApply(homeSection.querySelector('.sponsors-section'));
+        layoutHomeSponsorLogosRowApply(getHomeSponsorsInnerWrapper(homeSection));
+        fitHomeMaintitleHeadingFontSize();
     });
 }
 
 /** Show all home bands including introslider. */
 function revealHomeStageBandsBelowIntro(homeSection) {
     revealHomeStageBands(homeSection, { skipIntro: false });
+}
+
+/** Hero poster markup (kept when augmenting home.html so LCP image is not re-fetched). */
+const HOME_POSTER_PICTURE_HTML = `
+                <picture>
+                    <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
+                    <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
+                    <img src="images/wideposter.webp" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
+                    <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
+${POSTER_TOP_DIVIDER_HTML}
+${POSTER_HERO_TITLES_HTML}
+                </picture>
+`;
+
+/** Home bands below the poster (everything except past-talks overlay section). */
+const HOME_SECTION_BANDS_HTML =
+    HOME_HERO_INTROSLIDER_WRAPPER_HTML +
+    HOME_SPONSORS_SECTION_HTML +
+    `
+                <div class="feed-section">
+                    <div class="feed-section-inner-wrapper">
+                    </div>
+                </div>
+` +
+    HOME_SPEAKERS_SLIDER_HTML +
+    HOME_ONDEMAND_SECTION_HTML +
+    HOME_REGISTRATION_OUTER_HTML +
+    HOME_REGISTRATION_FOOTER_DIVIDER_HTML;
+
+/** Move divider onto poster (legacy title band) and ensure maintitles block. */
+function ensurePosterOverlaysOnPicture(picture, homeSection) {
+    if (!picture) return;
+    const stalePosterSponsors = picture.querySelector(':scope > .poster-sponsor-logos');
+    if (stalePosterSponsors) stalePosterSponsors.remove();
+    if (!picture.querySelector('.poster-top-divider')) {
+        const fromTitle =
+            homeSection && homeSection.querySelector(':scope > .title-section .event-section-divider-picture');
+        if (fromTitle) {
+            const wrap = document.createElement('div');
+            wrap.className = 'poster-top-divider';
+            wrap.appendChild(fromTitle);
+            picture.appendChild(wrap);
+            const titleBand = homeSection.querySelector(':scope > .title-section');
+            if (titleBand) titleBand.remove();
+        } else {
+            picture.insertAdjacentHTML('beforeend', POSTER_TOP_DIVIDER_HTML);
+        }
+    }
+    if (!picture.querySelector('.poster-maintitles')) {
+        const legacy =
+            picture.querySelector('.poster-hero-titles') ||
+            picture.querySelector('.mobile-poster-logo');
+        if (legacy) {
+            legacy.outerHTML = POSTER_HERO_TITLES_HTML.trim();
+        } else {
+            picture.insertAdjacentHTML('beforeend', POSTER_HERO_TITLES_HTML.trim());
+        }
+    }
+}
+
+/**
+ * Mount home section DOM. Reuses an existing <picture> from home.html when present
+ * so the preloaded hero poster is not torn down and downloaded again.
+ */
+function mountHomeSectionIntoMain(main) {
+    const existingHome = main.querySelector(':scope > .home-section');
+    const existingPicture = existingHome && existingHome.querySelector(':scope > picture');
+
+    if (existingHome && existingPicture) {
+        ensurePosterOverlaysOnPicture(existingPicture, existingHome);
+        Array.from(existingHome.children).forEach(function (child) {
+            if (child !== existingPicture) {
+                child.remove();
+            }
+        });
+        const bands = document.createElement('template');
+        bands.innerHTML = HOME_SECTION_BANDS_HTML;
+        existingPicture.after(bands.content);
+    } else {
+        const block = document.createElement('template');
+        block.innerHTML =
+            '<section class="home-section">' +
+            HOME_POSTER_PICTURE_HTML +
+            HOME_SECTION_BANDS_HTML +
+            '</section>';
+        main.innerHTML = '';
+        main.appendChild(block.content);
+    }
+
+    let pastTalks = main.querySelector(':scope > .past-talks-section');
+    if (!pastTalks) {
+        const pt = document.createElement('section');
+        pt.className = 'past-talks-section is-collapsed';
+        pt.hidden = true;
+        pt.setAttribute('aria-hidden', 'true');
+        main.appendChild(pt);
+    }
+
+    return main.querySelector(':scope > .home-section');
+}
+
+/** Feed / event / speakers / intro — after pink loader hides. */
+function runHomeDeferredHydration(homeSection, ctx) {
+    if (!homeSection || !ctx) return;
+
+    const introReady = ctx.introReady || Promise.resolve();
+    const introOuter = ctx.introOuter;
+    const newsFeedPromise = ctx.newsFeedPromise || Promise.resolve();
+    const speakersPromise = ctx.speakersPromise || Promise.resolve();
+    const speakersWrap = ctx.speakersWrap;
+    const regWrap = ctx.regWrap;
+    const sponsorsWrap = ctx.sponsorsWrap;
+    const registrationManifestoPromise = ctx.registrationManifestoPromise;
+
+    void introReady
+        .then(function () {
+            if (introOuter) introOuter.classList.remove('home-stage-hidden');
+            syncHomeIntrosliderLayout();
+            fitHomeMaintitleHeadingFontSize();
+        })
+        .catch(function (err) {
+            console.warn('introslider deferred hydrate', err);
+            if (introOuter) introOuter.classList.remove('home-stage-hidden');
+            fitHomeMaintitleHeadingFontSize();
+        });
+
+    void Promise.all([
+        newsFeedPromise,
+        Promise.race([
+            speakersPromise,
+            new Promise(function (resolve) {
+                setTimeout(resolve, HOME_LOAD_SPEAKERS_MAX_MS);
+            })
+        ])
+    ])
+        .then(function () {
+            revealStuckHomeStageBands(homeSection);
+            if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
+            wireSliderIndicators();
+        })
+        .catch(function (err) {
+            console.error('home deferred hydrate', err);
+            revealStuckHomeStageBands(homeSection);
+            if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
+        });
+
+    runHomePageBackgroundHydration(homeSection, {
+        speakersWrap: speakersWrap,
+        regWrap: regWrap,
+        sponsorsWrap: sponsorsWrap,
+        promises: [registrationManifestoPromise]
+    });
 }
 
 // Show the feed content (different from blog posts)
@@ -2743,52 +3222,23 @@ async function showFeedContent() {
         
         // No section title needed
         
-        main.innerHTML = `
-            <section class="home-section">
-                <picture>
-                    <source media="(max-width: 768px)" srcset="images/poster_narrow_q72.jpg">
-                    <img src="images/poster_wide_q72.jpg" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
-                    <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
-                    <div class="mobile-poster-logo">
-                        <img src="images/logo.png" alt="TBS Zermatt" class="mobile-poster-logo-img" loading="eager" decoding="async" onerror="this.style.display='none';">
-                        <p class="mobile-poster-logo-subtitle nav-logo-subtitle">TBS27, 9-12 February, Hotel Alex, Zermatt</p>
-                    </div>
-                </picture>
-${HOME_POSTER_EVENT_SPACER_HTML}${HOME_LOCATION_SECTION_HTML}
-${HOME_SPONSORS_SECTION_HTML}
-${HOME_HERO_INTROSLIDER_WRAPPER_HTML}
-                <div class="feed-section">
-                    <div class="feed-section-inner-wrapper">
-                    </div>
-                </div>
-${HOME_SPEAKERS_SLIDER_HTML}
-${HOME_ONDEMAND_SECTION_HTML}
-${HOME_REGISTRATION_OUTER_HTML}
-${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
-            </section>
-            <section class="past-talks-section is-collapsed" hidden aria-hidden="true"></section>
-        `;
-
-        const homeSection = main.querySelector('.home-section');
+        const homeSection = mountHomeSectionIntoMain(main);
         setupRegistrationFormValidation(homeSection);
         const pictureEl = homeSection && homeSection.querySelector(':scope > picture');
-        const introOuter = homeSection && homeSection.querySelector(':scope > .introslider-outer-wrapper');
+        const introOuter = homeSection && homeSection.querySelector(':scope > .introslider-section');
         const introWrap = introOuter && introOuter.querySelector(':scope > .introslider-inner-wrapper');
         const feedWrap = homeSection && homeSection.querySelector(':scope > .feed-section');
-        const eventSectionWrap = homeSection && homeSection.querySelector(':scope > .event-section');
-        const sponsorsWrap = homeSection && homeSection.querySelector(':scope > .sponsors-section');
         const speakersWrap = homeSection && homeSection.querySelector(':scope > .speaker-section');
         const regWrap = homeSection && homeSection.querySelector(':scope > .registration-section');
         const regDivider = homeSection && homeSection.querySelector(':scope > .registration-section + .home-section-divider-band');
-        const posterEventSpacer = homeSection && homeSection.querySelector(':scope > .poster-event-spacer');
-        [posterEventSpacer, introOuter, eventSectionWrap, feedWrap, sponsorsWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
+        mountHomeProgrammeSliderShell(homeSection);
+        positionHomeSponsorsAfterIntroslider(homeSection);
+        const sponsorsWrap = getHomeSponsorsInnerWrapper(homeSection);
+        [sponsorsWrap, introOuter, feedWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
-
-        mountHomeEventContentsSkeleton(homeSection);
         void prefetchHomeProgrammeSliderData();
-        mountHomeProgrammeSliderShell(homeSection);
-        const eventInfoPromise = injectHomeEventInfoBodyHtml(homeSection);
+
         const newsFeedPromise = loadNewsFeed();
         const speakersPromise = speakersWrap
             ? populateHomeSpeakersSliderFromFirebase(speakersWrap).catch(function (err) {
@@ -2809,9 +3259,6 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
             if (regWrap) applyRegistrationFormOpenState(regWrap, isOpen);
         });
 
-        wireSliderIndicators();
-        setupHomeViewNavbarScroll();
-        
         // Past talks introslider panel → Past talks (video) view
         const pastTalksSlideEl = main.querySelector('.home-section .introslider > .pasttalks');
         if (pastTalksSlideEl) {
@@ -2843,6 +3290,20 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
                 }
             });
         }
+        const eventSlideEl = main.querySelector('.home-section .introslider > .about.introslider-clickable');
+        if (eventSlideEl) {
+            eventSlideEl.addEventListener('click', function(e) {
+                if (e.target.closest('a')) return;
+                e.preventDefault();
+                scrollToHomeEventWelcomeSection();
+            });
+            eventSlideEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    scrollToHomeEventWelcomeSection();
+                }
+            });
+        }
         const locationSlideEl = main.querySelector('.home-section .introslider > .location');
         if (locationSlideEl) {
             locationSlideEl.addEventListener('click', function(e) {
@@ -2871,24 +3332,30 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
 
         try {
             revealHomeStageBands(homeSection, { skipIntro: true });
-            mountHomeFeedSkeleton();
-            if (speakersWrap) {
-                mountHomeSpeakersSkeleton(speakersWrap);
-                finalizeHomeSpeakersSection(speakersWrap);
-            }
             setupHomeHeroIntrosliderPosterGap(8);
 
-            if (introWrap) {
-                void prepareHomeIntrosliderBeforeReveal(introWrap).then(function () {
-                    if (introOuter) introOuter.classList.remove('home-stage-hidden');
-                });
-            } else if (introOuter) {
-                introOuter.classList.remove('home-stage-hidden');
-            }
+            const introReady = introWrap
+                ? prepareHomeIntrosliderBeforeReveal(introWrap)
+                : Promise.resolve();
 
             void prefetchHomeProgrammeSliderData().then(function () {
                 void hydrateHomeProgrammeSlider(homeSection);
             });
+
+            const posterReady = Promise.race([
+                waitForHomePosterPictureReady(pictureEl),
+                new Promise(function (resolve) {
+                    setTimeout(resolve, HOME_LOAD_POSTER_MAX_MS);
+                })
+            ]);
+
+            await posterReady;
+
+            setHomePageLoading(false);
+            mountHomeFeedSkeleton();
+
+            wireSliderIndicators();
+            setupHomeViewNavbarScroll();
 
             if (typeof requestIdleCallback === 'function') {
                 requestIdleCallback(function () {
@@ -2900,30 +3367,15 @@ ${HOME_REGISTRATION_FOOTER_DIVIDER_HTML}
                 });
             }
 
-            /* Unlock scroll as soon as poster is ready (do not wait for feed/speakers/Firestore). */
-            await Promise.race([
-                waitForHomePosterPictureReady(pictureEl),
-                new Promise(function (resolve) {
-                    setTimeout(resolve, 2000);
-                })
-            ]);
-            setHomePageLoading(false);
-
-            runHomePageBackgroundHydration(homeSection, {
+            runHomeDeferredHydration(homeSection, {
+                introReady: introReady,
+                introOuter: introOuter,
+                newsFeedPromise: newsFeedPromise,
+                speakersPromise: speakersPromise,
                 speakersWrap: speakersWrap,
                 regWrap: regWrap,
                 sponsorsWrap: sponsorsWrap,
-                promises: [
-                    newsFeedPromise,
-                    Promise.race([
-                        speakersPromise,
-                        new Promise(function (resolve) {
-                            setTimeout(resolve, 10000);
-                        })
-                    ]),
-                    registrationManifestoPromise,
-                    eventInfoPromise
-                ]
+                registrationManifestoPromise: registrationManifestoPromise
             });
         } catch (homePaintErr) {
             console.error('showFeedContent home paint', homePaintErr);
@@ -2990,10 +3442,12 @@ async function loadNewsFeed() {
         console.error('feedContent element not found');
         return;
     }
-    
-    // Show loading state
-    showFeedLoadingState();
-    
+
+    const pinkLoaderActive = document.body.classList.contains('loading');
+    if (!pinkLoaderActive) {
+        showFeedLoadingState();
+    }
+
     try {
         // Use shared fetch function with caching
         const newsRecords = await fetchNewsFeed();
@@ -3073,7 +3527,9 @@ async function loadNewsFeed() {
         window.allContentRecords = allRecords;
         window.allNewsRecords = allRecords;
 
-        await displayNewsGrid(orderHomeFeedWithFeaturedFirst(allRecords));
+        const ordered = orderHomeFeedWithFeaturedFirst(allRecords);
+        prefetchFeedThumbnailsForRecords(ordered, HOME_FEED_INITIAL_COUNT);
+        await displayNewsGrid(ordered);
         
     } catch (error) {
         console.error('Error loading news feed:', error);
@@ -3179,18 +3635,6 @@ async function showFallbackNewsContent() {
 
 const HOME_FEED_INITIAL_COUNT = 5;
 const HOME_FEED_PAGE_SIZE = 5;
-
-/** Placeholder lines in `.event-contents` until `injectHomeEventInfoBodyHtml` completes. */
-function mountHomeEventContentsSkeleton(homeSectionRoot) {
-    const el = homeSectionRoot && homeSectionRoot.querySelector('.event-contents');
-    if (!el || el.querySelector('.home-skeleton-event-contents')) return;
-    el.innerHTML =
-        '<div class="home-skeleton-event-contents" aria-hidden="true">' +
-        '<div class="skeleton-title skeleton-title--event-h3"></div>' +
-        '<div class="skeleton-text"></div>' +
-        '<div class="skeleton-text short"></div>' +
-        '</div>';
-}
 
 /** Placeholder feed cards until `displayNewsGrid` runs (skip if `loadNewsFeed` already painted loading UI). */
 function mountHomeFeedSkeleton() {
@@ -4606,22 +5050,6 @@ function wrapHomeRichHtml(html) {
 }
 
 /**
- * Fills `.event-contents` from Firestore `tbs/Snippets.Eventinfo` (empty when missing).
- * @param {ParentNode | null | undefined} homeSectionRoot
- */
-async function injectHomeEventInfoBodyHtml(homeSectionRoot) {
-    const el = homeSectionRoot && homeSectionRoot.querySelector('.event-contents');
-    if (!el) return;
-    let fromCloud = '';
-    try {
-        fromCloud = await fetchHomeEventEventInfoFromFirebase(TBS27_HOME_PROGRAMME_EVENT_ID);
-    } catch (e) {
-        console.warn('Home eventinfo Firestore read failed:', e);
-    }
-    el.innerHTML = String(fromCloud).trim() !== '' ? wrapHomeRichHtml(fromCloud) : '';
-}
-
-/**
  * Fills `.location-text-body` inside `.location-contents`: Firestore `locationinfo` first, then localStorage snippet, then default HTML.
  * @param {ParentNode | null | undefined} homeSectionRoot
  */
@@ -4951,15 +5379,17 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     if (!track) return;
     try {
         const eventId = TBS27_HOME_PROGRAMME_EVENT_ID;
-        const displaySpeakers = await withTimeout(
-            fetchHomeDisplaySpeakersFromFirestore(),
-            10000,
-            'Firestore displayspeakers'
-        ).catch(function () {
-            return true;
-        });
+        const settingsAndInfo = await Promise.all([
+            withTimeout(fetchHomeDisplaySpeakersFromFirestore(), 6000, 'Firestore displayspeakers').catch(
+                function () {
+                    return true;
+                }
+            ),
+            fetchHomeEventSpeakerInfoFromFirebase(eventId)
+        ]);
+        const displaySpeakers = settingsAndInfo[0];
+        const speakerinfoRaw = settingsAndInfo[1];
         speakersWrapperEl.classList.toggle('home-carousel--minimal', !displaySpeakers);
-        const speakerinfoRaw = await fetchHomeEventSpeakerInfoFromFirebase(eventId);
         const speakerinfoHtml = String(speakerinfoRaw || '').trim();
         const hasInfoCard = !!speakerinfoHtml;
 
@@ -5083,6 +5513,22 @@ function buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme) 
     return programmeSliderSection.querySelector('.programme-section');
 }
 
+/** Keep sponsors band immediately below the hero introslider. */
+function positionHomeSponsorsAfterIntroslider(homeSection) {
+    if (!homeSection) return;
+    const sponsorsSection = homeSection.querySelector(':scope > .sponsors-section');
+    if (!sponsorsSection) return;
+    const introsliderSection = homeSection.querySelector(':scope > .introslider-section');
+    if (introsliderSection) {
+        introsliderSection.insertAdjacentElement('afterend', sponsorsSection);
+        return;
+    }
+    const feedSection = homeSection.querySelector(':scope > .feed-section');
+    if (feedSection) {
+        feedSection.insertAdjacentElement('beforebegin', sponsorsSection);
+    }
+}
+
 function insertHomeProgrammeSection(programmeSection, homeSection) {
     if (!programmeSection || !homeSection) return;
     const existing = homeSection.querySelector(':scope > .programme-section');
@@ -5094,7 +5540,7 @@ function insertHomeProgrammeSection(programmeSection, homeSection) {
         });
     const speakersSliderWrapper = homeSection.querySelector(':scope > .speaker-section');
     const homeFeedBlock = homeSection.querySelector(':scope > .feed-section');
-    const heroIntrosliderWrapper = homeSection.querySelector(':scope > .introslider-outer-wrapper');
+    const heroIntrosliderWrapper = homeSection.querySelector(':scope > .introslider-section');
     if (speakersSliderWrapper) {
         speakersSliderWrapper.insertAdjacentElement('beforebegin', programmeSection);
     } else if (homeFeedBlock) {
@@ -5104,6 +5550,7 @@ function insertHomeProgrammeSection(programmeSection, homeSection) {
     } else {
         homeSection.appendChild(programmeSection);
     }
+    positionHomeSponsorsAfterIntroslider(homeSection);
     const registrationOuter = homeSection.querySelector(':scope > .registration-section');
     if (registrationOuter) {
         const registrationAnchor = speakersSliderWrapper || programmeSection;
@@ -5245,13 +5692,15 @@ async function displayNewsGrid(records) {
             '<p class="empty-feed-message">No published items to show yet.</p>';
     }
 
-    // Clear existing content and paint the feed immediately (programme hydrates in the background).
+    // Clear existing content and paint the feed (programme shell already mounted during home init).
     feedContent.innerHTML = '';
     const homeSection = document.querySelector('body.home-view .home-section');
     if (homeSection && !homeSection.querySelector(':scope > .programme-section')) {
         mountHomeProgrammeSliderShell(homeSection);
     }
-    void hydrateHomeProgrammeSlider(homeSection);
+    if (!document.body.classList.contains('loading')) {
+        void hydrateHomeProgrammeSlider(homeSection);
+    }
     const feedTitle = document.createElement('h2');
     feedTitle.className = 'section-titles';
     feedTitle.id = 'home-feed-latest-heading';
@@ -6015,18 +6464,50 @@ async function setupNavigationListeners() {
 
 
 
-// Mobile menu functionality
+function setMobileNavMenuOpen(open) {
+    if (!hamburger || !navMenu) return;
+    const isOpen = !!open;
+    navMenu.classList.toggle('active', isOpen);
+    hamburger.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('nav-menu-open', isOpen);
+}
+
+// Mobile hamburger drawer (full desktop nav links)
 function setupMobileMenu() {
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-        });
-        // Close mobile menu when any nav link is clicked (delegation: works after links are replaced by setupNavigationListeners)
-        document.addEventListener('click', function(e) {
-            const link = e.target.closest('.nav-link');
-            if (link && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-            }
+    if (!hamburger || !navMenu) return;
+
+    hamburger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setMobileNavMenuOpen(!navMenu.classList.contains('active'));
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!navMenu.classList.contains('active')) return;
+        if (e.target.closest('.hamburger') || e.target.closest('#site-nav-menu')) return;
+        setMobileNavMenuOpen(false);
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+            setMobileNavMenuOpen(false);
+        }
+    });
+
+    navMenu.addEventListener('click', function(e) {
+        if (!navMenu.classList.contains('active')) return;
+        if (e.target.closest('.nav-link[data-view]')) {
+            setMobileNavMenuOpen(false);
+        }
+    });
+
+    const menuLogoBtn = navMenu.querySelector('.nav-menu-logo-btn');
+    if (menuLogoBtn) {
+        menuLogoBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            setMobileNavMenuOpen(false);
+            void goToHomeFeed(e);
         });
     }
 }
@@ -6234,6 +6715,7 @@ let homeNavbarScrollHandler = null;
 
 let homeNavbarResizeHandler = null;
 
+
 let pastTalksStripResizeHandler = null;
 
 /** Prussian top strip height: desktop = top navbar; mobile = tab-bar height + safe-area (CSS). */
@@ -6287,39 +6769,135 @@ function setupPastTalksPrussianStripSync() {
 
 let homeHeroIntrosliderPosterGapResizeHandler = null;
 let homeHeroIntrosliderPosterGapResizeObserver = null;
+let homeIntrosliderLayoutModeMq = null;
+let homeIntrosliderLayoutModeMqHandler = null;
 
-/** Hero About introslider: measure tallest slide and apply --home-introslider-card-height (desktop). */
-function syncHomeIntrosliderCardHeights() {
-    const track = document.querySelector(
-        'body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider'
+/** Per-track locked heights — stable when viewport width changes (rem on mobile/desktop switch). */
+const homeIntrosliderTrackHeightLocks = new WeakMap();
+
+function getHomeIntrosliderTrackHeightLock(track) {
+    return homeIntrosliderTrackHeightLocks.get(track) || null;
+}
+
+function setHomeIntrosliderTrackHeightLock(track, patch) {
+    const prev = homeIntrosliderTrackHeightLocks.get(track) || {};
+    homeIntrosliderTrackHeightLocks.set(track, Object.assign(prev, patch));
+}
+
+function clearHomeIntrosliderHeightLocks() {
+    getHomeIntrosliderTracks().forEach(function (track) {
+        homeIntrosliderTrackHeightLocks.delete(track);
+        track.style.removeProperty('--home-introslider-card-height');
+        track.style.removeProperty('--introslider-text-height');
+    });
+}
+
+/** Natural content height of one introslider slide (tallest slide sets row height). */
+function measureHomeIntrosliderSlideContentHeight(slide) {
+    return Math.max(slide.scrollHeight, slide.offsetHeight, slide.getBoundingClientRect().height);
+}
+
+function getHomeIntrosliderTracks() {
+    if (!document.body.classList.contains('home-view')) return [];
+    return Array.from(
+        document.querySelectorAll('body.home-view .home-section .introslider-inner-wrapper > .introslider')
     );
+}
+
+/** Equal slide height per track — driven by the card with the most content. */
+function syncHomeIntrosliderCardHeights(options) {
+    const force = Boolean(options && options.force);
+    getHomeIntrosliderTracks().forEach(function (track) {
+        const lock = getHomeIntrosliderTrackHeightLock(track);
+        if (!force && lock && lock.cardHeightPx > 0) {
+            track.style.setProperty('--home-introslider-card-height', lock.cardHeightPx + 'px');
+            return;
+        }
+
+        const slides = Array.from(track.children).filter(function (el) {
+            return el.nodeType === 1;
+        });
+        if (!slides.length) return;
+
+        track.style.removeProperty('--home-introslider-card-height');
+        slides.forEach(function (slide) {
+            slide.style.removeProperty('min-height');
+            slide.style.removeProperty('height');
+        });
+        void track.offsetHeight;
+
+        let maxHeight = 0;
+        slides.forEach(function (slide) {
+            const h = measureHomeIntrosliderSlideContentHeight(slide);
+            if (h > maxHeight) maxHeight = h;
+        });
+
+        if (maxHeight > 0) {
+            const px = Math.ceil(maxHeight);
+            track.style.setProperty('--home-introslider-card-height', px + 'px');
+            setHomeIntrosliderTrackHeightLock(track, { cardHeightPx: px });
+        }
+    });
+}
+
+/** Equal `.introslider-text` height on every slide in one track (tallest copy wins). */
+function syncIntrosliderTextHeightsForTrack(track, options) {
     if (!track) return;
 
-    if (window.matchMedia('(max-width: 768px)').matches) {
-        track.style.removeProperty('--home-introslider-card-height');
+    const force = Boolean(options && options.force);
+    const lock = getHomeIntrosliderTrackHeightLock(track);
+    if (!force && lock && lock.textHeightPx > 0) {
+        track.style.setProperty('--introslider-text-height', lock.textHeightPx + 'px');
         return;
     }
 
-    const slides = Array.from(track.children).filter(function (node) {
-        return node.nodeType === 1;
+    const texts = Array.from(
+        track.querySelectorAll(':scope > * .about-text > .introslider-text')
+    );
+    if (!texts.length) {
+        track.style.removeProperty('--introslider-text-height');
+        return;
+    }
+
+    texts.forEach(function (el) {
+        el.style.removeProperty('min-height');
+        el.style.removeProperty('height');
     });
-    if (!slides.length) {
-        track.style.removeProperty('--home-introslider-card-height');
-        return;
-    }
-
-    track.style.removeProperty('--home-introslider-card-height');
+    track.style.removeProperty('--introslider-text-height');
     void track.offsetHeight;
 
     let maxHeight = 0;
-    slides.forEach(function (slide) {
-        const h = slide.getBoundingClientRect().height;
+    texts.forEach(function (el) {
+        const h = Math.max(el.scrollHeight, el.getBoundingClientRect().height);
         if (h > maxHeight) maxHeight = h;
     });
 
     if (maxHeight > 0) {
-        track.style.setProperty('--home-introslider-card-height', Math.ceil(maxHeight) + 'px');
+        const px = Math.ceil(maxHeight);
+        track.style.setProperty('--introslider-text-height', px + 'px');
+        setHomeIntrosliderTrackHeightLock(track, { textHeightPx: px });
     }
+}
+
+/** Every home introslider track (hero + any other `.introslider` rows). */
+function syncAllIntrosliderTextHeights(options) {
+    if (!document.body.classList.contains('home-view')) return;
+    const tracks = document.querySelectorAll(
+        'body.home-view .home-section .introslider-inner-wrapper > .introslider, ' +
+        'body.home-view .home-section .introslider-wrapper > .introslider'
+    );
+    tracks.forEach(function (track) {
+        syncIntrosliderTextHeightsForTrack(track, options);
+    });
+}
+
+function syncHomeIntrosliderTextHeights(options) {
+    syncAllIntrosliderTextHeights(options);
+}
+
+function syncHomeIntrosliderLayout(options) {
+    syncHomeIntrosliderTextHeights(options);
+    syncHomeIntrosliderCardHeights(options);
 }
 
 /** Legacy hook: introslider sits in normal flow between Event and Sponsors (no poster overlap). */
@@ -6339,6 +6917,11 @@ function teardownHomeHeroIntrosliderPosterGapSync() {
         homeHeroIntrosliderPosterGapResizeObserver.disconnect();
         homeHeroIntrosliderPosterGapResizeObserver = null;
     }
+    if (homeIntrosliderLayoutModeMq && homeIntrosliderLayoutModeMqHandler) {
+        homeIntrosliderLayoutModeMq.removeEventListener('change', homeIntrosliderLayoutModeMqHandler);
+        homeIntrosliderLayoutModeMq = null;
+        homeIntrosliderLayoutModeMqHandler = null;
+    }
 }
 
 function setupHomeHeroIntrosliderPosterGap(desiredGapPx = 8) {
@@ -6348,27 +6931,22 @@ function setupHomeHeroIntrosliderPosterGap(desiredGapPx = 8) {
     homeHeroIntrosliderPosterGapResizeHandler = function() {
         if (resizeTimer) clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            syncHomeIntrosliderCardHeights({ force: true });
             syncHomeHeroIntrosliderPosterGap(desiredGapPx);
         }, 120);
     };
     window.addEventListener('resize', homeHeroIntrosliderPosterGapResizeHandler, { passive: true });
 
-    const homeSection = document.querySelector('body.home-view .home-section');
-    const sliderWrapper =
-        homeSection && homeSection.querySelector(':scope > .introslider-outer-wrapper > .introslider-inner-wrapper');
-    const sliderTrack = sliderWrapper && sliderWrapper.querySelector(':scope > .introslider');
-
-    if (typeof ResizeObserver !== 'undefined' && sliderTrack) {
-        homeHeroIntrosliderPosterGapResizeObserver = new ResizeObserver(function() {
-            syncHomeIntrosliderCardHeights();
-            syncHomeHeroIntrosliderPosterGap(desiredGapPx);
+    homeIntrosliderLayoutModeMq = window.matchMedia('(max-width: 768px)');
+    homeIntrosliderLayoutModeMqHandler = function() {
+        clearHomeIntrosliderHeightLocks();
+        requestAnimationFrame(function () {
+            syncHomeIntrosliderLayout({ force: true });
         });
-        homeHeroIntrosliderPosterGapResizeObserver.observe(sliderTrack);
-    }
+    };
+    homeIntrosliderLayoutModeMq.addEventListener('change', homeIntrosliderLayoutModeMqHandler);
 
     requestAnimationFrame(function () {
-        syncHomeIntrosliderCardHeights();
+        syncHomeIntrosliderLayout();
         syncHomeHeroIntrosliderPosterGap(desiredGapPx);
     });
 }
@@ -6383,12 +6961,13 @@ function teardownHomeViewNavbarScroll() {
         homeNavbarResizeHandler = null;
     }
     teardownHomeHeroIntrosliderPosterGapSync();
+    clearHomeMaintitleHeadingFontSize();
     if (!document.body.classList.contains('home-view')) {
         resetNavHeaderToCssDefaults();
     }
 }
 
-/** Same recipe as `.home-section .introslider > .about` in styles.css */
+/** Same recipe as `--introslider-nav-glass-*` in styles.css (navbar + hero introslider cards) */
 const INTROSLIDER_NAV_GLASS = {
     bgAlpha: 0.6,
     blurPx: 5,
@@ -6472,7 +7051,8 @@ const HOME_NAV_FADE_MS = '0.45s';
  * @param {{ instant?: boolean }} [options] scroll-driven updates use instant so blur snaps on/off
  */
 function applyHomeHeroNavbarOpacity(opacity, options) {
-    const navbar = document.querySelector('.navbar');
+    const navbar =
+        document.querySelector('.navbar--mobile-top') || document.querySelector('.navbar');
     const header = document.querySelector('.header');
     if (!navbar) return;
     const o = Math.max(0, Math.min(1, opacity));
@@ -6523,7 +7103,7 @@ const HOME_NAV_SCROLL_INSTANT_THRESHOLD_PX = 2;
 
 /**
  * Scroll-spy: highlight nav tabs (yellow .active) for the home section currently at the navbar anchor line.
- * Order matches DOM: feed → event section → sponsors → speakers → programme → registration.
+ * Order matches DOM: event → introslider → feed → sponsors → programme → speakers → registration.
  */
 function isMobileBottomNavbarLayout() {
     return (
@@ -6536,9 +7116,11 @@ function isMobileBottomNavbarLayout() {
 function clearMobileBottomNavbarInlineStyles() {
     if (isMobileBottomNavbarLayout()) return;
     const header = document.querySelector('.header');
-    const navbar = document.querySelector('.navbar');
-    const navContainer = document.querySelector('.nav-container');
-    const headerProps = ['top', 'bottom', 'left', 'right', 'width', 'height'];
+    const topNav = document.querySelector('.navbar--mobile-top');
+    const bottomNav = document.querySelector('.navbar--mobile-bottom');
+    const topContainer = document.querySelector('.nav-container--mobile-top');
+    const bottomContainer = document.querySelector('.nav-container--mobile-bottom');
+    const headerProps = ['top', 'bottom', 'left', 'right', 'width', 'height', 'pointer-events'];
     const navbarProps = [
         'top',
         'bottom',
@@ -6551,56 +7133,102 @@ function clearMobileBottomNavbarInlineStyles() {
         'padding',
         'margin',
         'box-sizing',
+        'background',
+        'background-color',
+        'box-shadow',
+        'backdrop-filter',
+        '-webkit-backdrop-filter',
+        'border',
+        'border-top',
     ];
-    const containerProps = ['height', 'min-height', 'max-height', 'padding', 'align-items'];
+    const containerProps = [
+        'height',
+        'min-height',
+        'max-height',
+        'padding',
+        'align-items',
+        'justify-content',
+    ];
     if (header) headerProps.forEach((p) => header.style.removeProperty(p));
-    if (navbar) navbarProps.forEach((p) => navbar.style.removeProperty(p));
-    if (navContainer) containerProps.forEach((p) => navContainer.style.removeProperty(p));
+    [topNav, bottomNav].forEach((navbar) => {
+        if (navbar) navbarProps.forEach((p) => navbar.style.removeProperty(p));
+    });
+    [topContainer, bottomContainer].forEach((navContainer) => {
+        if (navContainer) containerProps.forEach((p) => navContainer.style.removeProperty(p));
+    });
 }
 
-/** Mobile bottom tab bar content height (px). Safe-area is added separately on `.header`. */
-const MOBILE_TAB_BAR_HEIGHT_PX = 45;
+/** Mobile tab bar content height (px). Safe-area is added separately per bar. */
+const MOBILE_TAB_BAR_HEIGHT_PX = 56;
 
-/** Enforce 45px bottom tab bar (wins over legacy inline nav padding / height: auto). */
+/** Enforce mobile top (transparent) + bottom (solid) tab bars over legacy inline nav styles. */
 function applyMobileBottomNavbarLayout() {
     if (!isMobileBottomNavbarLayout()) {
         clearMobileBottomNavbarInlineStyles();
         return;
     }
     const header = document.querySelector('.header');
-    const navbar = document.querySelector('.navbar');
-    const navContainer = document.querySelector('.nav-container');
+    const topNav = document.querySelector('.navbar--mobile-top');
+    const bottomNav = document.querySelector('.navbar--mobile-bottom');
+    const topContainer = document.querySelector('.nav-container--mobile-top');
+    const bottomContainer = document.querySelector('.nav-container--mobile-bottom');
     if (header) {
-        header.style.setProperty('top', 'auto', 'important');
+        header.style.setProperty('top', '0', 'important');
         header.style.setProperty('bottom', '0', 'important');
         header.style.setProperty('left', '0', 'important');
         header.style.setProperty('right', '0', 'important');
         header.style.setProperty('width', '100%', 'important');
-        header.style.setProperty(
-            'height',
-            `calc(${MOBILE_TAB_BAR_HEIGHT_PX}px + env(safe-area-inset-bottom, 0px))`,
-            'important'
-        );
+        header.style.setProperty('height', 'auto', 'important');
+        header.style.setProperty('pointer-events', 'none', 'important');
     }
-    if (navbar) {
-        navbar.style.removeProperty('top');
-        navbar.style.setProperty('bottom', 'env(safe-area-inset-bottom, 0px)', 'important');
-        navbar.style.setProperty('left', '0', 'important');
-        navbar.style.setProperty('right', '0', 'important');
-        navbar.style.setProperty('width', '100%', 'important');
-        navbar.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
-        navbar.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
-        navbar.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
-        navbar.style.setProperty('padding', '0', 'important');
-        navbar.style.setProperty('margin', '0', 'important');
-        navbar.style.setProperty('box-sizing', 'border-box', 'important');
+    if (topNav) {
+        topNav.style.setProperty('top', 'env(safe-area-inset-top, 0px)', 'important');
+        topNav.style.setProperty('bottom', 'auto', 'important');
+        topNav.style.setProperty('left', '0', 'important');
+        topNav.style.setProperty('right', '0', 'important');
+        topNav.style.setProperty('width', '100%', 'important');
+        topNav.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        topNav.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        topNav.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        topNav.style.setProperty('padding', '0', 'important');
+        topNav.style.setProperty('margin', '0', 'important');
+        topNav.style.setProperty('box-sizing', 'border-box', 'important');
+        topNav.style.setProperty('background', 'transparent', 'important');
+        topNav.style.setProperty('background-color', 'transparent', 'important');
+        topNav.style.setProperty('box-shadow', 'none', 'important');
     }
-    if (navContainer) {
-        navContainer.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
-        navContainer.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
-        navContainer.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
-        navContainer.style.setProperty('padding', '0 16px', 'important');
-        navContainer.style.setProperty('align-items', 'center', 'important');
+    if (bottomNav) {
+        bottomNav.style.setProperty('top', 'auto', 'important');
+        bottomNav.style.setProperty('bottom', 'env(safe-area-inset-bottom, 0px)', 'important');
+        bottomNav.style.setProperty('left', '0', 'important');
+        bottomNav.style.setProperty('right', '0', 'important');
+        bottomNav.style.setProperty('width', '100%', 'important');
+        bottomNav.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        bottomNav.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        bottomNav.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        bottomNav.style.setProperty('padding', '0', 'important');
+        bottomNav.style.setProperty('margin', '0', 'important');
+        bottomNav.style.setProperty('box-sizing', 'border-box', 'important');
+    }
+    if (topContainer) {
+        topContainer.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        topContainer.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        topContainer.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        topContainer.style.setProperty('padding', '0 8px', 'important');
+        topContainer.style.setProperty('align-items', 'center', 'important');
+        if (!document.body.classList.contains('past-talks-open')) {
+            topContainer.style.setProperty('justify-content', 'space-between', 'important');
+        } else {
+            topContainer.style.removeProperty('justify-content');
+        }
+    }
+    if (bottomContainer) {
+        bottomContainer.style.setProperty('height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        bottomContainer.style.setProperty('min-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        bottomContainer.style.setProperty('max-height', `${MOBILE_TAB_BAR_HEIGHT_PX}px`, 'important');
+        bottomContainer.style.setProperty('padding', '0 8px', 'important');
+        bottomContainer.style.setProperty('align-items', 'center', 'important');
+        bottomContainer.style.setProperty('justify-content', 'center', 'important');
     }
 }
 
@@ -6611,9 +7239,10 @@ function syncHomeNavSectionFromScroll() {
     const homeSection = document.querySelector('body.home-view .home-section');
     if (!homeSection) return;
 
-    const nav = document.querySelector('.navbar');
+    const nav =
+        document.querySelector('.navbar--mobile-top') || document.querySelector('.navbar');
     const navH = nav ? nav.getBoundingClientRect().height : 0;
-    const anchorY = isMobileBottomNavbarLayout() ? 12 : navH + 12;
+    const anchorY = navH + 12;
 
     const speakersEl = document.getElementById('speakers-section');
     const programmeEl =
@@ -6639,10 +7268,10 @@ function syncHomeViewNavbarFromScroll() {
     if (!isMobileBottomNavbarLayout()) {
         clearMobileBottomNavbarInlineStyles();
     }
-    /* Mobile: bottom tab bar stays solid Prussian blue (no top-of-page fade). */
+    /* Mobile: transparent top bar (hamburger + Register) over poster. */
     if (isMobileBottomNavbarLayout()) {
         applyMobileBottomNavbarLayout();
-        applyHomeHeroNavbarOpacity(1, { instant: true });
+        applyHomeHeroNavbarOpacity(0, { instant: true });
         if (document.body.classList.contains('past-talks-open')) {
             syncPastTalksPrussianStripToNavbar();
         }
@@ -6664,6 +7293,95 @@ function syncHomeViewNavbarFromScroll() {
     applyHomeHeroNavbarOpacity(opacity, { instant: true });
 }
 
+/** Home event welcome title (#home-event-welcome-heading). */
+function getHomeMaintitleHeadingEl() {
+    return document.getElementById('home-event-welcome-heading');
+}
+
+function clearHomeMaintitleHeadingFontSize() {
+    const heading = getHomeMaintitleHeadingEl();
+    if (!heading) return;
+    heading.style.removeProperty('font-size');
+    heading.style.removeProperty('white-space');
+    heading.style.removeProperty('overflow-wrap');
+    heading.style.removeProperty('word-wrap');
+}
+
+/** TBS27 introslider card: largest size where both maintitle lines fit card width (8px side padding). */
+function fitTbs27CardMaintitleFontSize(heading, container) {
+    const cs = getComputedStyle(container);
+    const padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    const available = container.clientWidth - padX;
+    if (available <= 0) return;
+
+    const lines = heading.querySelectorAll('.tbs27-card-maintitle-line');
+    const measureEls = lines.length ? Array.from(lines) : [heading];
+
+    heading.style.whiteSpace = 'normal';
+    heading.style.overflowWrap = 'normal';
+    heading.style.wordWrap = 'normal';
+    measureEls.forEach(function (line) {
+        line.style.whiteSpace = 'nowrap';
+    });
+
+    let lo = 10;
+    let hi = Math.min(240, Math.round(available * 1.25));
+    let best = lo;
+    while (lo <= hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        heading.style.setProperty('font-size', mid + 'px', 'important');
+        const fits = measureEls.every(function (line) {
+            return line.scrollWidth <= available;
+        });
+        if (fits) {
+            best = mid;
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    heading.style.setProperty('font-size', best + 'px', 'important');
+}
+
+function fitHomeMaintitleHeadingFontSize() {
+    if (!document.body.classList.contains('home-view')) {
+        clearHomeMaintitleHeadingFontSize();
+        return;
+    }
+    const heading = getHomeMaintitleHeadingEl();
+    if (!heading) return;
+
+    const posterTitles = heading.closest('.poster-maintitles');
+    if (posterTitles) {
+        clearHomeMaintitleHeadingFontSize();
+        return;
+    }
+
+    if (heading.offsetParent === null) return;
+
+    if (!isMobileBottomNavbarLayout()) {
+        clearHomeMaintitleHeadingFontSize();
+        return;
+    }
+
+    const container = heading.closest('.trailer-media') || heading.parentElement;
+    if (!container) return;
+
+    const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 20;
+    const maxPx = Math.round(rootPx * 3);
+    const available = container.clientWidth;
+    if (available <= 0) return;
+
+    heading.style.whiteSpace = 'nowrap';
+    heading.style.setProperty('font-size', maxPx + 'px', 'important');
+
+    let sizePx = maxPx;
+    while (sizePx > 12 && heading.scrollWidth > available) {
+        sizePx -= 1;
+        heading.style.setProperty('font-size', sizePx + 'px', 'important');
+    }
+}
+
 function setupHomeViewNavbarScroll() {
     teardownHomeViewNavbarScroll();
     if (!document.body.classList.contains('home-view')) return;
@@ -6674,12 +7392,17 @@ function setupHomeViewNavbarScroll() {
     homeNavbarResizeHandler = function() {
         syncHomeViewNavbarFromScroll();
         syncHomeNavSectionFromScroll();
+        fitHomeMaintitleHeadingFontSize();
     };
     window.addEventListener('scroll', homeNavbarScrollHandler, { passive: true });
     window.addEventListener('resize', homeNavbarResizeHandler, { passive: true });
     applyMobileBottomNavbarLayout();
     syncHomeViewNavbarFromScroll();
     syncHomeNavSectionFromScroll();
+    requestAnimationFrame(fitHomeMaintitleHeadingFontSize);
+    if (document.fonts && typeof document.fonts.ready === 'object' && document.fonts.ready.then) {
+        document.fonts.ready.then(fitHomeMaintitleHeadingFontSize).catch(function () {});
+    }
 }
 
 // Setup navbar transparency for event section
@@ -6847,22 +7570,35 @@ if (typeof window !== 'undefined' && !window.__tbsHomeLocationStorageBound) {
     });
 }
 
-/** Lock document scroll while home page is loading (poster + feed + bands). */
+/** Lock document scroll while home page is loading; pale pink screen fades out when done. */
 function setHomePageLoading(isLoading) {
     const on = !!isLoading;
     document.body.classList.toggle('loading', on);
     document.documentElement.classList.toggle('home-scroll-locked', on);
-}
 
-/* Firestore warm as soon as this file runs (firebase-* defer scripts are listed above script.js in home.html). */
-try {
-    warmHomePageFirestoreCache();
-} catch (warmErr) {
-    console.warn('warmHomePageFirestoreCache on parse:', warmErr);
+    const screen = document.getElementById('home-loading-screen');
+    if (!screen) {
+        return;
+    }
+    if (on) {
+        screen.classList.remove('is-hidden');
+        screen.setAttribute('aria-hidden', 'false');
+        screen.setAttribute('aria-busy', 'true');
+        return;
+    }
+    screen.setAttribute('aria-busy', 'false');
+    screen.classList.add('is-hidden');
+    screen.setAttribute('aria-hidden', 'true');
 }
 
 // Initialize the blog when page loads
 document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        warmHomePageFirestoreCache();
+    } catch (warmErr) {
+        console.warn('warmHomePageFirestoreCache:', warmErr);
+    }
+
     setHomePageLoading(true);
     // Setup initial event listeners first (non-blocking)
     setupEventListeners();

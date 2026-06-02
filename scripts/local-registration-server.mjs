@@ -194,6 +194,8 @@ const MIME = {
     '.svg': 'image/svg+xml',
     '.webp': 'image/webp',
     '.ico': 'image/x-icon',
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
 };
 
 const HOME_ROBOTS_HEADER_VALUE = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
@@ -256,21 +258,56 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    fs.readFile(filePath, (err, data) => {
+    serveStaticFile(req, res, filePath, url);
+});
+
+/** Safari requires byte-range (206) responses for MP4; full-file 200-only breaks video. */
+function serveStaticFile(req, res, filePath, url) {
+    fs.stat(filePath, (err, stat) => {
         if (err) {
             res.writeHead(404);
             res.end('Not found');
             return;
         }
         const ext = path.extname(filePath).toLowerCase();
-        const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+        const headers = {
+            'Content-Type': MIME[ext] || 'application/octet-stream',
+            'Accept-Ranges': 'bytes',
+        };
         if (isHomePageRequest(url, filePath)) {
             headers['X-Robots-Tag'] = HOME_ROBOTS_HEADER_VALUE;
         }
-        res.writeHead(200, headers);
-        res.end(data);
+        const size = stat.size;
+        const range = req.headers.range;
+        if (range) {
+            const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+            if (!match) {
+                res.writeHead(416, { 'Content-Range': `bytes */${size}` });
+                res.end();
+                return;
+            }
+            let start = match[1] ? parseInt(match[1], 10) : 0;
+            let end = match[2] ? parseInt(match[2], 10) : size - 1;
+            if (Number.isNaN(start)) start = 0;
+            if (Number.isNaN(end) || end >= size) end = size - 1;
+            if (start > end || start >= size) {
+                res.writeHead(416, { 'Content-Range': `bytes */${size}` });
+                res.end();
+                return;
+            }
+            const chunk = end - start + 1;
+            res.writeHead(206, {
+                ...headers,
+                'Content-Range': `bytes ${start}-${end}/${size}`,
+                'Content-Length': String(chunk),
+            });
+            fs.createReadStream(filePath, { start, end }).pipe(res);
+            return;
+        }
+        res.writeHead(200, { ...headers, 'Content-Length': String(size) });
+        fs.createReadStream(filePath).pipe(res);
     });
-});
+}
 
 server.listen(PORT, '127.0.0.1', () => {
     console.log(`Local site + registration API: http://127.0.0.1:${PORT}/`);

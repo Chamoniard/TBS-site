@@ -22,29 +22,41 @@
         .header { background: #003153; backdrop-filter: none; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); position: fixed; top: 0; width: 100%; z-index: 1000; transition: all 0.3s ease; }
         .navbar { padding: 16px 0; margin-bottom: 0; }
         @media (max-width: 768px) {
-            :root { --mobile-tab-bar-height: 45px; }
-            .navbar { padding: 0 !important; height: 45px !important; min-height: 45px !important; max-height: 45px !important; }
+            :root { --mobile-tab-bar-height: 56px; --navbar-height: calc(env(safe-area-inset-top, 0px) + var(--mobile-tab-bar-height)); }
+            .navbar { padding: 0 !important; height: var(--mobile-tab-bar-height) !important; min-height: var(--mobile-tab-bar-height) !important; max-height: var(--mobile-tab-bar-height) !important; }
+            .hamburger { display: flex !important; }
         }
         .nav-container { max-width: 1500px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { display: flex; align-items: center; }
         .nav-logo .logo { height: 64.8px; width: auto; max-width: 324px; object-fit: contain; filter: brightness(0) invert(1); }
         .nav-menu { display: flex; list-style: none; gap: 2rem; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
-        .nav-link { text-decoration: none; color: #fff; font-weight: 400; font-size: 1rem; transition: color 0.3s ease; white-space: nowrap; }
+        .nav-link { text-decoration: none; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 1rem; transition: color 0.3s ease; white-space: nowrap; letter-spacing: 0.02em; }
         .nav-link:hover { color: #FFD700; }
         .nav-link.active { color: #FFD700; font-weight: 500; }
+        @media (max-width: 1019px) {
+            .nav-logo { display: none !important; }
+        }
         @media (min-width: 769px) {
             .nav-link { font-size: 1.2rem; }
             .header { top: 0 !important; bottom: auto !important; width: 100% !important; height: auto !important; }
             .navbar { top: 0 !important; bottom: auto !important; padding: 16px 0 !important; height: auto !important; min-height: 0 !important; max-height: none !important; }
             body.home-view { padding-bottom: 0 !important; }
+        }
+        @media (min-width: 1020px) {
             .nav-logo { display: flex !important; }
         }
-        :root { font-size: 20px; --navbar-height: calc(16px + 58.32px + (1rem * 1.2) + 16px); }
+        :root { font-size: 20px; --navbar-height: calc(16px + 58.32px + 16px); }
         @media (max-width: 768px) {
-            :root { font-size: 18px; --mobile-tab-bar-height: 45px; --navbar-height: calc(45px + env(safe-area-inset-bottom, 0px)); }
-            .header { top: auto !important; bottom: 0; left: 0 !important; right: 0 !important; width: 100% !important; }
-            body.home-view .header:not(.post-view), body.home-view .navbar { background: #003153 !important; box-shadow: none !important; }
-            body.home-view { padding-bottom: var(--navbar-height); }
+            :root {
+                font-size: 18px;
+                --mobile-tab-bar-height: 56px;
+                --mobile-top-nav-height: var(--mobile-tab-bar-height);
+                --navbar-height: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-nav-height));
+                --mobile-bottom-nav-height: calc(var(--mobile-tab-bar-height) + env(safe-area-inset-bottom, 0px));
+            }
+            .header { top: 0 !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; height: auto !important; pointer-events: none !important; background: transparent !important; }
+            body.home-view .header:not(.post-view), body.home-view .navbar--mobile-top { background: transparent !important; box-shadow: none !important; }
+            body.home-view { padding-bottom: var(--mobile-bottom-nav-height) !important; }
         }
         .hero { background: #f8fafc; color: #333; height: calc(var(--navbar-height) - 2px); min-height: calc(var(--navbar-height) - 2px); text-align: left; position: relative; width: 100%; margin: 0 0 8px 0; }
         @media (max-width: 768px) { .hero { margin: 0 !important; } }
@@ -82,184 +94,313 @@
             object-position: top left;
             display: block;
         }
-        .nav-logo-subtitle { font-size: 1rem; color: #bff0ff; line-height: 1.2; }
         @media (max-width: 768px) {
-            .home-section > picture .mobile-poster-logo-subtitle.nav-logo-subtitle {
-                font-size: clamp(0.7rem, 3.1vw, 1rem);
-                color: #ffffff;
-                text-align: center;
-                white-space: nowrap;
+            .mobile-poster-logo-subtitle {
+                display: none !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section {
+                padding-top: max(calc(1016px - 250px), 100dvh, 100vh) !important;
             }
         }
         .container { max-width: 1500px; margin: 0 auto; padding: 0 20px; }
     </style>
-    <link rel="preload" href="styles.css?v=20260526-speakerslider-margin" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260526-speakerslider-margin">
-    <!-- LCP: preload optimized hero poster variants used by the home <picture> -->
-    <link rel="preload" as="image" href="images/poster_narrow_q72.jpg" media="(max-width: 768px)" fetchpriority="high">
-    <link rel="preload" as="image" href="images/poster_wide_q72.jpg" media="(min-width: 769px)" fetchpriority="high">
+    <link rel="preload" href="styles.css?v=20260530-tbs27-title-4rem" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260530-tbs27-title-4rem">
+    <!-- LCP: preload hero poster (WebP) -->
+    <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
     <!-- Mobile: tab row + Register; after main CSS for cascade -->
     <style>
         .nav-past-mobile,
-        .nav-register-mobile-top {
+        .nav-register-mobile-top,
+        .nav-register-mobile-bar,
+        .navbar--mobile-bottom {
             display: none !important;
         }
         @media (max-width: 768px) {
             .header {
-                top: auto !important;
+                top: 0 !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
                 width: 100% !important;
-                height: calc(45px + env(safe-area-inset-bottom, 0px)) !important;
+                height: auto !important;
+                pointer-events: none !important;
+                background: transparent !important;
             }
-            .navbar {
+            .navbar--mobile-top {
+                top: env(safe-area-inset-top, 0px) !important;
+                bottom: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                pointer-events: auto !important;
+            }
+            .navbar--mobile-bottom {
+                display: block !important;
                 top: auto !important;
                 bottom: env(safe-area-inset-bottom, 0px) !important;
                 left: 0 !important;
                 right: 0 !important;
                 width: 100% !important;
-                height: 45px !important;
-                min-height: 45px !important;
-                max-height: 45px !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
+                pointer-events: auto !important;
+                background: var(--introslider-nav-glass-bg) !important;
+                background-color: var(--introslider-nav-glass-bg) !important;
+                backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                border: none !important;
+                border-top: 1px solid var(--introslider-nav-glass-border) !important;
+                box-shadow: var(--introslider-nav-glass-shadow) !important;
+            }
+            body.home-view .navbar--mobile-bottom {
+                background: var(--introslider-nav-glass-bg) !important;
+                background-color: var(--introslider-nav-glass-bg) !important;
+                backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                border-top: 1px solid var(--introslider-nav-glass-border) !important;
+                box-shadow: var(--introslider-nav-glass-shadow) !important;
+            }
+            body.home-view .header:not(.post-view),
+            body.home-view .navbar--mobile-top {
+                background: transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
             }
             .nav-logo {
                 display: none !important;
             }
-            .nav-container {
-                justify-content: flex-start !important;
+            .nav-container--mobile-top {
+                justify-content: space-between !important;
                 align-items: center !important;
                 width: 100% !important;
                 max-width: none !important;
-                height: 45px !important;
-                min-height: 45px !important;
-                max-height: 45px !important;
-                padding: 0 16px !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 8px !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
+                background: transparent !important;
+            }
+            .hamburger {
+                display: flex !important;
+                flex-shrink: 0 !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .hamburger .bar {
+                background-color: #FFD700 !important;
+            }
+            .nav-register-mobile-bar {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                margin-left: auto !important;
+            }
+            .nav-register-mobile-top {
+                display: none !important;
+            }
+            .navbar--mobile-top .nav-past-mobile {
+                display: none !important;
+            }
+            .navbar--mobile-top .nav-menu {
+                display: none !important;
+            }
+            .nav-container--mobile-bottom {
+                justify-content: center !important;
+                align-items: center !important;
+                width: 100% !important;
+                max-width: none !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 8px !important;
                 gap: 8px !important;
                 box-sizing: border-box !important;
             }
-            .nav-item-register-desktop,
-            .nav-past-desktop {
-                display: none !important;
-            }
-            .nav-past-mobile,
-            .nav-register-mobile-top {
+            .nav-menu--bottom-tabs {
                 display: flex !important;
-            }
-            body.past-talks-open .nav-register-mobile-top {
-                display: none !important;
-            }
-            .nav-menu {
-                display: flex !important;
-                position: static !important;
                 flex: 1 1 0 !important;
-                min-width: 0 !important;
-                width: auto !important;
-                max-width: none !important;
                 flex-direction: row !important;
                 align-items: center !important;
                 justify-content: center !important;
+                width: 100% !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                gap: 8px !important;
                 background: transparent !important;
                 box-shadow: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                height: 45px !important;
-                min-height: 45px !important;
-                max-height: 45px !important;
-                gap: 8px !important;
             }
-            .nav-menu > .nav-item:not(.nav-item-hidden) {
+            .nav-menu--bottom-tabs > .nav-item {
                 flex: 0 0 auto !important;
-                min-width: 0 !important;
+                height: var(--mobile-tab-bar-height) !important;
                 justify-content: center !important;
-                font-size: 1rem !important;
+                align-items: center !important;
             }
-            .nav-menu > .nav-item:not(.nav-item-hidden) .nav-link,
-            .nav-menu > .nav-item:not(.nav-item-hidden) .mobile-top-tab-link {
-                font-size: 1rem !important;
+            .nav-menu--bottom-tabs .mobile-top-tab-link {
+                font-size: 1.25rem !important;
+                font-weight: 500 !important;
+                color: #ffffff !important;
+                padding: 0 0.15rem !important;
+                line-height: 1.2 !important;
+                text-align: center !important;
             }
-            .nav-register-mobile-top {
+            .nav-menu--bottom-tabs .mobile-top-tab-link.active {
+                color: #FFD700 !important;
+            }
+            body.nav-menu-open .nav-register-mobile-bar,
+            body.nav-menu-open .navbar--mobile-bottom {
+                display: none !important;
+            }
+            body.nav-menu-open .hamburger .bar {
+                background-color: #003153 !important;
+            }
+            .navbar--mobile-top .nav-menu.active {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
                 position: fixed !important;
-                top: calc(8px + env(safe-area-inset-top, 0px)) !important;
-                right: 12px !important;
-                left: auto !important;
-                bottom: auto !important;
-                z-index: 10050 !important;
+                inset: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                min-height: 100dvh !important;
+                max-height: none !important;
+                margin: 0 !important;
+                padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-tab-bar-height) + 12px) 8px calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+                gap: 4px !important;
+                background: #ffd700 !important;
+                background-color: #ffd700 !important;
+                box-shadow: none !important;
+                z-index: 10040 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-item:not(.nav-item-hidden):not(.nav-past-mobile) {
+                display: flex !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .navbar--mobile-top .nav-menu:not(.active) > .nav-menu-logo-item {
+                display: none !important;
+            }
+            .navbar--mobile-top .nav-menu.active > .nav-menu-logo-item {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding-bottom: 8px !important;
+                margin-bottom: 4px !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-menu-logo-btn {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                width: 100% !important;
                 margin: 0 !important;
-                padding: 0 !important;
-                pointer-events: auto !important;
-            }
-            .nav-register-mobile-top .nav-register-pill {
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                appearance: none !important;
-                -webkit-appearance: none !important;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-                font-size: 0.75rem !important;
-                font-weight: 400 !important;
-                line-height: 1.2 !important;
-                cursor: pointer !important;
-                background-color: #FFD700 !important;
-                color: #003153 !important;
+                padding: 8px !important;
                 border: none !important;
-                border-radius: 5px !important;
-                min-height: 33px !important;
-                padding: 6px 12px !important;
-                width: 4.78125rem !important;
-                min-width: 4.78125rem !important;
-                max-width: 4.78125rem !important;
-                margin: 0 !important;
-                white-space: nowrap !important;
-                box-sizing: border-box !important;
-                -webkit-tap-highlight-color: transparent !important;
-                text-align: center !important;
+                background: transparent !important;
+                cursor: pointer !important;
             }
-            .nav-register-mobile-top .nav-register-pill:hover,
-            .nav-register-mobile-top .nav-register-pill:focus-visible,
-            .nav-register-mobile-top .nav-register-pill.active {
-                background-color: #FFD700 !important;
+            .navbar--mobile-top .nav-menu.active .nav-menu-logo-img {
+                display: block !important;
+                max-width: min(72vw, 260px) !important;
+                max-height: 52px !important;
+                width: auto !important;
+                height: auto !important;
+                object-fit: contain !important;
+                filter: none !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-past-desktop {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-item-register-desktop {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-link,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link {
+                font-family: 'Montserrat', sans-serif !important;
+                font-size: 1.25rem !important;
+                font-weight: 500 !important;
                 color: #003153 !important;
-                font-weight: 400 !important;
-                outline: none !important;
-            }
-            .nav-menu .mobile-top-tab-link {
-                font-size: 1rem !important;
-                font-weight: 400 !important;
-                color: #ffffff !important;
-                padding: 0 0.15rem !important;
+                width: 100% !important;
+                padding: 12px 8px !important;
                 margin: 0 !important;
                 line-height: 1.2 !important;
                 text-align: center !important;
                 -webkit-tap-highlight-color: transparent !important;
             }
-            .nav-menu .mobile-top-tab-link.active {
-                color: #FFD700 !important;
-                font-weight: 500 !important;
+            .navbar--mobile-top .nav-menu.active .nav-link:hover,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link:hover,
+            .navbar--mobile-top .nav-menu.active .nav-link.active,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link.active {
+                color: #003153 !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-link.active,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link.active {
+                font-weight: 600 !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill {
+                background: transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 12px 8px !important;
             }
             .home-section .feed-section-inner-wrapper h3.post-title,
             .feed-section-inner-wrapper h3.post-title {
-                font-size: 1rem !important;
+                font-size: 1.1rem !important;
                 font-weight: 500 !important;
                 line-height: 1.25 !important;
-                max-height: calc(2 * 1rem * 1.25) !important;
+                max-height: calc(2 * 1.1rem * 1.25) !important;
                 -webkit-line-clamp: 2 !important;
                 line-clamp: 2 !important;
             }
         }
     </style>
-    <!-- Inter first (body/nav); secondary fonts load without blocking first paint -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" media="print" onload="this.media='all'">
+    <!-- Inter 4 (body) + Montserrat (headers/titles): preload + non-blocking -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" as="style">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:wght@300;400;500;600;700;800&display=swap">
+    </noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap">
     </noscript>
     <!-- Footer social icons — non-blocking -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
@@ -268,18 +409,27 @@
     </noscript>
 </head>
 <body class="home-view loading">
+    <div id="home-loading-screen" class="home-loading-screen" aria-live="polite" aria-busy="true" aria-label="Loading page">
+        <img src="images/logo.png" alt="TBS Zermatt" class="home-loading-screen-logo" width="324" height="65" loading="eager" decoding="async">
+    </div>
     <header class="header">
-        <div class="nav-register-mobile-top">
-            <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
-        </div>
-        <nav class="navbar">
-            <div class="nav-container">
+        <nav class="navbar navbar--mobile-top">
+            <div class="nav-container nav-container--mobile-top">
+                <button type="button" class="hamburger" id="site-nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
                 <div class="nav-logo" role="button" tabindex="0" aria-label="Home">
                     <img src="images/logo.png" alt="TBS Zermatt" class="logo" loading="eager" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <h2 style="display: none;">TBS Zermatt Blog</h2>
-                    <div class="nav-logo-subtitle">TBS27, 9-12 February, Hotel Alex, Zermatt</div>
                 </div>
-                <ul class="nav-menu">
+                <ul class="nav-menu" id="site-nav-menu">
+                    <li class="nav-item nav-menu-logo-item">
+                        <button type="button" class="nav-menu-logo-btn" aria-label="TBS Zermatt home">
+                            <img src="images/logo.png" alt="" class="nav-menu-logo-img" width="291" height="58" loading="eager" decoding="async">
+                        </button>
+                    </li>
                     <li class="nav-item">
                         <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
                     </li>
@@ -305,10 +455,27 @@
                         <a href="login.html" class="nav-link user-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; font-size: 1.38rem; color: #003153; border-radius: 50%; transition: all 0.3s ease; background-color: #FFD700; border: 2px solid #FFD700; text-shadow: none; filter: none;">👤</a>
                     </li>
                 </ul>
-                <div class="hamburger" aria-hidden="true">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
+                <div class="nav-register-mobile-bar">
+                    <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
                 </div>
+            </div>
+        </nav>
+        <nav class="navbar navbar--mobile-bottom" aria-label="Section navigation">
+            <div class="nav-container nav-container--mobile-bottom">
+                <ul class="nav-menu nav-menu--bottom-tabs">
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
+                    </li>
+                    <li class="nav-item nav-past-mobile">
+                        <span class="nav-link mobile-top-tab-link" data-view="past-talks" style="cursor: pointer;">Talks</span>
+                    </li>
+                </ul>
             </div>
         </nav>
     </header>
@@ -316,12 +483,20 @@
     <main class="everything">
         <section class="home-section">
             <picture>
-                <source media="(max-width: 768px)" srcset="images/poster_narrow_q72.jpg">
-                <img src="images/poster_wide_q72.jpg" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
+                <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
+                <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
+                <img src="images/wideposter.webp" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
                 <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
-                <div class="mobile-poster-logo">
-                    <img src="images/logo.png" alt="TBS Zermatt" class="mobile-poster-logo-img" width="324" height="65" loading="eager" decoding="async" onerror="this.style.display='none';">
-                    <p class="mobile-poster-logo-subtitle nav-logo-subtitle">TBS27, 9-12 February, Hotel Alex, Zermatt</p>
+                <div class="poster-top-divider">
+                    <picture class="event-section-divider-picture">
+                        <source media="(max-width: 768px)" srcset="images/narrowdivider.png">
+                        <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async" aria-hidden="true">
+                    </picture>
+                </div>
+                <div class="poster-maintitles">
+                    <h1 class="section-titles maintitle-heading tbs27-card-maintitle" id="home-event-welcome-heading">TBS27</h1>
+                    <h2 class="section-titles tbs27-card-subtitle">9-12 February, 2027</h2>
+                    <h2 class="section-titles tbs27-card-subtitle">Hotel Alex, Zermatt</h2>
                 </div>
             </picture>
             <div class="feed-section">
@@ -337,7 +512,7 @@
         <div class="footer-content">
             <div class="footer-section footer-section-stack">
                 <div class="footer-section-row">
-                    <h2 class="section-titles">Social</h2>
+                    <h3 class="post-title">Social</h3>
                     <div class="hero-social-links">
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-facebook"></i></a>
@@ -347,7 +522,7 @@
                     </div>
                 </div>
                 <div class="footer-section-row footer-section-contact">
-                    <h2 class="section-titles">Contact</h2>
+                    <h3 class="post-title">Contact</h3>
                     <p><a class="footer-contact-email" href="mailto:info@tbs-zermatt.org">info@tbs-zermatt.org</a></p>
                 </div>
             </div>
@@ -355,7 +530,7 @@
                 <div class="footer-logo-container">
                     <img src="images/emblem.png" alt="TBS Zermatt" class="footer-logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <div class="footer-logo-fallback" style="display: none;">
-                        <h3 style="color: #FFD700; margin: 0; font-size: 1.7rem;">TBS ZERMATT</h3>
+                        <h3 class="section-titles footer-logo-fallback-title">TBS ZERMATT</h3>
                         <p style="color: #94a3b8; margin: 0.5rem 0 0 0; font-size: 0.9rem;">THE SICKEST PATIENTS. THE FIRST HOURS.</p>
                     </div>
                 </div>
@@ -382,6 +557,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260526-load-perf2" defer></script>
+    <script src="script.js?v=20260530-introslider-content-height" defer></script>
 </body>
 </html>
