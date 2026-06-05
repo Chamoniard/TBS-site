@@ -10617,9 +10617,12 @@ body.login-page .login-main {
 }
 
 .auth-header-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     margin-bottom: 2rem;
-    max-width: 400px;
+    max-width: min(100%, 1344px);
     margin-left: auto;
     margin-right: auto;
 }
@@ -10632,10 +10635,13 @@ body.login-page .login-main {
 
 /* backendlogo.png is already light-on-dark; do not invert or the black canvas becomes a white block */
 .auth-header-logo-img--backend {
+    display: block;
     width: auto;
-    max-width: min(100%, 320px);
+    max-width: min(100%, 1344px);
     height: auto;
-    max-height: 48px;
+    max-height: 201px;
+    margin-left: auto;
+    margin-right: auto;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
 }
 
@@ -10651,6 +10657,24 @@ body.login-page .login-main {
     max-width: 120px;
     height: auto;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+body.login-page .auth-container {
+    background: var(--introslider-nav-glass-bg);
+    background-color: var(--introslider-nav-glass-bg);
+    backdrop-filter: blur(var(--introslider-nav-glass-blur));
+    -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur));
+    border: 1px solid var(--introslider-nav-glass-border);
+    border-radius: 5px;
+    box-shadow:
+        var(--introslider-nav-glass-shadow),
+        0 14px 48px rgba(0, 0, 0, 0.32),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+}
+
+body.login-page .auth-title {
+    color: #ffffff;
 }
 
 .auth-container {
