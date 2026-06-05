@@ -13,6 +13,7 @@ html {
     --introslider-nav-glass-blur: 5px;
     --introslider-nav-glass-border: rgba(255, 255, 255, 0.2);
     --introslider-nav-glass-shadow: 0 4px 28px rgba(0, 0, 0, 0.22);
+    --introslider-hover-lift: 2px;
     /* Mobile hamburger icon bars */
     --hamburger-bar-color: #FFD700;
     --hamburger-bar-shadow: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32));
@@ -1713,6 +1714,8 @@ body.home-view .home-section > .speaker-section {
     -webkit-backdrop-filter: none;
     overflow-x: auto;
     overflow-y: hidden;
+    /* Room for hover lift so the top border is not clipped by overflow-y: hidden */
+    padding-top: calc(var(--introslider-hover-lift) + 1px);
 }
 
 .home-section .introslider-section,
@@ -4867,7 +4870,7 @@ body.home-view .home-section > .home-social-row-container {
 .home-section .introslider > .introslider-clickable:focus-visible {
     border: 1px solid var(--tbs-pink-soft) !important;
     outline: none;
-    transform: translateY(-2px);
+    transform: translateY(calc(-1 * var(--introslider-hover-lift)));
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24), 0 3px 10px rgba(0, 0, 0, 0.12) !important;
 }
 
@@ -11218,7 +11221,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
     border: 1px solid var(--tbs-pink-soft) !important;
     outline: none;
-    transform: translateY(-2px);
+    transform: translateY(calc(-1 * var(--introslider-hover-lift)));
     box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
 }
 
@@ -11546,7 +11549,7 @@ body.home-view :is(.maintitle-heading) {
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
         border: 1px solid var(--tbs-pink-soft) !important;
         outline: none !important;
-        transform: translateY(-2px);
+        transform: translateY(calc(-1 * var(--introslider-hover-lift)));
         box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
     }
 
