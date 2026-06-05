@@ -10464,17 +10464,53 @@ body.home-password-locked .footer {
 }
 
 /* Authentication Styles */
-.auth-section {
+body.login-page {
+    margin: 0;
     padding: 0;
-    height: 100vh;
-    width: 100vw;
+    overflow-x: hidden;
+}
+
+body.login-page .login-main {
+    margin: 0;
+    padding: 0;
+}
+
+.auth-section {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
     display: flex;
     align-items: center;
-    background: url('images/background.jpg') no-repeat fixed;
-    background-size: cover;
-    background-position: calc(70% + 400px) 50%;
-    position: relative;
+    justify-content: center;
     margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #003153;
+}
+
+.auth-poster {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.auth-poster-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+}
+
+.auth-section-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 2rem 0;
+    box-sizing: border-box;
 }
 
 .auth-section .container {
@@ -10637,6 +10673,111 @@ body.home-password-locked .footer {
     animation: fadeIn 0.3s ease-in-out;
 }
 
+.auth-container--google {
+    text-align: center;
+}
+
+.auth-notice {
+    margin: 0 0 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    background: #fff8e1;
+    border: 1px solid #fde68a;
+    color: #854d0e;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.auth-notice--info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
+}
+
+.auth-google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid #dadce0;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #3c4043;
+    font-family: var(--title-font);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.18);
+}
+
+.auth-google-btn .fab.fa-google {
+    font-size: 1.15rem;
+    color: #4285f4;
+}
+
+.auth-google-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #d2d5d9;
+    box-shadow: 0 2px 6px rgba(60, 64, 67, 0.22);
+}
+
+.auth-google-btn:focus-visible {
+    outline: 2px solid #003153;
+    outline-offset: 2px;
+}
+
+.auth-google-btn:disabled,
+.auth-google-btn--inactive,
+.auth-google-btn[aria-disabled='true'] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.auth-google-help {
+    margin: 1rem 0 0;
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.auth-message {
+    margin: 0 0 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    text-align: left;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.auth-message--info {
+    background: #e0f2fe;
+    border: 1px solid #7dd3fc;
+    color: #0c4a6e;
+}
+
+.auth-message--success {
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.auth-message--error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -10659,7 +10800,7 @@ body.home-password-locked .footer {
         font-size: 1.75rem;
     }
     
-    .auth-section {
+    .auth-section-content {
         padding: 2rem 0;
     }
 }

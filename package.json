@@ -2,9 +2,9 @@
   "name": "blog-website",
   "private": true,
   "scripts": {
-    "start": "python3 -m http.server 8080 --bind 127.0.0.1",
+    "start": "python3 -m http.server 8080 --bind localhost",
     "start:8082": "node scripts/local-registration-server.mjs",
-    "start:3000": "python3 -m http.server 3000 --bind 127.0.0.1",
+    "start:3000": "python3 -m http.server 3000 --bind localhost",
     "start:serve": "npx --yes serve . -l 8080",
     "speakers:merge": "node scripts/merge-speakers-html-parts.mjs",
     "speakers:parse": "node scripts/parse-speakers-html.mjs",

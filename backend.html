@@ -224,7 +224,7 @@
         .eventnavigation #status-container.backend-status-inline {
             flex: 1 1 auto;
             min-width: 0;
-            margin-left: auto;
+            margin-left: 0;
             margin-top: 0;
             width: auto;
             text-align: right;
@@ -6318,6 +6318,43 @@
             flex: 0 0 auto;
         }
 
+        .backend-sign-out-btn {
+            flex: 0 0 auto;
+            align-self: center;
+            margin: 0;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: #ffffff;
+            color: #003153;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .backend-sign-out-btn:hover {
+            background: #f1f5f9;
+        }
+
+        html.backend-auth-checking body.backend-page > .main {
+            visibility: hidden;
+        }
+
+        .backend-auth-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            color: #003153;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
         .texteditor-selectors-empty {
             margin: 0;
             font-size: 0.875rem;
@@ -6858,6 +6895,7 @@
                     <div id="status-container" class="backend-status-inline" aria-live="polite" aria-atomic="true">
                         <div id="status" class="status loading">Starting backend…</div>
                     </div>
+                    <button type="button" class="backend-sign-out-btn" id="backend-sign-out-btn" hidden>Sign out</button>
                 </div>
             </div>
             <div class="eventnavigation-aspects-spacer" aria-hidden="true"></div>
@@ -7920,6 +7958,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="auth-common.js?v=20260605-google-auth"></script>
+    <script src="backend-auth.js?v=20260605-google-auth"></script>
     <script>
         // Airtable configuration - using same credentials as index page
         const AIRTABLE_API_KEY = 'pataRUBPj7Gxfmdfq.9469facf6725c22fd5eb0e17296497271995e544cc2dfcd1ce2d682dbc7ef9f0';
@@ -8823,18 +8863,17 @@
         }
 
         /**
-         * Firestore REST requires a Firebase Auth ID token for listCollectionIds under typical security rules.
-         * Enable Anonymous sign-in in Firebase Console → Authentication → Sign-in method.
+         * Firestore REST listCollectionIds uses the signed-in staff Google account ID token.
          */
         async function ensureFirebaseAuthForFirestoreRest() {
             if (typeof firebase === 'undefined') return null;
             try {
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 if (!firebase.auth) return null;
+                if (typeof TbsAuth !== 'undefined' && TbsAuth.shouldSkipGoogleAuth()) return null;
                 var auth = firebase.auth();
-                if (auth.currentUser) return await auth.currentUser.getIdToken();
-                var cred = await auth.signInAnonymously();
-                return cred.user ? await cred.user.getIdToken() : null;
+                if (!auth.currentUser) return null;
+                return await auth.currentUser.getIdToken();
             } catch (e) {
                 console.warn('ensureFirebaseAuthForFirestoreRest:', e);
                 return null;
@@ -16681,39 +16720,32 @@
             }
         }
 
-        async function connectGmailClient() {
-            var clientId = window.TBS_GMAIL_CLIENT_ID || '';
+        async function connectGmailClient(options) {
             var authEl = document.getElementById('emailer-auth-status');
-            if (!clientId) {
-                if (authEl) authEl.textContent = 'Missing TBS_GMAIL_CLIENT_ID.';
-                return;
+            var opts = options || {};
+            try {
+                if (authEl) authEl.textContent = 'Connecting to Gmail…';
+                if (typeof TbsAuth !== 'undefined' && TbsAuth.shouldSkipGoogleAuth()) {
+                    if (authEl) authEl.textContent = 'Gmail requires Google sign-in (not skipped on localhost).';
+                    return;
+                }
+                var tokenFn = typeof window.getBackendGmailAccessToken === 'function'
+                    ? window.getBackendGmailAccessToken
+                    : (typeof TbsAuth !== 'undefined' ? TbsAuth.ensureGmailAccessToken.bind(TbsAuth) : null);
+                if (!tokenFn) {
+                    throw new Error('Gmail auth is not available.');
+                }
+                gmailAccessToken = await tokenFn({ forcePrompt: !!opts.forcePrompt });
+                if (!gmailAccessToken) {
+                    if (authEl) authEl.textContent = 'Gmail not connected.';
+                    return;
+                }
+                await loadGmailFolders();
+                if (authEl) authEl.textContent = 'Connected to Gmail.';
+            } catch (err) {
+                console.error('connectGmailClient:', err);
+                if (authEl) authEl.textContent = err && err.message ? err.message : 'Failed to connect Gmail.';
             }
-            if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
-                await new Promise(function(resolve, reject) {
-                    var existing = document.querySelector('script[data-gmail-gsi]');
-                    if (existing) { existing.addEventListener('load', resolve, { once: true }); return; }
-                    var s = document.createElement('script');
-                    s.src = 'https://accounts.google.com/gsi/client';
-                    s.async = true;
-                    s.defer = true;
-                    s.setAttribute('data-gmail-gsi', 'true');
-                    s.onload = resolve;
-                    s.onerror = function() { reject(new Error('Failed loading Google Identity Services.')); };
-                    document.head.appendChild(s);
-                });
-            }
-            if (!gmailTokenClient) {
-                gmailTokenClient = window.google.accounts.oauth2.initTokenClient({
-                    client_id: clientId,
-                    scope: 'https://www.googleapis.com/auth/gmail.modify',
-                    callback: async function(resp) {
-                        if (!resp || !resp.access_token) return;
-                        gmailAccessToken = resp.access_token;
-                        try { await loadGmailFolders(); } catch (err) { if (authEl) authEl.textContent = err && err.message ? err.message : 'Failed loading Gmail.'; }
-                    }
-                });
-            }
-            gmailTokenClient.requestAccessToken({ prompt: gmailAccessToken ? '' : 'consent' });
         }
 
         function setBackendPanel(panel) {
@@ -18606,6 +18638,16 @@
         }
 
         window.addEventListener('load', async function() {
+            if (window.__backendAuthReady) {
+                await window.__backendAuthReady;
+            }
+            var signOutBtn = document.getElementById('backend-sign-out-btn');
+            if (signOutBtn && typeof TbsAuth !== 'undefined' && !TbsAuth.shouldSkipGoogleAuth()) {
+                signOutBtn.hidden = false;
+                signOutBtn.addEventListener('click', function() {
+                    TbsAuth.signOutStaff();
+                });
+            }
             const texteditorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');
@@ -18740,7 +18782,7 @@
             var emailerConnectBtn = document.getElementById('emailer-connect-btn');
             if (emailerConnectBtn) {
                 emailerConnectBtn.addEventListener('click', function() {
-                    connectGmailClient().catch(function(err) {
+                    connectGmailClient({ forcePrompt: true }).catch(function(err) {
                         var statusEl = document.getElementById('emailer-auth-status');
                         if (statusEl) statusEl.textContent = err && err.message ? err.message : 'Failed to connect Gmail.';
                     });
@@ -20511,6 +20553,9 @@
                 backendGuestsPreloadPromise
             ]);
             showStatus('success', 'Backend ready. Loaded ' + describeBackendStartupLoadedSummary() + '.');
+            connectGmailClient().catch(function(err) {
+                console.warn('Gmail auto-connect:', err);
+            });
             syncGuestEditorToolbarForBottomScroll();
             syncSpeakerEditorToolbarForBottomScroll();
             updateBackendContentCountDisplay();

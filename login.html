@@ -3,106 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - TBS Zermatt</title>
+    <title>Sign in - TBS Zermatt</title>
     <link rel="icon" href="images/emblem.png" type="image/png">
     <link rel="apple-touch-icon" href="images/emblem.png">
-    <link rel="stylesheet" href="styles.css?v=20260401-remove-live-nav">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260605-google-login">
+    <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="login-page">
 
-    <main class="main" style="margin: 0; padding: 0;">
-        <section class="auth-section" style="height: 100vh; width: 100vw; margin: 0; padding: 0; background: url('images/background.jpg') no-repeat fixed; background-size: cover; background-position: center;">
-            <div class="container">
-                <div class="auth-header-logo">
-                    <img src="images/logo.png" alt="TBS Zermatt" class="auth-header-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <h2 class="auth-header-logo-text" style="display: none;">TBS Zermatt Blog</h2>
-                </div>
-                
-                <div class="auth-container">
-                    <!-- Login Form -->
-                    <div class="auth-form" id="loginForm">
-                        <h2 class="auth-title">Sign In</h2>
-                        <p class="auth-subtitle">Access your TBS Zermatt account</p>
-                        
-                        <form class="form" id="loginFormElement">
-                            <div class="form-group">
-                                <label for="loginEmail" class="form-label">Email</label>
-                                <input type="email" id="loginEmail" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="loginPassword" class="form-label">Password</label>
-                                <input type="password" id="loginPassword" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="rememberMe">
-                                    <span class="checkbox-text">Remember me</span>
-                                </label>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Sign In</button>
-                            
-                            <div class="auth-links">
-                                <a href="#" class="auth-link">Forgot password?</a>
-                            </div>
-                        </form>
-                        
-                        <div class="auth-switch">
-                            <p>Don't have an account? <a href="#" class="auth-link" onclick="showRegisterForm()">Sign up</a></p>
-                            <p><a href="index.html" class="auth-link">Backend</a></p>
-                        </div>
+    <main class="main login-main">
+        <section class="auth-section" aria-label="Staff sign in">
+            <div class="auth-poster" aria-hidden="true">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
+                    <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
+                    <img src="images/wideposter.webp" alt="" class="auth-poster-img" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high">
+                </picture>
+            </div>
+            <div class="auth-section-content">
+                <div class="container">
+                    <div class="auth-header-logo">
+                        <img src="images/logo.png" alt="TBS Zermatt" class="auth-header-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <h2 class="auth-header-logo-text" style="display: none;">TBS Zermatt</h2>
                     </div>
 
-                    <!-- Registration Form -->
-                    <div class="auth-form" id="registerForm" style="display: none;">
-                        <h2 class="auth-title">Create Account</h2>
-                        <p class="auth-subtitle">Join the TBS Zermatt community</p>
-                        
-                        <form class="form" id="registerFormElement">
-                            <div class="form-group">
-                                <label for="registerName" class="form-label">Full Name</label>
-                                <input type="text" id="registerName" class="form-input" required>
+                    <div class="auth-container auth-container--google">
+                        <div class="auth-form" id="loginPanel">
+                            <h2 class="auth-title">Staff sign in</h2>
+                            <p class="auth-subtitle">Use your Google account to access the TBS backend and admin tools.</p>
+
+                            <p class="auth-notice auth-notice--info" id="authNotice" role="status">
+                                Sign in with your approved TBS Google account to open the backend.
+                            </p>
+
+                            <div id="authMessage" class="auth-message" hidden role="alert"></div>
+
+                            <button
+                                type="button"
+                                id="googleSignInBtn"
+                                class="auth-google-btn"
+                                aria-describedby="authNotice">
+                                <i class="fab fa-google" aria-hidden="true"></i>
+                                <span>Continue with Google</span>
+                            </button>
+
+                            <p class="auth-google-help">
+                                Only Google accounts added in Firebase Authentication can access the backend. Gmail opens with the same sign-in.
+                            </p>
+
+                            <div class="auth-switch">
+                                <p><a href="home.html" class="auth-link">Back to site</a></p>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="registerEmail" class="form-label">Email</label>
-                                <input type="email" id="registerEmail" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="registerPassword" class="form-label">Password</label>
-                                <input type="password" id="registerPassword" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" id="confirmPassword" class="form-input" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Create Account</button>
-                        </form>
-                        
-                        <div class="auth-switch">
-                            <p>Already have an account? <a href="#" class="auth-link" onclick="showLoginForm()">Sign in</a></p>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="auth-logo-section">
-                    <img src="images/emblem.png" alt="TBS Zermatt" class="auth-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div class="auth-logo-fallback" style="display: none;">
-                        <h3 style="color: #FFD700; margin: 0; font-size: 1.7rem;">TBS ZERMATT</h3>
-                        <p style="color: #94a3b8; margin: 0.5rem 0 0 0; font-size: 0.9rem;">THE SICKEST PATIENTS. THE FIRST HOURS.</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <script src="auth.js?v=20250923-1001"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="auth-common.js?v=20260605-google-auth"></script>
+    <script src="auth.js?v=20260605-google-auth"></script>
 </body>
 </html>
