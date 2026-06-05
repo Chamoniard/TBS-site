@@ -5517,6 +5517,7 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
     z-index: 2;
 }
 
+.feed-section-inner-wrapper .post-date,
 .feed-section-inner-wrapper .news-card-date {
     font-style: italic;
 }
@@ -5899,6 +5900,13 @@ h3.section-titles {
     box-shadow: none;
 }
 
+/* Feed section: thumbnails sized for feed layout (aspect ratio unchanged) */
+.feed-section-inner-wrapper .news-card,
+.home-section .feed-section-inner-wrapper .news-card {
+    --news-media-width: calc(288px * 1.2 * 0.9);
+    --news-media-height: calc(192px * 1.2 * 0.9);
+}
+
 /* Airtable Featured: same pink as Fieldcolour “Pink” / .news-card-bg-pink */
 .news-card.news-card--featured {
     background-color: #f9f1dc;
@@ -6100,6 +6108,7 @@ h3.section-titles {
     white-space: nowrap;
 }
 
+.news-card-title-row .post-date,
 .news-card-title-row .news-card-date {
     flex: 0 0 auto;
     margin: 0;
@@ -6150,6 +6159,7 @@ h3.section-titles {
     padding-right: 1.5rem;
 }
 
+.news-card-meta .post-date,
 .news-card-meta .news-card-date {
     margin: 0;
 }
@@ -6171,10 +6181,12 @@ h3.section-titles {
     }
 }
 
+.post-date,
 .news-card-date {
     color: #64748b;
     font-size: 0.9rem;
     font-weight: 500;
+    font-style: italic;
     margin: 0;
     margin-top: 0;
     white-space: nowrap;
@@ -6268,6 +6280,7 @@ h3.section-titles {
     pointer-events: none; /* Allow clicks to pass through to video */
 }
 
+.news-card-meta-overlay .post-date,
 .news-card-meta-overlay .news-card-date {
     color: white;
     margin: 0;
@@ -6474,11 +6487,11 @@ h4 {
         gap: 16px;
     }
 
-    /* Feed-section only: card thumbnails 20% smaller than default mobile news cards */
+    /* Feed-section only: card thumbnails (maintains 3:2) */
     .feed-section-inner-wrapper .news-card,
     .home-section .feed-section-inner-wrapper .news-card {
-        --news-media-width: calc(168px * 0.8);
-        --news-media-height: calc(115.2px * 0.8);
+        --news-media-width: calc(168px * 0.8 * 1.2 * 0.9);
+        --news-media-height: calc(115.2px * 0.8 * 1.2 * 0.9);
     }
 
     .news-card {
@@ -6565,6 +6578,7 @@ h4 {
         order: 1;
     }
 
+    body.home-view .home-section .feed-section-inner-wrapper .feed-section-post-meta .post-date,
     body.home-view .home-section .feed-section-inner-wrapper .feed-section-post-meta .news-card-date {
         flex: 0 0 auto;
         align-self: flex-start;
@@ -7047,14 +7061,21 @@ h4 {
         border-radius: 0;
     }
 
-    /* Speaker strip: same slide chrome as programme day cards on mobile */
+    /* Speaker strip: vertical dividers only (no top/bottom borders), same as programme */
     .home-section .speakerslider-track > .speaker-placeholder,
     .home-section .speakerslider-track > .speaker-card {
-        border: 1px solid #D1D5DB !important;
+        border-top: none !important;
+        border-bottom: none !important;
+        border-left: 1px solid #ffffff !important;
         border-right: none !important;
         padding-left: 16px !important;
         box-shadow: none !important;
         box-sizing: border-box !important;
+    }
+
+    .home-section .speakerslider-track > .speaker-card:first-child,
+    .home-section .speakerslider-track > .speaker-placeholder:first-child {
+        border-left: none !important;
     }
 
     .home-section .speakerslider-track > .speaker-placeholder {
@@ -7066,8 +7087,10 @@ h4 {
     }
 
     .home-section .speakerslider-track > .speaker-card:last-child,
-    .home-section .speakerslider-track > .speaker-card:only-child {
-        border-right: 1px solid #D1D5DB !important;
+    .home-section .speakerslider-track > .speaker-card:only-child,
+    .home-section .speakerslider-track > .speaker-placeholder:last-child,
+    .home-section .speakerslider-track > .speaker-placeholder:only-child {
+        border-right: none !important;
     }
 
     /* Programme poster — square corners, no frame */
@@ -7958,7 +7981,7 @@ h4 {
 }
 
 .blog-card-content {
-    padding: 8px;
+    padding: 8px 8px 16px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -7980,14 +8003,6 @@ h4 {
     align-items: center;
     margin-bottom: 0;
     gap: 0.5rem;
-}
-
-.blog-card-date {
-    color: #64748b;
-    font-size: 0.7rem;
-    font-weight: 500;
-    margin: 0;
-    text-align: right;
 }
 
 .blog-card-category {
@@ -8916,6 +8931,16 @@ h4 {
         max-height: var(--mobile-tab-bar-height) !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+        border-top: none !important;
+        box-shadow: none !important;
+    }
+
+    body.home-view.past-talks-open .navbar--mobile-bottom {
         background: var(--introslider-nav-glass-bg) !important;
         background-color: var(--introslider-nav-glass-bg) !important;
         backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
@@ -9671,7 +9696,7 @@ h4 {
     }
 
     .blog-card-content {
-        padding: 8px;
+        padding: 8px 8px 16px;
     }
 
     .footer-content {
@@ -9687,6 +9712,11 @@ h4 {
         padding-bottom: 50px;
         background: #003153 !important;
         color: #ffffff;
+    }
+
+    /* Home: tuck footer under bottom tab bar */
+    body.home-view:not(.past-talks-open) .footer {
+        margin-bottom: -50px !important;
     }
 
     /* Past talks: tuck footer under bottom tab bar (56px) */
@@ -9930,7 +9960,8 @@ h4 {
     flex-wrap: nowrap;
     gap: 0.5rem;
 }
-.viewing .post-meta .post-date {
+.viewing .post-meta .post-date,
+.viewing .post-meta .news-card-date {
     flex: 0 0 auto;
 }
 
@@ -9939,7 +9970,7 @@ h4 {
     margin-left: auto;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 8px;
     align-items: center;
     justify-content: flex-end;
 }
@@ -10008,8 +10039,22 @@ h4 {
 }
 
 /* Post date padding when inside viewing container */
-.viewing .post-date {
+.viewing .post-date,
+.viewing .news-card-date {
     padding-left: 0;
+}
+
+.post-date,
+.news-card-date {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 0.5rem;
+    text-align: left;
 }
 
 /* Post content margin when inside viewing container – match welcome section typography */
@@ -10142,11 +10187,6 @@ h4 {
     font-weight: 500;
 }
 
-.post-date {
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
 .post-name {
     font-size: 1rem;
     font-weight: 400;
@@ -10212,6 +10252,11 @@ h4 {
     .post-meta { 
         gap: 1rem; 
     }
+
+    .viewing .post-meta .post-meta-right {
+        gap: 6px;
+    }
+
     .viewer-section {
         padding-left: 0;
         padding-right: 0;
@@ -11042,8 +11087,8 @@ body.login-page .login-main {
     }
     .video-layout .morevideos-card {
         flex: 0 0 auto;
-        min-width: 180px;
-        max-width: 180px;
+        min-width: calc(180px * 1.2);
+        max-width: calc(180px * 1.2);
     }
 }
 

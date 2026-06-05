@@ -65,6 +65,8 @@ function withTimeout(promise, ms, label) {
 // Past talks post model (loaded from Firestore content feed)
 let blogPosts = [];
 let allPosts = [];
+/** In-flight / completed Past talks feed transform (shared by foreground + background loads). */
+let pastTalksLoadPromise = null;
 
 // DOM Elements
 let blogGrid = document.getElementById('blogGrid');
@@ -164,7 +166,7 @@ function getPostTopicBadgeLabels(topic) {
     return [s];
 }
 
-/** Video viewer meta: Event (category), then Type, then Topic badges. */
+/** Video viewer meta: Event (category), EDIT when applicable, then Topic badges — no Type label. */
 function buildViewerPostMetaBadgesHtml(post) {
     const parts = [];
     const category = post.category != null ? String(post.category).trim() : '';
@@ -172,12 +174,8 @@ function buildViewerPostMetaBadgesHtml(post) {
         parts.push(`<span class="post-category">${category}</span>`);
     }
     const typeKey = normalizePostTypeValue(post.type);
-    const typeRaw = post.type != null ? (Array.isArray(post.type) ? post.type[0] : post.type) : '';
-    const typeDisplay = typeRaw != null ? String(typeRaw).trim() : '';
     if (typeKey === 'edit') {
         parts.push('<span class="news-card-new-badge">EDIT</span>');
-    } else if (typeDisplay) {
-        parts.push(`<span class="post-category">${typeDisplay}</span>`);
     }
     getPostTopicBadgeLabels(post.topic).forEach((label) => {
         parts.push(`<span class="post-category">${label}</span>`);
@@ -185,78 +183,94 @@ function buildViewerPostMetaBadgesHtml(post) {
     return parts.join('');
 }
 
-// Load Past talks posts from Firebase feed source - deferred execution
-async function loadPostsFromFirebase() {
-    try {
-        showLoadingState();
-        
-        // Reuse the same Firestore-backed source as the home feed.
-        const allRecords = await fetchNewsFeed();
-        
-        if (!allRecords || allRecords.length === 0) {
-            console.error('No records received from Firebase feed source');
-            showErrorState('No data available');
-            return;
-        }
-        
-        // Get all records and filter for Video and Edit types (Edit handled like Video)
-        const videoRecords = allRecords.filter(record => 
-            record.fields.Type && isVideoOrEditType(record.fields.Type)
-        );
-        
-        // Transform video records to blog posts
-        blogPosts = videoRecords.map(record => {
-            const resolvedImage = extractFeedRecordImageUrl(record.fields);
-            const imageUrl = resolvedImage || '📝';
-            
-            const post = {
-                id: record.id,
-                title: record.fields.Title || 'Untitled',
-                name: record.fields.Name || null, // Add Name field
-                excerpt: record.fields.Excerpt || 'No excerpt available',
-                content: record.fields.Content || record.fields['Post Content'] || '',
-                category: normalizeEventField(record.fields.Event || record.fields.Events),
-                type: record.fields.Type || null,
-                topic: record.fields.Topic || getSampleTopic(),
-                date: record.fields.Date || new Date().toISOString().split('T')[0],
-                readTime: record.fields['Read Time'] || '5 min',
-                likes: record.fields.Likes || 0,
-                comments: record.fields.Comments || 0,
-                image: imageUrl,
-                slug: record.fields.Slug || generateSlug(record.fields.Title || 'untitled'),
-                featured: record.fields.Featured || false,
-                youtubeUrl: record.fields.Youtube || null,
-                fieldColour: record.fields.Fieldcolour || null
-            };
-            
-            return post;
-        });
-        
-        allPosts = [...blogPosts];
-        
-        // Sort posts by date (latest to earliest)
-        allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+function buildPastTalksPostsFromFeedRecords(allRecords) {
+    const videoRecords = allRecords.filter(
+        (record) => record.fields.Type && isVideoOrEditType(record.fields.Type)
+    );
+    return videoRecords.map((record) => {
+        const resolvedImage = extractFeedRecordImageUrl(record.fields);
+        const imageUrl = resolvedImage || '📝';
+        return {
+            id: record.id,
+            title: record.fields.Title || 'Untitled',
+            name: record.fields.Name || null,
+            excerpt: record.fields.Excerpt || 'No excerpt available',
+            content: record.fields.Content || record.fields['Post Content'] || '',
+            category: normalizeEventField(record.fields.Event || record.fields.Events),
+            type: record.fields.Type || null,
+            topic: record.fields.Topic || getSampleTopic(),
+            date: record.fields.Date || new Date().toISOString().split('T')[0],
+            readTime: record.fields['Read Time'] || '5 min',
+            likes: record.fields.Likes || 0,
+            comments: record.fields.Comments || 0,
+            image: imageUrl,
+            slug: record.fields.Slug || generateSlug(record.fields.Title || 'untitled'),
+            featured: record.fields.Featured || false,
+            youtubeUrl: record.fields.Youtube || null,
+            fieldColour: record.fields.Fieldcolour || null,
+        };
+    });
+}
 
-        prefetchBlogPostThumbnailsIntoCache(allPosts);
-        
-        // Populate filters after posts are loaded
-        populateFilters();
-        
-        // Only render posts if we're in blog view (blogGrid exists)
-        if (blogGrid) {
-            resetPastTalksPagination();
-            renderPosts();
-            // Setup event listeners for the initial page load
-            setupEventListeners();
-            setupTopicButtonListeners();
-        }
-        
-    } catch (error) {
-        console.error('Error loading posts from Firebase:', error);
-        
-        // Redirect to feed when content source is unavailable
-        void showFeedContent().then(() => scrollHomeToTop());
+/**
+ * Load Past talks card data from the shared Firestore feed.
+ * @param {{ silent?: boolean, force?: boolean }} [options]
+ *   silent — background warmup: no loading UI, no feed redirect on failure
+ */
+async function loadPostsFromFirebase(options) {
+    const silent = Boolean(options && options.silent);
+    const force = Boolean(options && options.force);
+    if (pastTalksLoadPromise && !force) {
+        return pastTalksLoadPromise;
     }
+
+    pastTalksLoadPromise = (async () => {
+        try {
+            if (!silent) {
+                showLoadingState();
+            }
+
+            const allRecords = await fetchNewsFeed();
+
+            if (!allRecords || allRecords.length === 0) {
+                const message = 'No records received from Firebase feed source';
+                if (silent) {
+                    console.warn('Background Past talks warmup:', message);
+                    return;
+                }
+                console.error(message);
+                showErrorState('No data available');
+                return;
+            }
+
+            blogPosts = buildPastTalksPostsFromFeedRecords(allRecords);
+            allPosts = [...blogPosts];
+            allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+            prefetchBlogPostThumbnailsIntoCache(allPosts);
+
+            populateFilters();
+
+            blogGrid = document.getElementById('blogGrid');
+            if (blogGrid) {
+                resetPastTalksPagination();
+                renderPosts();
+                setupEventListeners();
+                setupTopicButtonListeners();
+            }
+        } catch (error) {
+            console.error('Error loading posts from Firebase:', error);
+            if (silent) {
+                return;
+            }
+            void showFeedContent().then(() => scrollHomeToTop());
+        } finally {
+            if (!allPosts.length) {
+                pastTalksLoadPromise = null;
+            }
+        }
+    })();
+
+    return pastTalksLoadPromise;
 }
 
 // Generate URL slug from title
@@ -465,13 +479,21 @@ function prefetchBlogPostThumbnailsIntoCache(posts) {
 
 function scheduleBackgroundPastTalksWarmup() {
     const run = () => {
-        void loadPostsFromFirebase();
+        if (allPosts.length) return;
+        void loadPostsFromFirebase({ silent: true });
     };
-    if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
-        window.requestIdleCallback(run, { timeout: 2500 });
+    const schedule = () => {
+        if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(run, { timeout: 4000 });
+            return;
+        }
+        setTimeout(run, 800);
+    };
+    if (typeof document !== 'undefined' && document.readyState === 'complete') {
+        schedule();
         return;
     }
-    setTimeout(run, 400);
+    window.addEventListener('load', schedule, { once: true });
 }
 
 function warmHomePageFirestoreCache() {
@@ -721,7 +743,7 @@ function createPostElement(post) {
         </div>
         <div class="blog-card-content">
             <div class="blog-card-meta" style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
-                <p class="blog-card-date">${formatDate(post.date)}</p>
+                <p class="post-date">${formatDate(post.date)}</p>
                 ${metaBadgesHtml}
             </div>
             <h3 class="post-title">${post.title}</h3>
@@ -2875,6 +2897,28 @@ function scrollHomeToTop(opts) {
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const behavior = instant || reduce ? 'auto' : 'smooth';
     window.scrollTo({ top: 0, left: 0, behavior });
+    if (instant || reduce || behavior === 'auto') {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (typeof syncHomeViewNavbarFromScroll === 'function') {
+            syncHomeViewNavbarFromScroll();
+        }
+    }
+}
+
+/** Full reload / bfcache: disable browser scroll restoration and jump to top. */
+function initPageScrollOnReload() {
+    if (typeof window === 'undefined') return;
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    const scrollNow = function () {
+        scrollHomeToTop({ instant: true });
+    };
+    scrollNow();
+    window.addEventListener('pageshow', function (ev) {
+        if (!ev.persisted) scrollNow();
+    });
 }
 
 function scrollHomeTargetIntoView(el, opts) {
@@ -6335,7 +6379,7 @@ async function createNewsCard(record) {
         `</div>`;
     const feedSectionPostMetaHtml =
         `<div class="feed-section-post-meta">` +
-        `<p class="news-card-date">${formattedDate}</p>` +
+        `<p class="post-date">${formattedDate}</p>` +
         titleBadgesHtml +
         `</div>`;
     const titleRowHtml =
@@ -7064,6 +7108,7 @@ function teardownHomeViewNavbarScroll() {
     }
     teardownHomeHeroIntrosliderPosterGapSync();
     clearHomeMaintitleHeadingFontSize();
+    resetMobileBottomNavbarGlassInline();
     if (!document.body.classList.contains('home-view')) {
         resetNavHeaderToCssDefaults();
     }
@@ -7080,7 +7125,7 @@ const INTROSLIDER_NAV_GLASS = {
 /**
  * @param {HTMLElement} navbar
  * @param {number} strength 0–1 (0 = clear glass layer)
- * @param {{ noShadow?: boolean }} [options]
+ * @param {{ noShadow?: boolean, borderEdge?: 'all' | 'top' }} [options]
  */
 function applyNavbarIntrosliderGlassInline(navbar, strength, options) {
     if (!navbar) return;
@@ -7097,6 +7142,7 @@ function applyNavbarIntrosliderGlassInline(navbar, strength, options) {
         navbar.style.setProperty('backdrop-filter', 'none', 'important');
         navbar.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
         navbar.style.setProperty('border', 'none', 'important');
+        navbar.style.setProperty('border-top', 'none', 'important');
         return;
     }
     const a = INTROSLIDER_NAV_GLASS.bgAlpha * t;
@@ -7116,11 +7162,15 @@ function applyNavbarIntrosliderGlassInline(navbar, strength, options) {
         skipBlur || blurPx <= 0.02 ? 'none' : `blur(${blurPx}px)`;
     navbar.style.setProperty('backdrop-filter', blurVal, 'important');
     navbar.style.setProperty('-webkit-backdrop-filter', blurVal, 'important');
-    navbar.style.setProperty(
-        'border',
-        t < 0.02 ? 'none' : `1px solid rgba(255, 255, 255, ${INTROSLIDER_NAV_GLASS.borderWhiteA * t})`,
-        'important'
-    );
+    const borderEdge = options && options.borderEdge === 'top' ? 'top' : 'all';
+    const borderColor =
+        t < 0.02 ? 'none' : `1px solid rgba(255, 255, 255, ${INTROSLIDER_NAV_GLASS.borderWhiteA * t})`;
+    if (borderEdge === 'top') {
+        navbar.style.setProperty('border', 'none', 'important');
+        navbar.style.setProperty('border-top', borderColor, 'important');
+    } else {
+        navbar.style.setProperty('border', borderColor, 'important');
+    }
 }
 
 const NAV_HEADER_INLINE_RESET_PROPS = [
@@ -7202,6 +7252,38 @@ function applyHomeHeroNavbarAppearance(transparent) {
 
 /** Home hero: full frosted nav as soon as the page scrolls (no ramp, no transition on blur). */
 const HOME_NAV_SCROLL_INSTANT_THRESHOLD_PX = 2;
+/** Scroll distance (px) over which mobile bottom / desktop glass nav fades in. */
+const HOME_NAV_SCROLL_FADE_PX = 100;
+
+function getHomeScrollNavGlassOpacity(scrollY) {
+    if (!scrollY || scrollY <= 0) return 0;
+    return Math.min(scrollY / HOME_NAV_SCROLL_FADE_PX, 1);
+}
+
+/**
+ * Mobile bottom tab bar: frosted background fades in with scroll (tabs stay visible).
+ * @param {number} opacity 0–1
+ * @param {{ instant?: boolean }} [options]
+ */
+function applyMobileBottomNavbarOpacity(opacity, options) {
+    const bottomNav = document.querySelector('.navbar--mobile-bottom');
+    if (!bottomNav) return;
+    const o = Math.max(0, Math.min(1, opacity));
+    const instant = Boolean(options && options.instant);
+    const fade = instant ? '0s' : HOME_NAV_FADE_MS;
+    const navTransition = `background-color ${fade} ease, box-shadow ${fade} ease, backdrop-filter ${fade} ease, -webkit-backdrop-filter ${fade} ease, border-color ${fade} ease`;
+    bottomNav.style.setProperty('transition', navTransition, 'important');
+    applyNavbarIntrosliderGlassInline(bottomNav, o, { borderEdge: 'top' });
+    bottomNav.classList.toggle('transparent', o < 0.08);
+}
+
+function resetMobileBottomNavbarGlassInline() {
+    const bottomNav = document.querySelector('.navbar--mobile-bottom');
+    if (!bottomNav) return;
+    NAV_HEADER_INLINE_RESET_PROPS.forEach((p) => bottomNav.style.removeProperty(p));
+    bottomNav.style.removeProperty('border-top');
+    bottomNav.classList.remove('transparent');
+}
 
 /**
  * Scroll-spy: highlight nav tabs (yellow .active) for the home section currently at the navbar anchor line.
@@ -7370,13 +7452,21 @@ function syncHomeViewNavbarFromScroll() {
     if (!isMobileBottomNavbarLayout()) {
         clearMobileBottomNavbarInlineStyles();
     }
-    /* Mobile: transparent top bar (hamburger + Register) over poster. */
+    /* Mobile: transparent top bar; bottom bar glass is scroll-driven in script.js on home. */
     if (isMobileBottomNavbarLayout()) {
         applyMobileBottomNavbarLayout();
-        applyHomeHeroNavbarOpacity(0, { instant: true });
         if (document.body.classList.contains('past-talks-open')) {
+            applyHomeHeroNavbarOpacity(1, { instant: true });
+            applyMobileBottomNavbarOpacity(1, { instant: true });
             syncPastTalksPrussianStripToNavbar();
+            return;
         }
+        applyHomeHeroNavbarOpacity(0, { instant: true });
+        const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        const opacity = getHomeScrollNavGlassOpacity(scrollY);
+        applyMobileBottomNavbarOpacity(opacity, {
+            instant: opacity <= 0.001 || opacity >= 0.999,
+        });
         return;
     }
     /* Past talks / video viewer: always full frosted nav (not scroll-gated at top). */
@@ -7703,10 +7793,16 @@ function setHomePageLoading(isLoading) {
     screen.setAttribute('aria-busy', 'false');
     screen.classList.add('is-hidden');
     screen.setAttribute('aria-hidden', 'true');
+    requestAnimationFrame(function () {
+        scrollHomeToTop({ instant: true });
+    });
 }
 
 // Initialize the blog when page loads
+initPageScrollOnReload();
+
 document.addEventListener('DOMContentLoaded', async function() {
+    scrollHomeToTop({ instant: true });
     try {
         warmHomePageFirestoreCache();
     } catch (warmErr) {
@@ -7746,7 +7842,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('showFeedContent failed or timed out:', err);
     } finally {
         revealStuckHomeStageBands(document.querySelector('.everything .home-section'));
-        scrollHomeToTop();
+        scrollHomeToTop({ instant: true });
         setHomePageLoading(false);
     }
 
