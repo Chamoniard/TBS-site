@@ -2734,7 +2734,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     border: none;
     font-family: var(--title-font);
     font-size: 1.3rem;
-    font-weight: 600;
+    font-weight: 600 !important;
     line-height: 1.25;
     text-align: center;
     width: 100%;
@@ -2773,6 +2773,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 .home-section .speaker-section.home-carousel--minimal .speaker-card--tba .speaker-card-name.home-carousel-tba-title,
 .home-section .speaker-section.home-carousel--minimal .speaker-card--tba .home-carousel-tba-title {
+    font-weight: 600 !important;
     color: #000000;
     text-align: center !important;
     width: 100%;
@@ -11358,16 +11359,16 @@ body.home-view :is(
     .event-section-title,
     .sponsors-section-title,
     .ondemand-section-title,
-    .speaker-card-name,
+    .speaker-card-name:not(.home-carousel-tba-title),
     .speaker-card-long-bio-title,
     .featured-location-title,
     .featured-programme-title,
     .featured-video-title,
     .featured-social-gradient-title,
     .home-section .event-contents h3,
-    .home-section .programmestyle :is(h3, h4),
-    .home-programme-section .programmestyle :is(h3, h4),
-    .home-section .speakerslider .speaker-card-bio h3,
+    .home-section .programmestyle :is(h3, h4):not(.home-carousel-tba-title),
+    .home-programme-section .programmestyle :is(h3, h4):not(.home-carousel-tba-title),
+    .home-section .speakerslider .speaker-card-bio h3:not(.home-carousel-tba-title),
     .welcometext .featured-text-content h3,
     .featured-text-content h3
 ) {
@@ -11670,5 +11671,14 @@ body.home-view :is(.maintitle-heading) {
     body.home-view .home-section > .introslider-section.home-hero-introslider-outer .introslider-dot {
         border-radius: 50% !important;
     }
+}
+
+/* TBA carousel titles — always semibold 600 (wins Montserrat 700 title stack) */
+body.home-view h3.home-carousel-tba-title,
+body.home-view h3.speaker-card-name.home-carousel-tba-title,
+body.home-view .programme-tba h3.home-carousel-tba-title,
+body.home-view .speaker-card--tba h3.speaker-card-name.home-carousel-tba-title,
+body.home-view .home-section .programmestyle h3.home-carousel-tba-title {
+    font-weight: 600 !important;
 }
 
