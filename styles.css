@@ -6487,11 +6487,11 @@ h4 {
         gap: 16px;
     }
 
-    /* Feed-section only: card thumbnails (maintains 3:2) */
+    /* Feed-section only: card thumbnails +10% on mobile (maintains 3:2) */
     .feed-section-inner-wrapper .news-card,
     .home-section .feed-section-inner-wrapper .news-card {
-        --news-media-width: calc(168px * 0.8 * 1.2 * 0.9);
-        --news-media-height: calc(115.2px * 0.8 * 1.2 * 0.9);
+        --news-media-width: calc(168px * 0.8 * 1.2 * 0.9 * 1.1);
+        --news-media-height: calc(115.2px * 0.8 * 1.2 * 0.9 * 1.1);
     }
 
     .news-card {
