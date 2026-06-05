@@ -7083,17 +7083,24 @@ h4 {
 
     .home-section .programme-slider > *,
     .home-programme-section .programme-slider > * {
-        border: 1px solid #D1D5DB !important;
+        border-top: none !important;
+        border-bottom: none !important;
+        border-left: 1px solid #ffffff !important;
         border-right: none !important;
         box-shadow: none !important;
         box-sizing: border-box !important;
+    }
+
+    .home-section .programme-slider > *:first-child,
+    .home-programme-section .programme-slider > *:first-child {
+        border-left: none !important;
     }
 
     .home-section .programme-slider > *:last-child,
     .home-programme-section .programme-slider > *:last-child,
     .home-section .programme-slider > *:only-child,
     .home-programme-section .programme-slider > *:only-child {
-        border-right: 1px solid #D1D5DB !important;
+        border-right: none !important;
     }
 
     .home-section .programme-slider > *:first-child,
@@ -7138,6 +7145,31 @@ h4 {
     body.home-view .home-section .speakerslider-track > .speaker-placeholder {
         margin-left: 0 !important;
         margin-right: 0 !important;
+    }
+
+    /* Programme carousel: equal slide height; portrait min-height; no top/bottom borders */
+    body.home-view .home-section .programme-slider,
+    body.home-view .home-programme-section .programme-slider {
+        align-items: stretch !important;
+    }
+
+    body.home-view .home-section .programme-slider > *,
+    body.home-view .home-programme-section .programme-slider > *,
+    body.home-view .home-section .programme-slider > .programme-info,
+    body.home-view .home-programme-section .programme-slider > .programme-info {
+        align-self: stretch !important;
+        aspect-ratio: auto !important;
+        height: auto !important;
+        min-height: calc(100vw * 1920 / 1080);
+        max-height: none !important;
+        border-top: none !important;
+        border-bottom: none !important;
+    }
+
+    body.home-view .home-section .programme-slider > .programme-info > .programme-day-content,
+    body.home-view .home-programme-section .programme-slider > .programme-info > .programme-day-content {
+        flex: 1 1 auto;
+        min-height: 0;
     }
 
     .home-section .speakerslider-track > .speaker-card:not(:first-child),
