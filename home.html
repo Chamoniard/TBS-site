@@ -14,7 +14,6 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://www.gstatic.com">
     <link rel="preconnect" href="https://firestore.googleapis.com">
-    <link rel="dns-prefetch" href="https://api.airtable.com">
     <style>
         /* Critical CSS for above-the-fold content */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -109,8 +108,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260605-feed-meta-above-title" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260605-feed-meta-above-title">
+    <link rel="preload" href="styles.css?v=20260605-hamburger-shadow-soft" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260605-hamburger-shadow-soft">
     <!-- LCP: preload hero poster (WebP) -->
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
@@ -211,6 +210,10 @@
             }
             .hamburger .bar {
                 background-color: #FFD700 !important;
+                filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32)) !important;
+            }
+            body.nav-menu-open .hamburger .bar {
+                filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.28)) drop-shadow(0 1px 3px rgba(255, 255, 255, 0.22)) !important;
             }
             .nav-register-mobile-bar {
                 display: flex !important;
@@ -438,10 +441,10 @@
                         <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
+                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
+                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
                     </li>
                     <li class="nav-item nav-past-desktop">
                         <span class="nav-link" data-view="past-talks" style="cursor: pointer;">Past talks</span>
@@ -471,10 +474,10 @@
                         <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
+                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
+                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
                     </li>
                     <li class="nav-item nav-past-mobile">
                         <span class="nav-link mobile-top-tab-link" data-view="past-talks" style="cursor: pointer;">Talks</span>
@@ -561,6 +564,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260605-post-date" defer></script>
+    <script src="script.js?v=20260605-mobile-nav-scroll-top" defer></script>
 </body>
 </html>

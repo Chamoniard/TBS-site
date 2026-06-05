@@ -2921,8 +2921,31 @@ function initPageScrollOnReload() {
     });
 }
 
+function getElementDocumentTop(el) {
+    if (!el) return 0;
+    const rect = el.getBoundingClientRect();
+    return rect.top + (window.scrollY || document.documentElement.scrollTop || 0);
+}
+
+/** Scroll so the element's top edge meets the viewport top (ignores scroll-margin). */
+function scrollElementToViewportTop(el, opts) {
+    if (!el) return;
+    const instant = opts && opts.instant === true;
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const behavior = instant || reduce ? 'auto' : 'smooth';
+    const top = Math.max(0, Math.round(getElementDocumentTop(el)));
+    window.scrollTo({ top, left: 0, behavior });
+}
+
 function scrollHomeTargetIntoView(el, opts) {
     if (!el) return;
+    if (isMobileBottomNavbarLayout()) {
+        scrollElementToViewportTop(el, opts);
+        if ((opts && opts.instant === true) || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+            syncHomeNavSectionFromScroll();
+        }
+        return;
+    }
     const instant = opts && opts.instant === true;
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollIntoView({ behavior: instant || reduce ? 'auto' : 'smooth', block: 'start' });
@@ -2946,12 +2969,16 @@ function collapseViewerAndPastTalksForHome() {
     }
 }
 
-/** Smooth scroll to home programme section (#home-programme-title; scroll-margin accounts for fixed nav). */
+/** Smooth scroll to home programme section (#home-programme-title; desktop scroll-margin accounts for fixed nav). */
 function scrollToHomeProgrammeSection() {
     const el =
         document.getElementById('home-programme-title') ||
         document.querySelector('.home-section > .programme-section');
     if (!el) return;
+    if (isMobileBottomNavbarLayout()) {
+        scrollElementToViewportTop(el);
+        return;
+    }
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
 }
@@ -7426,7 +7453,8 @@ function syncHomeNavSectionFromScroll() {
     const nav =
         document.querySelector('.navbar--mobile-top') || document.querySelector('.navbar');
     const navH = nav ? nav.getBoundingClientRect().height : 0;
-    const anchorY = navH + 12;
+    const mobileNav = isMobileBottomNavbarLayout();
+    const anchorY = mobileNav ? 0 : navH + 12;
 
     const speakersEl = document.getElementById('speakers-section');
     const programmeEl =
@@ -7435,13 +7463,31 @@ function syncHomeNavSectionFromScroll() {
         document.getElementById('home-registration-heading') ||
         homeSection.querySelector(':scope > .registration-section');
 
+    const sectionViews = [
+        { view: 'register', el: registrationEl },
+        { view: 'flyer', el: programmeEl },
+        { view: 'speakers', el: speakersEl },
+    ];
+
     let view = 'feed';
-    if (registrationEl && registrationEl.getBoundingClientRect().top <= anchorY) {
-        view = 'register';
-    } else if (programmeEl && programmeEl.getBoundingClientRect().top <= anchorY) {
-        view = 'flyer';
-    } else if (speakersEl && speakersEl.getBoundingClientRect().top <= anchorY) {
-        view = 'speakers';
+    if (mobileNav) {
+        for (let i = sectionViews.length - 1; i >= 0; i--) {
+            const entry = sectionViews[i];
+            if (!entry.el) continue;
+            if (entry.el.getBoundingClientRect().top <= anchorY + 1) {
+                view = entry.view;
+                break;
+            }
+        }
+    } else {
+        for (let i = 0; i < sectionViews.length; i++) {
+            const entry = sectionViews[i];
+            if (!entry.el) continue;
+            if (entry.el.getBoundingClientRect().top <= anchorY) {
+                view = entry.view;
+                break;
+            }
+        }
     }
 
     setActiveNavView(view);

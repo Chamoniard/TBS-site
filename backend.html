@@ -9,7 +9,7 @@
     <title>Backend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=20260526-programme-info-preview">
+    <link rel="stylesheet" href="styles.css?v=20260605-hamburger-shadow-soft">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* After styles.css so this wins: 1rem = 16px on backend (overrides :root 18px site-wide). */
@@ -7961,13 +7961,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script src="backend-config.local.js?v=local"></script>
     <script src="auth-common.js?v=20260605-google-auth"></script>
     <script src="backend-auth.js?v=20260605-google-auth"></script>
     <script>
-        // Airtable PAT: set in backend-config.local.js (copy from backend-config.example.js).
-        const AIRTABLE_API_KEY = typeof window.TBS_AIRTABLE_API_KEY === 'string' ? window.TBS_AIRTABLE_API_KEY : '';
-        const AIRTABLE_BASE_ID = 'app3cQp1Mn7V8ckWA';
         // Firebase configuration (tbs-app-e2062) – Programme days + slots
         const firebaseConfig = {
             apiKey: 'AIzaSyANhRZZnQ9tXH-DmO8QQT-H-64LOaa0oAU',
@@ -18511,33 +18507,6 @@
         }
 
         // ===== HELPER FUNCTIONS =====
-        function getAirtableHeaders(includeContentType = false) {
-            const headers = {
-                'Authorization': `Bearer ${AIRTABLE_API_KEY}`
-            };
-            if (includeContentType) {
-                headers['Content-Type'] = 'application/json';
-            }
-            return headers;
-        }
-
-        function handleAirtableError(error, context = 'operation') {
-            const userFriendlyMessages = {
-                '422': 'Invalid data format. Please check your Airtable configuration.',
-                '401': 'Authentication failed. Please check your API key.',
-                '403': 'Access denied. Please check your Airtable permissions.',
-                '404': 'Resource not found. Please check your table and field names.',
-                '429': 'Rate limit exceeded. Please wait a moment and try again.',
-                '500': 'Server error. Please try again later.'
-            };
-
-            const statusCode = error.status || error.message?.match(/\d{3}/)?.[0];
-            const message = userFriendlyMessages[statusCode] || `Error during ${context}: ${error.message}`;
-            
-            showStatus('error', message);
-            return message;
-        }
-
 
         /** Local time prefix for status bar: `HH:MM: message` */
         function formatStatusMessageWithTime(message) {

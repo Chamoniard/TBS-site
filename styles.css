@@ -15,6 +15,7 @@ html {
     --introslider-nav-glass-shadow: 0 4px 28px rgba(0, 0, 0, 0.22);
     /* Mobile hamburger icon bars */
     --hamburger-bar-color: #FFD700;
+    --hamburger-bar-shadow: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32));
     /* Pull first band up over fixed poster so introslider gradient can fade from the image */
     --home-poster-content-pull: 250px;
     /* Hero introslider band (same bridge as former poster-event-spacer) */
@@ -2885,6 +2886,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 /* Programme day–matched scale; colours inherit from `.speaker-card-bio` (not programme gold/white). */
 .home-section .speakerslider .speaker-card-bio h2 {
+    font-weight: 600;
     text-align: left;
     white-space: normal;
     margin: 0 0 0.5rem 0;
@@ -4163,6 +4165,7 @@ body.home-view .home-section > .home-social-row-container {
 .programme-friday .programmestyle h2,
 .texteditor-render-html .programmestyle h2 {
     font-size: 1.7rem;
+    font-weight: 600;
     text-align: left;
     color: #FFD700;
 }
@@ -9107,6 +9110,11 @@ h4 {
 
     .hamburger .bar {
         background-color: var(--hamburger-bar-color);
+        filter: var(--hamburger-bar-shadow);
+    }
+
+    body.nav-menu-open .hamburger .bar {
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.28)) drop-shadow(0 1px 3px rgba(255, 255, 255, 0.22));
     }
 
     .nav-register-mobile-bar {
@@ -11348,17 +11356,14 @@ body.home-view :is(
     .about-title:not(.introslider-title),
     .introslider-section-title,
     .event-section-title,
-    .speakers-section-title,
     .sponsors-section-title,
     .ondemand-section-title,
-    .registration-section-title,
     .speaker-card-name,
     .speaker-card-long-bio-title,
     .featured-location-title,
     .featured-programme-title,
     .featured-video-title,
     .featured-social-gradient-title,
-    .home-carousel-tba-title,
     .home-section .event-contents h3,
     .home-section .programmestyle :is(h3, h4),
     .home-programme-section .programmestyle :is(h3, h4),
@@ -11391,13 +11396,36 @@ body.home-view .home-programme-section .programme-section h2 {
     line-height: normal !important;
 }
 
-/* Home h2: same font, size, and weight as Latest (#home-feed-latest-heading); colour unchanged */
+/* Home h2: same font and size as Latest (#home-feed-latest-heading); colour unchanged */
 body.home-view .home-section h2,
 body.home-view .home-programme-section h2 {
     font-family: var(--title-font) !important;
     font-size: 1.5rem !important;
-    font-weight: 600 !important;
     letter-spacing: 0.02em !important;
+}
+
+/* Home + backend h2: semibold 600 (not browser default bold) */
+body.home-view h2,
+body.backend-page h2 {
+    font-weight: 600 !important;
+}
+
+/* Section band titles + carousel card headings (incl. Programme/Speakers TBA) */
+body.home-view :is(
+    .registration-section-title,
+    .speakers-section-title,
+    .ondemand-section-title,
+    .home-carousel-tba-title,
+    .speaker-card-name.home-carousel-tba-title
+) {
+    font-weight: 600 !important;
+}
+
+body.home-view .programme-slider h2,
+body.home-view .speakerslider h2,
+body.home-view .speakerslider .speaker-card-bio h2,
+body.backend-page .programme-slider h2 {
+    font-weight: 600 !important;
 }
 
 /* Introslider card titles — inherit `.section-titles`; gold only */
