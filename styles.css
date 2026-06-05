@@ -7147,29 +7147,22 @@ h4 {
         margin-right: 0 !important;
     }
 
-    /* Programme carousel: equal slide height; portrait min-height; no top/bottom borders */
-    body.home-view .home-section .programme-slider,
-    body.home-view .home-programme-section .programme-slider {
-        align-items: stretch !important;
-    }
-
+    /* Programme carousel: full-width 1080×1920 portrait slides; no top/bottom borders */
     body.home-view .home-section .programme-slider > *,
     body.home-view .home-programme-section .programme-slider > *,
     body.home-view .home-section .programme-slider > .programme-info,
     body.home-view .home-programme-section .programme-slider > .programme-info {
-        align-self: stretch !important;
-        aspect-ratio: auto !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        align-self: flex-start !important;
+        aspect-ratio: var(--home-carousel-minimal-aspect-ratio) !important;
         height: auto !important;
-        min-height: calc(100vw * 1920 / 1080);
+        min-height: 0 !important;
         max-height: none !important;
         border-top: none !important;
         border-bottom: none !important;
-    }
-
-    body.home-view .home-section .programme-slider > .programme-info > .programme-day-content,
-    body.home-view .home-programme-section .programme-slider > .programme-info > .programme-day-content {
-        flex: 1 1 auto;
-        min-height: 0;
     }
 
     .home-section .speakerslider-track > .speaker-card:not(:first-child),
