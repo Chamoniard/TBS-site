@@ -2092,6 +2092,14 @@ body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
     text-shadow: var(--poster-hero-title-shadow);
 }
 
+body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+    display: none;
+}
+
+body.home-view .home-section > picture .poster-maintitles .poster-maintitle-text {
+    display: inline;
+}
+
 body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin: 0 !important;
     padding: 0;
@@ -3501,6 +3509,27 @@ body.home-view .home-section > .home-social-row-container {
         font-size: 5rem !important;
         font-weight: 600 !important;
         line-height: 1.12 !important;
+        overflow: visible;
+        text-overflow: clip;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    body.home-view .home-section > picture .poster-maintitles .poster-maintitle-text {
+        display: none !important;
+    }
+
+    body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+        display: block;
+        width: auto;
+        height: 6rem;
+        max-width: min(88vw, 432px);
+        margin: 0 auto;
+        object-fit: contain;
+        object-position: center center;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.28));
     }
 
     body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {

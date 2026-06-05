@@ -1792,7 +1792,10 @@ ${ABOUT_LOCATION_INNER_HTML}
 /** TBS27 + date/venue — left third of hero poster (.poster-maintitles). */
 const POSTER_HERO_TITLES_HTML = `
                     <div class="poster-maintitles">
-                        <h1 class="section-titles maintitle-heading tbs27-card-maintitle" id="home-event-welcome-heading">TBS27</h1>
+                        <h1 class="section-titles maintitle-heading tbs27-card-maintitle" id="home-event-welcome-heading">
+                            <span class="poster-maintitle-text">TBS27</span>
+                            <img src="images/27logo.png" alt="TBS27" class="poster-maintitle-logo" width="1000" height="347" loading="eager" decoding="async">
+                        </h1>
                         <h2 class="section-titles tbs27-card-subtitle">9-12 February, 2027</h2>
                         <h2 class="section-titles tbs27-card-subtitle">Hotel Alex, Zermatt</h2>
                     </div>
