@@ -4170,6 +4170,7 @@
         #speaker-editor .speakers-actions .add-speaker-button:disabled,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled,
         #programme-editor .programme-toolbar .texteditor-save-btn:disabled:not(.texteditor-save-btn--saved),
+        #programme-editor .programme-toolbar .programme-restore-btn:disabled,
         #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved) {
             background: #fef3c7;
             border: none;
@@ -4193,6 +4194,7 @@
         #speaker-editor .speakers-actions .add-speaker-button:disabled:hover,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled:hover,
         #programme-editor .programme-toolbar .texteditor-save-btn:disabled:not(.texteditor-save-btn--saved):hover,
+        #programme-editor .programme-toolbar .programme-restore-btn:disabled:hover,
         #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved):hover {
             filter: none;
         }
@@ -6560,6 +6562,10 @@
             filter: brightness(0.92);
         }
 
+        #programme-editor .programme-toolbar .swap-slots {
+            font-size: 1.125rem;
+        }
+
         #programme-editor .programme-toolbar-actions {
             display: flex;
             align-items: center;
@@ -6569,7 +6575,8 @@
             flex-wrap: nowrap;
         }
 
-        #programme-editor .programme-toolbar .texteditor-save-btn {
+        #programme-editor .programme-toolbar .texteditor-save-btn,
+        #programme-editor .programme-toolbar .programme-restore-btn {
             flex: 0 0 var(--backend-gold-toolbar-btn-width);
             width: var(--backend-gold-toolbar-btn-width);
             min-width: var(--backend-gold-toolbar-btn-width);
@@ -6589,7 +6596,8 @@
             text-align: center;
         }
 
-        #programme-editor .programme-toolbar .texteditor-save-btn:hover:not(:disabled) {
+        #programme-editor .programme-toolbar .texteditor-save-btn:hover:not(:disabled),
+        #programme-editor .programme-toolbar .programme-restore-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
@@ -6675,7 +6683,7 @@
             flex-direction: column;
             overflow: hidden;
             background: #ffffff;
-            padding: 0;
+            padding: 0 0 24px 0;
             margin: 0;
             box-sizing: border-box;
             border: none;
@@ -6776,8 +6784,15 @@
         }
 
         #programme-editor .programme-day-slot.is-selected {
-            outline: 3px solid magenta;
-            outline-offset: 2px;
+            outline: none;
+            box-shadow: inset 0 0 0 1px magenta;
+            border-radius: 5px;
+        }
+
+        #programme-editor .programme-day-slot.is-swap-selected {
+            outline: none;
+            box-shadow: inset 0 0 0 1px #4ade80;
+            border-radius: 5px;
         }
 
         #programme-editor .programme-day-session[contenteditable="true"] {
@@ -6785,13 +6800,15 @@
         }
 
         #programme-editor .programme-day-session[contenteditable="true"]:focus {
-            outline: 2px solid magenta;
-            outline-offset: 2px;
+            outline: none;
+            box-shadow: inset 0 0 0 1px magenta;
+            border-radius: 5px;
         }
 
         #programme-editor .programme-day-session.is-selected:not(:focus) {
-            outline: 3px solid magenta;
-            outline-offset: 2px;
+            outline: none;
+            box-shadow: inset 0 0 0 1px magenta;
+            border-radius: 5px;
         }
 
         #programme-editor .programme-editor-days-loading,
@@ -7653,15 +7670,15 @@
                                 />
                             </svg>
                         </button>
-                        <button type="button" class="texteditor-save-btn" id="save-programme-btn" disabled aria-disabled="true">Save</button>
                         <button type="button" class="programme-add-session-btn" id="programme-add-session-btn" disabled aria-disabled="true">Add session</button>
                         <button type="button" class="programme-add-slot-btn" id="programme-add-slot-btn" disabled aria-disabled="true">Add slot</button>
-                        <div class="programme-session-order-controls" aria-label="Session order">
-                            <button type="button" class="programme-session-order-btn" id="programme-session-order-up-btn" disabled aria-disabled="true" aria-label="Move session up" title="Move session up">↑</button>
-                            <button type="button" class="programme-session-order-btn" id="programme-session-order-down-btn" disabled aria-disabled="true" aria-label="Move session down" title="Move session down">↓</button>
+                        <div class="programme-session-order-controls" aria-label="Session and slot order">
+                            <button type="button" class="programme-session-order-btn" id="programme-session-order-up-btn" disabled aria-disabled="true" aria-label="Move selection up" title="Move selection up">↑</button>
+                            <button type="button" class="programme-session-order-btn" id="programme-session-order-down-btn" disabled aria-disabled="true" aria-label="Move selection down" title="Move selection down">↓</button>
+                            <button type="button" class="programme-session-order-btn swap-slots" id="swap-slots-btn" disabled aria-disabled="true" aria-label="Swap slots" title="Shift+click a second slot, then swap">⇆</button>
                         </div>
-                    </div>
-                    <div class="programme-toolbar-actions">
+                        <button type="button" class="texteditor-save-btn" id="save-programme-btn" disabled aria-disabled="true">Save</button>
+                        <button type="button" class="texteditor-save-btn programme-restore-btn" id="restore-programme-btn" disabled aria-disabled="true">Restore</button>
                         <button type="button" class="add-speaker-delete-btn" id="programme-delete-btn" disabled aria-disabled="true" title="Delete session or slot" aria-label="Delete session or slot">
                             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                             <span>Delete</span>
@@ -8086,7 +8103,6 @@
         var contentLocalDraftDirtyIds = Object.create(null);
         var contentSyncTimer = null;
         var contentPeriodicSyncTimer = null;
-        var programmePeriodicSyncTimer = null;
         var contentSyncInFlight = false;
         var CONTENT_FIREBASE_DEBOUNCE_MS = 2000;
         var CONTENT_FIREBASE_PERIODIC_MS = 12000;
@@ -8788,13 +8804,15 @@
         var speakerSyncInFlight = false;
         var SPEAKER_FIREBASE_DEBOUNCE_MS = 2000;
         var SPEAKER_FIREBASE_PERIODIC_MS = 12000;
-        var PROGRAMME_FIREBASE_PERIODIC_MS = 12000;
         let dragState = null;
         let justDragged = false;
         let selectedProgrammeEditorDayDate = null;
         let selectedProgrammeEditorSessionId = null;
         let selectedProgrammeEditorSlotId = null;
         let selectedProgrammeEditorSlotSessionId = null;
+        let selectedProgrammeEditorSwapDayDate = null;
+        let selectedProgrammeEditorSwapSlotSessionId = null;
+        let selectedProgrammeEditorSwapSlotId = null;
 
         // In-memory programme model: all UI reads/writes this until Save
         const programmeState = {
@@ -8812,24 +8830,220 @@
         let programmeStateDirty = false;
         let programmeSessionNamesDirty = false;
         let programmeSlotsDirty = false;
-        var programmeFirestoreSyncTimer = null;
+        /** Last Firebase-synced programme sessions/slots (editable fields only). */
+        let programmePersistedSessionsByDay = {};
         var programmeFirestoreSyncInFlight = false;
-        var programmeFirestoreSyncDelayMs = 2500;
 
-        function scheduleProgrammeFirestoreSync(delayMs) {
-            if (programmeFirestoreSyncTimer) {
-                clearTimeout(programmeFirestoreSyncTimer);
+        function cloneProgrammeSlotForPersistedSnapshot(slot) {
+            return {
+                id: String(slot.id || ''),
+                name: normalizeProgrammeSlotName(slot.name),
+                starttime: slot.starttime,
+                endtime: slot.endtime,
+                speaker: slot.speaker != null ? String(slot.speaker) : '',
+                note: slot.note != null ? String(slot.note) : ''
+            };
+        }
+
+        function cloneProgrammeSessionForPersistedSnapshot(session) {
+            return {
+                id: String(session.id || ''),
+                name: normalizeProgrammeSessionName(session.name),
+                order: session.order != null ? session.order : null,
+                slots: (session.slots || []).map(cloneProgrammeSlotForPersistedSnapshot)
+            };
+        }
+
+        function cloneProgrammeSessionsByDayForPersistedSnapshot(sessionsByDay) {
+            var out = {};
+            var dates = sessionsByDay ? Object.keys(sessionsByDay) : [];
+            for (var di = 0; di < dates.length; di++) {
+                var dateStr = dates[di];
+                out[dateStr] = (sessionsByDay[dateStr] || []).map(cloneProgrammeSessionForPersistedSnapshot);
             }
-            programmeFirestoreSyncTimer = setTimeout(function() {
-                programmeFirestoreSyncTimer = null;
-                void flushProgrammeDirtyToFirestore({ silent: true, skipUiRefresh: true });
-            }, delayMs != null ? delayMs : programmeFirestoreSyncDelayMs);
+            return out;
+        }
+
+        function syncProgrammePersistedSnapshotFromState() {
+            programmePersistedSessionsByDay = cloneProgrammeSessionsByDayForPersistedSnapshot(
+                programmeState && programmeState.sessionsByDay ? programmeState.sessionsByDay : {}
+            );
+        }
+
+        function getPersistedProgrammeSession(dateStr, sessionId) {
+            var list = programmePersistedSessionsByDay[dateStr];
+            if (!list) return null;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].id === sessionId) return list[i];
+            }
+            return null;
+        }
+
+        function getPersistedProgrammeSlot(dateStr, sessionId, slotId) {
+            var session = getPersistedProgrammeSession(dateStr, sessionId);
+            if (!session || !session.slots) return null;
+            for (var i = 0; i < session.slots.length; i++) {
+                if (session.slots[i].id === slotId) return session.slots[i];
+            }
+            return null;
+        }
+
+        function programmeSessionNameDiffersFromPersisted(dateStr, sessionId, name) {
+            var persisted = getPersistedProgrammeSession(dateStr, sessionId);
+            if (!persisted) return true;
+            return normalizeProgrammeSessionName(name) !== persisted.name;
+        }
+
+        function programmeSlotFieldsDifferFromPersisted(dateStr, sessionId, slot) {
+            var persisted = getPersistedProgrammeSlot(dateStr, sessionId, slot.id);
+            if (!persisted) return true;
+            if (normalizeProgrammeSlotName(slot.name) !== persisted.name) return true;
+            if (programmeSlotTimestampMillis(slot.starttime) !== programmeSlotTimestampMillis(persisted.starttime)) return true;
+            if (programmeSlotTimestampMillis(slot.endtime) !== programmeSlotTimestampMillis(persisted.endtime)) return true;
+            if (String(slot.speaker != null ? slot.speaker : '') !== String(persisted.speaker != null ? persisted.speaker : '')) return true;
+            if (String(slot.note != null ? slot.note : '') !== String(persisted.note != null ? persisted.note : '')) return true;
+            return false;
+        }
+
+        function programmeSlotDomFieldDiffersFromPersisted(el) {
+            if (!el) return false;
+            var dateStr = el.getAttribute('data-programme-date') || '';
+            var sessionId = el.getAttribute('data-session-id') || '';
+            var slotId = el.getAttribute('data-slot-id') || '';
+            var field = slotFieldFromEditableEl(el);
+            if (!dateStr || !sessionId || !slotId || !field) return false;
+            var persisted = getPersistedProgrammeSlot(dateStr, sessionId, slotId);
+            var rawValue = readProgrammeSlotEditableText(el);
+            if (!persisted) return rawValue !== '';
+            if (field === 'name') {
+                return normalizeProgrammeSlotName(rawValue) !== persisted.name;
+            }
+            var patch = buildProgrammeSlotPatchFromEditable(dateStr, sessionId, slotId, field, rawValue);
+            if (field === 'starttime') {
+                if (!patch) return rawValue !== formatProgrammeSlotTimestampToHhmm(persisted.starttime);
+                return programmeSlotTimestampMillis(patch.starttime) !== programmeSlotTimestampMillis(persisted.starttime);
+            }
+            if (field === 'endtime') {
+                if (!patch) return rawValue !== formatProgrammeSlotTimestampToHhmm(persisted.endtime);
+                return programmeSlotTimestampMillis(patch.endtime) !== programmeSlotTimestampMillis(persisted.endtime);
+            }
+            return false;
+        }
+
+        function recomputeProgrammeEditDirtyFlags() {
+            programmeSessionNamesDirty = false;
+            programmeSlotsDirty = false;
+            var byDay = programmeState && programmeState.sessionsByDay ? programmeState.sessionsByDay : {};
+            var dates = Object.keys(byDay);
+            for (var di = 0; di < dates.length; di++) {
+                var dateStr = dates[di];
+                var sessions = byDay[dateStr] || [];
+                for (var si = 0; si < sessions.length; si++) {
+                    var session = sessions[si];
+                    if (programmeSessionNameDiffersFromPersisted(dateStr, session.id, session.name)) {
+                        programmeSessionNamesDirty = true;
+                    }
+                    var slots = session.slots || [];
+                    for (var sj = 0; sj < slots.length; sj++) {
+                        if (programmeSlotFieldsDifferFromPersisted(dateStr, session.id, slots[sj])) {
+                            programmeSlotsDirty = true;
+                            break;
+                        }
+                    }
+                    if (programmeSlotsDirty) break;
+                }
+                if (programmeSessionNamesDirty && programmeSlotsDirty) break;
+            }
+            if (!programmeSessionNamesDirty) {
+                var sessionEls = document.querySelectorAll('#programme-editor .programme-day-session[data-session-id][data-programme-date]');
+                for (var ti = 0; ti < sessionEls.length; ti++) {
+                    var sessionEl = sessionEls[ti];
+                    var sDate = sessionEl.getAttribute('data-programme-date') || '';
+                    var sId = sessionEl.getAttribute('data-session-id') || '';
+                    if (!sDate || !sId) continue;
+                    if (programmeSessionNameDiffersFromPersisted(sDate, sId, readProgrammeSessionTitleEl(sessionEl))) {
+                        programmeSessionNamesDirty = true;
+                        break;
+                    }
+                }
+            }
+            if (!programmeSlotsDirty) {
+                var slotEls = document.querySelectorAll(
+                    '#programme-editor .programme-day-slot-starttime[data-slot-id], ' +
+                    '#programme-editor .programme-day-slot-endtime[data-slot-id], ' +
+                    '#programme-editor .programme-day-slot-detail[data-slot-id]'
+                );
+                for (var ui = 0; ui < slotEls.length; ui++) {
+                    if (programmeSlotDomFieldDiffersFromPersisted(slotEls[ui])) {
+                        programmeSlotsDirty = true;
+                        break;
+                    }
+                }
+            }
+            updateSaveButtonState();
+        }
+
+        function flushProgrammeSessionDomEditsToLocal() {
+            var els = document.querySelectorAll('#programme-editor .programme-day-session[data-session-id][data-programme-date]');
+            for (var i = 0; i < els.length; i++) {
+                applyProgrammeSessionInputToLocal(els[i], { skipNormalizeDom: false });
+            }
+        }
+
+        function flushProgrammeSlotDomEditsToLocal(options) {
+            options = options || {};
+            var els = document.querySelectorAll(
+                '#programme-editor .programme-day-slot-starttime[data-slot-id], ' +
+                '#programme-editor .programme-day-slot-endtime[data-slot-id], ' +
+                '#programme-editor .programme-day-slot-detail[data-slot-id]'
+            );
+            var refreshDates = {};
+            for (var i = 0; i < els.length; i++) {
+                var el = els[i];
+                var dateStr = el.getAttribute('data-programme-date') || '';
+                var sessionId = el.getAttribute('data-session-id') || '';
+                if (options.dateStr && dateStr !== options.dateStr) continue;
+                if (options.sessionId && sessionId !== options.sessionId) continue;
+                var field = slotFieldFromEditableEl(el);
+                if (applyProgrammeSlotInputToLocal(el, {
+                    skipNormalizeDom: false,
+                    skipRefresh: true
+                }) && field === 'starttime' && dateStr) {
+                    refreshDates[dateStr] = true;
+                }
+            }
+            if (!options.skipRefresh) {
+                var refreshDateKeys = Object.keys(refreshDates);
+                if (refreshDateKeys.length) {
+                    refreshProgrammeEditorDays();
+                    if (selectedProgrammeEditorDayDate && selectedProgrammeEditorSlotId && selectedProgrammeEditorSlotSessionId) {
+                        selectProgrammeEditorSlot(
+                            selectedProgrammeEditorDayDate,
+                            selectedProgrammeEditorSlotSessionId,
+                            selectedProgrammeEditorSlotId
+                        );
+                    }
+                }
+            }
+            recomputeProgrammeEditDirtyFlags();
+        }
+
+        function flushDirtyProgrammeSlotFieldsInSession(dateStr, sessionId) {
+            flushProgrammeSlotDomEditsToLocal({ dateStr: dateStr, sessionId: sessionId, skipRefresh: false });
+        }
+
+        function programmeSaveStatusMessage(savedParts) {
+            if (!savedParts || !savedParts.length) return 'Programme saved.';
+            if (savedParts.length === 1) return 'Programme ' + savedParts[0] + ' saved.';
+            if (savedParts.length === 2) {
+                return 'Programme ' + savedParts[0] + ' and ' + savedParts[1] + ' saved.';
+            }
+            return 'Programme ' + savedParts.slice(0, -1).join(', ') + ', and ' + savedParts[savedParts.length - 1] + ' saved.';
         }
 
         async function flushProgrammeDirtyToFirestore(options) {
             options = options || {};
             if (programmeFirestoreSyncInFlight) {
-                scheduleProgrammeFirestoreSync(800);
                 return false;
             }
             if (!programmeState || !programmeState.eventId) return false;
@@ -8837,26 +9051,35 @@
                 return false;
             }
             programmeFirestoreSyncInFlight = true;
+            var savedParts = [];
             try {
+                flushProgrammeSessionDomEditsToLocal();
+                flushProgrammeSlotDomEditsToLocal({ skipRefresh: true });
+                recomputeProgrammeEditDirtyFlags();
                 if (programmeSessionNamesDirty) {
                     await saveProgrammeSessionNamesFromDom({
                         silent: true,
                         skipRefresh: Boolean(options.skipRefresh || options.skipUiRefresh)
                     });
+                    if (!programmeSessionNamesDirty) savedParts.push('session titles');
                 }
                 if (programmeSlotsDirty) {
                     await saveProgrammeSlotsFromDom({
                         silent: true,
                         skipRefresh: Boolean(options.skipRefresh || options.skipUiRefresh)
                     });
+                    if (!programmeSlotsDirty) savedParts.push('slot changes');
                 }
                 if (programmeState.meta && programmeStateDirty) {
-                    await saveProgrammeState();
+                    await saveProgrammeState({ silent: true });
+                    if (!programmeStateDirty) savedParts.push('schedule');
                 }
-                if (!options.silent && typeof showStatus === 'function') {
-                    showStatus('success', 'Programme saved.');
+                syncProgrammePersistedSnapshotFromState();
+                recomputeProgrammeEditDirtyFlags();
+                if (savedParts.length && options.silent !== true && typeof showStatus === 'function') {
+                    showStatus('success', programmeSaveStatusMessage(savedParts));
                 }
-                return true;
+                return savedParts.length > 0;
             } catch (err) {
                 console.error('flushProgrammeDirtyToFirestore', err);
                 if (typeof showStatus === 'function') {
@@ -9539,22 +9762,22 @@
         function programmeSlotTimestampFromHhmm(isoDate, rawHhmm, existingTs) {
             var parsed = parseProgrammeSlotHhmmInput(rawHhmm);
             if (!parsed) return null;
-            var base = programmeSlotTimestampToDate(existingTs);
             var y;
             var mo;
             var d;
-            if (base) {
-                y = base.getFullYear();
-                mo = base.getMonth();
-                d = base.getDate();
-            } else {
-                var parts = String(isoDate || '').trim().split('-');
-                if (parts.length < 3) return null;
+            var parts = String(isoDate || '').trim().split('-');
+            if (parts.length >= 3) {
                 y = parseInt(parts[0], 10);
                 mo = parseInt(parts[1], 10) - 1;
                 d = parseInt(parts[2], 10);
-                if (isNaN(y) || isNaN(mo) || isNaN(d)) return null;
+            } else {
+                var base = programmeSlotTimestampToDate(existingTs);
+                if (!base) return null;
+                y = base.getFullYear();
+                mo = base.getMonth();
+                d = base.getDate();
             }
+            if (isNaN(y) || isNaN(mo) || isNaN(d)) return null;
             return firebase.firestore.Timestamp.fromDate(new Date(y, mo, d, parsed.hours, parsed.minutes, 0, 0));
         }
 
@@ -9639,6 +9862,55 @@
             sortProgrammeSlotsInState(dateStr, sessionId);
         }
 
+        function swapProgrammeSlotTimestampsBetween(slotA, slotB) {
+            if (!slotA || !slotB) return false;
+            if (!slotA.starttime || !slotA.endtime || !slotB.starttime || !slotB.endtime) return false;
+            var tmpStart = slotA.starttime;
+            var tmpEnd = slotA.endtime;
+            slotA.starttime = slotB.starttime;
+            slotA.endtime = slotB.endtime;
+            slotB.starttime = tmpStart;
+            slotB.endtime = tmpEnd;
+            return true;
+        }
+
+        function swapProgrammeSlotContentBetween(slotA, slotB) {
+            if (!slotA || !slotB) return false;
+            var tmpName = slotA.name;
+            var tmpNote = slotA.note != null ? String(slotA.note) : '';
+            var tmpSpeaker = slotA.speaker != null ? String(slotA.speaker) : '';
+            slotA.name = slotB.name;
+            slotA.note = slotB.note != null ? String(slotB.note) : '';
+            slotA.speaker = slotB.speaker != null ? String(slotB.speaker) : '';
+            slotB.name = tmpName;
+            slotB.note = tmpNote;
+            slotB.speaker = tmpSpeaker;
+            return true;
+        }
+
+        function swapProgrammeSlotTimingsInState(dateStr, sessionId, slotIdA, slotIdB) {
+            var slotA = getProgrammeSlotFromState(dateStr, sessionId, slotIdA);
+            var slotB = getProgrammeSlotFromState(dateStr, sessionId, slotIdB);
+            if (!slotA || !slotB) return null;
+            if (!swapProgrammeSlotTimestampsBetween(slotA, slotB)) return null;
+            sortProgrammeSlotsInState(dateStr, sessionId);
+            return {
+                a: { id: slotIdA, starttime: slotA.starttime, endtime: slotA.endtime },
+                b: { id: slotIdB, starttime: slotB.starttime, endtime: slotB.endtime }
+            };
+        }
+
+        function swapProgrammeSlotsContentAcross(dateStrA, sessionIdA, slotIdA, dateStrB, sessionIdB, slotIdB) {
+            var slotA = getProgrammeSlotFromState(dateStrA, sessionIdA, slotIdA);
+            var slotB = getProgrammeSlotFromState(dateStrB, sessionIdB, slotIdB);
+            if (!slotA || !slotB) return null;
+            if (!swapProgrammeSlotContentBetween(slotA, slotB)) return null;
+            return {
+                a: { id: slotIdA, name: slotA.name, speaker: slotA.speaker, note: slotA.note },
+                b: { id: slotIdB, name: slotB.name, speaker: slotB.speaker, note: slotB.note }
+            };
+        }
+
         function removeProgrammeSlotFromState(dateStr, sessionId, slotId) {
             var sessions =
                 programmeState.sessionsByDay && programmeState.sessionsByDay[dateStr]
@@ -9700,31 +9972,7 @@
         }
 
         function recomputeProgrammeSlotsDirty() {
-            programmeSlotsDirty = false;
-            var els = document.querySelectorAll(
-                '#programme-editor .programme-day-slot-starttime[data-slot-id], ' +
-                '#programme-editor .programme-day-slot-endtime[data-slot-id], ' +
-                '#programme-editor .programme-day-slot-detail[data-slot-id]'
-            );
-            for (var i = 0; i < els.length; i++) {
-                var el = els[i];
-                var dateStr = el.getAttribute('data-programme-date') || '';
-                var sessionId = el.getAttribute('data-session-id') || '';
-                var slotId = el.getAttribute('data-slot-id') || '';
-                var field = slotFieldFromEditableEl(el);
-                if (!dateStr || !sessionId || !slotId || !field) continue;
-                var current = readProgrammeSlotEditableText(el);
-                var saved = field === 'name'
-                    ? getProgrammeSlotNameFromState(dateStr, sessionId, slotId)
-                    : (field === 'starttime'
-                        ? getProgrammeSlotStartHhmmFromState(dateStr, sessionId, slotId)
-                        : getProgrammeSlotEndHhmmFromState(dateStr, sessionId, slotId));
-                if (current !== saved) {
-                    programmeSlotsDirty = true;
-                    break;
-                }
-            }
-            updateSaveButtonState();
+            recomputeProgrammeEditDirtyFlags();
         }
 
         function normalizeProgrammeSlotEditableDom(el) {
@@ -9817,8 +10065,9 @@
             return null;
         }
 
-        function applyProgrammeSlotEditableElToLocal(el) {
-            if (!programmeSlotEditableElIsDirty(el)) return false;
+        function applyProgrammeSlotInputToLocal(el, options) {
+            options = options || {};
+            if (!programmePadlockIsOpen) return false;
             var dateStr = el.getAttribute('data-programme-date') || '';
             var sessionId = el.getAttribute('data-session-id') || '';
             var slotId = el.getAttribute('data-slot-id') || '';
@@ -9826,71 +10075,107 @@
             var rawValue = readProgrammeSlotEditableText(el);
             if (!dateStr || !sessionId || !slotId || !field) return false;
             var patch = buildProgrammeSlotPatchFromEditable(dateStr, sessionId, slotId, field, rawValue);
-            if (!patch) return false;
-            syncProgrammeSlotInState(dateStr, sessionId, slotId, patch);
-            normalizeProgrammeSlotEditableDom(el);
-            recomputeProgrammeSlotsDirty();
-            if (field === 'starttime') {
+            if (!patch) {
+                recomputeProgrammeEditDirtyFlags();
+                return false;
+            }
+            var slot = getProgrammeSlotFromState(dateStr, sessionId, slotId);
+            if (!slot) return false;
+            var changed = false;
+            if (patch.name != null && normalizeProgrammeSlotName(slot.name) !== patch.name) {
+                slot.name = patch.name;
+                changed = true;
+            }
+            if (patch.starttime != null &&
+                programmeSlotTimestampMillis(slot.starttime) !== programmeSlotTimestampMillis(patch.starttime)) {
+                slot.starttime = patch.starttime;
+                changed = true;
+            }
+            if (patch.endtime != null &&
+                programmeSlotTimestampMillis(slot.endtime) !== programmeSlotTimestampMillis(patch.endtime)) {
+                slot.endtime = patch.endtime;
+                changed = true;
+            }
+            if (!changed) {
+                recomputeProgrammeEditDirtyFlags();
+                return false;
+            }
+            sortProgrammeSlotsInState(dateStr, sessionId);
+            if (options.skipNormalizeDom !== true) {
+                normalizeProgrammeSlotEditableDom(el);
+            }
+            recomputeProgrammeEditDirtyFlags();
+            if (!options.skipRefresh && field === 'starttime') {
                 refreshProgrammeEditorDays();
                 selectProgrammeEditorSlot(dateStr, sessionId, slotId);
-            } else {
+            } else if (!options.skipRefresh) {
                 updateProgrammeCounterDisplay();
             }
-            scheduleProgrammeFirestoreSync();
             return true;
         }
 
-        function applyProgrammeSessionEditableElToLocal(el) {
-            if (!programmeSessionTitleElIsDirty(el)) return false;
+        function applyProgrammeSlotEditableElToLocal(el, options) {
+            return applyProgrammeSlotInputToLocal(el, options || {});
+        }
+
+        function applyProgrammeSessionInputToLocal(el, options) {
+            options = options || {};
+            if (!programmePadlockIsOpen) return false;
             var dateStr = el.getAttribute('data-programme-date') || '';
             var sessionId = el.getAttribute('data-session-id') || '';
             if (!dateStr || !sessionId) return false;
             var normalized = normalizeProgrammeSessionName(readProgrammeSessionTitleEl(el));
+            if (normalized === getProgrammeSessionNameFromState(dateStr, sessionId)) {
+                recomputeProgrammeEditDirtyFlags();
+                return false;
+            }
             syncProgrammeSessionNameInState(dateStr, sessionId, normalized);
-            el.textContent = normalized;
-            recomputeProgrammeSessionNamesDirty();
-            scheduleProgrammeFirestoreSync();
+            if (options.skipNormalizeDom !== true) {
+                el.textContent = normalized;
+            }
+            recomputeProgrammeEditDirtyFlags();
             return true;
+        }
+
+        function applyProgrammeSessionEditableElToLocal(el, options) {
+            return applyProgrammeSessionInputToLocal(el, options || {});
         }
 
         async function saveProgrammeSlotsFromDom(options) {
             options = options || {};
-            var els = document.querySelectorAll(
-                '#programme-editor .programme-day-slot-starttime[data-slot-id], ' +
-                '#programme-editor .programme-day-slot-endtime[data-slot-id], ' +
-                '#programme-editor .programme-day-slot-detail[data-slot-id]'
-            );
+            flushProgrammeSlotDomEditsToLocal({ skipRefresh: Boolean(options.skipRefresh || options.skipUiRefresh) });
+            var db = getFirestore();
             var writes = [];
-            var datesToRefresh = {};
-            els.forEach(function(el) {
-                var dateStr = el.getAttribute('data-programme-date') || '';
-                var sessionId = el.getAttribute('data-session-id') || '';
-                var slotId = el.getAttribute('data-slot-id') || '';
-                var field = slotFieldFromEditableEl(el);
-                if (!dateStr || !sessionId || !slotId || !field) return;
-                var current = readProgrammeSlotEditableText(el);
-                var saved = field === 'name'
-                    ? getProgrammeSlotNameFromState(dateStr, sessionId, slotId)
-                    : (field === 'starttime'
-                        ? getProgrammeSlotStartHhmmFromState(dateStr, sessionId, slotId)
-                        : getProgrammeSlotEndHhmmFromState(dateStr, sessionId, slotId));
-                if (current === saved) return;
-                datesToRefresh[dateStr] = true;
-                writes.push(saveProgrammeSlotEditableEl(el));
-            });
+            var byDay = programmeState && programmeState.sessionsByDay ? programmeState.sessionsByDay : {};
+            var dates = Object.keys(byDay);
+            for (var di = 0; di < dates.length; di++) {
+                var dateStr = dates[di];
+                var sessions = byDay[dateStr] || [];
+                for (var si = 0; si < sessions.length; si++) {
+                    var session = sessions[si];
+                    var slots = session.slots || [];
+                    for (var sj = 0; sj < slots.length; sj++) {
+                        var slot = slots[sj];
+                        if (!programmeSlotFieldsDifferFromPersisted(dateStr, session.id, slot)) continue;
+                        var slotRef = tbsProgrammeSessionSlotsCollection(db, dateStr, session.id).doc(slot.id);
+                        writes.push(slotRef.set({
+                            starttime: slot.starttime,
+                            endtime: slot.endtime,
+                            name: normalizeProgrammeSlotName(slot.name),
+                            speaker: slot.speaker != null ? String(slot.speaker) : '',
+                            note: slot.note != null ? String(slot.note) : ''
+                        }, { merge: true }));
+                    }
+                }
+            }
             if (writes.length === 0) {
-                programmeSlotsDirty = false;
-                updateSaveButtonState();
+                recomputeProgrammeEditDirtyFlags();
                 return;
             }
             await Promise.all(writes);
-            programmeSlotsDirty = false;
-            updateSaveButtonState();
-            var refreshDates = Object.keys(datesToRefresh);
-            if (refreshDates.length && !options.skipRefresh) {
-                await Promise.all(refreshDates.map(function(dateStr) {
-                    return refreshProgrammeDaySessionsFromFirestore(dateStr);
-                }));
+            syncProgrammePersistedSnapshotFromState();
+            recomputeProgrammeEditDirtyFlags();
+            if (!options.skipRefresh && !options.skipUiRefresh) {
                 var savedDay = selectedProgrammeEditorDayDate;
                 var savedSessionId = selectedProgrammeEditorSessionId;
                 var savedSlotId = selectedProgrammeEditorSlotId;
@@ -10039,6 +10324,8 @@
             var db = getFirestore();
             programmeState.sessionsByDay = programmeState.sessionsByDay || {};
             programmeState.sessionsByDay[dateStr] = await loadProgrammeSessionsForDay(db, dateStr);
+            syncProgrammePersistedSnapshotFromState();
+            recomputeProgrammeEditDirtyFlags();
         }
 
         async function loadProgrammeSessionsByDay(db, dates) {
@@ -10086,19 +10373,7 @@
         }
 
         function recomputeProgrammeSessionNamesDirty() {
-            programmeSessionNamesDirty = false;
-            var els = document.querySelectorAll('#programme-editor .programme-day-session[data-session-id][data-programme-date]');
-            for (var i = 0; i < els.length; i++) {
-                var el = els[i];
-                var dateStr = el.getAttribute('data-programme-date') || '';
-                var sessionId = el.getAttribute('data-session-id') || '';
-                if (!dateStr || !sessionId) continue;
-                if (readProgrammeSessionTitleEl(el) !== getProgrammeSessionNameFromState(dateStr, sessionId)) {
-                    programmeSessionNamesDirty = true;
-                    break;
-                }
-            }
-            updateSaveButtonState();
+            recomputeProgrammeEditDirtyFlags();
         }
 
         function programmeSessionTitleElIsDirty(el) {
@@ -10137,36 +10412,31 @@
 
         async function saveProgrammeSessionNamesFromDom(options) {
             options = options || {};
-            var els = document.querySelectorAll('#programme-editor .programme-day-session[data-session-id][data-programme-date]');
+            flushProgrammeSessionDomEditsToLocal();
             var db = getFirestore();
             var writes = [];
-            var datesToRefresh = {};
-            els.forEach(function(el) {
-                var dateStr = el.getAttribute('data-programme-date') || '';
-                var sessionId = el.getAttribute('data-session-id') || '';
-                if (!dateStr || !sessionId) return;
-                var name = readProgrammeSessionTitleEl(el);
-                if (name === getProgrammeSessionNameFromState(dateStr, sessionId)) return;
-                datesToRefresh[dateStr] = true;
-                writes.push(
-                    tbsProgrammeDayCollection(db, dateStr).doc(sessionId).set({ name: name }, { merge: true }).then(function() {
-                        syncProgrammeSessionNameInState(dateStr, sessionId, name);
-                    })
-                );
-            });
+            var byDay = programmeState && programmeState.sessionsByDay ? programmeState.sessionsByDay : {};
+            var dates = Object.keys(byDay);
+            for (var di = 0; di < dates.length; di++) {
+                var dateStr = dates[di];
+                var sessions = byDay[dateStr] || [];
+                for (var si = 0; si < sessions.length; si++) {
+                    var session = sessions[si];
+                    var name = normalizeProgrammeSessionName(session.name);
+                    if (!programmeSessionNameDiffersFromPersisted(dateStr, session.id, name)) continue;
+                    writes.push(
+                        tbsProgrammeDayCollection(db, dateStr).doc(session.id).set({ name: name }, { merge: true })
+                    );
+                }
+            }
             if (writes.length === 0) {
-                programmeSessionNamesDirty = false;
-                updateSaveButtonState();
+                recomputeProgrammeEditDirtyFlags();
                 return;
             }
             await Promise.all(writes);
-            programmeSessionNamesDirty = false;
-            updateSaveButtonState();
-            var refreshDates = Object.keys(datesToRefresh);
-            if (refreshDates.length && !options.skipRefresh) {
-                await Promise.all(refreshDates.map(function(dateStr) {
-                    return refreshProgrammeDaySessionsFromFirestore(dateStr);
-                }));
+            syncProgrammePersistedSnapshotFromState();
+            recomputeProgrammeEditDirtyFlags();
+            if (!options.skipRefresh && !options.skipUiRefresh) {
                 refreshProgrammeEditorDays();
             }
             if (!options.silent && typeof showStatus === 'function') {
@@ -10175,6 +10445,9 @@
         }
 
         function programmeDaySlotsHtml(dateStr, session) {
+            if (session && session.id) {
+                sortProgrammeSlotsInState(dateStr, session.id);
+            }
             var slots = session && session.slots ? session.slots : [];
             if (!slots.length) return '';
             return '<div class="programme-day-session-slots">' + slots.map(function(slot) {
@@ -17086,11 +17359,40 @@
         function updateSaveButtonState() {
             const btn = document.getElementById('save-programme-btn');
             if (!btn) return;
-            const active = Boolean(programmeState && programmeState.eventId) && programmePadlockIsOpen;
+            const canEdit = Boolean(programmeState && programmeState.eventId) && programmePadlockIsOpen;
+            const hasUnsaved =
+                programmeSessionNamesDirty ||
+                programmeSlotsDirty ||
+                (programmeState.meta && programmeStateDirty);
+            if (!canEdit) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.textContent = 'Save';
+                btn.classList.remove('texteditor-save-btn--saved');
+                updateProgrammeRestoreButtonState();
+                return;
+            }
+            if (hasUnsaved) {
+                btn.disabled = false;
+                btn.setAttribute('aria-disabled', 'false');
+                btn.textContent = 'Save';
+                btn.classList.remove('texteditor-save-btn--saved');
+                updateProgrammeRestoreButtonState();
+                return;
+            }
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+            btn.textContent = 'Saved';
+            btn.classList.add('texteditor-save-btn--saved');
+            updateProgrammeRestoreButtonState();
+        }
+
+        function updateProgrammeRestoreButtonState() {
+            var btn = document.getElementById('restore-programme-btn');
+            if (!btn) return;
+            var active = Boolean(programmeState && programmeState.eventId) && programmePadlockIsOpen;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
-            btn.textContent = 'Save';
-            btn.classList.remove('texteditor-save-btn--saved');
         }
 
         function syncProgrammePadlockButtonUi() {
@@ -17132,6 +17434,9 @@
             });
             updateProgrammeLeadingToolbarButtonsState();
             updateSaveButtonState();
+            if (!canEdit) {
+                closeProgrammeDeleteConfirmModal();
+            }
         }
 
         async function saveProgrammeEditorFromToolbar() {
@@ -17143,42 +17448,67 @@
                 if (typeof showStatus === 'function') showStatus('info', 'Unlock programme to save edits.');
                 return;
             }
-            if (programmeFirestoreSyncTimer) {
-                clearTimeout(programmeFirestoreSyncTimer);
-                programmeFirestoreSyncTimer = null;
+            var saved = await flushProgrammeDirtyToFirestore({});
+            if (!saved && typeof showStatus === 'function') {
+                showStatus('info', 'Nothing to save.');
             }
-            var savedAnything = false;
-            if (programmeSessionNamesDirty) {
-                try {
-                    await saveProgrammeSessionNamesFromDom();
-                    savedAnything = true;
-                } catch (err) {
-                    console.error('Failed to save session titles:', err);
-                    if (typeof showStatus === 'function') {
-                        showStatus('error', err.message || 'Failed to save session titles.');
-                    }
-                    return;
+        }
+
+        async function restoreProgrammeEditorFromFirebase() {
+            if (!programmeState || !programmeState.eventId) {
+                if (typeof showStatus === 'function') showStatus('info', 'Select an event first.');
+                return;
+            }
+            if (!programmePadlockIsOpen) {
+                if (typeof showStatus === 'function') showStatus('info', 'Unlock programme to restore from Firebase.');
+                return;
+            }
+            var restoreBtn = document.getElementById('restore-programme-btn');
+            if (restoreBtn) {
+                restoreBtn.disabled = true;
+                restoreBtn.setAttribute('aria-disabled', 'true');
+            }
+            var savedDay = selectedProgrammeEditorDayDate;
+            var savedSessionId = selectedProgrammeEditorSessionId;
+            var savedSlotId = selectedProgrammeEditorSlotId;
+            var savedSlotSessionId = selectedProgrammeEditorSlotSessionId;
+            try {
+                var db = getFirestore();
+                var dayDates = (programmeState.dayDates && programmeState.dayDates.length)
+                    ? programmeState.dayDates.slice()
+                    : [];
+                if (dayDates.length) {
+                    await loadProgrammeSessionsByDay(db, dayDates);
+                } else {
+                    programmeState.sessionsByDay = {};
                 }
-            }
-            if (programmeSlotsDirty) {
-                try {
-                    await saveProgrammeSlotsFromDom();
-                    savedAnything = true;
-                } catch (err) {
-                    console.error('Failed to save slot changes:', err);
-                    if (typeof showStatus === 'function') {
-                        showStatus('error', err.message || 'Failed to save slot changes.');
-                    }
-                    return;
+                syncProgrammePersistedSnapshotFromState();
+                programmeStateDirty = false;
+                refreshProgrammeEditorDays();
+                if (savedDay && savedSlotId && savedSlotSessionId &&
+                    getProgrammeSlotFromState(savedDay, savedSlotSessionId, savedSlotId)) {
+                    selectProgrammeEditorSlot(savedDay, savedSlotSessionId, savedSlotId);
+                } else if (savedDay && savedSessionId &&
+                    (programmeState.sessionsByDay[savedDay] || []).some(function(s) {
+                        return s.id === savedSessionId;
+                    })) {
+                    selectProgrammeEditorSession(savedDay, savedSessionId);
+                } else if (savedDay) {
+                    selectProgrammeEditorDay(savedDay);
+                } else {
+                    clearProgrammeEditorDaySelection();
                 }
-            }
-            if (programmeState.meta && programmeStateDirty) {
-                await saveProgrammeState();
-                savedAnything = true;
-            } else if (!savedAnything) {
+                recomputeProgrammeEditDirtyFlags();
                 if (typeof showStatus === 'function') {
-                    showStatus('info', 'Nothing to save.');
+                    showStatus('success', 'Programme restored from Firebase.');
                 }
+            } catch (err) {
+                console.error('Failed to restore programme from Firebase:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to restore programme from Firebase.');
+                }
+            } finally {
+                updateProgrammeRestoreButtonState();
             }
         }
 
@@ -17199,6 +17529,117 @@
                 osc.start(ctx.currentTime);
                 osc.stop(ctx.currentTime + 0.08);
             } catch (e) {}
+        }
+
+        function programmeEditorSlotsAreSame(dateStrA, sessionIdA, slotIdA, dateStrB, sessionIdB, slotIdB) {
+            return String(dateStrA || '') === String(dateStrB || '') &&
+                String(sessionIdA || '') === String(sessionIdB || '') &&
+                String(slotIdA || '') === String(slotIdB || '');
+        }
+
+        function clearProgrammeEditorSwapSlotSelection() {
+            if (!selectedProgrammeEditorSwapSlotId &&
+                !selectedProgrammeEditorSwapSlotSessionId &&
+                !selectedProgrammeEditorSwapDayDate) {
+                return;
+            }
+            selectedProgrammeEditorSwapSlotId = null;
+            selectedProgrammeEditorSwapSlotSessionId = null;
+            selectedProgrammeEditorSwapDayDate = null;
+            applyProgrammeEditorSlotSelection();
+            updateProgrammeLeadingToolbarButtonsState();
+        }
+
+        function canSwapSelectedProgrammeSlots() {
+            if (!programmePadlockIsOpen) return false;
+            if (!selectedProgrammeEditorSlotId ||
+                !selectedProgrammeEditorSlotSessionId ||
+                !selectedProgrammeEditorDayDate ||
+                !selectedProgrammeEditorSwapSlotId ||
+                !selectedProgrammeEditorSwapSlotSessionId ||
+                !selectedProgrammeEditorSwapDayDate) {
+                return false;
+            }
+            return !programmeEditorSlotsAreSame(
+                selectedProgrammeEditorDayDate,
+                selectedProgrammeEditorSlotSessionId,
+                selectedProgrammeEditorSlotId,
+                selectedProgrammeEditorSwapDayDate,
+                selectedProgrammeEditorSwapSlotSessionId,
+                selectedProgrammeEditorSwapSlotId
+            );
+        }
+
+        function selectProgrammeEditorSwapSlot(dateStr, sessionId, slotId) {
+            if (!dateStr || !sessionId || !slotId || !isProgrammeSessionDocId(sessionId)) return;
+            if (!selectedProgrammeEditorSlotId || !selectedProgrammeEditorSlotSessionId) {
+                selectProgrammeEditorSlot(dateStr, sessionId, slotId);
+                return;
+            }
+            if (programmeEditorSlotsAreSame(
+                dateStr,
+                sessionId,
+                slotId,
+                selectedProgrammeEditorDayDate,
+                selectedProgrammeEditorSlotSessionId,
+                selectedProgrammeEditorSlotId
+            )) {
+                return;
+            }
+            if (programmeEditorSlotsAreSame(
+                dateStr,
+                sessionId,
+                slotId,
+                selectedProgrammeEditorSwapDayDate,
+                selectedProgrammeEditorSwapSlotSessionId,
+                selectedProgrammeEditorSwapSlotId
+            )) {
+                clearProgrammeEditorSwapSlotSelection();
+                return;
+            }
+            selectedProgrammeEditorSwapDayDate = String(dateStr);
+            selectedProgrammeEditorSwapSlotSessionId = String(sessionId);
+            selectedProgrammeEditorSwapSlotId = String(slotId);
+            applyProgrammeEditorSlotSelection();
+            updateProgrammeLeadingToolbarButtonsState();
+        }
+
+        function swapSelectedProgrammeSlots() {
+            if (!programmePadlockIsOpen) {
+                if (typeof showStatus === 'function') showStatus('info', 'Unlock programme to swap slots.');
+                return;
+            }
+            if (!canSwapSelectedProgrammeSlots()) return;
+            var swapBtn = document.getElementById('swap-slots-btn');
+            if (swapBtn) swapBtn.dataset.swapSlotsBusy = '1';
+            updateProgrammeLeadingToolbarButtonsState();
+            try {
+                var dateA = selectedProgrammeEditorDayDate;
+                var sessionA = selectedProgrammeEditorSlotSessionId;
+                var slotA = selectedProgrammeEditorSlotId;
+                var dateB = selectedProgrammeEditorSwapDayDate;
+                var sessionB = selectedProgrammeEditorSwapSlotSessionId;
+                var slotB = selectedProgrammeEditorSwapSlotId;
+                flushProgrammeSlotDomEditsToLocal({ skipRefresh: true });
+                var swapped = swapProgrammeSlotsContentAcross(dateA, sessionA, slotA, dateB, sessionB, slotB);
+                if (!swapped) {
+                    if (typeof showStatus === 'function') showStatus('error', 'Could not swap selected slots.');
+                    return;
+                }
+                clearProgrammeEditorSwapSlotSelection();
+                refreshProgrammeEditorDays();
+                selectProgrammeEditorSlot(dateA, sessionA, slotA);
+                recomputeProgrammeEditDirtyFlags();
+                if (typeof showStatus === 'function') showStatus('success', 'Slots swapped.');
+            } catch (err) {
+                console.error('Failed to swap programme slots:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to swap slots.');
+                }
+            } finally {
+                if (swapBtn) delete swapBtn.dataset.swapSlotsBusy;
+                updateProgrammeLeadingToolbarButtonsState();
+            }
         }
 
         function getProgrammeEditorActiveSessionId() {
@@ -17228,6 +17669,27 @@
             );
         }
 
+        function isProgrammeEditorSlotSelected() {
+            return Boolean(
+                selectedProgrammeEditorDayDate &&
+                selectedProgrammeEditorSlotId &&
+                selectedProgrammeEditorSlotSessionId &&
+                isProgrammeSessionDocId(selectedProgrammeEditorSlotSessionId)
+            );
+        }
+
+        function getProgrammeSlotsForSessionSorted(dateStr, sessionId) {
+            var sessions = programmeState.sessionsByDay && programmeState.sessionsByDay[dateStr];
+            if (!sessions) return [];
+            for (var i = 0; i < sessions.length; i++) {
+                if (sessions[i].id === sessionId) {
+                    sortProgrammeSlotsInState(dateStr, sessionId);
+                    return sessions[i].slots || [];
+                }
+            }
+            return [];
+        }
+
         function canMoveSelectedProgrammeSessionUp() {
             if (!isProgrammeEditorSessionTitleSelected()) return false;
             var sessions = getProgrammeSessionsForDaySorted(selectedProgrammeEditorDayDate);
@@ -17240,6 +17702,34 @@
             var sessions = getProgrammeSessionsForDaySorted(selectedProgrammeEditorDayDate);
             if (sessions.length < 2) return false;
             return sessions[sessions.length - 1].id !== selectedProgrammeEditorSessionId;
+        }
+
+        function canMoveSelectedProgrammeSlotUp() {
+            if (!isProgrammeEditorSlotSelected()) return false;
+            var slots = getProgrammeSlotsForSessionSorted(
+                selectedProgrammeEditorDayDate,
+                selectedProgrammeEditorSlotSessionId
+            );
+            if (slots.length < 2) return false;
+            return slots[0].id !== selectedProgrammeEditorSlotId;
+        }
+
+        function canMoveSelectedProgrammeSlotDown() {
+            if (!isProgrammeEditorSlotSelected()) return false;
+            var slots = getProgrammeSlotsForSessionSorted(
+                selectedProgrammeEditorDayDate,
+                selectedProgrammeEditorSlotSessionId
+            );
+            if (slots.length < 2) return false;
+            return slots[slots.length - 1].id !== selectedProgrammeEditorSlotId;
+        }
+
+        function canMoveSelectedProgrammeOrderUp() {
+            return canMoveSelectedProgrammeSessionUp() || canMoveSelectedProgrammeSlotUp();
+        }
+
+        function canMoveSelectedProgrammeOrderDown() {
+            return canMoveSelectedProgrammeSessionDown() || canMoveSelectedProgrammeSlotDown();
         }
 
         function hasProgrammeDeleteSelection() {
@@ -17309,6 +17799,7 @@
         }
 
         function openProgrammeDeleteConfirmModal() {
+            if (!programmePadlockIsOpen) return;
             var target = getProgrammeDeleteTarget();
             if (!target) return;
             programmeDeletePendingTarget = target;
@@ -17341,7 +17832,7 @@
         function syncProgrammeDeleteButtonUi() {
             var delBtn = document.getElementById('programme-delete-btn');
             if (!delBtn || delBtn.dataset.programmeDeleteBusy === '1') return;
-            var canDelete = hasProgrammeDeleteSelection();
+            var canDelete = programmePadlockIsOpen && hasProgrammeDeleteSelection();
             delBtn.disabled = !canDelete;
             delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
             var label = 'Delete session or slot';
@@ -17358,6 +17849,11 @@
         }
 
         async function performDeleteSelectedProgrammeFromFirebase(explicitTarget) {
+            if (!programmePadlockIsOpen) {
+                closeProgrammeDeleteConfirmModal();
+                syncProgrammeDeleteButtonUi();
+                return;
+            }
             var target = explicitTarget || programmeDeletePendingTarget || getProgrammeDeleteTarget();
             closeProgrammeDeleteConfirmModal();
             if (!target) {
@@ -17380,6 +17876,9 @@
             selectedProgrammeEditorSessionId = null;
             selectedProgrammeEditorSlotId = null;
             selectedProgrammeEditorSlotSessionId = null;
+            selectedProgrammeEditorSwapSlotId = null;
+            selectedProgrammeEditorSwapSlotSessionId = null;
+            selectedProgrammeEditorSwapDayDate = null;
             refreshProgrammeEditorDays();
             applyProgrammeEditorDaySelection();
             recomputeProgrammeSessionNamesDirty();
@@ -17404,6 +17903,8 @@
                     batch.delete(tbsProgrammeSessionDocRef(db, target.dateStr, target.sessionId));
                     await batch.commit();
                 }
+                syncProgrammePersistedSnapshotFromState();
+                recomputeProgrammeEditDirtyFlags();
             } catch (err) {
                 console.error('Failed to delete programme item:', err);
                 try {
@@ -17413,6 +17914,8 @@
                         reloadDb,
                         target.dateStr
                     );
+                    syncProgrammePersistedSnapshotFromState();
+                    recomputeProgrammeEditDirtyFlags();
                     refreshProgrammeEditorDays();
                     applyProgrammeEditorDaySelection();
                 } catch (reloadErr) {
@@ -17445,15 +17948,21 @@
             }
             var orderUpBtn = document.getElementById('programme-session-order-up-btn');
             if (orderUpBtn && orderUpBtn.dataset.programmeSessionOrderBusy !== '1') {
-                var canUp = canEditProgramme && canMoveSelectedProgrammeSessionUp();
+                var canUp = canEditProgramme && canMoveSelectedProgrammeOrderUp();
                 orderUpBtn.disabled = !canUp;
                 orderUpBtn.setAttribute('aria-disabled', canUp ? 'false' : 'true');
             }
             var orderDownBtn = document.getElementById('programme-session-order-down-btn');
             if (orderDownBtn && orderDownBtn.dataset.programmeSessionOrderBusy !== '1') {
-                var canDown = canEditProgramme && canMoveSelectedProgrammeSessionDown();
+                var canDown = canEditProgramme && canMoveSelectedProgrammeOrderDown();
                 orderDownBtn.disabled = !canDown;
                 orderDownBtn.setAttribute('aria-disabled', canDown ? 'false' : 'true');
+            }
+            var swapSlotsBtn = document.getElementById('swap-slots-btn');
+            if (swapSlotsBtn && swapSlotsBtn.dataset.swapSlotsBusy !== '1') {
+                var canSwap = canEditProgramme && canSwapSelectedProgrammeSlots();
+                swapSlotsBtn.disabled = !canSwap;
+                swapSlotsBtn.setAttribute('aria-disabled', canSwap ? 'false' : 'true');
             }
             updateProgrammeDeleteButtonState();
         }
@@ -17485,6 +17994,8 @@
                 });
                 programmeState.sessionsByDay = programmeState.sessionsByDay || {};
                 programmeState.sessionsByDay[dateStr] = await loadProgrammeSessionsForDay(db, dateStr);
+                syncProgrammePersistedSnapshotFromState();
+                recomputeProgrammeEditDirtyFlags();
                 refreshProgrammeEditorDays();
                 selectProgrammeEditorSession(dateStr, sessionId);
                 if (typeof showStatus === 'function') {
@@ -17501,7 +18012,60 @@
             }
         }
 
+        async function moveSelectedProgrammeSlotOrder(delta) {
+            if (!programmePadlockIsOpen) {
+                if (typeof showStatus === 'function') showStatus('info', 'Unlock programme to reorder slots.');
+                return;
+            }
+            var dateStr = selectedProgrammeEditorDayDate;
+            var sessionId = selectedProgrammeEditorSlotSessionId;
+            var slotId = selectedProgrammeEditorSlotId;
+            if (!dateStr || !sessionId || !slotId || !isProgrammeSessionDocId(sessionId)) {
+                if (typeof showStatus === 'function') showStatus('info', 'Select a slot first.');
+                return;
+            }
+            if (delta < 0 && !canMoveSelectedProgrammeSlotUp()) return;
+            if (delta > 0 && !canMoveSelectedProgrammeSlotDown()) return;
+            var upBtn = document.getElementById('programme-session-order-up-btn');
+            var downBtn = document.getElementById('programme-session-order-down-btn');
+            if (upBtn) upBtn.dataset.programmeSessionOrderBusy = '1';
+            if (downBtn) downBtn.dataset.programmeSessionOrderBusy = '1';
+            updateProgrammeLeadingToolbarButtonsState();
+            try {
+                flushDirtyProgrammeSlotFieldsInSession(dateStr, sessionId);
+                var slots = getProgrammeSlotsForSessionSorted(dateStr, sessionId);
+                var idx = -1;
+                for (var i = 0; i < slots.length; i++) {
+                    if (slots[i].id === slotId) {
+                        idx = i;
+                        break;
+                    }
+                }
+                if (idx < 0) return;
+                var swapIdx = idx + delta;
+                if (swapIdx < 0 || swapIdx >= slots.length) return;
+                var otherSlotId = slots[swapIdx].id;
+                var swapped = swapProgrammeSlotTimingsInState(dateStr, sessionId, slotId, otherSlotId);
+                if (!swapped) return;
+                refreshProgrammeEditorDays();
+                selectProgrammeEditorSlot(dateStr, sessionId, slotId);
+                recomputeProgrammeEditDirtyFlags();
+            } catch (err) {
+                console.error('Failed to reorder programme slot:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to reorder slot.');
+                }
+            } finally {
+                if (upBtn) delete upBtn.dataset.programmeSessionOrderBusy;
+                if (downBtn) delete downBtn.dataset.programmeSessionOrderBusy;
+                updateProgrammeLeadingToolbarButtonsState();
+            }
+        }
+
         async function moveSelectedProgrammeSessionOrder(delta) {
+            if (isProgrammeEditorSlotSelected()) {
+                return moveSelectedProgrammeSlotOrder(delta);
+            }
             if (!programmePadlockIsOpen) {
                 if (typeof showStatus === 'function') showStatus('info', 'Unlock programme to reorder sessions.');
                 return;
@@ -17546,6 +18110,8 @@
                 ]);
                 syncProgrammeSessionOrderInState(dateStr, current.id, otherOrder);
                 syncProgrammeSessionOrderInState(dateStr, other.id, currentOrder);
+                syncProgrammePersistedSnapshotFromState();
+                recomputeProgrammeEditDirtyFlags();
                 refreshProgrammeEditorDays();
                 selectProgrammeEditorSession(dateStr, sessionId);
             } catch (err) {
@@ -17629,14 +18195,26 @@
             for (var i = 0; i < slotEls.length; i++) {
                 var el = slotEls[i];
                 var dateStr = el.getAttribute('data-programme-date') || '';
+                var sessionId = el.getAttribute('data-session-id') || '';
                 var slotId = el.getAttribute('data-slot-id') || '';
                 var isSelected = Boolean(
                     selectedProgrammeEditorDayDate &&
                     selectedProgrammeEditorSlotId &&
+                    selectedProgrammeEditorSlotSessionId &&
                     dateStr === selectedProgrammeEditorDayDate &&
+                    sessionId === selectedProgrammeEditorSlotSessionId &&
                     slotId === selectedProgrammeEditorSlotId
                 );
+                var isSwapSelected = Boolean(
+                    selectedProgrammeEditorSwapDayDate &&
+                    selectedProgrammeEditorSwapSlotId &&
+                    selectedProgrammeEditorSwapSlotSessionId &&
+                    dateStr === selectedProgrammeEditorSwapDayDate &&
+                    sessionId === selectedProgrammeEditorSwapSlotSessionId &&
+                    slotId === selectedProgrammeEditorSwapSlotId
+                );
                 el.classList.toggle('is-selected', isSelected);
+                el.classList.toggle('is-swap-selected', isSwapSelected);
                 el.setAttribute('aria-selected', isSelected ? 'true' : 'false');
             }
         }
@@ -17648,6 +18226,7 @@
             selectedProgrammeEditorSessionId = String(sessionId);
             selectedProgrammeEditorSlotId = null;
             selectedProgrammeEditorSlotSessionId = null;
+            clearProgrammeEditorSwapSlotSelection();
             applyProgrammeEditorDaySelection();
         }
 
@@ -17658,6 +18237,7 @@
             selectedProgrammeEditorSessionId = null;
             selectedProgrammeEditorSlotId = String(slotId);
             selectedProgrammeEditorSlotSessionId = String(sessionId);
+            clearProgrammeEditorSwapSlotSelection();
             applyProgrammeEditorDaySelection();
         }
 
@@ -17669,9 +18249,13 @@
         }
 
         function clearProgrammeEditorSlotSelection() {
-            if (!selectedProgrammeEditorSlotId && !selectedProgrammeEditorSlotSessionId) return;
+            if (!selectedProgrammeEditorSlotId && !selectedProgrammeEditorSlotSessionId &&
+                !selectedProgrammeEditorSwapSlotId && !selectedProgrammeEditorSwapSlotSessionId) return;
             selectedProgrammeEditorSlotId = null;
             selectedProgrammeEditorSlotSessionId = null;
+            selectedProgrammeEditorSwapSlotId = null;
+            selectedProgrammeEditorSwapSlotSessionId = null;
+            selectedProgrammeEditorSwapDayDate = null;
             applyProgrammeEditorSlotSelection();
             updateProgrammeLeadingToolbarButtonsState();
         }
@@ -17701,6 +18285,20 @@
                 if (!slotStillExists) {
                     selectedProgrammeEditorSlotId = null;
                     selectedProgrammeEditorSlotSessionId = null;
+                }
+            }
+            if (selectedProgrammeEditorSwapSlotId &&
+                selectedProgrammeEditorSwapDayDate &&
+                selectedProgrammeEditorSwapSlotSessionId) {
+                var swapStillExists = getProgrammeSlotFromState(
+                    selectedProgrammeEditorSwapDayDate,
+                    selectedProgrammeEditorSwapSlotSessionId,
+                    selectedProgrammeEditorSwapSlotId
+                );
+                if (!swapStillExists) {
+                    selectedProgrammeEditorSwapSlotId = null;
+                    selectedProgrammeEditorSwapSlotSessionId = null;
+                    selectedProgrammeEditorSwapDayDate = null;
                 }
             }
             applyProgrammeEditorSessionSelection();
@@ -17880,6 +18478,7 @@
                 programmeStateDirty = false;
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
+                programmePersistedSessionsByDay = {};
                 renderGridFromState();
                 updateSaveButtonState();
                 rebuildTexteditorProgrammeButtons();
@@ -17920,6 +18519,7 @@
                         : id;
                 }
                 await loadProgrammeSessionsByDay(db, programmeState.dayDates);
+                syncProgrammePersistedSnapshotFromState();
                 renderGridFromState();
                 updateSaveButtonState();
                 rebuildTexteditorProgrammeButtons();
@@ -17932,12 +18532,14 @@
                 programmeState.sessionsByDay = {};
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
+                programmePersistedSessionsByDay = {};
                 renderGridFromState();
                 rebuildTexteditorProgrammeButtons();
             }
         }
 
-        async function saveProgrammeState() {
+        async function saveProgrammeState(options) {
+            options = options || {};
             if (!programmeState || !programmeState.eventId) {
                 if (typeof showStatus === 'function') showStatus('info', 'Select an event first.');
                 return;
@@ -17981,7 +18583,10 @@
                     }, { merge: true });
                 }
                 await loadProgrammeFromFirestore(eventId);
-                if (typeof showStatus === 'function') showStatus('success', 'Programme saved to Firestore.');
+                programmeStateDirty = false;
+                if (!options.silent && typeof showStatus === 'function') {
+                    showStatus('success', 'Programme schedule saved.');
+                }
             } catch (err) {
                 console.error('Failed to save programme:', err);
                 if (typeof showStatus === 'function') showStatus('error', err.message || 'Failed to save.');
@@ -20322,12 +20927,6 @@
             contentPeriodicSyncTimer = setInterval(function () {
                 if (Object.keys(contentDirtyDocIds).length) flushContentToFirebase();
             }, CONTENT_FIREBASE_PERIODIC_MS);
-            if (programmePeriodicSyncTimer) clearInterval(programmePeriodicSyncTimer);
-            programmePeriodicSyncTimer = setInterval(function() {
-                if (programmeSessionNamesDirty || programmeSlotsDirty || (programmeState.meta && programmeStateDirty)) {
-                    void flushProgrammeDirtyToFirestore({ silent: true, skipUiRefresh: true });
-                }
-            }, PROGRAMME_FIREBASE_PERIODIC_MS);
             document.addEventListener('visibilitychange', function() {
                 if (document.visibilityState === 'hidden' && Object.keys(speakerDirtyDocIds).length) {
                     flushSpeakersToFirebase({ silent: true });
@@ -20336,12 +20935,6 @@
             document.addEventListener('visibilitychange', function () {
                 if (document.visibilityState === 'hidden' && Object.keys(contentDirtyDocIds).length) {
                     flushContentToFirebase({ silent: true });
-                }
-            });
-            document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'hidden' &&
-                    (programmeSessionNamesDirty || programmeSlotsDirty || (programmeState.meta && programmeStateDirty))) {
-                    void flushProgrammeDirtyToFirestore({ silent: true, skipUiRefresh: true });
                 }
             });
             initTexteditorCodeInputPersistence();
@@ -20628,7 +21221,11 @@
                     var slotDate = slotEl.getAttribute('data-programme-date');
                     var slotId = slotEl.getAttribute('data-slot-id');
                     if (slotSessionId && slotDate && slotId) {
-                        selectProgrammeEditorSlot(slotDate, slotSessionId, slotId);
+                        if (e.shiftKey || e.metaKey || e.ctrlKey) {
+                            selectProgrammeEditorSwapSlot(slotDate, slotSessionId, slotId);
+                        } else {
+                            selectProgrammeEditorSlot(slotDate, slotSessionId, slotId);
+                        }
                     }
                     return;
                 }
@@ -20663,18 +21260,28 @@
                     saveProgrammeEditorFromToolbar();
                 });
             }
+            const restoreBtn = document.getElementById('restore-programme-btn');
+            if (restoreBtn) {
+                restoreBtn.addEventListener('click', function() {
+                    void restoreProgrammeEditorFromFirebase();
+                });
+            }
+            updateProgrammeRestoreButtonState();
             var programmeEditorEl = document.getElementById('programme-editor');
             if (programmeEditorEl) {
                 programmeEditorEl.addEventListener('input', function(e) {
                     if (!programmePadlockIsOpen) return;
                     if (e.target.classList && e.target.classList.contains('programme-day-session')) {
-                        recomputeProgrammeSessionNamesDirty();
-                        if (programmeSessionNamesDirty) scheduleProgrammeFirestoreSync();
+                        applyProgrammeSessionInputToLocal(e.target, { skipNormalizeDom: true });
                         return;
                     }
-                    if (slotFieldFromEditableEl(e.target)) {
-                        recomputeProgrammeSlotsDirty();
-                        if (programmeSlotsDirty) scheduleProgrammeFirestoreSync();
+                    var slotField = slotFieldFromEditableEl(e.target);
+                    if (slotField === 'name') {
+                        applyProgrammeSlotInputToLocal(e.target, { skipNormalizeDom: true, skipRefresh: true });
+                        return;
+                    }
+                    if (slotField === 'starttime' || slotField === 'endtime') {
+                        recomputeProgrammeEditDirtyFlags();
                     }
                 });
                 programmeEditorEl.addEventListener('focusout', function(e) {
@@ -20766,11 +21373,19 @@
                     moveSelectedProgrammeSessionOrder(1);
                 });
             }
+            const swapSlotsBtn = document.getElementById('swap-slots-btn');
+            if (swapSlotsBtn) {
+                swapSlotsBtn.addEventListener('click', function() {
+                    if (swapSlotsBtn.disabled) return;
+                    swapSelectedProgrammeSlots();
+                });
+            }
             var programmeDeleteBtn = document.getElementById('programme-delete-btn');
             if (programmeDeleteBtn) {
                 programmeDeleteBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     if (programmeDeleteBtn.disabled) return;
+                    if (!programmePadlockIsOpen) return;
                     if (!getProgrammeDeleteTarget()) return;
                     openProgrammeDeleteConfirmModal();
                 });

@@ -3263,8 +3263,9 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 }
 
 #programme-editor .programme-editor-day.programme-day-slide.is-selected {
-    border: 3px solid magenta;
-    border-right: 3px solid magenta;
+    border: 1px solid magenta;
+    border-right: 1px solid magenta;
+    border-radius: 5px;
     box-sizing: border-box;
     z-index: 1;
 }
