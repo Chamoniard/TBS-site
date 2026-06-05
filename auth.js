@@ -4,17 +4,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     const signInBtn = document.getElementById('googleSignInBtn');
     const messageEl = document.getElementById('authMessage');
-    const noticeEl = document.getElementById('authNotice');
 
     if (typeof TbsAuth === 'undefined') {
         showAuthMessage('Auth configuration failed to load.', 'error');
         return;
-    }
-
-    if (noticeEl) {
-        noticeEl.textContent = 'Sign in with your approved TBS Google account to open the backend.';
-        noticeEl.classList.remove('auth-notice');
-        noticeEl.classList.add('auth-notice', 'auth-notice--info');
     }
 
     if (signInBtn) {

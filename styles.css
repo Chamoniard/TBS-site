@@ -10630,6 +10630,15 @@ body.login-page .login-main {
     filter: brightness(0) invert(1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
+/* backendlogo.png is already light-on-dark; do not invert or the black canvas becomes a white block */
+.auth-header-logo-img--backend {
+    width: auto;
+    max-width: min(100%, 320px);
+    height: auto;
+    max-height: 48px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+}
+
 .auth-logo-section {
     text-align: center;
     margin-top: 3rem;

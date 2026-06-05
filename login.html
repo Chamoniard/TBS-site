@@ -9,7 +9,7 @@
     <title>Sign in - TBS Zermatt</title>
     <link rel="icon" href="images/emblem.png" type="image/png">
     <link rel="apple-touch-icon" href="images/emblem.png">
-    <link rel="stylesheet" href="styles.css?v=20260605-google-login">
+    <link rel="stylesheet" href="styles.css?v=20260605-login-backend-logo">
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -29,37 +29,23 @@
             <div class="auth-section-content">
                 <div class="container">
                     <div class="auth-header-logo">
-                        <img src="images/logo.png" alt="TBS Zermatt" class="auth-header-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <img src="images/backendlogo.png?v=20260605-backendlogo-v2" alt="TBS Backend" class="auth-header-logo-img auth-header-logo-img--backend" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                         <h2 class="auth-header-logo-text" style="display: none;">TBS Zermatt</h2>
                     </div>
 
                     <div class="auth-container auth-container--google">
                         <div class="auth-form" id="loginPanel">
                             <h2 class="auth-title">Staff sign in</h2>
-                            <p class="auth-subtitle">Use your Google account to access the TBS backend and admin tools.</p>
-
-                            <p class="auth-notice auth-notice--info" id="authNotice" role="status">
-                                Sign in with your approved TBS Google account to open the backend.
-                            </p>
 
                             <div id="authMessage" class="auth-message" hidden role="alert"></div>
 
                             <button
                                 type="button"
                                 id="googleSignInBtn"
-                                class="auth-google-btn"
-                                aria-describedby="authNotice">
+                                class="auth-google-btn">
                                 <i class="fab fa-google" aria-hidden="true"></i>
                                 <span>Continue with Google</span>
                             </button>
-
-                            <p class="auth-google-help">
-                                Only Google accounts added in Firebase Authentication can access the backend. Gmail opens with the same sign-in.
-                            </p>
-
-                            <div class="auth-switch">
-                                <p><a href="home.html" class="auth-link">Back to site</a></p>
-                            </div>
                         </div>
                     </div>
                 </div>
