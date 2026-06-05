@@ -545,7 +545,27 @@ function prefetchFeedThumbnailsForRecords(records, limit) {
         if (!url) return;
         const img = new Image();
         img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
         img.src = url;
+    });
+}
+
+/** Mobile Safari can skip lazy/decoded imgs injected before the feed band is visible — force a reload. */
+function ensureFeedCardImagesLoad(root) {
+    const scope = root && root.querySelectorAll ? root : document;
+    const imgs = scope.querySelectorAll
+        ? scope.querySelectorAll('.feed-section .news-card-thumbnail')
+        : [];
+    imgs.forEach(function (img) {
+        if (!(img instanceof HTMLImageElement)) return;
+        img.loading = 'eager';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        if (img.complete && img.naturalWidth > 0) return;
+        const src = img.getAttribute('src') || img.src;
+        if (!src) return;
+        img.src = '';
+        img.src = src;
     });
 }
 
@@ -3616,6 +3636,9 @@ async function loadNewsFeed() {
     } finally {
         const feedSection = document.querySelector('body.home-view .home-section > .feed-section');
         if (feedSection) feedSection.classList.remove('home-stage-hidden');
+        requestAnimationFrame(function () {
+            ensureFeedCardImagesLoad(document);
+        });
     }
 }
 
@@ -3783,6 +3806,9 @@ async function appendNewsCardsToGrid(newsGrid, recordsSlice) {
     const cardPromises = recordsSlice.map((record) => createNewsCard(record));
     const newsCards = (await Promise.all(cardPromises)).filter(Boolean);
     newsCards.forEach((card) => newsGrid.appendChild(card));
+    requestAnimationFrame(function () {
+        ensureFeedCardImagesLoad(newsGrid);
+    });
 }
 
 function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
@@ -5787,6 +5813,10 @@ async function displayNewsGrid(records) {
     const feedSection = document.querySelector('body.home-view .home-section > .feed-section');
     if (feedSection) feedSection.classList.remove('home-stage-hidden');
 
+    requestAnimationFrame(function () {
+        ensureFeedCardImagesLoad(feedContent);
+    });
+
     wireSliderIndicators();
 }
 
@@ -6375,7 +6405,7 @@ async function createNewsCard(record) {
         // Regular news card layout
         const imageContainer = imageUrl ? `
             <div class="news-card-image">
-                <img src="${imageUrl}" alt="${title}" class="news-card-thumbnail">
+                <img src="${homeEscapeHtml(imageUrl)}" alt="${homeEscapeHtml(title)}" class="news-card-thumbnail" loading="eager" decoding="async" referrerpolicy="no-referrer">
                 </div>
         ` : '';
         
