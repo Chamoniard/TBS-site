@@ -536,9 +536,11 @@ function formatApplicationDate(date: Date): string {
  * Expects JSON body with form fields (no reCAPTCHA).
  */
 export const submitRegistrationHttp = onRequest({
-  cors: true,
   invoker: "public",
 }, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") {
     res.status(204).send("");
     return;
