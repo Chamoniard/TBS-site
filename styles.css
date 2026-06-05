@@ -4856,16 +4856,19 @@ body.home-view .home-section > .home-social-row-container {
     }
 }
 
-/* Clickable home introslider slides: 3px pink border on hover */
+/* Clickable home introslider slides: 1px pink border + discrete lift on hover */
 .home-section .introslider > .introslider-clickable {
     cursor: pointer;
     box-sizing: border-box !important;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
 .home-section .introslider > .introslider-clickable:hover,
 .home-section .introslider > .introslider-clickable:focus-visible {
-    border: 3px solid var(--tbs-pink-soft) !important;
+    border: 1px solid var(--tbs-pink-soft) !important;
     outline: none;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24), 0 3px 10px rgba(0, 0, 0, 0.12) !important;
 }
 
 @media (min-width: 769px) {
@@ -11213,8 +11216,10 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
-    border: 3px solid var(--tbs-pink-soft) !important;
+    border: 1px solid var(--tbs-pink-soft) !important;
     outline: none;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
 }
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text a {
@@ -11539,8 +11544,10 @@ body.home-view :is(.maintitle-heading) {
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
-        border: 3px solid var(--tbs-pink-soft) !important;
+        border: 1px solid var(--tbs-pink-soft) !important;
         outline: none !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
     }
 
     /* Dot indicators — fixed at bottom of slider band; cards scroll underneath (script.js) */
