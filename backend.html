@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <title>Backend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -7958,11 +7961,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="backend-config.local.js?v=local"></script>
     <script src="auth-common.js?v=20260605-google-auth"></script>
     <script src="backend-auth.js?v=20260605-google-auth"></script>
     <script>
-        // Airtable configuration - using same credentials as index page
-        const AIRTABLE_API_KEY = 'pataRUBPj7Gxfmdfq.9469facf6725c22fd5eb0e17296497271995e544cc2dfcd1ce2d682dbc7ef9f0';
+        // Airtable PAT: set in backend-config.local.js (copy from backend-config.example.js).
+        const AIRTABLE_API_KEY = typeof window.TBS_AIRTABLE_API_KEY === 'string' ? window.TBS_AIRTABLE_API_KEY : '';
         const AIRTABLE_BASE_ID = 'app3cQp1Mn7V8ckWA';
         // Firebase configuration (tbs-app-e2062) – Programme days + slots
         const firebaseConfig = {

@@ -1,4 +1,3 @@
-# Home page is not for public search indexing.
+# Block all crawlers and indexers site-wide.
 User-agent: *
-Disallow: /home.html
 Disallow: /

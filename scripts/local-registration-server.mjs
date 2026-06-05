@@ -198,12 +198,10 @@ const MIME = {
     '.webm': 'video/webm',
 };
 
-const HOME_ROBOTS_HEADER_VALUE = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
+const ROBOTS_HEADER_VALUE = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
 
-function isHomePageRequest(url, filePath) {
-    const p = url.pathname.toLowerCase();
-    if (p === '/' || p === '' || p === '/home.html' || p === '/home') return true;
-    return path.basename(filePath).toLowerCase() === 'home.html';
+function isHtmlFile(filePath) {
+    return path.extname(filePath).toLowerCase() === '.html';
 }
 
 const server = http.createServer(async (req, res) => {
@@ -274,8 +272,8 @@ function serveStaticFile(req, res, filePath, url) {
             'Content-Type': MIME[ext] || 'application/octet-stream',
             'Accept-Ranges': 'bytes',
         };
-        if (isHomePageRequest(url, filePath)) {
-            headers['X-Robots-Tag'] = HOME_ROBOTS_HEADER_VALUE;
+        if (isHtmlFile(filePath)) {
+            headers['X-Robots-Tag'] = ROBOTS_HEADER_VALUE;
         }
         const size = stat.size;
         const range = req.headers.range;
