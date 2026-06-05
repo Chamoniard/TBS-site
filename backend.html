@@ -121,17 +121,16 @@
             cursor: default;
         }
 
-        /* Pre-sets / snippets tab: keep pill styling (not --backend-icon-btn-radius) */
+        /* Pre-sets tab: preset selectors match standard backend gold buttons; equal width in column */
+        body.backend-page #texteditor .texteditor-selectors {
+            align-items: stretch;
+        }
+
         body.backend-page #texteditor button.texteditor-day-btn,
         body.backend-page #texteditor button.texteditor-snippet-btn {
-            background: #FFD700;
-            border: 1px solid transparent;
-            color: #003153;
-            font-weight: 500;
-            font-size: 0.875rem;
-            padding: 0.4rem 0.85rem;
-            border-radius: 10px;
-            box-shadow: none;
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
             box-sizing: border-box;
         }
 
@@ -142,21 +141,7 @@
 
         body.backend-page #texteditor button.texteditor-day-btn.is-active,
         body.backend-page #texteditor button.texteditor-snippet-btn.is-active {
-            background: #FFD700;
             border: 1px solid #fd3db5;
-            color: #003153;
-            box-shadow: none;
-            filter: none;
-            opacity: 1;
-        }
-
-        body.backend-page #texteditor button.texteditor-day-btn:disabled,
-        body.backend-page #texteditor button.texteditor-snippet-btn:disabled {
-            background: #fef3c7;
-            border: none;
-            color: #94a3b8;
-            cursor: not-allowed;
-            filter: none;
         }
 
         body.backend-page button.add-speaker-button,
@@ -6227,19 +6212,16 @@
             flex-direction: column;
             flex-wrap: nowrap;
             gap: 0.5rem;
-            align-items: flex-start;
+            align-items: stretch;
             min-width: 0;
             flex: 0 0 auto;
             width: 100%;
             overflow: visible;
         }
 
-        .texteditor-day-btn {
+        #texteditor .texteditor-day-btn {
             flex-shrink: 0;
-            width: auto;
-            max-width: 100%;
             box-sizing: border-box;
-            text-align: left;
         }
 
         /* ===== CONTAINER STYLES ===== */
@@ -6344,18 +6326,79 @@
             visibility: hidden;
         }
 
-        .backend-auth-gate {
+        body.backend-page.loading {
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        body.backend-page.loading::before,
+        body.backend-page.loading::after {
+            content: none;
+            display: none;
+        }
+
+        .backend-loading-screen {
             position: fixed;
             inset: 0;
-            z-index: 20000;
+            z-index: 20001;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f1f5f9;
-            color: #003153;
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            font-weight: 500;
+            background-color: var(--tbs-loading-pink, #fce7f3);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition:
+                opacity 0.45s ease,
+                visibility 0s linear 0s;
+        }
+
+        .backend-loading-screen-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .backend-loading-screen-logo {
+            display: block;
+            width: min(80vw, 320px);
+            height: min(22vh, 120px);
+            max-width: min(80vw, 320px);
+            max-height: min(22vh, 120px);
+            background-color: #000000;
+            -webkit-mask-image: url('images/backendlogo.png?v=20260605-backendlogo-v3');
+            mask-image: url('images/backendlogo.png?v=20260605-backendlogo-v3');
+            -webkit-mask-mode: luminance;
+            mask-mode: luminance;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+        }
+
+        .backend-loading-screen-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 49, 83, 0.14);
+            border-top-color: #003153;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            flex: 0 0 auto;
+        }
+
+        .backend-loading-screen.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition:
+                opacity 0.45s ease,
+                visibility 0s linear 0.45s;
         }
 
         .texteditor-selectors-empty {
@@ -6886,7 +6929,13 @@
 
     </style>
 </head>
-<body class="backend-page">
+<body class="backend-page loading">
+    <div id="backend-loading-screen" class="backend-loading-screen" aria-live="polite" aria-busy="true" aria-label="Loading backend">
+        <div class="backend-loading-screen-inner">
+            <div class="backend-loading-screen-logo" role="img" aria-label="TBS Backend"></div>
+            <div class="backend-loading-screen-spinner" aria-hidden="true"></div>
+        </div>
+    </div>
     <main class="main">
         <div class="container">
             <div class="eventnavigation">
@@ -7604,7 +7653,7 @@
                                 />
                             </svg>
                         </button>
-                        <button type="button" class="texteditor-save-btn" id="save-programme-btn">Save</button>
+                        <button type="button" class="texteditor-save-btn" id="save-programme-btn" disabled aria-disabled="true">Save</button>
                         <button type="button" class="programme-add-session-btn" id="programme-add-session-btn" disabled aria-disabled="true">Add session</button>
                         <button type="button" class="programme-add-slot-btn" id="programme-add-slot-btn" disabled aria-disabled="true">Add slot</button>
                         <div class="programme-session-order-controls" aria-label="Session order">
@@ -7962,7 +8011,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script src="auth-common.js?v=20260605-google-auth"></script>
-    <script src="backend-auth.js?v=20260605-google-auth"></script>
+    <script src="backend-auth.js?v=20260605-backend-loading"></script>
     <script>
         // Firebase configuration (tbs-app-e2062) – Programme days + slots
         const firebaseConfig = {
@@ -17037,7 +17086,7 @@
         function updateSaveButtonState() {
             const btn = document.getElementById('save-programme-btn');
             if (!btn) return;
-            const active = Boolean(programmeState && programmeState.eventId);
+            const active = Boolean(programmeState && programmeState.eventId) && programmePadlockIsOpen;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
             btn.textContent = 'Save';
@@ -18568,6 +18617,38 @@
             if (statusContainer) {
                 statusContainer.appendChild(statusDiv);
             }
+        }
+
+        var backendLoadingFailsafeTimer = null;
+        var BACKEND_LOADING_FAILSAFE_MS = 120000;
+
+        /** Pale pink full-screen loader (backend logo + spinner) until startup fetches finish. */
+        function setBackendPageLoading(isLoading) {
+            var on = !!isLoading;
+            document.body.classList.toggle('loading', on);
+            var screen = document.getElementById('backend-loading-screen');
+            if (!screen) return;
+            if (on) {
+                screen.classList.remove('is-hidden');
+                screen.setAttribute('aria-hidden', 'false');
+                screen.setAttribute('aria-busy', 'true');
+                if (backendLoadingFailsafeTimer) {
+                    clearTimeout(backendLoadingFailsafeTimer);
+                }
+                backendLoadingFailsafeTimer = setTimeout(function () {
+                    backendLoadingFailsafeTimer = null;
+                    console.warn('Backend loading failsafe: dismissing pink loader after timeout.');
+                    setBackendPageLoading(false);
+                }, BACKEND_LOADING_FAILSAFE_MS);
+                return;
+            }
+            if (backendLoadingFailsafeTimer) {
+                clearTimeout(backendLoadingFailsafeTimer);
+                backendLoadingFailsafeTimer = null;
+            }
+            screen.setAttribute('aria-busy', 'false');
+            screen.classList.add('is-hidden');
+            screen.setAttribute('aria-hidden', 'true');
         }
 
         var indexProgrammeParsedDoc = null;
@@ -20429,6 +20510,8 @@
                 texteditorMiscellaneousSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
             }
 
+            setBackendPageLoading(true);
+            try {
             showStatus('loading', 'Loading backend settings from Firestore…');
             await syncSelectedAndCurrentEventFromSettings();
             updateBackendEditorVisibility();
@@ -20526,6 +20609,11 @@
                 backendGuestsPreloadPromise
             ]);
             showStatus('success', 'Backend ready. Loaded ' + describeBackendStartupLoadedSummary() + '.');
+            } catch (startupErr) {
+                console.error('Backend startup failed:', startupErr);
+            } finally {
+                setBackendPageLoading(false);
+            }
             connectGmailClient().catch(function(err) {
                 console.warn('Gmail auto-connect:', err);
             });

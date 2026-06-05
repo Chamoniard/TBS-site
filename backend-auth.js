@@ -11,27 +11,25 @@
 
     document.documentElement.classList.add('backend-auth-checking');
 
-    const gate = document.createElement('div');
-    gate.id = 'backend-auth-gate';
-    gate.className = 'backend-auth-gate';
-    gate.setAttribute('role', 'status');
-    gate.setAttribute('aria-live', 'polite');
-    gate.innerHTML = '<p class="backend-auth-gate__text">Checking Google sign-in…</p>';
-    document.body.insertBefore(gate, document.body.firstChild);
+    var loadingScreen = document.getElementById('backend-loading-screen');
+    if (loadingScreen) {
+        loadingScreen.setAttribute('aria-label', 'Checking Google sign-in');
+    }
 
     window.__backendAuthReady = TbsAuth.requireBackendAccess()
         .then(function (result) {
             document.documentElement.classList.remove('backend-auth-checking');
             document.documentElement.classList.add('backend-auth-ready');
-            if (gate.parentNode) gate.parentNode.removeChild(gate);
+            if (loadingScreen) {
+                loadingScreen.setAttribute('aria-label', 'Loading backend');
+            }
             window.__backendAuthUser = result && result.user ? result.user : null;
             return result;
         })
         .catch(function (err) {
             console.error('Backend auth failed:', err);
-            if (gate.querySelector('.backend-auth-gate__text')) {
-                gate.querySelector('.backend-auth-gate__text').textContent =
-                    err && err.message ? err.message : 'Sign-in required.';
+            if (loadingScreen) {
+                loadingScreen.setAttribute('aria-label', err && err.message ? err.message : 'Sign-in required.');
             }
             throw err;
         });
