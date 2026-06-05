@@ -13,7 +13,12 @@
     "guests:sync-tbs-firestore": "node scripts/sync-tbs-zermatt-guests-to-firestore.mjs",
     "airtable:check": "node scripts/airtable-check.mjs",
     "content:sync-tbs": "node scripts/sync-contents-to-tbs-firestore.mjs",
-    "content:rebuild-index": "node scripts/rebuild-tbs-content-row-index.mjs"
+    "content:rebuild-index": "node scripts/rebuild-tbs-content-row-index.mjs",
+    "firebase:login": "firebase login",
+    "firebase:deploy:registration": "firebase deploy --only functions:submitRegistrationHttp --project tbs-app-e2062"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.0.0"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0"
