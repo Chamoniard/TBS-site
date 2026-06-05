@@ -68,7 +68,12 @@ body {
     transition: opacity 0.3s ease;
 }
 
-h1, h2, h3, h4, h5, h6, p {
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--title-font);
+    letter-spacing: 0.02em;
+}
+
+p {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -172,6 +177,7 @@ body.loading:not(.home-view)::after {
 
 /* Navbar vertical size: padding + tallest row (logo on desktop; tab row on mobile). Use px so it matches .navbar regardless of :root font-size. */
 :root {
+    --title-font: 'Montserrat', sans-serif;
     /* .navbar padding 16px 0 + .nav-logo .logo 58.32px (≥769px) */
     --navbar-height: calc(16px + 58.32px + 16px);
     --tbs-pink: #fd3db5;
@@ -701,7 +707,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 .eventwrapper .infosponsors h3,
 .eventwrapper .infolocation h3,
 .eventwrapper .infoprogramme h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 1.5rem !important;
     font-weight: 600 !important;
     margin: 0 0 8px 0;
@@ -709,19 +715,19 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 }
 
 .eventwrapper .infoevent h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     color: #FFD700;
 }
 .eventwrapper .infolocation h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     color: #FFD700;
 }
 .eventwrapper .infoprogramme h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     color: #000000;
 }
 .eventwrapper .infosponsors h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
 }
 
 .eventwrapper .infoevent p,
@@ -823,7 +829,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 }
 
 .nav-link {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--title-font);
     letter-spacing: 0.02em;
     text-decoration: none;
     color: #fff;
@@ -895,7 +901,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     justify-content: center;
     appearance: none;
     -webkit-appearance: none;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--title-font);
     letter-spacing: 0.02em;
     font-size: 1rem;
     font-weight: 400;
@@ -917,7 +923,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 }
 
 .registration-submit-btn {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     letter-spacing: normal;
 }
 
@@ -1093,7 +1099,7 @@ body.home-view .hero {
 }
 
 .hero-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     text-align: center;
     font-size: 3rem;
     font-weight: 600;
@@ -1172,11 +1178,38 @@ body.home-view .hero {
     text-align: center;
 }
 
-.hero-social-links a:hover {
+.hero-social-links a:hover,
+.hero-social-links a:hover i,
+.hero-social-links a:hover i.fab,
+.hero-social-links a:hover i.fab.fa-youtube {
     background: transparent;
     color: var(--tbs-pink);
     transform: none;
     box-shadow: none;
+}
+
+.hero-social-links a i.fab,
+.hero-social-links a i.fab.fa-youtube {
+    color: var(--tbs-pink-soft);
+}
+
+/* YouTube icon: footer social pink (not platform default red) */
+.hero-social-links a i.fab.fa-youtube,
+.footer-section .hero-social-links a i.fab.fa-youtube,
+.home-social-row-container .social-links a i.fab.fa-youtube,
+.home-section .introslider .social-links a i.fab.fa-youtube,
+.viewing .youtubereminder-icon i.fab.fa-youtube,
+.viewing .youtubereminder-icon .fab.fa-youtube {
+    color: var(--tbs-pink-soft) !important;
+}
+
+.hero-social-links a:hover i.fab.fa-youtube,
+.footer-section .hero-social-links a:hover i.fab.fa-youtube,
+.home-social-row-container .social-links a:hover i.fab.fa-youtube,
+.home-section .introslider .social-links a:hover i.fab.fa-youtube,
+.viewing .youtubereminder-icon:hover i.fab.fa-youtube,
+.viewing .youtubereminder-icon:hover .fab.fa-youtube {
+    color: var(--tbs-pink) !important;
 }
 
 /* Social Links in Footer */
@@ -1606,7 +1639,9 @@ body.home-view .home-section > .speaker-section {
     }
 
     body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider {
-        gap: 16px;
+        gap: 0;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 0;
         background-color: transparent !important;
         background: transparent !important;
     }
@@ -1623,24 +1658,28 @@ body.home-view .home-section > .speaker-section {
         overflow: hidden !important;
     }
 
-    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider {
-        width: 100%;
-        max-width: 100%;
-        margin-right: 0;
-        scroll-padding-left: 16px;
-        scroll-padding-right: 8px;
-    }
-
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider,
     body.home-view .home-section .introslider-inner-wrapper > .introslider {
         width: 100%;
         max-width: 100%;
         margin-right: 0;
-        scroll-padding-left: 8px;
-        scroll-padding-right: 8px;
+        --introslider-column-width: 100%;
+        gap: 0;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 0;
+        -webkit-overflow-scrolling: touch;
     }
 
-    body.home-view .home-section .introslider-inner-wrapper > .introslider > * {
+    body.home-view .home-section .introslider-inner-wrapper > .introslider > *,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
         scroll-snap-align: start;
+        scroll-snap-stop: always;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
     body.home-view .home-section .introslider-inner-wrapper .introslider-indicators {
@@ -2040,7 +2079,7 @@ body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
     padding: 0;
     color: var(--poster-hero-title-color, #f4f0e8) !important;
     -webkit-text-fill-color: var(--poster-hero-title-color, #f4f0e8) !important;
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 4rem !important;
     font-weight: 600 !important;
     letter-spacing: 0.01em;
@@ -2054,9 +2093,9 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     padding: 0;
     color: var(--poster-hero-title-color, #f4f0e8) !important;
     -webkit-text-fill-color: var(--poster-hero-title-color, #f4f0e8) !important;
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 1.5rem !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     letter-spacing: 0.02em;
     line-height: 1.2;
     text-align: left;
@@ -2155,7 +2194,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 }
 
 .home-section > .event-section .event-contents h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 1.7rem;
     font-weight: 600;
     color: var(--tbs-icy-blue) !important;
@@ -2375,9 +2414,6 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin: 0;
     padding: 0;
     color: #003153 !important;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 1.7rem;
-    font-weight: 600;
 }
 
 /* Home: speakers row — Prussian band; 8px horizontal inset on section + inner */
@@ -2695,7 +2731,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin: 0;
     padding: 0;
     border: none;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.3rem;
     font-weight: 600;
     line-height: 1.25;
@@ -2791,7 +2827,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 .home-section .speaker-card .speaker-card-long-bio-title {
     margin: 0 0 0.4rem 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.25;
@@ -2816,7 +2852,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 /* Same scale as `.programmestyle h3` on programme day cards; colour is black on the white speaker slide. */
 .home-section .speaker-card .speaker-card-name {
     flex-shrink: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.3rem;
     font-weight: 600;
     color: #000000;
@@ -2849,9 +2885,6 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 /* Programme day–matched scale; colours inherit from `.speaker-card-bio` (not programme gold/white). */
 .home-section .speakerslider .speaker-card-bio h2 {
-    font-size: 1.7rem;
-    font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     text-align: left;
     white-space: normal;
     margin: 0 0 0.5rem 0;
@@ -2860,7 +2893,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 .home-section .speakerslider .speaker-card-bio h3 {
     font-size: 1.3rem;
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     text-align: center;
     white-space: normal;
     margin: 0 0 0.5rem 0;
@@ -3278,7 +3311,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 .programme-day-slide h6 {
     font-size: 1.7rem;
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
 }
 
 .introslider-indicators {
@@ -3312,7 +3345,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 
 .about-title {
     margin: 0;
-    font-family: 'League Spartan', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.7rem;
     font-weight: 600;
     line-height: 1.3;
@@ -3458,13 +3491,13 @@ body.home-view .home-section > .home-social-row-container {
     }
 
     body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
-        font-size: 4rem !important;
+        font-size: 5rem !important;
         font-weight: 600 !important;
         line-height: 1.12 !important;
     }
 
     body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
-        font-size: clamp(0.9rem, 3.8vw, 1.5rem) !important;
+        font-size: clamp(1.15rem, 5vw, 1.85rem) !important;
     }
 
     /* Mobile: move social icons into a Prussian-blue bar below the poster logo */
@@ -3697,7 +3730,7 @@ body.home-view .home-section > .home-social-row-container {
 .home-section .programme-slider > .about .about-title,
 .home-programme-section .programme-slider > .about .about-title {
     margin: 0 0 0.3rem 0 !important;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.7rem;
     font-weight: 600;
     line-height: 1.3;
@@ -4362,7 +4395,7 @@ body.home-view .home-section > .home-social-row-container {
 
 .featured-location-title {
     margin: 0 0 1rem 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.2rem;
     font-weight: 600;
     line-height: 1.3;
@@ -4397,7 +4430,7 @@ body.home-view .home-section > .home-social-row-container {
 
 .featured-programme-title {
     margin: 0 0 1rem 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.7rem;
     font-weight: 600;
     line-height: 1.3;
@@ -4439,7 +4472,7 @@ body.home-view .home-section > .home-social-row-container {
     padding: 0 8px;
     border-radius: 5px;
     color: #ffffff;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.7rem;
     font-weight: 600;
     text-align: left;
@@ -4563,7 +4596,7 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 .featured-video .featured-video-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.7rem;
     font-weight: 600;
     color: #003153;
@@ -4583,7 +4616,7 @@ body.home-view .home-section > .home-social-row-container {
 .flyer-section .introslider > .about .about-title:not(.introslider-title),
 .home-section .programme-slider > .about .about-title:not(.introslider-title),
 .home-programme-section .programme-slider > .about .about-title:not(.introslider-title) {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 1.1rem !important;
     font-weight: 600 !important;
     line-height: 1.25 !important;
@@ -5154,7 +5187,12 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
 
 .home-section .introslider > .tbsonsocial .social-links a,
 .home-section .introslider > .tbsonsocial .social-links a i.fab {
-    color: #FFD700 !important;
+    color: var(--tbs-pink-soft) !important;
+}
+
+.home-section .introslider > .tbsonsocial .social-links a:hover,
+.home-section .introslider > .tbsonsocial .social-links a:hover i.fab {
+    color: var(--tbs-pink) !important;
 }
 
 .home-section .introslider > .featured-video .featured-video-text {
@@ -5286,7 +5324,7 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
     padding: 1rem 1rem 1.25rem;
     font-size: 1.1rem;
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     color: #ffffff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     pointer-events: none;
@@ -5313,7 +5351,7 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.12);
     font-size: 1.2rem;
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--title-font);
     color: #ffd700;
     text-shadow: none;
     pointer-events: none;
@@ -5483,6 +5521,46 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
     font-style: italic;
 }
 
+/* Feed cards: meta wrapper is layout-neutral on desktop (children stay in title row flex) */
+@media (min-width: 769px) {
+    .feed-section-inner-wrapper .news-card-title-row .feed-section-post-meta {
+        display: contents;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .news-card-title-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        gap: 0.5rem 10px;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .news-card-title-row .news-card-title-block {
+        order: unset;
+        flex: 1 1 auto;
+        width: auto;
+        max-width: none;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .news-card .news-card-text-row,
+    body.home-view .home-section .feed-section-inner-wrapper .news-card .news-card-text {
+        display: block !important;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .news-card h3.post-title {
+        display: block !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        -webkit-line-clamp: unset !important;
+        line-clamp: unset !important;
+        -webkit-box-orient: unset !important;
+        max-height: none !important;
+        font-size: inherit !important;
+        font-weight: 600 !important;
+    }
+}
+
 .sponsors_wrapper {
     width: 100%;
     flex: 1 1 auto;
@@ -5544,7 +5622,7 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
 h1.section-titles,
 h2.section-titles,
 h3.section-titles {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 1.5rem;
     font-weight: 600;
     color: #000000;
@@ -5555,7 +5633,7 @@ h3.section-titles {
 
 /* Programme band: all h2 headings use `.section-titles` typography (not day-card gold/white styles) */
 .programme-section h2 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     font-size: 1.5rem !important;
     font-weight: 600 !important;
     color: #000000 !important;
@@ -5756,10 +5834,10 @@ h3.section-titles {
     -webkit-appearance: none;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     cursor: pointer;
-    /* Same magenta as `.filter-btn.active` (#FD3DB5) */
-    background-color: var(--tbs-pink);
+    /* Same pink as footer social icons (--tbs-pink-soft / --tbs-pink) */
+    background-color: var(--tbs-pink-soft) !important;
     color: #ffffff !important;
-    border: 1.5px solid var(--tbs-pink);
+    border: 1.5px solid var(--tbs-pink-soft) !important;
     border-radius: 5px;
     min-height: 33px;
     padding: 6px 12px;
@@ -5782,8 +5860,8 @@ h3.section-titles {
 .feed-load-more-btn:focus-visible:not(:disabled),
 .feed-load-less-btn:hover:not(:disabled),
 .feed-load-less-btn:focus-visible:not(:disabled) {
-    background-color: var(--tbs-pink);
-    border-color: var(--tbs-pink);
+    background-color: var(--tbs-pink) !important;
+    border-color: var(--tbs-pink) !important;
     color: #ffffff !important;
     box-shadow:
         0 4px 14px rgba(0, 0, 0, 0.18),
@@ -6222,7 +6300,7 @@ h3.section-titles {
 
 /* Card / post headings (news feed, Past talks cards, video viewer) — `h3.post-title` */
 .post-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 1.1rem;
     font-weight: 500;
     color: #000000;
@@ -6310,6 +6388,13 @@ h4 {
         margin-top: 24px;
     }
 
+    .feed-load-more-btn,
+    .feed-load-less-btn {
+        width: 75vw;
+        min-width: 75vw;
+        max-width: 75vw;
+    }
+
     .feed-section-inner-wrapper,
     .home-section .feed-section-inner-wrapper {
         border-radius: 5px 5px 0 0 !important;
@@ -6386,7 +6471,7 @@ h4 {
 
     .feed-section-inner-wrapper .news-grid,
     .home-section .feed-section-inner-wrapper .news-grid {
-        gap: 8px;
+        gap: 16px;
     }
 
     /* Feed-section only: card thumbnails 20% smaller than default mobile news cards */
@@ -6447,15 +6532,35 @@ h4 {
         column-gap: 0;
     }
 
-    /* Date + badges on one row above the title block */
-    .news-card-title-row .news-card-date {
+    /* Home feed: date + badges below post-title (feed-section-post-meta) */
+    body.home-view .home-section .feed-section-inner-wrapper .news-card-title-row .feed-section-post-meta {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        align-content: flex-start;
+        order: 2;
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        gap: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .news-card-title-row .news-card-title-block {
         order: 1;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .feed-section-post-meta .news-card-date {
+        flex: 0 0 auto;
         align-self: flex-start;
         margin: 0;
     }
 
-    .news-card-title-row .news-card-badges {
-        order: 2;
+    body.home-view .home-section .feed-section-inner-wrapper .feed-section-post-meta .news-card-badges {
+        flex: 0 0 auto;
         align-self: flex-start;
         margin-left: auto;
         margin-top: 0;
@@ -6510,7 +6615,7 @@ h4 {
         display: none !important;
     }
 
-    /* TBS27 ABOUT title (League Spartan) */
+    /* TBS27 ABOUT title */
     .flyer-section .about-title {
         font-size: 1rem !important;
         font-weight: 600 !important;
@@ -6905,13 +7010,17 @@ h4 {
     }
 
     /* Home carousel track square; slide panels use 5px corners */
-    .home-section .introslider {
+    body.home-view .home-section .introslider {
         border-radius: 0;
-        gap: 16px;
+        gap: 0;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 0;
     }
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider {
-        gap: 16px !important;
+        gap: 0 !important;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 0 !important;
     }
 
     .home-section .introslider > * {
@@ -6980,6 +7089,43 @@ h4 {
     .home-section .speakerslider-track > .speaker-card:first-child:not(:only-child),
     .home-section .speakerslider-track > .speaker-placeholder:first-child:not(:only-child) {
         margin-left: 0 !important;
+    }
+
+    /* Home: programme + speakers — full-width slides, snap one card per swipe */
+    body.home-view .home-section > .programme-section,
+    body.home-view .home-section > .speaker-section {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    body.home-view .home-section .programme-slider,
+    body.home-view .home-section .speakerslider-track {
+        --introslider-column-width: 100%;
+        --home-carousel-slide-width: 100%;
+        width: 100%;
+        max-width: 100%;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 0;
+    }
+
+    body.home-view .home-section .programme-slider > *,
+    body.home-view .home-section .speakerslider-track > .speaker-card,
+    body.home-view .home-section .speakerslider-track > .speaker-placeholder {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+    }
+
+    body.home-view .home-section .programme-slider > *:first-child,
+    body.home-view .home-section .programme-slider > *:last-child,
+    body.home-view .home-section .programme-slider > *:only-child,
+    body.home-view .home-section .speakerslider-track > .speaker-card,
+    body.home-view .home-section .speakerslider-track > .speaker-placeholder {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
     .home-section .speakerslider-track > .speaker-card:not(:first-child),
@@ -7077,7 +7223,7 @@ h4 {
     
     .featured-text-content h3,
     .section-titles {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 1.5rem !important;
         font-weight: 600 !important;
     }
@@ -7100,7 +7246,7 @@ h4 {
     .eventwrapper .infosponsors h3,
     .eventwrapper .infolocation h3,
     .eventwrapper .infoprogramme h3 {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 1.1rem !important;
         font-weight: 600 !important;
     }
@@ -7137,7 +7283,7 @@ h4 {
     
     .featured-text-content h3,
     .section-titles {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 1.5rem !important;
         font-weight: 600 !important;
     }
@@ -7161,7 +7307,7 @@ h4 {
     .eventwrapper .infosponsors h3,
     .eventwrapper .infolocation h3,
     .eventwrapper .infoprogramme h3 {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 1rem !important;
         font-weight: 600 !important;
     }
@@ -7198,7 +7344,7 @@ h4 {
     
     .featured-text-content h3,
     .section-titles {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 1.5rem !important;
         font-weight: 600 !important;
     }
@@ -7222,7 +7368,7 @@ h4 {
     .eventwrapper .infosponsors h3,
     .eventwrapper .infolocation h3,
     .eventwrapper .infoprogramme h3 {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 0.9rem !important;
         font-weight: 600 !important;
     }
@@ -7338,7 +7484,7 @@ h4 {
 
 .featured-text-content h3,
 .welcometext .featured-text-content h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    font-family: var(--title-font) !important;
     color: #000000;
     font-size: 1.7rem;
     font-weight: 600;
@@ -7643,7 +7789,7 @@ h4 {
 }
 
 .section-header h2 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 2.5rem;
     font-weight: 600;
     color: #1e293b;
@@ -7881,7 +8027,7 @@ h4 {
     margin-bottom: 0;
 }
 
-/* Past talks “More” uses `.feed-load-more-btn` (same magenta button as home feed). */
+/* Past talks “More” uses `.feed-load-more-btn` (same pink as footer social icons). */
 
 .chevron {
     font-size: 2em;
@@ -8963,7 +9109,7 @@ h4 {
     }
 
     .nav-menu--bottom-tabs .mobile-top-tab-link {
-        font-family: 'Montserrat', sans-serif;
+        font-family: var(--title-font);
         font-size: 1.25rem !important;
         font-weight: 500;
         color: #ffffff !important;
@@ -9073,7 +9219,7 @@ h4 {
 
     .navbar--mobile-top .nav-menu.active .nav-link,
     .navbar--mobile-top .nav-menu.active .mobile-top-tab-link {
-        font-family: 'Montserrat', sans-serif !important;
+        font-family: var(--title-font) !important;
         font-size: 1.25rem !important;
         font-weight: 500;
         color: #003153 !important;
@@ -9143,7 +9289,7 @@ h4 {
     }
 
     body.past-talks-open .past-talks-section:not(.is-collapsed) {
-        padding-bottom: var(--mobile-bottom-nav-height);
+        padding-bottom: 24px;
         background-color: transparent;
     }
 
@@ -9210,7 +9356,7 @@ h4 {
 
     .past-talks-event-row {
         margin-bottom: 0;
-        padding-top: 24px;
+        padding-top: 0;
     }
 
     .hero-title {
@@ -9282,6 +9428,7 @@ h4 {
         margin-right: 0;
         padding-left: 0;
         padding-right: 0;
+        padding-bottom: 24px;
     }
 
     .past-talks-wrapper {
@@ -9494,10 +9641,20 @@ h4 {
         grid-template-columns: 1fr;
         text-align: center;
         border-radius: 0;
+        background: transparent !important;
     }
 
     .footer {
         border-radius: 0;
+        margin-bottom: 0 !important;
+        padding-bottom: 50px;
+        background: #003153 !important;
+        color: #ffffff;
+    }
+
+    /* Past talks: tuck footer under bottom tab bar (56px) */
+    body.past-talks-open .footer {
+        margin-bottom: -56px !important;
     }
 
     /* Social + Contact stack: left-aligned rows; logo centered below */
@@ -9867,17 +10024,21 @@ h4 {
     flex: 1;
     color: #000000;
 }
-.viewing .youtubereminder-icon {
+.viewing .youtubereminder-icon,
+.viewing .youtubereminder-icon .fab,
+.viewing .youtubereminder-icon .fab.fa-youtube {
     flex-shrink: 0;
-    color: #FD3DB5;
+    color: var(--tbs-pink-soft) !important;
     font-size: 2.6rem;
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.viewing .youtubereminder-icon:hover {
-    color: #FC70D7;
+.viewing .youtubereminder-icon:hover,
+.viewing .youtubereminder-icon:hover .fab,
+.viewing .youtubereminder-icon:hover .fab.fa-youtube {
+    color: var(--tbs-pink) !important;
 }
 
 .action-btn {
@@ -10050,7 +10211,7 @@ h4 {
 
     /* Crop YouTube title bar / watermark chrome inside the iframe box */
     .post-video,
-    .post-video * {
+    .post-video *:not(.post-video-play-overlay):not(.post-video-play-img) {
         border-radius: 0 !important;
     }
 
@@ -10078,24 +10239,32 @@ h4 {
     }
 
     .post-video--thumbnail-first .post-video-play-overlay {
+        --post-video-play-btn-width: clamp(4.5rem, 22vw, 5.75rem);
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: rgba(0, 49, 83, 0.75);
-        color: #ffffff;
+        width: var(--post-video-play-btn-width);
+        height: auto;
+        border-radius: 0 !important;
+        overflow: visible;
+        background: transparent;
+        border: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.35rem;
+        line-height: 0;
         pointer-events: none;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        box-shadow: none;
     }
 
-    .post-video--thumbnail-first .post-video-play-overlay .fa-play {
-        margin-left: 4px;
+    .post-video--thumbnail-first .post-video-play-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        flex-shrink: 0;
     }
 
     .post-video--thumbnail-first .post-video-iframe--preload {
@@ -10353,7 +10522,7 @@ body.home-password-locked .footer {
 }
 
 .auth-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--title-font);
     font-size: 2rem;
     font-weight: 600;
     color: #003153;
@@ -10855,14 +11024,15 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .i
 }
 
 /*
- * Home: all headers and titles use Montserrat.
- * Wins over `.about-title` League Spartan, Inter stacks, and per-component rules.
+ * Site: headers and titles use Montserrat (wins Inter / League Spartan component rules).
  */
-body.home-view {
-    --home-title-font: 'Montserrat', sans-serif;
-}
-
-body.home-view :is(
+:is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
     .section-titles,
     .about-title,
     .introslider-title,
@@ -10870,7 +11040,12 @@ body.home-view :is(
     .event-section-title,
     .speakers-section-title,
     .maintitle-heading,
+    .hero-title,
+    .auth-title,
     .post-title,
+    .past-talks-section-title,
+    .past-talks-wrapper > .past-talks-section-title,
+    .section-header h2,
     .featured-location-title,
     .featured-programme-title,
     .featured-bottom-title,
@@ -10893,33 +11068,33 @@ body.home-view :is(
     .welcometext .featured-text-content h3,
     .featured-text-content h3
 ) {
-    font-family: var(--home-title-font) !important;
+    font-family: var(--title-font) !important;
     letter-spacing: 0.02em;
 }
 
-/* Introslider card titles — wins `.home-section .introslider > …` Inter stacks */
-body.home-view .home-section .introslider :is(
+/* Introslider card titles — wins `.home-section .introslider > …` legacy stacks */
+.home-section .introslider :is(
     .introslider-title,
     .about-title,
     .featured-bottom-title,
     .featured-video-title
 ),
-body.home-view .home-section .introslider-inner-wrapper .introslider :is(
+.home-section .introslider-inner-wrapper .introslider :is(
     .introslider-title,
     .about-title,
     .featured-bottom-title
 ),
-body.home-view .introslider :is(.introslider-title, .about-title.introslider-title, .featured-bottom-title) {
-    font-family: var(--home-title-font) !important;
+.introslider :is(.introslider-title, .about-title.introslider-title, .featured-bottom-title) {
+    font-family: var(--title-font) !important;
     letter-spacing: 0.02em;
 }
 
 /* Navbar tabs + Register pill (desktop header + mobile top pill) */
-body.home-view .navbar :is(.nav-link, .mobile-top-tab-link, .nav-register-pill),
-body.home-view .header :is(.nav-link, .mobile-top-tab-link, .nav-register-pill),
-body.home-view .nav-register-mobile-top :is(.nav-register-pill, .nav-link),
-body.home-view .nav-register-mobile-bar :is(.nav-register-pill, .nav-link) {
-    font-family: var(--home-title-font) !important;
+.navbar :is(.nav-link, .mobile-top-tab-link, .nav-register-pill),
+.header :is(.nav-link, .mobile-top-tab-link, .nav-register-pill),
+.nav-register-mobile-top :is(.nav-register-pill, .nav-link),
+.nav-register-mobile-bar :is(.nav-register-pill, .nav-link) {
+    font-family: var(--title-font) !important;
     letter-spacing: 0.02em;
 }
 
@@ -10962,9 +11137,9 @@ body.home-view :is(
     .featured-social-gradient-title,
     .home-carousel-tba-title,
     .home-section .event-contents h3,
-    .home-section .programmestyle :is(h2, h3, h4),
-    .home-programme-section .programmestyle :is(h2, h3, h4),
-    .home-section .speakerslider .speaker-card-bio :is(h2, h3),
+    .home-section .programmestyle :is(h3, h4),
+    .home-programme-section .programmestyle :is(h3, h4),
+    .home-section .speakerslider .speaker-card-bio h3,
     .welcometext .featured-text-content h3,
     .featured-text-content h3
 ) {
@@ -10982,19 +11157,24 @@ body.home-view :is(
     font-weight: 600 !important;
 }
 
-/* Programme band h2: match `.section-titles` (wins home Montserrat / gold / white programme rules) */
+/* Programme band h2: colour/layout only — font/size/weight match Latest via home h2 rule below */
 body.home-view .programme-section h2,
 body.home-view .home-programme-section .programme-section h2 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
-    font-size: 1.5rem !important;
-    font-weight: 600 !important;
     color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
     text-transform: none !important;
     text-shadow: none !important;
-    letter-spacing: normal !important;
     line-height: normal !important;
+}
+
+/* Home h2: same font, size, and weight as Latest (#home-feed-latest-heading); colour unchanged */
+body.home-view .home-section h2,
+body.home-view .home-programme-section h2 {
+    font-family: var(--title-font) !important;
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
 }
 
 /* Introslider card titles — inherit `.section-titles`; gold only */
@@ -11046,9 +11226,9 @@ body.home-view :is(.maintitle-heading) {
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider {
         position: relative !important;
-        scroll-padding-left: 0 !important;
-        scroll-padding-right: 0 !important;
-        gap: 16px !important;
+        scroll-padding-inline: 0 !important;
+        gap: 0 !important;
+        scroll-snap-type: x mandatory !important;
         background-color: transparent !important;
         background: transparent !important;
     }
@@ -11089,6 +11269,10 @@ body.home-view :is(.maintitle-heading) {
         width: 100% !important;
         min-width: 100% !important;
         max-width: 100% !important;
+        scroll-snap-align: start !important;
+        scroll-snap-stop: always !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
         border-radius: 0 !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;

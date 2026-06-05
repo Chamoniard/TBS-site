@@ -365,7 +365,7 @@ function buildViewerYouTubeHtml(post) {
                     <div class="video-container" id="videoContainer">
                         <button type="button" class="post-video-thumbnail-btn" aria-label="Play video">
                             <img src="${thumbUrl}" alt="" class="post-video-thumbnail" loading="eager" decoding="async" referrerpolicy="no-referrer">
-                            <span class="post-video-play-overlay" aria-hidden="true"><i class="fas fa-play"></i></span>
+                            <span class="post-video-play-overlay" aria-hidden="true"><img src="images/ytbutton.png" alt="" class="post-video-play-img" loading="eager" decoding="async"></span>
                         </button>
                         <iframe class="post-video-iframe post-video-iframe--preload"
                                 title="YouTube video player"
@@ -6234,11 +6234,15 @@ async function createNewsCard(record) {
         `<h3 class="post-title">${title}</h3>` +
         nameHtml +
         `</div>`;
+    const feedSectionPostMetaHtml =
+        `<div class="feed-section-post-meta">` +
+        `<p class="news-card-date">${formattedDate}</p>` +
+        titleBadgesHtml +
+        `</div>`;
     const titleRowHtml =
         `<div class="news-card-title-row">` +
         titleBlockHtml +
-        `<p class="news-card-date">${formattedDate}</p>` +
-        titleBadgesHtml +
+        feedSectionPostMetaHtml +
         `</div>`;
 
     // Check for URL in various possible field names
@@ -6714,7 +6718,6 @@ let navbarScrollHandler = null;
 let homeNavbarScrollHandler = null;
 
 let homeNavbarResizeHandler = null;
-
 
 let pastTalksStripResizeHandler = null;
 
