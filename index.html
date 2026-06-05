@@ -68,7 +68,8 @@
             z-index: 2;
             pointer-events: none;
             user-select: none;
-            max-width: min(92vw, 640px);
+            width: max-content;
+            max-width: none;
         }
 
         .index-logo {
@@ -87,6 +88,11 @@
             font-weight: 500;
             line-height: 1.1;
             letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .index-standby-title * {
+            white-space: nowrap;
         }
 
         .index-standby-title:not(.is-ready) {
@@ -95,17 +101,23 @@
 
         @media (max-width: 768px) {
             .index-brand {
-                top: auto;
+                top: 10vh;
+                bottom: auto;
                 left: 50%;
-                bottom: 12vh;
                 transform: translateX(-50%);
                 align-items: center;
                 text-align: center;
-                max-width: 92vw;
+                width: max-content;
+                max-width: none;
+            }
+
+            .index-logo {
+                width: min(88vw, 420px);
             }
 
             .index-standby-title {
                 padding-left: 0;
+                font-size: clamp(1rem, 3.6vw, 1.75rem);
             }
         }
     </style>
