@@ -4643,7 +4643,7 @@ body.home-view .home-section > .home-social-row-container {
 .featured-pasttalks {
     position: relative;
     background-color: #BFF0FF;
-    background-image: url('images/Postertalks.png');
+    background-image: url('images/introslider%20images/pasttalks.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -7644,7 +7644,7 @@ h4 {
     width: 100vw !important;
     height: 100vh !important;
     background: #FF0000 !important; /* Bright red fallback to test visibility */
-    background-image: url('images/background.jpg') !important;
+    background-image: url('images/starrynight.png') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;

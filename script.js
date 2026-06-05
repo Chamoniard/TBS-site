@@ -206,19 +206,8 @@ async function loadPostsFromFirebase() {
         
         // Transform video records to blog posts
         blogPosts = videoRecords.map(record => {
-            // Handle image fields (string URL, attachment array/object)
-            let imageUrl = '📝';
-            if (record.fields.Image) {
-                if (typeof record.fields.Image === 'string') {
-                    imageUrl = record.fields.Image;
-                } else if (Array.isArray(record.fields.Image) && record.fields.Image.length > 0) {
-                    // Attachment array: use the first URL.
-                    imageUrl = record.fields.Image[0].url;
-                } else if (record.fields.Image && record.fields.Image.url) {
-                    // Single attachment object
-                    imageUrl = record.fields.Image.url;
-                }
-            }
+            const resolvedImage = extractFeedRecordImageUrl(record.fields);
+            const imageUrl = resolvedImage || '📝';
             
             const post = {
                 id: record.id,
@@ -507,16 +496,44 @@ const HOME_LOAD_POSTER_MAX_MS = 1200;
 const HOME_LOADING_FAILSAFE_MS = 15000;
 let homeLoadingFailsafeTimer = null;
 const HOME_LOAD_SPEAKERS_MAX_MS = 8000;
+const HOME_LOAD_FEED_MAX_MS = 12000;
+
+function firebaseStorageAltMediaUrl(objectPath) {
+    const path = String(objectPath || '').trim();
+    if (!path || path.indexOf('/') === -1) return '';
+    const bucket = String(firebaseConfig?.storageBucket || '').trim();
+    if (!bucket) return '';
+    return (
+        'https://firebasestorage.googleapis.com/v0/b/' +
+        bucket +
+        '/o/' +
+        encodeURIComponent(path) +
+        '?alt=media'
+    );
+}
+
+/** Turn Firestore Image values (https, gs://, or storage paths) into browser-loadable URLs. */
+function resolveFeedImageDisplayUrl(rawUrl) {
+    const url = String(rawUrl || '').trim();
+    if (!url) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.indexOf('gs://') === 0) {
+        const match = url.match(/^gs:\/\/[^/]+\/(.+)$/);
+        return match ? firebaseStorageAltMediaUrl(match[1]) : '';
+    }
+    if (/^(images\/|\.\/|\/)/.test(url)) return url;
+    if (url.indexOf('/') !== -1) return firebaseStorageAltMediaUrl(url);
+    return url;
+}
 
 function extractFeedRecordImageUrl(fields) {
     if (!fields || typeof fields !== 'object') return '';
     const image = fields.Image;
-    if (typeof image === 'string') return image;
-    if (Array.isArray(image) && image.length > 0 && image[0] && image[0].url) {
-        return image[0].url;
-    }
-    if (image && typeof image === 'object' && image.url) return image.url;
-    return '';
+    let raw = '';
+    if (typeof image === 'string') raw = image;
+    else if (Array.isArray(image) && image.length > 0 && image[0] && image[0].url) raw = image[0].url;
+    else if (image && typeof image === 'object' && image.url) raw = image.url;
+    return resolveFeedImageDisplayUrl(raw);
 }
 
 /** Warm browser cache for first-screen feed thumbnails while the pink overlay is up. */
@@ -1071,6 +1088,32 @@ function rowIdsFromTbsContentParentData(data) {
     return [];
 }
 
+async function discoverTbsContentRowIdsViaItemCollectionGroup(db) {
+    try {
+        const snap = await withTimeout(
+            db.collectionGroup('item').get(),
+            15000,
+            'Firestore content collectionGroup'
+        );
+        const ids = [];
+        const seen = Object.create(null);
+        snap.forEach(function (doc) {
+            const parts = String(doc.ref.path || '').split('/');
+            if (parts.length === 4 && parts[0] === 'tbs' && parts[1] === 'Content' && parts[2]) {
+                const rowId = parts[2];
+                if (!seen[rowId]) {
+                    seen[rowId] = true;
+                    ids.push(rowId);
+                }
+            }
+        });
+        return ids;
+    } catch (e) {
+        console.warn('discoverTbsContentRowIdsViaItemCollectionGroup:', e);
+        return [];
+    }
+}
+
 async function resolveTbsContentRowIds(db) {
     const parentSnap = await withTimeout(
         db.collection('tbs').doc('Content').get(),
@@ -1084,11 +1127,18 @@ async function resolveTbsContentRowIds(db) {
             return fromManifest;
         }
     }
-    if (!fromManifest.length) {
-        console.warn(
-            'No content row index on document tbs/Content. Add an array field rowIds (or order, ids, …) listing each subcollection id, or open the backend Content tab once so it can rebuild the index.'
-        );
+    const discovered = await discoverTbsContentRowIdsViaItemCollectionGroup(db);
+    if (discovered.length) {
+        try {
+            await db.collection('tbs').doc('Content').set({ rowIds: discovered }, { merge: true });
+        } catch (manifestErr) {
+            console.warn('resolveTbsContentRowIds manifest update:', manifestErr);
+        }
+        return discovered;
     }
+    console.warn(
+        'No content row index on document tbs/Content. Add an array field rowIds (or order, ids, …) listing each subcollection id, or open the backend Content tab once so it can rebuild the index.'
+    );
     return [];
 }
 
@@ -1098,19 +1148,28 @@ async function fetchTbsContentItemLayoutRows(db) {
     if (!subIds.length) return [];
     const rows = [];
     const chunkSize = 25;
+    const chunks = [];
     for (let i = 0; i < subIds.length; i += chunkSize) {
-        const chunk = subIds.slice(i, i + chunkSize);
-        const snaps = await Promise.all(
-            chunk.map((rowId) =>
-                withTimeout(
-                    db.collection('tbs').doc('Content').collection(rowId).doc('item').get(),
-                    12000,
-                    'tbs/Content/' + rowId + '/item read'
-                ).catch(function () {
-                    return null;
-                })
-            )
-        );
+        chunks.push(subIds.slice(i, i + chunkSize));
+    }
+    const chunkSnaps = await Promise.all(
+        chunks.map(function (chunk) {
+            return Promise.all(
+                chunk.map((rowId) =>
+                    withTimeout(
+                        db.collection('tbs').doc('Content').collection(rowId).doc('item').get(),
+                        12000,
+                        'tbs/Content/' + rowId + '/item read'
+                    ).catch(function () {
+                        return null;
+                    })
+                )
+            );
+        })
+    );
+    for (let ci = 0; ci < chunks.length; ci++) {
+        const chunk = chunks[ci];
+        const snaps = chunkSnaps[ci];
         for (let j = 0; j < chunk.length; j++) {
             const rowId = chunk[j];
             const snap = snaps[j];
@@ -2459,11 +2518,11 @@ const HOME_REGISTRATION_FOOTER_DIVIDER_HTML = `
 /** About copy (TBS27 programme flyer — introslider slide 2) */
 const ABOUT_SECTION_HTML_PROGRAMME = `
                         <div class="about">
-                            <img src="images/spacer.png" alt="" class="about-spacer" loading="lazy" decoding="async">
+                            <img src="images/narrowdivider.png" alt="" class="about-spacer" loading="lazy" decoding="async">
                             <div class="about-text">
 ${ABOUT_EVENT_LOCATION_INNER_HTML}
                             </div>
-                            <img src="images/spacer.png" alt="" class="about-spacer" loading="lazy" decoding="async">
+                            <img src="images/narrowdivider.png" alt="" class="about-spacer" loading="lazy" decoding="async">
                         </div>
 `;
 
@@ -3184,8 +3243,19 @@ function runHomeDeferredHydration(homeSection, ctx) {
             fitHomeMaintitleHeadingFontSize();
         });
 
+    const revealDeferredHomeBands = function () {
+        revealStuckHomeStageBands(homeSection);
+        if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
+        wireSliderIndicators();
+    };
+
     void Promise.all([
-        newsFeedPromise,
+        Promise.race([
+            newsFeedPromise,
+            new Promise(function (resolve) {
+                setTimeout(resolve, HOME_LOAD_FEED_MAX_MS);
+            })
+        ]),
         Promise.race([
             speakersPromise,
             new Promise(function (resolve) {
@@ -3193,15 +3263,10 @@ function runHomeDeferredHydration(homeSection, ctx) {
             })
         ])
     ])
-        .then(function () {
-            revealStuckHomeStageBands(homeSection);
-            if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
-            wireSliderIndicators();
-        })
+        .then(revealDeferredHomeBands)
         .catch(function (err) {
             console.error('home deferred hydrate', err);
-            revealStuckHomeStageBands(homeSection);
-            if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
+            revealDeferredHomeBands();
         });
 
     runHomePageBackgroundHydration(homeSection, {
@@ -3548,6 +3613,9 @@ async function loadNewsFeed() {
         } else {
             console.error('feedContent element not found - cannot display error message');
         }
+    } finally {
+        const feedSection = document.querySelector('body.home-view .home-section > .feed-section');
+        if (feedSection) feedSection.classList.remove('home-stage-hidden');
     }
 }
 
@@ -3568,7 +3636,7 @@ async function showFallbackNewsContent() {
                 Type: 'news',
                 Published: 'Yes',
                 Content: 'Stay tuned for the latest updates about TBS26. We\'re working on bringing you the most current information about our upcoming conference.',
-                Image: 'images/background.jpg',
+                Image: 'images/starrynight.png',
                 Date: new Date().toISOString()
             }
         },
@@ -3579,7 +3647,7 @@ async function showFallbackNewsContent() {
                 Type: 'news',
                 Published: 'Yes',
                 Content: 'TBS continues to be at the forefront of critical care education, bringing together leading experts in emergency medicine.',
-                Image: 'images/background.jpg',
+                Image: 'images/starrynight.png',
                 Date: new Date(Date.now() - 86400000).toISOString() // Yesterday
             }
         },
@@ -3590,7 +3658,7 @@ async function showFallbackNewsContent() {
                 Type: 'news',
                 Published: 'Yes',
                 Content: 'Our beautiful venue in Zermatt provides the perfect setting for intensive learning and networking in critical care medicine.',
-                Image: 'images/background.jpg',
+                Image: 'images/starrynight.png',
                 Date: new Date(Date.now() - 172800000).toISOString() // 2 days ago
             }
         },
@@ -3601,7 +3669,7 @@ async function showFallbackNewsContent() {
                 Type: 'news',
                 Published: 'Yes',
                 Content: 'We\'re excited to announce our lineup of world-class speakers for TBS26. More details coming soon.',
-                Image: 'images/background.jpg', 
+                Image: 'images/starrynight.png', 
                 Date: new Date(Date.now() - 259200000).toISOString() // 3 days ago
             }
         }
@@ -5591,6 +5659,9 @@ async function hydrateHomeProgrammeSlider(homeSection) {
         wireSliderIndicators();
     } catch (e) {
         console.error('hydrateHomeProgrammeSlider', e);
+        const programmeSection = homeSection.querySelector(':scope > .programme-section');
+        if (programmeSection) programmeSection.classList.remove('home-stage-hidden');
+        revealStuckHomeStageBands(homeSection);
     }
 }
 
@@ -5712,6 +5783,9 @@ async function displayNewsGrid(records) {
     feedContent.appendChild(feedTitle);
     feedContent.appendChild(newsGrid);
     attachHomeFeedLoadMore(feedContent, newsGrid, validRecords);
+
+    const feedSection = document.querySelector('body.home-view .home-section > .feed-section');
+    if (feedSection) feedSection.classList.remove('home-stage-hidden');
 
     wireSliderIndicators();
 }
@@ -6161,17 +6235,8 @@ async function createNewsCard(record) {
         newsCard.style.backgroundColor = cssColor;
     }
     
-    // Get image URL from stored image field
-    let imageUrl = '';
-    if (record.fields.Image) {
-        if (typeof record.fields.Image === 'string') {
-            imageUrl = record.fields.Image;
-        } else if (Array.isArray(record.fields.Image) && record.fields.Image.length > 0) {
-            imageUrl = record.fields.Image[0].url;
-        } else if (record.fields.Image && record.fields.Image.url) {
-            imageUrl = record.fields.Image.url;
-        }
-    }
+    // Get image URL from stored image field (resolve Firebase Storage paths to https URLs)
+    let imageUrl = extractFeedRecordImageUrl(record.fields);
     
     // For Video/Edit, optionally reuse cached text metadata only (no image fallback).
     let videoData = null;
