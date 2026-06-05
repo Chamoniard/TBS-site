@@ -3065,7 +3065,7 @@ const HOME_POSTER_PICTURE_HTML = `
                 <picture>
                     <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
                     <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
-                    <img src="images/wideposter.webp" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='images/poster_wide.png';">
+                    <img src="images/wideposter.webp" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high">
                     <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
 ${POSTER_TOP_DIVIDER_HTML}
 ${POSTER_HERO_TITLES_HTML}
