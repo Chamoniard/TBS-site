@@ -6499,8 +6499,8 @@ h4 {
         width: var(--news-media-width);
     }
     .news-card-image {
-        height: var(--news-media-height);
-        min-height: var(--news-media-height);
+        height: auto;
+        min-height: 0;
     }
     .news-card-youtube-container {
         height: var(--news-media-height);
@@ -6508,9 +6508,9 @@ h4 {
     .feed-section-inner-wrapper .news-card-thumbnail,
     .home-section .feed-section-inner-wrapper .news-card-thumbnail {
         width: 100%;
-        height: 100%;
-        max-height: var(--news-media-height);
-        object-fit: cover;
+        height: auto;
+        max-height: none;
+        object-fit: contain;
         object-position: center;
     }
     .news-card .news-card-content,
