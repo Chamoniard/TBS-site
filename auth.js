@@ -53,8 +53,16 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(err);
             var msg = err && err.message ? err.message : 'Google sign-in failed.';
             if (err && err.code === 'auth/unauthorized-domain') {
+                var host = window.location && window.location.hostname ? window.location.hostname : 'this site';
                 msg =
-                    'This page URL is not authorized in Firebase. Use http://localhost:8080/ (not 127.0.0.1 or file://). In Firebase Console → Authentication → Settings → Authorized domains, add localhost and 127.0.0.1 if needed.';
+                    'This page URL is not authorized in Firebase (' + host + '). Add it under Firebase Console → Authentication → Settings → Authorized domains.';
+                if (host === 'localhost' || host === '127.0.0.1') {
+                    msg += ' For local dev, use http://localhost:8080/ (not file://).';
+                } else if (host.indexOf('www.') === 0) {
+                    msg += ' If you use both www and non-www, add ' + host.slice(4) + ' as well.';
+                } else if (host.indexOf('.') !== -1 && !/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+                    msg += ' If you use both www and non-www, add www.' + host + ' as well.';
+                }
             }
             showAuthMessage(msg, 'error');
             signInBtn.disabled = false;
