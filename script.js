@@ -503,6 +503,9 @@ function warmHomePageFirestoreCache() {
 
 /** Max time the pink loader waits for the hero poster (feed / event / speakers hydrate after unlock). */
 const HOME_LOAD_POSTER_MAX_MS = 1200;
+/** Never keep the pink loader visible longer than this (failsafe). */
+const HOME_LOADING_FAILSAFE_MS = 15000;
+let homeLoadingFailsafeTimer = null;
 const HOME_LOAD_SPEAKERS_MAX_MS = 8000;
 
 function extractFeedRecordImageUrl(fields) {
@@ -3888,6 +3891,7 @@ let homePasswordGatePromise = null;
 /** Modal gate until the site password is entered (when Settings enable protection). */
 function showHomePasswordGate() {
     return new Promise(function (resolve) {
+        setHomePageLoading(false);
         document.body.classList.add('home-password-locked');
         let gate = document.getElementById('homePasswordGate');
         if (!gate) {
@@ -7587,7 +7591,19 @@ function setHomePageLoading(isLoading) {
         screen.classList.remove('is-hidden');
         screen.setAttribute('aria-hidden', 'false');
         screen.setAttribute('aria-busy', 'true');
+        if (homeLoadingFailsafeTimer) {
+            clearTimeout(homeLoadingFailsafeTimer);
+        }
+        homeLoadingFailsafeTimer = setTimeout(function () {
+            homeLoadingFailsafeTimer = null;
+            console.warn('Home loading failsafe: dismissing pink loader after timeout.');
+            setHomePageLoading(false);
+        }, HOME_LOADING_FAILSAFE_MS);
         return;
+    }
+    if (homeLoadingFailsafeTimer) {
+        clearTimeout(homeLoadingFailsafeTimer);
+        homeLoadingFailsafeTimer = null;
     }
     screen.setAttribute('aria-busy', 'false');
     screen.classList.add('is-hidden');
@@ -7600,6 +7616,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         warmHomePageFirestoreCache();
     } catch (warmErr) {
         console.warn('warmHomePageFirestoreCache:', warmErr);
+    }
+
+    try {
+        await ensureHomePasswordAccess();
+    } catch (passwordErr) {
+        console.error('ensureHomePasswordAccess:', passwordErr);
     }
 
     setHomePageLoading(true);
@@ -7619,10 +7641,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 setTimeout(function () {
                     reject(
                         new Error(
-                            'Home initialisation exceeded 120s (network or Firebase still stalled)'
+                            'Home initialisation exceeded 30s (network or Firebase still stalled)'
                         )
                     );
-                }, 120000);
+                }, 30000);
             }),
         ]);
     } catch (err) {

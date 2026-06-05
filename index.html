@@ -8,6 +8,8 @@
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <title>TBS Zermatt</title>
     <link rel="icon" href="images/emblem.png" type="image/png">
+    <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
@@ -25,7 +27,7 @@
         }
 
         body {
-            background: #ffffff;
+            background: #003153;
             position: relative;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
@@ -34,40 +36,31 @@
             position: relative;
             width: 100%;
             height: 100%;
-            max-width: 1500px;
+            min-height: 100dvh;
             margin: 0 auto;
-            padding: 0 20px;
             overflow: hidden;
         }
 
-        .poster-bg {
+        .index-poster {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 1920px;
-            height: auto;
-            max-width: none;
+            inset: 0;
             z-index: 0;
+            overflow: hidden;
             pointer-events: none;
-            user-select: none;
         }
 
-        @media (max-width: 768px) {
-            .poster-bg {
-                width: 768px;
-            }
-
-            .index-content {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+        .poster-bg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top left;
         }
 
         .index-brand {
             position: absolute;
-            top: 267px;
-            left: 24px;
+            top: clamp(7rem, 20vw, 267px);
+            left: clamp(1rem, 3vw, 24px);
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -75,23 +68,22 @@
             z-index: 2;
             pointer-events: none;
             user-select: none;
+            max-width: min(92vw, 640px);
         }
 
         .index-logo {
-            position: static;
-            width: 640px;
-            max-width: none;
+            width: 100%;
+            max-width: 640px;
             height: auto;
             filter: brightness(0) invert(1);
         }
 
         .index-standby-title {
-            position: static;
             margin: 0;
             padding-left: 5px;
-            color: #a8e6ff; /* --tbs-icy-blue, same as sponsors “Presented by” title */
+            color: #a8e6ff;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 2rem;
+            font-size: clamp(1.35rem, 4vw, 2rem);
             font-weight: 500;
             line-height: 1.1;
             letter-spacing: 0.01em;
@@ -103,16 +95,13 @@
 
         @media (max-width: 768px) {
             .index-brand {
-                position: static;
                 top: auto;
-                left: auto;
-                gap: 6px;
+                left: 50%;
+                bottom: 12vh;
+                transform: translateX(-50%);
                 align-items: center;
                 text-align: center;
-            }
-
-            .index-logo {
-                width: 90vw;
+                max-width: 92vw;
             }
 
             .index-standby-title {
@@ -123,17 +112,18 @@
 </head>
 <body aria-label="Poster background page">
     <div class="index-content">
-        <picture>
-            <source media="(max-width: 768px)" srcset="images/poster_narrow.png">
-            <img src="images/poster_wide.png" alt="" class="poster-bg" decoding="async" fetchpriority="high" aria-hidden="true">
+        <picture class="index-poster">
+            <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
+            <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
+            <img src="images/wideposter.webp" alt="" class="poster-bg" width="1920" height="1300" decoding="async" fetchpriority="high" aria-hidden="true">
         </picture>
         <div class="index-brand">
-            <img src="images/logo.png" alt="TBS Zermatt" class="index-logo">
+            <img src="images/logo.png" alt="TBS Zermatt" class="index-logo" width="640" height="128" decoding="async">
             <p class="index-standby-title" id="index-standby-title" aria-live="polite"></p>
         </div>
     </div>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="index.js?v=20260522-standby-setting" defer></script>
+    <script src="index.js?v=20260605-standby-poster" defer></script>
 </body>
 </html>

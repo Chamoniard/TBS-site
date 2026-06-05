@@ -14,6 +14,18 @@ const FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD = 'Stand by';
 const TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY = 'tbsBackend:texteditor:home:standby';
 const INDEX_STANDBY_DEFAULT = 'Stand by...';
 const HOME_PAGE_URL = 'home.html';
+const INDEX_FIRESTORE_TIMEOUT_MS = 10000;
+
+function withFirestoreTimeout(promise, label) {
+    return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+            setTimeout(function () {
+                reject(new Error(label || 'Firestore timeout'));
+            }, INDEX_FIRESTORE_TIMEOUT_MS);
+        }),
+    ]);
+}
 
 function normalizeStandbySettingYes(value) {
     const s = String(value == null ? '' : value).trim().toLowerCase();
@@ -58,7 +70,10 @@ async function fetchStandbyModeEnabledFromFirestore() {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
-        const snap = await db.collection('tbs').doc('Settings').get();
+        const snap = await withFirestoreTimeout(
+            db.collection('tbs').doc('Settings').get(),
+            'Firestore tbs/Settings (index standby)'
+        );
         const data = snap.exists ? snap.data() || {} : {};
         return normalizeStandbySettingYes(data[FIRESTORE_TBS_SETTINGS_STANDBY_FIELD]);
     } catch (err) {
@@ -74,7 +89,10 @@ async function loadIndexStandbyFromFirestore() {
     }
     try {
         const db = firebase.firestore();
-        const snap = await db.collection('tbs').doc('Snippets').get();
+        const snap = await withFirestoreTimeout(
+            db.collection('tbs').doc('Snippets').get(),
+            'Firestore tbs/Snippets (index standby)'
+        );
         const data = snap.exists ? snap.data() || {} : {};
         const raw = data[FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD];
         const html = raw != null ? String(raw) : '';
@@ -105,6 +123,9 @@ async function initIndexPage() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    if (!applyIndexStandbyFromLocalStorage()) {
+        applyIndexStandbyContent(INDEX_STANDBY_DEFAULT);
+    }
     void initIndexPage();
 });
 
