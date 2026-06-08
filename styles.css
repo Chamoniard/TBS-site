@@ -9936,7 +9936,7 @@ h4 {
     margin-top: 0;
     margin-bottom: 0;
     padding: 0.7rem;
-    background: #f8f9fa;
+    background: #ffffff;
     border-radius: 5px;
     line-height: 1.6;
     color: #333;
@@ -10079,6 +10079,7 @@ h4 {
 /* Post name padding when inside viewing container */
 .viewing .post-name {
     padding: 0;
+    margin: 0;
     font-style: italic;
     color: #3b82f6; /* medium blue */
 }
@@ -10106,7 +10107,8 @@ h4 {
 .viewing .post-content {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    background: transparent !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     padding: 24px 0 24px 0 !important;
     font-size: 1rem !important;
     font-weight: 300 !important;
@@ -10237,7 +10239,7 @@ h4 {
     font-weight: 400;
     font-style: italic;
     color: #3b82f6; /* medium blue */
-    margin: 0.5rem 0 0 0;
+    margin: 0;
     line-height: 1.4;
 }
 
@@ -10260,7 +10262,7 @@ h4 {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     padding: 1.4rem;
-    background: #f8f9fa;
+    background: #ffffff;
     border-radius: 5px;
 }
 

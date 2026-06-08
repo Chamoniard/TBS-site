@@ -893,7 +893,7 @@ function showPostOnSamePage(post) {
                     ${post.name ? `<p class="post-name">${post.name}</p>` : ''}
                 </div>
             </div>
-            ${formattedContent ? `<div class="post-content" style="padding-top: 24px; padding-bottom: 24px;">${formattedContent}</div>` : '<div class="post-content" style="padding-top: 24px; padding-bottom: 24px;"><p>No content available for this post.</p></div>'}
+            ${formattedContent ? `<div class="post-content">${formattedContent}</div>` : '<div class="post-content"><p>No content available for this post.</p></div>'}
                     <a href="https://www.youtube.com/@TBSZermatt" target="_blank" rel="noopener" class="youtubereminder" style="background-color: #BFF0FF !important; text-decoration: none;"><span class="youtubereminder-text">Find all recorded content from TBS on our Youtube channel.</span><span class="youtubereminder-icon" aria-hidden="true"><i class="fab fa-youtube"></i></span></a>
                     </div>
                 </div>
