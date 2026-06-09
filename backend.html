@@ -8094,10 +8094,16 @@
         let programmePadlockIsOpen = false;
         let programmeDeleteConfirmArmed = false;
         let programmeDeletePendingTarget = null;
-        /** Set after a successful full fetch of tbs/Content/{rowId}/item into memory. */
+        /** Set after roster rows are in memory (table-ready); full body/excerpt may still hydrate in background. */
         let contentMemoryLoaded = false;
         /** Promise from initial page load preload; used so Content tab can await the same fetch instead of duplicating work. */
         var backendContentPreloadPromise = null;
+        /** Background hydration of excerpt/body/image fields for roster rows not yet opened in the editor. */
+        var contentBackgroundHydratePromise = null;
+        var contentBackgroundHydrateInFlight = false;
+        var CONTENT_BACKGROUND_HYDRATE_CHUNK = 4;
+        /** Full Firestore payloads held until background merge (roster fetch already downloaded these). */
+        var contentPendingDetailDataById = Object.create(null);
         var contentDirtyDocIds = Object.create(null);
         /** Local-only drafts skip contentDirtyDocIds (no auto-sync); track edits for Save button enablement. */
         var contentLocalDraftDirtyIds = Object.create(null);
@@ -8622,10 +8628,9 @@
             return rec && rec.published === true ? 'Yes' : 'No';
         }
 
-        /** Firestore doc → in-memory row (Image URL for preview; Alt-image omitted from memory). */
-        function contentRecordFromFirestore(docId, d) {
+        /** Firestore doc → roster fields for the Content table (heavy editor fields hydrate separately). */
+        function contentRecordRosterFromFirestore(docId, d) {
             d = d || {};
-            var imageUrl = imageUrlFromFirestoreData(d);
             return {
                 id: docId,
                 date: formatContentDateForDisplay(d.Date != null ? String(d.Date) : ''),
@@ -8636,12 +8641,34 @@
                 type: d.Type != null ? String(d.Type) : '',
                 event: contentCloneEvent(d.Event),
                 topic: contentCloneTopic(d.Topic),
-                excerpt: d.Excerpt != null ? String(d.Excerpt) : '',
-                contentBody: d.Content != null ? String(d.Content) : '',
-                fieldcolour: d.Fieldcolour != null ? String(d.Fieldcolour) : '',
-                youtube: d.Youtube != null ? String(d.Youtube) : '',
-                image: imageUrl,
+                excerpt: '',
+                contentBody: '',
+                fieldcolour: '',
+                youtube: '',
+                image: '',
+                detailsLoaded: false,
             };
+        }
+
+        /** Merge editor-only fields from Firestore into an in-memory roster row. */
+        function mergeContentDetailsFromFirestore(rec, d) {
+            if (!rec || !d) return;
+            rec.excerpt = d.Excerpt != null ? String(d.Excerpt) : '';
+            rec.contentBody = d.Content != null ? String(d.Content) : '';
+            rec.fieldcolour = d.Fieldcolour != null ? String(d.Fieldcolour) : '';
+            rec.youtube = d.Youtube != null ? String(d.Youtube) : '';
+            rec.image = imageUrlFromFirestoreData(d);
+            rec.detailsLoaded = true;
+        }
+
+        /** Firestore doc → in-memory row (Image URL for preview; Alt-image omitted from memory). */
+        function contentRecordFromFirestore(docId, d, opts) {
+            opts = opts || {};
+            var rec = contentRecordRosterFromFirestore(docId, d);
+            if (!opts.rosterOnly) {
+                mergeContentDetailsFromFirestore(rec, d);
+            }
+            return rec;
         }
 
         function contentDisplayListField(val) {
@@ -8729,6 +8756,11 @@
                 for (var i = 0; i < idsToSync.length; i++) {
                     var docId = idsToSync[i];
                     var rec = findContentInMemory(docId);
+                    if (!rec) continue;
+                    if (!rec.detailsLoaded) {
+                        await hydrateContentRecordDetails(docId, { silent: true });
+                        rec = findContentInMemory(docId);
+                    }
                     if (!rec) continue;
                     batch.set(contentItemDocRef(db, docId), contentPayloadFromRecord(rec), { merge: true });
                     syncedIds.push(docId);
@@ -15726,7 +15758,90 @@
             return out;
         }
 
-        async function fetchAllContentIntoMemory() {
+        function isBackendContentPanelOpen() {
+            var section = document.getElementById('content-editor');
+            return Boolean(section && section.classList.contains('is-open'));
+        }
+
+        async function hydrateContentRecordDetails(docId, opts) {
+            opts = opts || {};
+            var id = String(docId || '').trim();
+            if (!id) return false;
+            var rec = findContentInMemory(id);
+            if (!rec || rec.localOnly === true || rec.detailsLoaded === true) return true;
+            if (contentDirtyDocIds[id]) {
+                rec.detailsLoaded = true;
+                return true;
+            }
+            try {
+                var pendingData = contentPendingDetailDataById[id];
+                if (pendingData) {
+                    mergeContentDetailsFromFirestore(rec, pendingData);
+                    delete contentPendingDetailDataById[id];
+                } else {
+                    var db = getFirestore();
+                    var snap = await contentItemDocRef(db, id).get();
+                    if (snap && snap.exists) {
+                        mergeContentDetailsFromFirestore(rec, snap.data() || {});
+                    } else {
+                        rec.detailsLoaded = true;
+                    }
+                }
+                if (
+                    !opts.silent &&
+                    String(contentFormEditingDocId || '').trim() === id &&
+                    isBackendContentPanelOpen()
+                ) {
+                    populateContentEditorFromRecord(rec);
+                }
+                return true;
+            } catch (err) {
+                console.warn('hydrateContentRecordDetails:', id, err);
+                return false;
+            }
+        }
+
+        function startContentBackgroundHydration(priorityDocId) {
+            var priorityId = String(priorityDocId || '').trim();
+            if (priorityId) {
+                void hydrateContentRecordDetails(priorityId, { silent: true });
+            }
+            if (contentBackgroundHydrateInFlight && contentBackgroundHydratePromise) {
+                return contentBackgroundHydratePromise;
+            }
+            contentBackgroundHydrateInFlight = true;
+            contentBackgroundHydratePromise = (async function () {
+                try {
+                    var pendingIds = [];
+                    for (var i = 0; i < contentRosterInMemory.length; i++) {
+                        var row = contentRosterInMemory[i];
+                        if (!row || row.localOnly === true || row.detailsLoaded === true) continue;
+                        var rowId = String(row.id || '').trim();
+                        if (!rowId || contentDirtyDocIds[rowId]) continue;
+                        if (priorityId && rowId === priorityId) continue;
+                        pendingIds.push(rowId);
+                    }
+                    for (var c = 0; c < pendingIds.length; c += CONTENT_BACKGROUND_HYDRATE_CHUNK) {
+                        var chunk = pendingIds.slice(c, c + CONTENT_BACKGROUND_HYDRATE_CHUNK);
+                        await Promise.all(
+                            chunk.map(function (hydrateId) {
+                                return hydrateContentRecordDetails(hydrateId, { silent: true });
+                            })
+                        );
+                        await new Promise(function (resolve) {
+                            setTimeout(resolve, 0);
+                        });
+                    }
+                } finally {
+                    contentBackgroundHydrateInFlight = false;
+                }
+            })();
+            return contentBackgroundHydratePromise;
+        }
+
+        /** Load Content roster rows (table fields). Editor body/excerpt hydrate in background or on row select. */
+        async function fetchContentRosterIntoMemory(opts) {
+            opts = opts || {};
             try {
                 var db = getFirestore();
                 var ids = await listSubcollectionIdsUnderTbsContent(db);
@@ -15741,6 +15856,9 @@
                     }
                 }
                 ids = dedupeContentRowIds(ids);
+                var localDrafts = contentRosterInMemory.filter(function (r) {
+                    return r && r.localOnly === true;
+                });
                 var rows = [];
                 var chunkSize = 12;
                 for (var i = 0; i < ids.length; i += chunkSize) {
@@ -15754,24 +15872,39 @@
                         var rowId = chunk[j];
                         var snap = snaps[j];
                         if (snap && snap.exists) {
-                            rows.push(contentRecordFromFirestore(rowId, snap.data() || {}));
+                            var rowData = snap.data() || {};
+                            rows.push(contentRecordFromFirestore(rowId, rowData, { rosterOnly: true }));
+                            contentPendingDetailDataById[rowId] = rowData;
                         }
                     }
+                    if (opts.progressiveRender && isBackendContentPanelOpen()) {
+                        var partial = rows.slice().sort(contentRosterDateSortCompare);
+                        contentRosterInMemory = localDrafts.concat(partial);
+                        renderContentTableFromMemory();
+                    }
                 }
-                rows.sort(function (a, b) {
-                    var ta = new Date(a.date || 0).getTime();
-                    var tb = new Date(b.date || 0).getTime();
-                    if (isNaN(ta)) ta = 0;
-                    if (isNaN(tb)) tb = 0;
-                    return tb - ta;
-                });
-                contentRosterInMemory = rows;
+                rows.sort(contentRosterDateSortCompare);
+                contentRosterInMemory = localDrafts.concat(rows);
                 contentMemoryLoaded = true;
                 updateBackendContentCountDisplay();
             } catch (err) {
                 contentMemoryLoaded = false;
                 throw err;
             }
+        }
+
+        function contentRosterDateSortCompare(a, b) {
+            var ta = new Date(a.date || 0).getTime();
+            var tb = new Date(b.date || 0).getTime();
+            if (isNaN(ta)) ta = 0;
+            if (isNaN(tb)) tb = 0;
+            return tb - ta;
+        }
+
+        /** @deprecated Use fetchContentRosterIntoMemory; kept for callers expecting the old name. */
+        async function fetchAllContentIntoMemory(opts) {
+            await fetchContentRosterIntoMemory(opts);
+            await startContentBackgroundHydration();
         }
 
         function updateBackendContentCountDisplay() {
@@ -16101,6 +16234,7 @@
             rec.contentBody = bodyEl ? String(bodyEl.value || '') : '';
             rec.fieldcolour = colourEl ? String(colourEl.value || '') : '';
             rec.youtube = ytEl ? String(ytEl.value || '') : '';
+            rec.detailsLoaded = true;
             if (!opts.noDirtySync) {
                 markContentDocDirty(id);
                 if (rec.localOnly === true) {
@@ -16144,6 +16278,7 @@
                 localOnly: true,
                 pendingImageFile: null,
                 localImagePreviewUrl: '',
+                detailsLoaded: true,
             };
         }
 
@@ -16346,6 +16481,10 @@
                     }
                 }
             }
+            if (rec && rec.localOnly !== true && rec.detailsLoaded !== true) {
+                await hydrateContentRecordDetails(nextId);
+                rec = findContentInMemory(nextId) || rec;
+            }
             contentPadlockIsOpen = false;
             contentDeleteConfirmArmed = false;
             populateContentEditorFromRecord(rec);
@@ -16353,6 +16492,9 @@
             syncContentEditabilityFromPadlock();
             /* rowEl is often stale after syncContentFormToMemoryIfEditing re-renders the roster table */
             syncContentRosterSelectionHighlight();
+            if (rec && rec.localOnly !== true) {
+                startContentBackgroundHydration(nextId);
+            }
         }
 
         function populateContentEditorFromRecord(rec) {
@@ -16496,8 +16638,7 @@
 
         /**
          * Load Content roster for the Content tab.
-         * Uses memory filled on page load when possible (no second Firestore full fetch).
-         * Still flushes dirty rows to Firebase before rendering so the roster matches what was saved.
+         * Fetches table fields first, renders the roster, then hydrates excerpt/body/image for other rows in the background.
          */
         async function loadAndRenderContentTable() {
             var itemsEl = document.getElementById('content-list-items');
@@ -16516,7 +16657,7 @@
                         await backendContentPreloadPromise;
                     }
                     if (!contentMemoryLoaded) {
-                        await fetchAllContentIntoMemory();
+                        await fetchContentRosterIntoMemory({ progressiveRender: true });
                     }
                 }
             } catch (err) {
@@ -16532,6 +16673,7 @@
             }
             renderContentTableFromMemory();
             syncContentEditorEmptyState();
+            startContentBackgroundHydration(String(contentFormEditingDocId || '').trim());
         }
 
         var gmailAccessToken = '';
@@ -19206,7 +19348,6 @@
         }
 
         function describeBackendStartupLoadedSummary() {
-            var contentCount = Array.isArray(contentRosterInMemory) ? contentRosterInMemory.length : 0;
             var guestCount = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
             var speakerCount = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory.length : 0;
             var programmeDayCount = programmeState && Array.isArray(programmeState.dayDates) ? programmeState.dayDates.length : 0;
@@ -19214,10 +19355,6 @@
             return (
                 eventLabel +
                 ': ' +
-                contentCount +
-                ' content item' +
-                (contentCount === 1 ? '' : 's') +
-                ', ' +
                 guestCount +
                 ' guest' +
                 (guestCount === 1 ? '' : 's') +
@@ -19228,7 +19365,8 @@
                 ', ' +
                 programmeDayCount +
                 ' programme day' +
-                (programmeDayCount === 1 ? '' : 's')
+                (programmeDayCount === 1 ? '' : 's') +
+                ' (content loads when you open the Content tab)'
             );
         }
 
@@ -21149,7 +21287,7 @@
             updateAddSpeakerSaveButtonState();
             updateContentSaveButtonState();
             var startupEventLabel = String(selectedevent || current_event || '').trim() || 'the selected event';
-            var startupLoaded = { content: false, guests: false, programme: false, speakers: false };
+            var startupLoaded = { guests: false, programme: false, speakers: false };
             function updateBackendStartupLoadStatus(errorMessage) {
                 if (errorMessage) {
                     showStatus('error', errorMessage);
@@ -21157,12 +21295,6 @@
                 }
                 var done = [];
                 var pending = [];
-                if (startupLoaded.content) {
-                    var contentCount = Array.isArray(contentRosterInMemory) ? contentRosterInMemory.length : 0;
-                    done.push(contentCount + ' content item' + (contentCount === 1 ? '' : 's'));
-                } else {
-                    pending.push('content');
-                }
                 if (startupLoaded.guests) {
                     var guestCount = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
                     done.push(guestCount + ' guest' + (guestCount === 1 ? '' : 's'));
@@ -21198,15 +21330,6 @@
                 updateBackendStartupLoadStatus();
             }
             updateBackendStartupLoadStatus();
-            backendContentPreloadPromise = fetchAllContentIntoMemory()
-                .then(function () {
-                    markStartupLoaded('content');
-                })
-                .catch(function (err) {
-                    console.error('Content preload failed:', err);
-                    updateBackendStartupLoadStatus('Failed to load content from Firestore.');
-                    throw err;
-                });
             backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({})
                 .then(function () {
                     markStartupLoaded('guests');
@@ -21235,7 +21358,6 @@
                         updateBackendStartupLoadStatus('Failed to load speakers from Firestore.');
                         throw err;
                     }),
-                backendContentPreloadPromise,
                 backendGuestsPreloadPromise
             ]);
             showStatus('success', 'Backend ready. Loaded ' + describeBackendStartupLoadedSummary() + '.');
