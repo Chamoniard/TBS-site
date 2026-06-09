@@ -16246,12 +16246,14 @@
             updateContentToolbarPublishButtonUi();
         }
 
-        /** Content toolbar lives outside `.content-viewer`; exclude it so padlock/save keep working. */
+        /** Content chrome where pointerdown must not trigger viewer blur save/lock (roster clicks must reach click handlers). */
         function isPointerInsideContentEditorViewerOrTopChrome(target) {
             if (!target || typeof target.closest !== 'function') return false;
             return Boolean(
                 target.closest('#content-editor .content-viewer') ||
-                    target.closest('#content-editor .content-top-row')
+                    target.closest('#content-editor .content-top-row') ||
+                    target.closest('#content-editor .content-list') ||
+                    target.closest('#content-editor #content-actions')
             );
         }
 
@@ -16347,11 +16349,10 @@
             contentPadlockIsOpen = false;
             contentDeleteConfirmArmed = false;
             populateContentEditorFromRecord(rec);
-            if (rowEl) {
-                setContentRosterItemSelection(rowEl);
-            } else {
-                syncContentRosterSelectionHighlight();
-            }
+            syncContentPadlockButtonUi();
+            syncContentEditabilityFromPadlock();
+            /* rowEl is often stale after syncContentFormToMemoryIfEditing re-renders the roster table */
+            syncContentRosterSelectionHighlight();
         }
 
         function populateContentEditorFromRecord(rec) {
