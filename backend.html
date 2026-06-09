@@ -8746,7 +8746,7 @@
                     for (var p = 0; p < idsToSync.length; p++) delete contentDirtyDocIds[idsToSync[p]];
                     return true;
                 }
-                await batch.commit();
+                await firestoreOpWithTimeout(batch.commit(), 15000, 'Content sync');
                 for (var w = 0; w < syncedIds.length; w++) delete contentDirtyDocIds[syncedIds[w]];
                 if (!opts.silent && typeof showStatus === 'function') {
                     showStatus('success', 'Content synced to Firebase.');
@@ -9098,6 +9098,19 @@
                 firestoreDb = firebase.firestore();
             }
             return firestoreDb;
+        }
+
+        /** Reject if Firestore does not settle in time (batch.commit can hang on bad networks). */
+        function firestoreOpWithTimeout(promise, ms, label) {
+            var waitMs = typeof ms === 'number' ? ms : 15000;
+            return Promise.race([
+                promise,
+                new Promise(function (_, reject) {
+                    setTimeout(function () {
+                        reject(new Error((label || 'Firestore') + ' timed out after ' + waitMs + 'ms'));
+                    }, waitMs);
+                })
+            ]);
         }
 
         function getFunctions() {
@@ -16323,7 +16336,12 @@
                 syncContentFormToMemoryIfEditing();
                 if (!(currentRec && currentRec.localOnly === true)) {
                     var saved = await flushContentToFirebase({ silent: true });
-                    if (!saved) return;
+                    if (!saved && typeof showStatus === 'function') {
+                        showStatus(
+                            'error',
+                            'Could not save the current item to Firebase; switched locally. Use Save or check your connection.'
+                        );
+                    }
                 }
             }
             contentPadlockIsOpen = false;
@@ -17065,8 +17083,17 @@
                 await loadGmailFolders();
                 if (authEl) authEl.textContent = 'Connected to Gmail.';
             } catch (err) {
+                var code = err && err.code ? String(err.code) : '';
+                var msg = err && err.message ? String(err.message) : 'Failed to connect Gmail.';
+                if (code === 'auth/popup-blocked' || msg.indexOf('popup') !== -1) {
+                    console.warn('connectGmailClient: popup blocked — use E-mailer → Connect when pop-ups are allowed.');
+                    if (authEl) {
+                        authEl.textContent = 'Allow pop-ups for this site, then click Connect in E-mailer.';
+                    }
+                    return;
+                }
                 console.error('connectGmailClient:', err);
-                if (authEl) authEl.textContent = err && err.message ? err.message : 'Failed to connect Gmail.';
+                if (authEl) authEl.textContent = msg;
             }
         }
 
@@ -17205,6 +17232,11 @@
             if (isEmailer) {
                 var emailerStatusEl = document.getElementById('emailer-editor-status');
                 if (emailerStatusEl) emailerStatusEl.textContent = 'Editing creates a Gmail draft copy.';
+                if (!gmailAccessToken) {
+                    connectGmailClient().catch(function (err) {
+                        console.warn('Gmail connect on emailer open:', err);
+                    });
+                }
             }
             if (isSettings) {
                 void loadSiteSettingsFromFirestore().catch(function (err) {
@@ -20465,9 +20497,13 @@
                     syncContentFormToMemoryIfEditing();
                     if (!(editingRec && editingRec.localOnly === true)) {
                         var saved = await flushContentToFirebase({ silent: true });
-                        if (!saved) return;
-                        if (typeof showStatus === 'function') {
+                        if (saved && typeof showStatus === 'function') {
                             showStatus('success', 'Saved selected content to Firebase.');
+                        } else if (!saved && typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                'Could not save the current item to Firebase; continuing with new draft locally.'
+                            );
                         }
                     }
                 }
@@ -21207,9 +21243,6 @@
             } finally {
                 setBackendPageLoading(false);
             }
-            connectGmailClient().catch(function(err) {
-                console.warn('Gmail auto-connect:', err);
-            });
             syncGuestEditorToolbarForBottomScroll();
             syncSpeakerEditorToolbarForBottomScroll();
             updateBackendContentCountDisplay();

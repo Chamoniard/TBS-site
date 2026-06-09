@@ -808,6 +808,21 @@ function setupEventListeners() {
         }
     });
     }
+
+    document.addEventListener('click', function (e) {
+        const card = e.target.closest('#morevideosCards .morevideos-card[data-youtube-url]');
+        if (!card) return;
+        const url = card.getAttribute('data-youtube-url');
+        if (url) showVideoFromUrl(url);
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const card = e.target.closest('#morevideosCards .morevideos-card[data-youtube-url]');
+        if (!card) return;
+        e.preventDefault();
+        const url = card.getAttribute('data-youtube-url');
+        if (url) showVideoFromUrl(url);
+    });
 }
 
 // Setup topic button event listeners
@@ -6235,6 +6250,13 @@ function orderHomeFeedWithFeaturedFirst(records) {
     return featured.concat(rest);
 }
 
+function escapeHtmlAttr(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // Populate morevideos container with latest 20 videos (latest first)
 async function populateMoreVideosCards(currentPostId) {
     const morevideosCards = document.getElementById('morevideosCards');
@@ -6254,23 +6276,28 @@ async function populateMoreVideosCards(currentPostId) {
             return;
         }
         
-        // Create cards only when an explicit Image URL exists on the post.
+        // Create cards for videos with a custom image or a YouTube still fallback.
         let cardsHTML = '';
         latestVideos.forEach((post) => {
+            if (!post.youtubeUrl) return;
+            const videoId = extractYouTubeId(post.youtubeUrl);
             const hasImageUrl = post.image && typeof post.image === 'string' && post.image.startsWith('http');
-            const imageUrl = hasImageUrl ? post.image : '';
-            if (imageUrl && post.youtubeUrl) {
-                const safeImgSrc = imageUrl.replace(/"/g, '&quot;');
-                const safeYoutubeUrl = (post.youtubeUrl || '').replace(/'/g, "\\'");
-                const safeTitle = (post.title || '').replace(/"/g, '&quot;');
-                cardsHTML += `
-                    <div class="morevideos-card" onclick="showVideoFromUrl('${safeYoutubeUrl}')">
+            const imageUrl = hasImageUrl
+                ? post.image
+                : videoId
+                  ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                  : '';
+            if (!imageUrl) return;
+            const safeImgSrc = escapeHtmlAttr(imageUrl);
+            const safeYoutubeUrl = escapeHtmlAttr(post.youtubeUrl);
+            const safeTitle = escapeHtmlAttr(post.title || '');
+            cardsHTML += `
+                    <div class="morevideos-card" role="button" tabindex="0" data-youtube-url="${safeYoutubeUrl}" aria-label="${safeTitle}">
                         <div class="morevideos-card-image">
-                            <img src="${safeImgSrc}" alt="${safeTitle}" />
+                            <img src="${safeImgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
                         </div>
                     </div>
                 `;
-            }
         });
         
         morevideosCards.innerHTML = cardsHTML;

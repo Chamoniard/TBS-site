@@ -9997,7 +9997,7 @@ h4 {
 
 /* Post meta padding when inside viewing container */
 .viewing .post-meta {
-    padding: 8px 0 0.5rem 0;
+    padding: 8px 0 0 0;
     width: 100%;
     display: flex;
     justify-content: space-between;
