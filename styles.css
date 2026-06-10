@@ -184,6 +184,7 @@ body.loading:not(.home-view)::after {
     --navbar-height: calc(16px + 58.32px + 16px);
     --tbs-pink: #fd3db5;
     --tbs-pink-soft: #fc70d7;
+    /* Interactive pinks match introslider scrollbar: --tbs-pink at rest, --tbs-pink-soft on hover. */
     /* Same pale pink as .home-loading-screen */
     --tbs-loading-pink: #fce7f3;
     /* Home Event band: Location section title on Prussian */
@@ -415,7 +416,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 }
 
 .registration-required-asterisk {
-    color: var(--tbs-pink-soft);
+    color: var(--tbs-pink);
 }
 
 .registration-field input,
@@ -1161,7 +1162,7 @@ body.home-view .hero {
     width: 54px;
     height: 54px;
     background: transparent;
-    color: var(--tbs-pink-soft);
+    color: var(--tbs-pink);
     border-radius: 5px;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -1185,14 +1186,14 @@ body.home-view .hero {
 .hero-social-links a:hover i.fab,
 .hero-social-links a:hover i.fab.fa-youtube {
     background: transparent;
-    color: var(--tbs-pink);
+    color: var(--tbs-pink-soft);
     transform: none;
     box-shadow: none;
 }
 
 .hero-social-links a i.fab,
 .hero-social-links a i.fab.fa-youtube {
-    color: var(--tbs-pink-soft);
+    color: var(--tbs-pink);
 }
 
 /* YouTube icon: footer social pink (not platform default red) */
@@ -1202,7 +1203,7 @@ body.home-view .hero {
 .home-section .introslider .social-links a i.fab.fa-youtube,
 .viewing .youtubereminder-icon i.fab.fa-youtube,
 .viewing .youtubereminder-icon .fab.fa-youtube {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
 }
 
 .hero-social-links a:hover i.fab.fa-youtube,
@@ -1211,7 +1212,7 @@ body.home-view .hero {
 .home-section .introslider .social-links a:hover i.fab.fa-youtube,
 .viewing .youtubereminder-icon:hover i.fab.fa-youtube,
 .viewing .youtubereminder-icon:hover .fab.fa-youtube {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 /* Social Links in Footer */
@@ -1612,6 +1613,10 @@ body.home-view .home-section > .speaker-section {
 
     body.home-view .home-section > picture .poster-maintitles {
         z-index: 4;
+    }
+
+    body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
+        font-size: 4.8rem !important;
     }
 
     body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
@@ -2196,13 +2201,13 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 }
 
 .home-section > .event-section .event-contents a {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 .home-section > .event-section .event-contents a:hover {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 .home-section > .event-section .event-contents h3 {
@@ -2302,13 +2307,13 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 /* Same pink as introslider Location slide (Hotel Alex, etc.) */
 .home-section > .event-section .location-content a {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 .home-section > .event-section .location-content a:hover {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 .home-section > .event-section .location-content p {
@@ -3111,8 +3116,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         height: 100%;
         min-width: 22px;
         border-radius: var(--horizontal-slider-scrollbar-radius);
-        background: #fd3db5;
-        background-color: #fd3db5;
+        background: var(--tbs-pink);
+        background-color: var(--tbs-pink);
         pointer-events: auto;
         cursor: grab;
         touch-action: none;
@@ -3125,8 +3130,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     }
 
     .home-section .introslider-inner-wrapper > .home-introslider-scrollbar .home-introslider-scrollbar-thumb:hover {
-        background: #fc70d7;
-        background-color: #fc70d7;
+        background: var(--tbs-pink-soft);
+        background-color: var(--tbs-pink-soft);
     }
 
     /* Inner slide overflow (tall copy): hide scrollbars on wide screens */
@@ -3471,7 +3476,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 .about-programme .about-text a,
 .tbsonsocial .about-text a,
 .about .about-text a {
-    color: #FC70D7;
+    color: #FD3DB5;
     text-decoration: underline;
     text-underline-offset: 2px;
     font-weight: inherit;
@@ -3484,7 +3489,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 .about-programme .about-text a:hover,
 .tbsonsocial .about-text a:hover,
 .about .about-text a:hover {
-    color: #FD3DB5;
+    color: #FC70D7;
 }
 
 /* Home social row below introslider */
@@ -3523,14 +3528,14 @@ body.home-view .home-section > .home-social-row-container {
 .home-social-row-container .social-links a,
 .home-social-row-container .social-links a i,
 .home-social-row-container .social-links a i.fab {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
     background: transparent !important;
 }
 
 .home-social-row-container .social-links a:hover,
 .home-social-row-container .social-links a:hover i,
 .home-social-row-container .social-links a:hover i.fab {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
     background: transparent !important;
 }
 
@@ -3619,14 +3624,14 @@ body.home-view .home-section > .home-social-row-container {
     body.home-view .home-section > .home-social-row-container .social-links a,
     body.home-view .home-section > .home-social-row-container .social-links a i,
     body.home-view .home-section > .home-social-row-container .social-links a i.fab {
-        color: var(--tbs-pink-soft) !important;
+        color: var(--tbs-pink) !important;
         background: transparent !important;
     }
 
     body.home-view .home-section > .home-social-row-container .social-links a:hover,
     body.home-view .home-section > .home-social-row-container .social-links a:hover i,
     body.home-view .home-section > .home-social-row-container .social-links a:hover i.fab {
-        color: var(--tbs-pink) !important;
+        color: var(--tbs-pink-soft) !important;
         background: transparent !important;
     }
 }
@@ -4333,14 +4338,14 @@ body.home-view .home-section > .home-social-row-container {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-/* Programme intro links: same pink as home chevron controls (--tbs-pink-soft / --tbs-pink) */
+/* Programme intro links: same pink as introslider scrollbar (--tbs-pink / --tbs-pink-soft) */
 .programme-info .programmestyle a,
 .programme-info .programme-day-content a,
 .programme-slider .programme-info a,
 .texteditor-render-html .programme-info .programmestyle a,
 .texteditor-render-html .programme-info .programme-day-content a,
 .texteditor-render-surface .texteditor-render-html .programme-info a {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
@@ -4351,7 +4356,7 @@ body.home-view .home-section > .home-social-row-container {
 .texteditor-render-html .programme-info .programmestyle a:hover,
 .texteditor-render-html .programme-info .programme-day-content a:hover,
 .texteditor-render-surface .texteditor-render-html .programme-info a:hover {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 .programme-slider .programmestyle p,
@@ -4957,7 +4962,7 @@ body.home-view .home-section > .home-social-row-container {
 
 .home-section .introslider > .introslider-clickable:hover,
 .home-section .introslider > .introslider-clickable:focus-visible {
-    border: 1px solid var(--tbs-pink-soft) !important;
+    border: 1px solid var(--tbs-pink) !important;
     outline: none;
     transform: translateY(calc(-1 * var(--introslider-hover-lift)));
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24), 0 3px 10px rgba(0, 0, 0, 0.12) !important;
@@ -5275,23 +5280,23 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
     color: #FC70D7 !important;
 }
 
-/* Location slide (Hotel Alex, etc.): same pink as footer / home social icons */
+/* Location slide (Hotel Alex, etc.): same pink as introslider scrollbar */
 .home-section .introslider > .location .about-text a {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
 }
 
 .home-section .introslider > .location .about-text a:hover {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 .home-section .introslider > .tbsonsocial .social-links a,
 .home-section .introslider > .tbsonsocial .social-links a i.fab {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
 }
 
 .home-section .introslider > .tbsonsocial .social-links a:hover,
 .home-section .introslider > .tbsonsocial .social-links a:hover i.fab {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 .home-section .introslider > .featured-video .featured-video-text {
@@ -5930,10 +5935,10 @@ h3.section-titles {
     -webkit-appearance: none;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     cursor: pointer;
-    /* Same pink as footer social icons (--tbs-pink-soft / --tbs-pink) */
-    background-color: var(--tbs-pink-soft) !important;
+    /* Same pink as introslider scrollbar (--tbs-pink / --tbs-pink-soft) */
+    background-color: var(--tbs-pink) !important;
     color: #ffffff !important;
-    border: 1.5px solid var(--tbs-pink-soft) !important;
+    border: 1.5px solid var(--tbs-pink) !important;
     border-radius: 5px;
     min-height: 33px;
     padding: 6px 12px;
@@ -5956,8 +5961,8 @@ h3.section-titles {
 .feed-load-more-btn:focus-visible:not(:disabled),
 .feed-load-less-btn:hover:not(:disabled),
 .feed-load-less-btn:focus-visible:not(:disabled) {
-    background-color: var(--tbs-pink) !important;
-    border-color: var(--tbs-pink) !important;
+    background-color: var(--tbs-pink-soft) !important;
+    border-color: var(--tbs-pink-soft) !important;
     color: #ffffff !important;
     box-shadow:
         0 4px 14px rgba(0, 0, 0, 0.18),
@@ -8165,7 +8170,7 @@ h4 {
     margin-bottom: 0;
 }
 
-/* Past talks “More” uses `.feed-load-more-btn` (same pink as footer social icons). */
+/* Past talks “More” uses `.feed-load-more-btn` (same pink as introslider scrollbar). */
 
 .chevron {
     font-size: 2em;
@@ -8882,18 +8887,18 @@ h4 {
     transform: translateY(-2px);
 }
 
-/* Home social bar: softer pink at rest, stronger pink on hover (matches footer) */
+/* Home social bar: same pink as introslider scrollbar (--tbs-pink / --tbs-pink-soft) */
 .home-social-row-container .social-links a,
 .home-social-row-container .social-links a i,
 .home-social-row-container .social-links a i.fab {
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
     background: transparent !important;
 }
 
 .home-social-row-container .social-links a:hover,
 .home-social-row-container .social-links a:hover i,
 .home-social-row-container .social-links a:hover i.fab {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
     background: transparent !important;
 }
 
@@ -10203,7 +10208,7 @@ h4 {
 .viewing .youtubereminder-icon .fab,
 .viewing .youtubereminder-icon .fab.fa-youtube {
     flex-shrink: 0;
-    color: var(--tbs-pink-soft) !important;
+    color: var(--tbs-pink) !important;
     font-size: 2.6rem;
     text-decoration: none;
     display: flex;
@@ -10213,7 +10218,7 @@ h4 {
 .viewing .youtubereminder-icon:hover,
 .viewing .youtubereminder-icon:hover .fab,
 .viewing .youtubereminder-icon:hover .fab.fa-youtube {
-    color: var(--tbs-pink) !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 .action-btn {
@@ -11330,7 +11335,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
-    border: 1px solid var(--tbs-pink-soft) !important;
+    border: 1px solid var(--tbs-pink) !important;
     outline: none;
     transform: translateY(calc(-1 * var(--introslider-hover-lift)));
     box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
@@ -11341,7 +11346,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .i
 }
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > * .about-text a:hover {
-    color: #FC70D7 !important;
+    color: var(--tbs-pink-soft) !important;
 }
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .introslider > :is(
@@ -11658,7 +11663,7 @@ body.home-view :is(.maintitle-heading) {
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
-        border: 1px solid var(--tbs-pink-soft) !important;
+        border: 1px solid var(--tbs-pink) !important;
         outline: none !important;
         transform: translateY(calc(-1 * var(--introslider-hover-lift)));
         box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
