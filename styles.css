@@ -2983,11 +2983,11 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin: 0;
 }
 
-/* Wide screens: hide all scrollbars; overflow areas still scroll via wheel/trackpad */
+/* Wide screens: introslider pink bar; programme + speakers scroll with no visible bar */
 @media (min-width: 769px) {
     :root {
-        --horizontal-slider-scrollbar-height: 0;
-        --horizontal-slider-scrollbar-radius: 0;
+        --horizontal-slider-scrollbar-height: 8px;
+        --horizontal-slider-scrollbar-radius: 4px;
     }
 
     .introslider,
@@ -3028,7 +3028,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         overflow: visible;
     }
 
-    /* Native scrollbars: hidden on all horizontal carousels */
+    /* Native scrollbars: hidden on horizontal carousels (introslider uses custom bar below) */
     .introslider::-webkit-scrollbar,
     .programme-slider::-webkit-scrollbar,
     .home-section .speakerslider-track::-webkit-scrollbar,
@@ -3055,10 +3055,10 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         height: 0 !important;
     }
 
-    /* Custom pink scrollbar UI (Safari fallback): disabled on wide screens */
-    .home-introslider-scrollbar,
-    .home-introslider-scrollbar-track,
-    .home-introslider-scrollbar-thumb {
+    /* Programme + speakers: no custom scrollbar on wide screens */
+    .home-section .programmeslider-innerwrapper > .home-introslider-scrollbar,
+    .home-programme-section .programmeslider-innerwrapper > .home-introslider-scrollbar,
+    .home-section .speakers-inner-wrapper > .home-introslider-scrollbar {
         display: none !important;
         visibility: hidden !important;
         width: 0 !important;
@@ -3068,6 +3068,65 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         opacity: 0 !important;
         pointer-events: none !important;
         overflow: hidden !important;
+    }
+
+    /* Home introslider: custom pink bar (Safari-safe), always visible on wide screens */
+    .home-section .introslider-inner-wrapper > .home-introslider-scrollbar {
+        display: block;
+        visibility: visible;
+        flex-shrink: 0;
+        width: 100%;
+        max-width: 100%;
+        height: var(--horizontal-slider-scrollbar-height);
+        box-sizing: border-box;
+        padding: 0;
+        margin: 6px 0 0 0;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .home-introslider-scrollbar--nooverflow {
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+        overflow: hidden;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    .home-section .introslider-inner-wrapper > .home-introslider-scrollbar .home-introslider-scrollbar-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: var(--horizontal-slider-scrollbar-radius);
+        background-color: rgba(240, 224, 235, 0.45);
+        cursor: pointer;
+        pointer-events: auto;
+    }
+
+    .home-section .introslider-inner-wrapper > .home-introslider-scrollbar .home-introslider-scrollbar-thumb {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        min-width: 22px;
+        border-radius: var(--horizontal-slider-scrollbar-radius);
+        background: #fd3db5;
+        background-color: #fd3db5;
+        pointer-events: auto;
+        cursor: grab;
+        touch-action: none;
+        box-sizing: border-box;
+        will-change: transform, width;
+    }
+
+    .home-section .introslider-inner-wrapper > .home-introslider-scrollbar .home-introslider-scrollbar-thumb.is-dragging {
+        cursor: grabbing;
+    }
+
+    .home-section .introslider-inner-wrapper > .home-introslider-scrollbar .home-introslider-scrollbar-thumb:hover {
+        background: #fc70d7;
+        background-color: #fc70d7;
     }
 
     /* Inner slide overflow (tall copy): hide scrollbars on wide screens */
@@ -5758,10 +5817,6 @@ h3.section-titles {
     padding-right: 0;
 }
 
-.home-section > .programme-section .programmeslider-innerwrapper > .home-introslider-scrollbar {
-    bottom: 0 !important;
-}
-
 /* Registration title: colour; vertical padding shared with Latest above */
 .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title {
     flex-shrink: 0;
@@ -6810,6 +6865,10 @@ h4 {
         font-size: inherit !important;
     }
 
+    .home-section > .sponsors-section {
+        padding-top: 10px;
+    }
+
     .home-section > .sponsors-section .sponsors-section-inner-wrapper {
         flex-direction: column !important;
         align-items: stretch !important;
@@ -7009,22 +7068,9 @@ h4 {
         display: none !important;
     }
 
-    /* Speakers: programme-style pink thumb (dots removed); override global hide above */
-    .home-section .speaker-section .speakers-inner-wrapper > .home-introslider-scrollbar {
-        display: block !important;
-    }
-
-    .home-section .speaker-section .speakers-inner-wrapper > .home-introslider-scrollbar:not(.home-introslider-scrollbar--nooverflow) {
-        opacity: 1 !important;
-    }
-
     .home-section .speakers-inner-wrapper {
         padding: 0 !important;
         box-sizing: border-box;
-    }
-
-    .home-section .speaker-section .speakers-inner-wrapper > .home-introslider-scrollbar {
-        bottom: 0;
     }
 
     .introslider {

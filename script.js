@@ -1533,7 +1533,7 @@ function wireOneIntrostyleSlider(wrapper) {
 
 /**
  * Home hero introslider: Safari (and some macOS overlay modes) ignore ::-webkit-scrollbar styling.
- * Desktop-only custom bar — transparent track, magenta thumb — synced to scroll position.
+ * Desktop-only custom bar — pink thumb synced to scroll; draggable thumb + clickable track.
  */
 function wireHomeIntrosliderScrollbar() {
     const wrapper = document.querySelector('.home-section .introslider-inner-wrapper');
@@ -1546,23 +1546,89 @@ function wireHomeIntrosliderScrollbar() {
     const track = thumb.parentElement;
     if (!track) return;
 
-    function update() {
+    function scrollMetrics() {
         const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
         const trackW = track.clientWidth;
-        if (trackW <= 0) return;
-        if (maxScroll <= 0) {
+        const thumbW = thumb.offsetWidth || 22;
+        const maxLeft = Math.max(trackW - thumbW, 0);
+        return { maxScroll, trackW, thumbW, maxLeft };
+    }
+
+    function scrollFromThumbLeft(leftPx) {
+        const metrics = scrollMetrics();
+        if (metrics.maxLeft <= 0 || metrics.maxScroll <= 0) return;
+        const clamped = Math.max(0, Math.min(leftPx, metrics.maxLeft));
+        scrollEl.scrollLeft = (clamped / metrics.maxLeft) * metrics.maxScroll;
+    }
+
+    function update() {
+        const metrics = scrollMetrics();
+        if (metrics.trackW <= 0) return;
+        if (metrics.maxScroll <= 0) {
             thumb.style.width = '100%';
             thumb.style.transform = 'translateX(0)';
             bar.classList.add('home-introslider-scrollbar--nooverflow');
             return;
         }
         bar.classList.remove('home-introslider-scrollbar--nooverflow');
-        const thumbW = Math.max((scrollEl.clientWidth / scrollEl.scrollWidth) * trackW, 22);
-        const maxLeft = Math.max(trackW - thumbW, 0);
-        const left = maxLeft > 0 ? (scrollEl.scrollLeft / maxScroll) * maxLeft : 0;
+        const thumbW = Math.max((scrollEl.clientWidth / scrollEl.scrollWidth) * metrics.trackW, 22);
+        const maxLeft = Math.max(metrics.trackW - thumbW, 0);
+        const left = maxLeft > 0 ? (scrollEl.scrollLeft / metrics.maxScroll) * maxLeft : 0;
         thumb.style.width = `${thumbW}px`;
         thumb.style.transform = `translateX(${left}px)`;
     }
+
+    let dragPointerId = null;
+    let dragStartX = 0;
+    let dragStartScrollLeft = 0;
+
+    function endThumbDrag() {
+        if (dragPointerId == null) return;
+        dragPointerId = null;
+        thumb.classList.remove('is-dragging');
+        document.body.style.removeProperty('user-select');
+    }
+
+    thumb.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
+        e.preventDefault();
+        dragPointerId = e.pointerId;
+        dragStartX = e.clientX;
+        dragStartScrollLeft = scrollEl.scrollLeft;
+        thumb.classList.add('is-dragging');
+        document.body.style.userSelect = 'none';
+        if (typeof thumb.setPointerCapture === 'function') {
+            thumb.setPointerCapture(e.pointerId);
+        }
+    });
+
+    thumb.addEventListener('pointermove', function (e) {
+        if (dragPointerId !== e.pointerId) return;
+        e.preventDefault();
+        const metrics = scrollMetrics();
+        if (metrics.maxLeft <= 0 || metrics.maxScroll <= 0) return;
+        const startLeft = (dragStartScrollLeft / metrics.maxScroll) * metrics.maxLeft;
+        scrollFromThumbLeft(startLeft + (e.clientX - dragStartX));
+    });
+
+    thumb.addEventListener('pointerup', function (e) {
+        if (dragPointerId !== e.pointerId) return;
+        endThumbDrag();
+    });
+
+    thumb.addEventListener('pointercancel', function (e) {
+        if (dragPointerId !== e.pointerId) return;
+        endThumbDrag();
+    });
+
+    track.addEventListener('pointerdown', function (e) {
+        if (e.target === thumb || e.button !== 0) return;
+        e.preventDefault();
+        const rect = track.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const metrics = scrollMetrics();
+        scrollFromThumbLeft(clickX - metrics.thumbW / 2);
+    });
 
     scrollEl.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
