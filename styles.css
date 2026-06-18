@@ -180,8 +180,8 @@ body.loading:not(.home-view)::after {
 /* Navbar vertical size: padding + tallest row (logo on desktop; tab row on mobile). Use px so it matches .navbar regardless of :root font-size. */
 :root {
     --title-font: 'Montserrat', sans-serif;
-    /* .navbar padding 16px 0 + .nav-logo .logo 58.32px (≥769px) */
-    --navbar-height: calc(16px + 58.32px + 16px);
+    /* .navbar padding 16px 0 + .nav-logo .logo 46.656px (≥769px) */
+    --navbar-height: calc(16px + 46.656px + 16px);
     --tbs-pink: #fd3db5;
     --tbs-pink-soft: #fc70d7;
     /* Interactive pinks match introslider scrollbar: --tbs-pink at rest, --tbs-pink-soft on hover. */
@@ -776,8 +776,8 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 
 @media (min-width: 769px) {
     .nav-logo .logo {
-        height: 58.32px;   /* 64.8px - 10% */
-        max-width: 291.6px; /* 324px - 10% */
+        height: 46.656px;   /* 58.32px - 20% */
+        max-width: 233.28px; /* 291.6px - 20% */
     }
 }
 
@@ -2117,6 +2117,29 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     line-height: 1.2;
     text-align: left;
     text-shadow: var(--poster-hero-title-shadow);
+}
+
+/* Wide screens: 27logo image instead of TBS27 text (mobile uses logo in max-width: 768px block). */
+@media (min-width: 769px) {
+    body.home-view .home-section > picture .poster-maintitles .poster-maintitle-text {
+        display: none !important;
+    }
+
+    body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+        display: block;
+        width: auto;
+        height: 7.2rem; /* 4.8rem + 50% */
+        max-width: min(54vw, 21rem);
+        margin: 0;
+        object-fit: contain;
+        object-position: left center;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.28));
+    }
+
+    body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
+        overflow: visible;
+        text-overflow: clip;
+    }
 }
 
 
@@ -9646,7 +9669,7 @@ h4 {
 /* Wide screens: top navbar with logo (undo mobile bottom tab bar layout) */
 @media (min-width: 769px) {
     :root {
-        --navbar-height: calc(16px + 58.32px + 16px);
+        --navbar-height: calc(16px + 46.656px + 16px);
         --navbar-margin-inline: 193px;
     }
 
