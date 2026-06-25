@@ -4910,11 +4910,30 @@ async function fetchHomeProgrammeDayHtmlFromFirebase(dayKey) {
     return value || '';
 }
 
+function stripDuplicateProgrammeHeadingFromHomeInfoHtml(html) {
+    const t = String(html || '').trim();
+    if (!t) return '';
+    try {
+        const doc = new DOMParser().parseFromString('<div id="programmeinfo-root">' + t + '</div>', 'text/html');
+        const root = doc.getElementById('programmeinfo-root');
+        if (!root) return t;
+        const first = root.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > .programme-info-title');
+        if (first && String(first.textContent || '').trim().toLowerCase() === 'programme') {
+            first.remove();
+        }
+        return root.innerHTML.trim();
+    } catch (e) {
+        return t;
+    }
+}
+
 function wrapProgrammeInfoSlideHtml(innerHtml) {
+    const bodyHtml = stripDuplicateProgrammeHeadingFromHomeInfoHtml(innerHtml);
     return (
         '<div class="programme-info">' +
+        '<h2 class="section-titles programme-info-title">Programme</h2>' +
         '<div class="programme-day-content programmestyle">' +
-        innerHtml +
+        bodyHtml +
         '</div></div>'
     );
 }
@@ -5467,7 +5486,7 @@ function stripDuplicateSpeakersHeadingFromInfoHtml(html) {
         const doc = new DOMParser().parseFromString('<div id="speakerinfo-root">' + t + '</div>', 'text/html');
         const root = doc.getElementById('speakerinfo-root');
         if (!root) return t;
-        const first = root.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > .about-title');
+        const first = root.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > .about-title, :scope > .speakers-section-title');
         if (first && /^speakers$/i.test(String(first.textContent || '').trim())) {
             first.remove();
         }
@@ -5756,38 +5775,6 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
         const speakerinfoRaw = settingsAndInfo[1];
         speakersWrapperEl.classList.toggle('home-carousel--minimal', !displaySpeakers);
         const speakerinfoHtml = String(speakerinfoRaw || '').trim();
-        const hasInfoCard = !!speakerinfoHtml;
-
-        track.innerHTML = '';
-
-        if (!displaySpeakers) {
-            const syntheticInfo = {
-                id: '__speakerinfo__',
-                firstName: '',
-                lastName: '',
-                shortBio: '',
-                longBio: ''
-            };
-            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = hasInfoCard ? speakerinfoHtml : null;
-            speakersWrapperEl._homeSpeakersList = hasInfoCard ? [syntheticInfo] : [];
-            speakersWrapperEl._homeSpeakersExpanded = false;
-            if (hasInfoCard) {
-                appendHomeSpeakerinfoCard(track, speakerinfoHtml);
-            }
-            for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
-                appendHomeSpeakerTbaCard(track, hasInfoCard ? tbaIdx + 1 : tbaIdx);
-            }
-            return;
-        }
-
-        const speakers = await fetchHomeSpeakersListFromFirebase(eventId);
-        if (!speakers.length && !speakerinfoHtml) {
-            speakersWrapperEl._homeSpeakersList = [];
-            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = null;
-            appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
-            return;
-        }
-
         const syntheticInfo = {
             id: '__speakerinfo__',
             firstName: '',
@@ -5795,14 +5782,35 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
             shortBio: '',
             longBio: ''
         };
-        speakersWrapperEl._homeFirstCardSpeakerInfoHtml = hasInfoCard ? speakerinfoHtml : null;
-        speakersWrapperEl._homeSpeakersList = hasInfoCard ? [syntheticInfo].concat(speakers.slice()) : speakers.slice();
-        speakersWrapperEl._homeSpeakersExpanded = false;
-        if (hasInfoCard) {
+
+        track.innerHTML = '';
+
+        if (!displaySpeakers) {
+            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
+            speakersWrapperEl._homeSpeakersList = [syntheticInfo];
+            speakersWrapperEl._homeSpeakersExpanded = false;
             appendHomeSpeakerinfoCard(track, speakerinfoHtml);
+            for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
+                appendHomeSpeakerTbaCard(track, tbaIdx + 1);
+            }
+            return;
         }
+
+        const speakers = await fetchHomeSpeakersListFromFirebase(eventId);
+        if (!speakers.length && !speakerinfoHtml) {
+            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
+            speakersWrapperEl._homeSpeakersList = [syntheticInfo];
+            speakersWrapperEl._homeSpeakersExpanded = false;
+            appendHomeSpeakerinfoCard(track, speakerinfoHtml);
+            return;
+        }
+
+        speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
+        speakersWrapperEl._homeSpeakersList = [syntheticInfo].concat(speakers.slice());
+        speakersWrapperEl._homeSpeakersExpanded = false;
+        appendHomeSpeakerinfoCard(track, speakerinfoHtml);
         speakers.forEach(function (s, i) {
-            appendHomeSpeakerCard(track, s, hasInfoCard || i > 0, hasInfoCard ? i + 1 : i);
+            appendHomeSpeakerCard(track, s, true, i + 1);
         });
     } catch (err) {
         console.error('populateHomeSpeakersSliderFromFirebase', err);

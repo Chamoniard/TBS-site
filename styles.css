@@ -4170,6 +4170,17 @@ body.home-view .home-section > .home-social-row-container {
     pointer-events: none;
 }
 
+.programme-info > .programme-info-title {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    margin: 0 0 0.5rem 0 !important;
+    padding: 0 !important;
+    color: #ffffff !important;
+    text-align: left !important;
+    width: 100%;
+}
+
 .programme-info > .programme-day-content {
     position: relative;
     z-index: 1;
@@ -5805,11 +5816,12 @@ h3.section-titles {
     scroll-margin-top: calc(var(--navbar-height) + 12px);
 }
 
-.home-section .speaker-card--speakerinfo .speakers-section-title {
+.home-section .speaker-card--speakerinfo .speakers-section-title,
+.texteditor-render-html .texteditor-speaker-info-preview .speakers-section-title {
     flex-shrink: 0;
     margin: 0 0 0.5rem 0;
     padding: 0;
-    color: #003153 !important;
+    color: #000000 !important;
     text-align: left;
     width: 100%;
 }
@@ -11550,6 +11562,12 @@ body.home-view .home-programme-section .programme-section h2 {
     text-transform: none !important;
     text-shadow: none !important;
     line-height: normal !important;
+}
+
+body.home-view .programme-section .programme-info > .programme-info-title,
+body.home-view .home-programme-section .programme-info > .programme-info-title,
+.texteditor-render-html .programme-info > .programme-info-title {
+    color: #ffffff !important;
 }
 
 /* Home h2: same font and size as Latest (#home-feed-latest-heading); colour unchanged */
