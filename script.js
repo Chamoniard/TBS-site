@@ -97,6 +97,103 @@ function bindViewLinks(view, onClick) {
     });
 }
 
+const HOME_HISTORY_APP_KEY = 'tbs-home-sections';
+
+function homeHistoryState(view, extra) {
+    return Object.assign({ app: HOME_HISTORY_APP_KEY, view: view || 'home' }, extra || {});
+}
+
+function isHomeHistoryState(state) {
+    return !!state && state.app === HOME_HISTORY_APP_KEY;
+}
+
+function pushHomeSectionHistory(view, extra) {
+    if (typeof window === 'undefined' || !window.history || typeof window.history.pushState !== 'function') return;
+    const next = homeHistoryState(view, extra);
+    const current = window.history.state;
+    if (
+        isHomeHistoryState(current) &&
+        current.view === next.view &&
+        String(current.postId || '') === String(next.postId || '')
+    ) {
+        return;
+    }
+    window.history.pushState(next, '', window.location.href);
+}
+
+function replaceHomeSectionHistory(view, extra) {
+    if (typeof window === 'undefined' || !window.history || typeof window.history.replaceState !== 'function') return;
+    window.history.replaceState(homeHistoryState(view, extra), '', window.location.href);
+}
+
+function historyPostSnapshot(post) {
+    if (!post) return null;
+    return {
+        id: post.id,
+        title: post.title,
+        name: post.name || null,
+        excerpt: post.excerpt || '',
+        content: post.content || '',
+        category: post.category || '',
+        topic: post.topic || '',
+        date: post.date || '',
+        readTime: post.readTime || '',
+        image: post.image || null,
+        youtubeUrl: post.youtubeUrl || '',
+        url: post.url || '',
+        youtube: post.youtube || '',
+        slug: post.slug || '',
+        featured: !!post.featured
+    };
+}
+
+async function resolveHistoryViewerPost(state) {
+    const postId = String((state && state.postId) || '').trim();
+    if (postId) {
+        const found = allPosts.find((post) => String(post && post.id) === postId);
+        if (found) return found;
+        try {
+            await loadPostsFromFirebase({ silent: true });
+        } catch (e) {
+            console.warn('History viewer post load failed:', e);
+        }
+        const loaded = allPosts.find((post) => String(post && post.id) === postId);
+        if (loaded) return loaded;
+    }
+    return state && state.post ? state.post : null;
+}
+
+async function showSectionFromHistoryState(state) {
+    const next = isHomeHistoryState(state) ? state : homeHistoryState('home');
+    try {
+        if (next.view === 'viewer') {
+            const post = await resolveHistoryViewerPost(next);
+            if (post) {
+                showPostOnSamePage(post, { skipHistoryPush: true });
+                return;
+            }
+            await showBlogFeed({ skipHistoryPush: true });
+            return;
+        }
+        if (next.view === 'past-talks') {
+            await showBlogFeed({ skipHistoryPush: true });
+            return;
+        }
+        await goToHomeFeed(null, { skipHistoryPush: true });
+    } catch (err) {
+        console.error('History navigation failed:', err);
+    }
+}
+
+function setupHomeSectionHistory() {
+    if (typeof window === 'undefined' || window.__tbsHomeSectionHistoryBound) return;
+    window.__tbsHomeSectionHistoryBound = true;
+    replaceHomeSectionHistory('home');
+    window.addEventListener('popstate', function (ev) {
+        void showSectionFromHistoryState(ev.state);
+    });
+}
+
 // State
 let currentFilter = 'all';
 let currentTopicFilter = 'all';
@@ -870,7 +967,7 @@ async function goBackToFeed() {
 }
 
 // Show post content on the same page
-function showPostOnSamePage(post) {
+function showPostOnSamePage(post, options) {
     document.body.classList.add('home-view');
     setPastTalksOpenState(true);
     setActiveNavView('past-talks');
@@ -960,10 +1057,16 @@ function showPostOnSamePage(post) {
             matchMoreVideosHeight();
         }, 100);
     }
+    if (!options || options.skipHistoryPush !== true) {
+        pushHomeSectionHistory('viewer', {
+            postId: post && post.id != null ? String(post.id) : '',
+            post: historyPostSnapshot(post)
+        });
+    }
 }
 
 // Show the blog feed (original content)
-async function showBlogFeed() {
+async function showBlogFeed(options) {
     document.body.classList.add('home-view');
     setPastTalksOpenState(true);
     const main = document.querySelector('.everything');
@@ -1069,6 +1172,9 @@ async function showBlogFeed() {
         // Setup topic button event listeners after HTML is created
         setupTopicButtonListeners();
         scrollHomeToTop();
+        if (!options || options.skipHistoryPush !== true) {
+            pushHomeSectionHistory('past-talks');
+        }
     }
 }
 
@@ -3232,7 +3338,7 @@ async function prepareHomeIntrosliderBeforeReveal(introWrap) {
 }
 
 /** Home nav / logo: show feed if needed, then scroll to top. */
-async function goToHomeFeed(e) {
+async function goToHomeFeed(e, options) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     setActiveNavView('feed');
     setPastTalksOpenState(false);
@@ -3243,6 +3349,9 @@ async function goToHomeFeed(e) {
         setTimeout(() => {
             monitorFeaturedTitleBreak();
         }, 100);
+        if (!options || options.skipHistoryPush !== true) {
+            pushHomeSectionHistory('home');
+        }
         return;
     }
     await showFeedContent();
@@ -3251,6 +3360,9 @@ async function goToHomeFeed(e) {
     setTimeout(() => {
         monitorFeaturedTitleBreak();
     }, 100);
+    if (!options || options.skipHistoryPush !== true) {
+        pushHomeSectionHistory('home');
+    }
 }
 
 /** Remove `.home-stage-hidden` from any node still inside `.home-section` (used when staged load throws). */
@@ -7963,6 +8075,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupNavbarTransparency();
     setupMobileMenu();
     applyMobileBottomNavbarLayout();
+    setupHomeSectionHistory();
 
     // Bind header nav in parallel with home paint (nav exists in home.html before feed inject).
     const navigationReady = setupNavigationListeners();
