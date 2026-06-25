@@ -1864,7 +1864,8 @@
         #content-editor .content-roster-table,
         #guest-editor .guests-list-table,
         #speaker-editor .speakers-roster-table,
-        #programme-editor .programme-speakers-table {
+        #programme-editor .programme-speakers-table,
+        #texteditor .texteditor-preset-table {
             font-size: 0.875rem;
             font-weight: 500;
             color: #0f172a;
@@ -1890,7 +1891,8 @@
         #content-editor .content-roster-table tbody td,
         #guest-editor .guests-list-table tbody td,
         #speaker-editor .speakers-roster-table tbody td,
-        #programme-editor .programme-speakers-table tbody td {
+        #programme-editor .programme-speakers-table tbody td,
+        #texteditor .texteditor-preset-table tbody td {
             border-bottom: 1px solid #e2e8f0;
         }
 
@@ -6219,6 +6221,28 @@
             flex: 0 0 auto;
             width: 100%;
             overflow: visible;
+        }
+
+        #texteditor .texteditor-preset-table {
+            width: 100%;
+            min-width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        #texteditor .texteditor-preset-table tbody td {
+            padding: var(--backend-roster-row-pad-y) var(--backend-table-cell-pad-x);
+            text-align: left;
+        }
+
+        #texteditor .texteditor-preset-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        #texteditor .texteditor-preset-table .texteditor-day-btn,
+        #texteditor .texteditor-preset-table .texteditor-snippet-btn {
+            width: 100%;
         }
 
         #texteditor .texteditor-day-btn {
@@ -15167,6 +15191,34 @@
                 ? '<button type="button" class="texteditor-day-btn" data-programme-date="' + escapeHtml(fridayDate) + '" data-programme-alias="programme-intro" aria-pressed="false">Programme intro</button>'
                 : '';
             container.innerHTML = infoBtnHtml + dayButtonsHtml;
+            wrapTexteditorPresetButtonsInTable(container);
+        }
+
+        function wrapTexteditorPresetButtonsInTable(container) {
+            if (!container) return;
+            var buttons = Array.prototype.slice.call(container.children).filter(function (child) {
+                return child && child.tagName === 'BUTTON' && child.classList.contains('texteditor-day-btn');
+            });
+            if (!buttons.length) return;
+            var table = document.createElement('table');
+            table.className = 'texteditor-preset-table';
+            table.setAttribute('role', 'presentation');
+            var tbody = document.createElement('tbody');
+            buttons.forEach(function (btn) {
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                td.appendChild(btn);
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
+
+        function wrapAllTexteditorPresetButtonGroupsInTables() {
+            document.querySelectorAll('#texteditor .texteditor-selectors').forEach(function (container) {
+                wrapTexteditorPresetButtonsInTable(container);
+            });
         }
 
         async function loadProgrammeDayHtmlForTexteditor(dateStr, alias) {
@@ -21287,6 +21339,7 @@
                 });
             }
             var texteditorSelectorsEl = document.getElementById('texteditor-selectors');
+            wrapAllTexteditorPresetButtonGroupsInTables();
             if (texteditorSelectorsEl) {
                 texteditorSelectorsEl.addEventListener('click', function(e) {
                     var btn = e.target.closest('.texteditor-day-btn');
