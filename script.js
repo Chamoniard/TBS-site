@@ -805,7 +805,7 @@ function createPostElement(post) {
     if (post.fieldColour) {
         // Map color names to CSS color values
         const colorMap = {
-            'Pink': '#fce7f3',
+            'Pink': '#fc70d7',
             'Yellow': '#fef3c7', 
             'Blue': '#F0FFFF'
         };
@@ -1943,7 +1943,7 @@ const ABOUT_EVENT_INNER_HTML = introsliderTextBlock(`
 /** Location body for home Location slide */
 const ABOUT_LOCATION_INNER_HTML = introsliderTextBlock(`
                                 <h3 class="section-titles about-title introslider-title">Location</h3>
-                                <p>Held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection.<br><br></p>
+                                <p>Held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection. The famous <a href="https://www.hotelalexzermatt.com/en/" target="_blank" rel="noopener noreferrer">Hotel Alex</a> is the venue and heart of the event.</p>
 `);
 
 /** Register body for home Register slide */
@@ -6536,7 +6536,7 @@ async function createNewsCard(record) {
     if (fieldColour && !isFeatured) {
         // Map color names to CSS color values
         const colorMap = {
-            'Pink': '#fce7f3',
+            'Pink': '#fc70d7',
             'Yellow': '#fef3c7', 
             'Blue': '#F0FFFF'
         };

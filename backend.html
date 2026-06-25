@@ -68,7 +68,7 @@
             overscroll-behavior: none;
         }
 
-        /* Backend buttons: gold + Prussian blue (Editor/Speakers links stay magenta — see .backend-editor-link) */
+        /* Backend buttons: gold + Prussian blue (Editor/Speakers links use site pink — see .backend-editor-link) */
         body.backend-page button {
             appearance: none;
             -webkit-appearance: none;
@@ -141,7 +141,7 @@
 
         body.backend-page #texteditor button.texteditor-day-btn.is-active,
         body.backend-page #texteditor button.texteditor-snippet-btn.is-active {
-            border: 1px solid #fd3db5;
+            border: 1px solid #fc70d7;
         }
 
         body.backend-page button.add-speaker-button,
@@ -365,7 +365,7 @@
             padding: 0.25rem 0.625rem;
             border-radius: 5px;
             border: none;
-            background: #fd3db5;
+            background: #fc70d7;
             box-sizing: border-box;
         }
 
@@ -388,7 +388,7 @@
         .aspects .navigation #texteditor-toggle:not(.is-active),
         .aspects .navigation #emailer-toggle:not(.is-active),
         .aspects .navigation #settings-toggle:not(.is-active) {
-            background: #fbcfe8;
+            background: #fc70d7;
             color: #9ca3af;
         }
 
@@ -1299,7 +1299,7 @@
             border-right: 1px solid #cbd5e1;
             border-bottom: none;
             border-radius: 5px 5px 0 0;
-            background: #fbcfe8;
+            background: #fc70d7;
             box-shadow: none;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
@@ -1373,7 +1373,7 @@
             border-right: 1px solid #cbd5e1;
             border-bottom: none;
             border-radius: 5px 5px 0 0;
-            background: #fbcfe8;
+            background: #fc70d7;
             box-shadow: none;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
@@ -2618,7 +2618,7 @@
 
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field input,
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field textarea {
-            background: #fdf2f8;
+            background: #fc70d7;
         }
 
         #content-editor .content-name-date-row {
@@ -2678,7 +2678,7 @@
         }
 
         #content-editor .content-editor-badge-dropdown .content-editor-topic-option.is-selected {
-            background: #ec4899;
+            background: #fc70d7;
             color: #ffffff;
         }
 
@@ -2960,7 +2960,7 @@
         }
 
         #content-editor.content-editable-unlocked .content-editor-image-placeholder {
-            background: #fdf2f8;
+            background: #fc70d7;
         }
 
         #content-editor #edit-content-image:not([src]) + .content-editor-image-placeholder {
@@ -3394,7 +3394,7 @@
 
         /* Topic / Type / Event share `#content-editor .content-badge` chrome; modifiers only set colours. */
         #content-editor .content-badge.content-badge--topic {
-            background: #ec4899;
+            background: #fc70d7;
             color: #ffffff;
             white-space: nowrap;
         }
@@ -3405,7 +3405,7 @@
         }
 
         #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic.is-selected {
-            background: #ec4899 !important;
+            background: #fc70d7 !important;
             color: #ffffff !important;
         }
 
@@ -5518,7 +5518,7 @@
         }
 
         #speaker-editor .long-bio-highlight-content .long-bio-overflow {
-            background: #fce7f3;
+            background: #fc70d7;
         }
 
         #speaker-editor textarea#add-speaker-long-bio {
@@ -6785,7 +6785,7 @@
 
         #programme-editor .programme-day-slot.is-selected {
             outline: none;
-            box-shadow: inset 0 0 0 1px magenta;
+            box-shadow: inset 0 0 0 1px #fc70d7;
             border-radius: 5px;
         }
 
@@ -6801,13 +6801,13 @@
 
         #programme-editor .programme-day-session[contenteditable="true"]:focus {
             outline: none;
-            box-shadow: inset 0 0 0 1px magenta;
+            box-shadow: inset 0 0 0 1px #fc70d7;
             border-radius: 5px;
         }
 
         #programme-editor .programme-day-session.is-selected:not(:focus) {
             outline: none;
-            box-shadow: inset 0 0 0 1px magenta;
+            box-shadow: inset 0 0 0 1px #fc70d7;
             border-radius: 5px;
         }
 
@@ -8056,7 +8056,7 @@
         /** After prev/next guest: open **Guest management** strip if it was visible before navigation. */
         let guestEditorScrollToManagementOnNextPopulate = false;
         let guestEditorBottomPane = 'management';
-        /** Invited column: first click arms badge (magenta ring); second opens value dropdown. */
+        /** Invited column: first click arms badge (pink ring); second opens value dropdown. */
         var guestsInvitedArmedDocId = '';
         var guestsInvitedDropdownOpenDocId = '';
         /** Read column: same two-step interaction as Invited. */
@@ -8107,6 +8107,7 @@
         var contentDirtyDocIds = Object.create(null);
         /** Local-only drafts skip contentDirtyDocIds (no auto-sync); track edits for Save button enablement. */
         var contentLocalDraftDirtyIds = Object.create(null);
+        var contentLocalDraftAutosaveInFlightIds = Object.create(null);
         var contentSyncTimer = null;
         var contentPeriodicSyncTimer = null;
         var contentSyncInFlight = false;
@@ -15668,7 +15669,7 @@
                 btn.classList.toggle('is-selected', on);
                 btn.setAttribute('aria-pressed', on ? 'true' : 'false');
                 btn.setAttribute('title', on ? 'Selected' : 'Not selected');
-                btn.style.background = on ? '#ec4899' : '#e2e8f0';
+                btn.style.background = on ? '#fc70d7' : '#e2e8f0';
                 btn.style.color = on ? '#ffffff' : '#334155';
             });
         }
@@ -16085,18 +16086,32 @@
             var btn = document.getElementById('add-content-save-btn');
             if (!btn) return;
             var id = String(contentFormEditingDocId || '').trim();
-            var titleEl = document.getElementById('edit-content-title');
-            var nameEl = document.getElementById('edit-content-name');
-            var hasTitle = Boolean(titleEl && String(titleEl.value || '').trim());
-            var hasName = Boolean(nameEl && String(nameEl.value || '').trim());
+            var hasRequired = contentEditorRequiredFieldsMet();
             var rec = id ? findContentInMemory(id) : null;
             var dirty =
                 Boolean(id && contentDirtyDocIds[id]) ||
                 Boolean(id && contentLocalDraftDirtyIds[id]) ||
                 Boolean(rec && rec.pendingImageFile);
-            var active = Boolean(id) && hasTitle && hasName && dirty;
+            var active = Boolean(id) && hasRequired && dirty;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+        }
+
+        function contentEditorRequiredFieldsMet() {
+            var titleEl = document.getElementById('edit-content-title');
+            var nameEl = document.getElementById('edit-content-name');
+            return Boolean(
+                titleEl && String(titleEl.value || '').trim() &&
+                nameEl && String(nameEl.value || '').trim()
+            );
+        }
+
+        function contentRecordRequiredFieldsMet(rec) {
+            return Boolean(
+                rec &&
+                String(rec.title || '').trim() &&
+                String(rec.name || '').trim()
+            );
         }
 
         function updateContentToolbarPublishButtonUi() {
@@ -16247,6 +16262,9 @@
             }
             updateContentHeadingFromForm();
             updateContentSaveButtonState();
+            if (!opts.noDirtySync && rec.localOnly === true && contentRecordRequiredFieldsMet(rec)) {
+                void autosaveLocalContentDraftIfReady(id);
+            }
         }
 
         function createLocalContentDraftId() {
@@ -16280,6 +16298,44 @@
                 localImagePreviewUrl: '',
                 detailsLoaded: true,
             };
+        }
+
+        async function autosaveLocalContentDraftIfReady(docId) {
+            var id = String(docId || '').trim();
+            if (!id || contentLocalDraftAutosaveInFlightIds[id]) return;
+            var rec = findContentInMemory(id);
+            if (!(rec && rec.localOnly === true)) return;
+            if (!contentRecordRequiredFieldsMet(rec)) return;
+            contentLocalDraftAutosaveInFlightIds[id] = true;
+            try {
+                rec.localOnly = false;
+                markContentDocDirty(id);
+                renderContentTableFromMemory();
+                syncContentRosterSelectionHighlight();
+                updateContentSaveButtonState();
+                var saved = await flushContentToFirebase({ silent: true });
+                if (saved) {
+                    delete contentLocalDraftDirtyIds[id];
+                    contentDeleteConfirmArmed = false;
+                    syncContentEditabilityFromPadlock();
+                    updateContentSaveButtonState();
+                } else {
+                    markContentDocDirty(id);
+                    scheduleContentFirebaseSync();
+                    if (typeof showStatus === 'function') {
+                        showStatus('error', 'Content item was added locally but could not be saved yet.');
+                    }
+                }
+            } catch (err) {
+                console.error('autosaveLocalContentDraftIfReady:', err);
+                markContentDocDirty(id);
+                scheduleContentFirebaseSync();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to save new content item.');
+                }
+            } finally {
+                delete contentLocalDraftAutosaveInFlightIds[id];
+            }
         }
 
         async function toggleContentPublishedForRow(docId) {
@@ -20911,7 +20967,7 @@
                         }
                         btn.classList.toggle('is-selected', !isOn);
                         btn.setAttribute('aria-pressed', !isOn ? 'true' : 'false');
-                        btn.style.background = !isOn ? '#ec4899' : '#e2e8f0';
+                        btn.style.background = !isOn ? '#fc70d7' : '#e2e8f0';
                         btn.style.color = !isOn ? '#ffffff' : '#334155';
                         var selectedVals = [];
                         topicDropdown.querySelectorAll('.content-editor-topic-option.is-selected').forEach(function (opt) {
