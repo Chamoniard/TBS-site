@@ -1637,6 +1637,76 @@ function wireOneIntrostyleSlider(wrapper) {
     });
 }
 
+function wireHorizontalCardSliderDragScrolling(root) {
+    const scope = root || document;
+    const sliders = scope.querySelectorAll('.introslider, .programme-slider, .speakerslider-track');
+    sliders.forEach(function (slider) {
+        if (slider.dataset.horizontalDragScrollWired === '1') return;
+
+        let mouseActive = false;
+        let startX = 0;
+        let startY = 0;
+        let startScrollLeft = 0;
+        let dragging = false;
+        let suppressClickUntil = 0;
+        const dragThreshold = 4;
+
+        function finishDrag() {
+            if (!mouseActive) return;
+            if (dragging) {
+                suppressClickUntil = Date.now() + 350;
+            }
+            mouseActive = false;
+            dragging = false;
+            document.body.classList.remove('horizontal-slider-dragging');
+            document.removeEventListener('mousemove', onMouseMove, true);
+            document.removeEventListener('mouseup', finishDrag, true);
+        }
+
+        function onMouseMove(e) {
+            if (!mouseActive) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            if (!dragging) {
+                if (Math.abs(dx) < dragThreshold || Math.abs(dx) < Math.abs(dy)) return;
+                dragging = true;
+                document.body.classList.add('horizontal-slider-dragging');
+            }
+            slider.scrollLeft = startScrollLeft - dx;
+            e.preventDefault();
+        }
+
+        slider.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            if (slider.scrollWidth <= slider.clientWidth) return;
+            mouseActive = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startScrollLeft = slider.scrollLeft;
+            dragging = false;
+            document.addEventListener('mousemove', onMouseMove, true);
+            document.addEventListener('mouseup', finishDrag, true);
+        });
+
+        slider.addEventListener('dragstart', function (e) {
+            if (!mouseActive) return;
+            e.preventDefault();
+        });
+
+        slider.addEventListener(
+            'click',
+            function (e) {
+                if (Date.now() > suppressClickUntil) return;
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            },
+            true
+        );
+
+        slider.dataset.horizontalDragScrollWired = '1';
+    });
+}
+
 /**
  * Home hero introslider: Safari (and some macOS overlay modes) ignore ::-webkit-scrollbar styling.
  * Desktop-only custom bar — pink thumb synced to scroll; draggable thumb + clickable track.
@@ -1918,6 +1988,7 @@ function wireSliderIndicators() {
     setupHomeHeroIntrosliderMobileLayout();
     wireProgrammeSliderScrollbar();
     wireSpeakersSliderScrollbar();
+    wireHorizontalCardSliderDragScrolling(main);
 }
 
 /** Hotel Alex — same URL in introslider Location slide and home Location band. */

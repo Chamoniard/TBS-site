@@ -3019,6 +3019,12 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin: 0;
 }
 
+body.horizontal-slider-dragging,
+body.horizontal-slider-dragging * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
 /* Wide screens: introslider pink bar; programme + speakers scroll with no visible bar */
 @media (min-width: 769px) {
     :root {
@@ -4179,6 +4185,12 @@ body.home-view .home-section > .home-social-row-container {
     color: #ffffff !important;
     text-align: left !important;
     width: 100%;
+}
+
+@media (max-width: 768px) {
+    .programme-info > .programme-info-title {
+        text-align: center !important;
+    }
 }
 
 .programme-info > .programme-day-content {
