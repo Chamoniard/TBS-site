@@ -17068,6 +17068,19 @@
             return res.json();
         }
 
+        async function ensureGmailAccessForSending() {
+            if (gmailAccessToken) return true;
+            if (typeof showStatus === 'function') {
+                showStatus('info', 'Authorize Gmail to send this e-mail.');
+            }
+            await connectGmailClient({ forcePrompt: true, skipFolderLoad: true });
+            if (gmailAccessToken) return true;
+            if (typeof showStatus === 'function') {
+                showStatus('error', 'Gmail authorization is required before sending e-mail.');
+            }
+            return false;
+        }
+
         function renderGmailFolders() {
             var listEl = document.getElementById('emailer-folder-list');
             if (!listEl) return;
@@ -17252,12 +17265,7 @@
                 }
                 return;
             }
-            if (!gmailAccessToken) {
-                if (typeof showStatus === 'function') {
-                    showStatus('error', 'Connect to Gmail in the E-mailer tab first.');
-                }
-                return;
-            }
+            if (!(await ensureGmailAccessForSending())) return;
             if (btn) btn.disabled = true;
             try {
                 var html = await fetchGuestInvitationHtmlFromFirestore();
@@ -17368,12 +17376,7 @@
                 }
                 return;
             }
-            if (!gmailAccessToken) {
-                if (typeof showStatus === 'function') {
-                    showStatus('error', 'Connect to Gmail in the E-mailer tab first.');
-                }
-                return;
-            }
+            if (!(await ensureGmailAccessForSending())) return;
             if (btn) btn.disabled = true;
             try {
                 var template = await fetchSpeakerInvitationFromFirestore();
@@ -17465,10 +17468,15 @@
                 gmailAccessToken = await tokenFn({ forcePrompt: !!opts.forcePrompt });
                 if (!gmailAccessToken) {
                     if (authEl) authEl.textContent = 'Gmail not connected.';
-                    return;
+                    return '';
+                }
+                if (opts.skipFolderLoad) {
+                    if (authEl) authEl.textContent = 'Gmail authorized for sending.';
+                    return gmailAccessToken;
                 }
                 await loadGmailFolders();
                 if (authEl) authEl.textContent = 'Connected to Gmail.';
+                return gmailAccessToken;
             } catch (err) {
                 var code = err && err.code ? String(err.code) : '';
                 var msg = err && err.message ? String(err.message) : 'Failed to connect Gmail.';
@@ -17477,10 +17485,11 @@
                     if (authEl) {
                         authEl.textContent = 'Allow pop-ups for this site, then click Connect in E-mailer.';
                     }
-                    return;
+                    return '';
                 }
                 console.error('connectGmailClient:', err);
                 if (authEl) authEl.textContent = msg;
+                throw err;
             }
         }
 

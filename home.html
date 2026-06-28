@@ -115,7 +115,17 @@
             }
 
             body.home-view:not(.past-talks-open) .home-section {
-                padding-top: max(calc(1168px - 330px), 100dvh, 100vh) !important;
+                padding-top: max(calc(217.2727272727vw - 330px), 100dvh, 100vh) !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture {
+                height: 217.2727272727vw !important;
+                max-width: 100vw;
+            }
+
+            body.home-view .home-section > picture .home-poster-wide {
+                object-fit: contain;
+                object-position: top center;
             }
         }
         .container { max-width: 1725px; margin: 0 auto; padding: 0 20px; }
@@ -124,8 +134,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260628-poster-title-scale" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260628-poster-title-scale">
+    <link rel="preload" href="styles.css?v=20260628-narrow-poster-fit" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260628-narrow-poster-fit">
     <!-- LCP: preload hero poster (WebP) -->
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">

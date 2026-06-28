@@ -19,6 +19,7 @@ html {
     --hamburger-bar-shadow: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32));
     /* Pull first band up over fixed poster so introslider gradient can fade from the image */
     --home-poster-content-pull: 330px;
+    --home-poster-mobile-height: 217.2727272727vw;
     /* Hero introslider band (same bridge as former poster-event-spacer) */
     --introslider-section-gradient: linear-gradient(
         to bottom,
@@ -1472,10 +1473,20 @@ body.home-view:not(.past-talks-open) .home-section {
 @media (max-width: 768px) {
     body.home-view:not(.past-talks-open) .home-section {
         padding-top: max(
-            calc(var(--home-poster-layout-height) - var(--home-poster-content-pull)),
+            calc(var(--home-poster-mobile-height) - var(--home-poster-content-pull)),
             100dvh,
             100vh
         ) !important;
+    }
+
+    body.home-view:not(.past-talks-open) .home-section > picture {
+        height: var(--home-poster-mobile-height) !important;
+        max-width: 100vw;
+    }
+
+    body.home-view:not(.past-talks-open) .home-section > picture img.home-poster-wide {
+        object-fit: contain;
+        object-position: top center;
     }
 }
 
