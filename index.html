@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="index-is-checking">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,20 @@
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <title>TBS Zermatt</title>
     <link rel="icon" href="images/emblem.png" type="image/png">
+    <script>
+        (function () {
+            try {
+                var raw = localStorage.getItem('tbs:index:standby');
+                var parts = raw ? String(raw).split('|') : [];
+                var cachedAt = Number(parts[1] || 0);
+                if (parts[0] === 'no' && cachedAt && Date.now() - cachedAt < 300000) {
+                    window.location.replace('home.html');
+                }
+            } catch (e) {
+                /* ignore */
+            }
+        })();
+    </script>
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,6 +53,10 @@
             min-height: 100dvh;
             margin: 0 auto;
             overflow: hidden;
+        }
+
+        .index-is-checking .index-content {
+            visibility: hidden;
         }
 
         .index-poster {
@@ -137,6 +155,6 @@
     </div>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="index.js?v=20260605-standby-poster" defer></script>
+    <script src="index.js?v=20260628-fast-home-redirect" defer></script>
 </body>
 </html>

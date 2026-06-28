@@ -1314,13 +1314,6 @@ body.past-talks-open .home-section > picture > .poster-snow-canvas {
     display: none !important;
 }
 
-/* Past talks / video viewer: hide Register everywhere (desktop nav + mobile top pill) */
-body.past-talks-open .nav-register-mobile-top,
-body.past-talks-open .nav-register-mobile-bar,
-body.past-talks-open .nav-item-register-desktop {
-    display: none !important;
-}
-
 /* When Past talks / video viewer is open, hide home chrome; only the top Prussian strip (picture) stays. */
 body.past-talks-open .home-section {
     padding-top: 0 !important;
@@ -9257,7 +9250,9 @@ h4 {
     }
 
     body.past-talks-open .nav-container--mobile-top .nav-register-mobile-bar {
-        display: none !important;
+        display: flex !important;
+        position: relative;
+        z-index: 2;
     }
 
     .nav-container--mobile-bottom {

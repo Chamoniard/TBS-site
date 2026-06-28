@@ -1,3 +1,14 @@
-# Block all crawlers and indexers site-wide.
+# Public event page is crawlable; private/shell pages stay hidden from crawlers.
 User-agent: *
+Allow: /home.html
+Allow: /styles.css
+Allow: /script.js
+Allow: /images/
 Disallow: /
+Disallow: /index.html
+Disallow: /login.html
+Disallow: /backend.html
+Disallow: /data/
+Disallow: /auth.js
+Disallow: /auth-common.js
+Disallow: /backend-auth.js

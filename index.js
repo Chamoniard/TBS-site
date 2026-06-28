@@ -12,17 +12,20 @@ const firebaseConfig = {
 const FIRESTORE_TBS_SETTINGS_STANDBY_FIELD = 'Standby';
 const FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD = 'Stand by';
 const TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY = 'tbsBackend:texteditor:home:standby';
+const INDEX_STANDBY_MODE_LS_KEY = 'tbs:index:standby';
 const INDEX_STANDBY_DEFAULT = 'Stand by...';
 const HOME_PAGE_URL = 'home.html';
 const INDEX_FIRESTORE_TIMEOUT_MS = 10000;
+const INDEX_SETTINGS_TIMEOUT_MS = 1500;
+const INDEX_STANDBY_MODE_CACHE_TTL_MS = 5 * 60 * 1000;
 
-function withFirestoreTimeout(promise, label) {
+function withFirestoreTimeout(promise, label, timeoutMs) {
     return Promise.race([
         promise,
         new Promise(function (_, reject) {
             setTimeout(function () {
                 reject(new Error(label || 'Firestore timeout'));
-            }, INDEX_FIRESTORE_TIMEOUT_MS);
+            }, timeoutMs || INDEX_FIRESTORE_TIMEOUT_MS);
         }),
     ]);
 }
@@ -30,6 +33,34 @@ function withFirestoreTimeout(promise, label) {
 function normalizeStandbySettingYes(value) {
     const s = String(value == null ? '' : value).trim().toLowerCase();
     return s === 'yes' || s === 'y';
+}
+
+function readCachedStandbyMode() {
+    try {
+        const raw = localStorage.getItem(INDEX_STANDBY_MODE_LS_KEY);
+        const parts = raw ? String(raw).split('|') : [];
+        const cachedAt = Number(parts[1] || 0);
+        if (!parts[0] || !cachedAt || Date.now() - cachedAt > INDEX_STANDBY_MODE_CACHE_TTL_MS) {
+            return null;
+        }
+        if (parts[0] === 'yes') return true;
+        if (parts[0] === 'no') return false;
+    } catch (e) {
+        /* ignore */
+    }
+    return null;
+}
+
+function cacheStandbyMode(isStandbyOn) {
+    try {
+        localStorage.setItem(INDEX_STANDBY_MODE_LS_KEY, (isStandbyOn ? 'yes' : 'no') + '|' + Date.now());
+    } catch (e) {
+        /* ignore */
+    }
+}
+
+function revealIndexPage() {
+    document.documentElement.classList.remove('index-is-checking');
 }
 
 function applyIndexStandbyContent(raw) {
@@ -63,7 +94,7 @@ function applyIndexStandbyFromLocalStorage() {
 
 async function fetchStandbyModeEnabledFromFirestore() {
     if (typeof firebase === 'undefined') {
-        return true;
+        return null;
     }
     try {
         if (!firebase.apps.length) {
@@ -72,13 +103,14 @@ async function fetchStandbyModeEnabledFromFirestore() {
         const db = firebase.firestore();
         const snap = await withFirestoreTimeout(
             db.collection('tbs').doc('Settings').get(),
-            'Firestore tbs/Settings (index standby)'
+            'Firestore tbs/Settings (index standby)',
+            INDEX_SETTINGS_TIMEOUT_MS
         );
         const data = snap.exists ? snap.data() || {} : {};
         return normalizeStandbySettingYes(data[FIRESTORE_TBS_SETTINGS_STANDBY_FIELD]);
     } catch (err) {
         console.warn('fetchStandbyModeEnabledFromFirestore:', err);
-        return true;
+        return null;
     }
 }
 
@@ -114,18 +146,31 @@ async function loadIndexStandbyFromFirestore() {
 }
 
 async function initIndexPage() {
-    const standbyOn = await fetchStandbyModeEnabledFromFirestore();
-    if (!standbyOn) {
+    const cachedStandbyOn = readCachedStandbyMode();
+    if (cachedStandbyOn === false) {
         window.location.replace(HOME_PAGE_URL);
         return;
     }
+
+    const standbyOn = await fetchStandbyModeEnabledFromFirestore();
+    if (standbyOn === false) {
+        cacheStandbyMode(false);
+        window.location.replace(HOME_PAGE_URL);
+        return;
+    }
+
+    if (standbyOn === true) {
+        cacheStandbyMode(true);
+    }
+
+    if (!applyIndexStandbyFromLocalStorage()) {
+        applyIndexStandbyContent(INDEX_STANDBY_DEFAULT);
+    }
+    revealIndexPage();
     await loadIndexStandbyFromFirestore();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    if (!applyIndexStandbyFromLocalStorage()) {
-        applyIndexStandbyContent(INDEX_STANDBY_DEFAULT);
-    }
     void initIndexPage();
 });
 
