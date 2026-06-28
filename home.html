@@ -25,7 +25,7 @@
             .navbar { padding: 0 !important; height: var(--mobile-tab-bar-height) !important; min-height: var(--mobile-tab-bar-height) !important; max-height: var(--mobile-tab-bar-height) !important; }
             .hamburger { display: flex !important; }
         }
-        .nav-container { max-width: 1500px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-container { max-width: 1725px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { display: flex; align-items: center; }
         .nav-logo .logo { height: 64.8px; width: auto; max-width: 324px; object-fit: contain; filter: brightness(0) invert(1); }
         .nav-menu { display: flex; list-style: none; gap: 1.5rem; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
@@ -65,7 +65,7 @@
         body.home-view .navbar { background: transparent !important; box-shadow: none !important; }
         .everything { margin: 0; padding: 0; }
         /* Reserve hero poster slot while fixed poster + scroll-over layout loads */
-        body.home-view:not(.past-talks-open) .home-section { padding-top: calc(1016px - 250px) !important; }
+        body.home-view:not(.past-talks-open) .home-section { padding-top: calc(1168px - 330px) !important; }
         body.home-view:not(.past-talks-open) .home-section > picture {
             position: fixed;
             top: 0;
@@ -74,10 +74,18 @@
             margin-left: auto;
             margin-right: auto;
             width: 100%;
-            max-width: 1500px;
-            height: 1016px;
+            max-width: 1725px;
+            height: 1168px;
             overflow: hidden;
             z-index: 0;
+        }
+        @media (min-width: 769px) {
+            body.home-view:not(.past-talks-open) .home-section {
+                padding-top: calc(min(1168px, 67.7083333333vw) - min(330px, 19.1304347826vw)) !important;
+            }
+            body.home-view:not(.past-talks-open) .home-section > picture {
+                height: min(1168px, 67.7083333333vw);
+            }
         }
         body.past-talks-open .home-section { padding-top: 0 !important; }
         body.past-talks-open .home-section > picture {
@@ -93,23 +101,31 @@
             object-position: top left;
             display: block;
         }
+        @media (min-width: 769px) and (max-width: 1150px) {
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
+                top: 119px !important;
+            }
+            body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+                height: min(7.2rem, 12.5217391304vw) !important;
+            }
+        }
         @media (max-width: 768px) {
             .mobile-poster-logo-subtitle {
                 display: none !important;
             }
 
             body.home-view:not(.past-talks-open) .home-section {
-                padding-top: max(calc(1016px - 250px), 100dvh, 100vh) !important;
+                padding-top: max(calc(1168px - 330px), 100dvh, 100vh) !important;
             }
         }
-        .container { max-width: 1500px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1725px; margin: 0 auto; padding: 0 20px; }
     </style>
     <script>
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260628-register-past-talks-visible" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260628-register-past-talks-visible">
+    <link rel="preload" href="styles.css?v=20260628-poster-title-scale" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260628-poster-title-scale">
     <!-- LCP: preload hero poster (WebP) -->
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">

@@ -18,7 +18,7 @@ html {
     --hamburger-bar-color: #FFD700;
     --hamburger-bar-shadow: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32));
     /* Pull first band up over fixed poster so introslider gradient can fade from the image */
-    --home-poster-content-pull: 250px;
+    --home-poster-content-pull: 330px;
     /* Hero introslider band (same bridge as former poster-event-spacer) */
     --introslider-section-gradient: linear-gradient(
         to bottom,
@@ -180,7 +180,7 @@ body.loading:not(.home-view)::after {
 }
 
 .container {
-    max-width: 1500px;
+    max-width: 1725px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -260,10 +260,10 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     background: transparent !important;
     background-color: transparent !important;
     box-shadow: none !important;
-    /* Align frosted navbar with centered max 1500px main column (main.everything has no horizontal padding) */
+    /* Align frosted navbar with centered max 1725px main column (main.everything has no horizontal padding) */
     --_home-nav-pad: 0px;
     --_home-nav-avail: calc(100vw - 2 * var(--_home-nav-pad));
-    --_home-nav-w: min(1500px, var(--_home-nav-avail));
+    --_home-nav-w: min(1725px, var(--_home-nav-avail));
     left: calc(var(--_home-nav-pad) + max(0px, (var(--_home-nav-avail) - var(--_home-nav-w)) / 2)) !important;
     right: auto !important;
     width: var(--_home-nav-w) !important;
@@ -274,7 +274,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 /* Unified layout: viewer now lives inside .everything, so no special top offset here */
 
 .nav-container {
-    max-width: 1500px;
+    max-width: 1725px;
     margin: 0 auto;
     padding: 0 16px;
     display: flex;
@@ -1077,9 +1077,18 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 body.home-view .home-section {
     margin-top: 0 !important;
     background-color: #003153 !important;
-    /* 1920×1300 scaled to max 1500px column width */
-    --home-poster-layout-height: 1016px;
+    /* 1920×1300 scaled to max 1725px column width */
+    --home-poster-layout-height: 1168px;
+    --home-poster-visual-height: var(--home-poster-layout-height);
+    --home-poster-effective-pull: var(--home-poster-content-pull);
     --home-hero-poster-slider-gap: 16px;
+}
+
+@media (min-width: 769px) {
+    body.home-view .home-section {
+        --home-poster-visual-height: min(1168px, 67.7083333333vw);
+        --home-poster-effective-pull: min(var(--home-poster-content-pull), 19.1304347826vw);
+    }
 }
 
 /* Deprecated layout aid — introslider moved below Event band */
@@ -1252,7 +1261,7 @@ body.home-view .hero {
     padding-bottom: 0;
     padding-left: 0;
     padding-right: 0;
-    max-width: min(1500px, 100%);
+    max-width: min(1725px, 100%);
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -1332,7 +1341,7 @@ body.past-talks-open .home-section > picture {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
-    max-width: min(1500px, 100%);
+    max-width: min(1725px, 100%);
     height: var(--navbar-height);
     min-height: var(--navbar-height);
     box-sizing: border-box;
@@ -1368,7 +1377,7 @@ body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider
     left: 50%;
     transform: translateX(-50%);
     width: 70%;
-    max-width: calc(min(1500px, 100vw) * 0.7);
+    max-width: calc(min(1725px, 100vw) * 0.7);
     margin: 0;
     padding: 0;
     z-index: 5;
@@ -1426,7 +1435,7 @@ body.home-view .home-section > picture::after {
 
 /*
  * Hero poster: fixed in the viewport; bands below scroll over it.
- * Centered to match the 1500px home column (no horizontal bleed past .home-section).
+ * Centered to match the 1725px home column (no horizontal bleed past .home-section).
  */
 body.home-view:not(.past-talks-open) .home-section > picture {
     position: fixed;
@@ -1436,8 +1445,8 @@ body.home-view:not(.past-talks-open) .home-section > picture {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
-    max-width: min(1500px, 100%);
-    height: var(--home-poster-layout-height);
+    max-width: min(1725px, 100%);
+    height: var(--home-poster-visual-height);
     box-sizing: border-box;
     z-index: 0;
     overflow: hidden;
@@ -1454,7 +1463,7 @@ body.home-view:not(.past-talks-open) .home-section > picture img.home-poster-wid
 }
 
 body.home-view:not(.past-talks-open) .home-section {
-    padding-top: calc(var(--home-poster-layout-height) - var(--home-poster-content-pull)) !important;
+    padding-top: calc(var(--home-poster-visual-height) - var(--home-poster-effective-pull)) !important;
     overflow-x: hidden;
     isolation: isolate;
 }
@@ -2148,6 +2157,16 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
         overflow: visible;
         text-overflow: clip;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1150px) {
+    body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
+        top: 119px;
+    }
+
+    body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+        height: min(7.2rem, 12.5217391304vw);
     }
 }
 
@@ -7771,10 +7790,10 @@ h4 {
     background: transparent;
 }
 
-/* Video Section (Past talks): Prussian blue; 8px horizontal padding inside the centered max 1500px column */
+/* Video Section (Past talks): Prussian blue; 8px horizontal padding inside the centered max 1725px column */
 .past-talks-section {
     width: 100%;
-    max-width: 1500px;
+    max-width: 1725px;
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
@@ -8712,9 +8731,9 @@ h4 {
     box-sizing: border-box;
 }
 
-/* Same column as main: centered max 1500px (.home-section / .everything) */
+/* Same column as main: centered max 1725px (.home-section / .everything) */
 .footer-content {
-    max-width: 1500px;
+    max-width: 1725px;
     margin: 0 auto;
     padding: 16px 16px 0 16px;
     width: 100%;
@@ -8752,7 +8771,7 @@ h4 {
         top: 0;
         left: 50%;
         width: 100%;
-        max-width: 1500px;
+        max-width: 1725px;
         height: 50px;
         background: #003153;
         transform: translateX(-50%);
@@ -9791,7 +9810,7 @@ h4 {
         box-shadow: none !important;
         --_home-nav-pad: 0px;
         --_home-nav-avail: calc(100vw - 2 * var(--_home-nav-pad));
-        --_home-nav-w: min(1500px, var(--_home-nav-avail));
+        --_home-nav-w: min(1725px, var(--_home-nav-avail));
         left: calc(var(--_home-nav-pad) + max(0px, (var(--_home-nav-avail) - var(--_home-nav-w)) / 2)) !important;
         right: auto !important;
         width: var(--_home-nav-w) !important;
@@ -9802,7 +9821,7 @@ h4 {
         height: auto !important;
         min-height: 0 !important;
         max-height: none !important;
-        max-width: 1500px;
+        max-width: 1725px;
         align-items: center !important;
         padding: 0 16px !important;
     }
@@ -10091,7 +10110,7 @@ h4 {
 
 /* Post Content Styles (Same Page) */
 .viewer-section {
-    max-width: 1500px;
+    max-width: 1725px;
     margin: 0 auto;
     padding: 0 8px;
     background-color: #003153;
