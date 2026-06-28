@@ -933,6 +933,14 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.navbar .nav-register-pill,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"],
+.nav-register-mobile-top .nav-register-pill,
+.nav-register-mobile-bar .nav-register-pill {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
 .registration-submit-btn {
     font-family: var(--title-font);
     letter-spacing: normal;
@@ -9300,7 +9308,7 @@ h4 {
         min-height: 33px;
         height: auto;
         max-height: none;
-        padding: 6px 12px;
+        padding: 6px 4px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
 
@@ -9493,7 +9501,7 @@ h4 {
         min-height: 0;
         height: auto;
         max-height: none;
-        padding: 12px 8px;
+        padding: 12px 4px;
     }
 
     .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill:hover,
@@ -9645,6 +9653,16 @@ h4 {
 
     .footer-logo {
         max-width: 60px;
+    }
+
+    .footer {
+        margin-bottom: 0 !important;
+        padding-bottom: var(--mobile-bottom-nav-height);
+    }
+
+    body.home-view:not(.past-talks-open) .footer,
+    body.past-talks-open .footer {
+        margin-bottom: calc(-1 * var(--mobile-bottom-nav-height)) !important;
     }
 
     .filter-tabs {
@@ -9887,19 +9905,19 @@ h4 {
     .footer {
         border-radius: 0;
         margin-bottom: 0 !important;
-        padding-bottom: 50px;
+        padding-bottom: var(--mobile-bottom-nav-height);
         background: #003153 !important;
         color: #ffffff;
     }
 
     /* Home: tuck footer under bottom tab bar */
     body.home-view:not(.past-talks-open) .footer {
-        margin-bottom: -50px !important;
+        margin-bottom: calc(-1 * var(--mobile-bottom-nav-height)) !important;
     }
 
-    /* Past talks: tuck footer under bottom tab bar (56px) */
+    /* Past talks: tuck footer under bottom tab bar */
     body.past-talks-open .footer {
-        margin-bottom: -56px !important;
+        margin-bottom: calc(-1 * var(--mobile-bottom-nav-height)) !important;
     }
 
     /* Social + Contact stack: left-aligned rows; logo centered below */
