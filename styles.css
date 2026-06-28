@@ -826,7 +826,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 .nav-menu {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.5rem;
     align-items: center;
     flex-wrap: nowrap;
     white-space: nowrap;
@@ -888,7 +888,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     }
 
     .navbar .nav-link {
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
 }
 
@@ -8737,6 +8737,33 @@ h4 {
 
 /* Equal side columns + invisible third column → logo centered in footer */
 @media (min-width: 769px) {
+    .footer {
+        background: #F4F3F2 !important;
+        color: #003153;
+        margin-bottom: 0;
+        padding-bottom: 50px;
+        overflow: visible;
+    }
+
+    .footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 100%;
+        max-width: 1500px;
+        height: 50px;
+        background: #003153;
+        transform: translateX(-50%);
+        pointer-events: none;
+    }
+
+    .footer > .footer-content {
+        position: relative;
+        z-index: 1;
+        transform: translateY(50px);
+    }
+
     .footer-content {
         grid-template-columns: 1fr auto 1fr;
         align-items: center;
