@@ -43,6 +43,7 @@
             --backend-page-width: 2000px;
             --backend-table-cell-pad-x: 8px;
             --backend-roster-row-pad-y: 0.175rem;
+            --backend-tab-pale-pink: #fbcfe8;
             background-color: #f1f5f9;
             height: 100%;
             max-height: 100vh;
@@ -2620,7 +2621,7 @@
 
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field input,
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field textarea {
-            background: #fc70d7;
+            background: var(--backend-tab-pale-pink);
         }
 
         #content-editor .content-name-date-row {
@@ -2962,7 +2963,7 @@
         }
 
         #content-editor.content-editable-unlocked .content-editor-image-placeholder {
-            background: #fc70d7;
+            background: var(--backend-tab-pale-pink);
         }
 
         #content-editor #edit-content-image:not([src]) + .content-editor-image-placeholder {
@@ -5926,7 +5927,8 @@
             display: flex;
             flex-direction: column;
             align-items: stretch;
-            gap: 1rem;
+            justify-content: flex-start;
+            gap: 0.5rem;
             flex: 1.2 1.2 0;
             min-width: 0;
             min-height: 0;
@@ -6240,10 +6242,6 @@
             text-align: center;
             border: none;
             border-bottom: none;
-        }
-
-        .select-pre-set > .pre-set-name {
-            font-weight: 600;
         }
 
         #texteditor .html-editor > .pre-set-name,
@@ -7107,7 +7105,6 @@
                 </div>
                 <div class="texteditor-main">
                 <div class="select-pre-set">
-                    <p class="pre-set-name" id="texteditor-preset-name">Select pre-set</p>
                     <div class="texteditor-programme-toolbar texteditor-home-toolbar">
                         <p class="texteditor-programme-heading">Home:</p>
                         <div class="texteditor-selectors" id="texteditor-home-selectors" role="group" aria-label="Home page snippets">
@@ -15636,12 +15633,6 @@
             return '';
         }
 
-        function updateTexteditorPresetName() {
-            var el = document.getElementById('texteditor-preset-name');
-            if (!el) return;
-            el.textContent = 'Select pre-set';
-        }
-
         function updateTexteditorCodeEditor(html, storageKey, presetName) {
             var ta = document.getElementById('texteditor-code');
             if (!ta) return;
@@ -15682,17 +15673,6 @@
             texteditorPadlockIsOpen = false;
             syncTexteditorPadlockButtonUi();
             syncTexteditorEditabilityFromPadlock();
-            var displayPreset = String(presetName != null ? presetName : '').trim();
-            if (!displayPreset && nextKey) {
-                displayPreset = texteditorPresetLabelForSnippetKey(nextKey);
-                if (!displayPreset) {
-                    var activeBtn = document.querySelector(
-                        '#texteditor-selectors .texteditor-day-btn.is-active, .texteditor-snippet-btn.is-active'
-                    );
-                    if (activeBtn) displayPreset = String(activeBtn.textContent || '').trim();
-                }
-            }
-            updateTexteditorPresetName();
         }
 
         function initTexteditorCodeInputPersistence() {
