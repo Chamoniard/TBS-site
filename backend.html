@@ -481,6 +481,11 @@
             padding-bottom: 0;
         }
 
+        .content-editor-section.is-open {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
         .programme-section,
         .programme-section.is-open {
             background: #ffffff;
@@ -6323,10 +6328,10 @@
 
         /* ===== CONTAINER STYLES ===== */
         body.backend-page .container {
-            width: min(var(--backend-page-width), 100%);
-            max-width: var(--backend-page-width);
-            margin: 0 auto;
-            padding: 0 8px 8px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 0 8px;
             background: transparent;
             box-sizing: border-box;
             flex: 1;
@@ -16906,8 +16911,7 @@
         var gmailLabels = [];
         /** User labels only: segment -> { label, kids } tree (name split on "/"). */
         var gmailUserRoots = {};
-        var gmailCategoryLabels = [];
-        /** Which folder groups are expanded: keys "__categories__" or "user:Work/Client". */
+        /** Which nested user-label folders are expanded: keys like "user:Work/Client". */
         var gmailFolderExpandedKeys = {};
         var gmailMessages = [];
         var gmailTokenClient = null;
@@ -16922,28 +16926,12 @@
             STARRED: 'Starred'
         };
 
-        function isGmailCategoryLabel(l) {
-            return l && l.type === 'system' && String(l.id || '').indexOf('CATEGORY_') === 0;
-        }
-
-        function gmailFriendlyCategoryName(l) {
-            var id = String(l.id || '');
-            if (id.indexOf('CATEGORY_') === 0) {
-                var rest = id.slice('CATEGORY_'.length).replace(/_/g, ' ').toLowerCase();
-                return rest.charAt(0).toUpperCase() + rest.slice(1);
-            }
-            return l.name || id;
-        }
-
         function gmailResolveFolderHeading(labelId) {
             if (!labelId) return 'Messages';
             if (GMAIL_SYSTEM_TOP_NAMES[labelId]) return GMAIL_SYSTEM_TOP_NAMES[labelId];
             for (var i = 0; i < gmailLabels.length; i++) {
                 var L = gmailLabels[i];
-                if (L && L.id === labelId) {
-                    if (isGmailCategoryLabel(L)) return gmailFriendlyCategoryName(L);
-                    return L.name || labelId;
-                }
+                if (L && L.id === labelId) return L.name || labelId;
             }
             return labelId;
         }
@@ -17085,39 +17073,8 @@
                 parts.push('<button type="button" class="' + cls + '" data-label-id="' + escapeHtml(sid) + '">' + escapeHtml(disp) + '</button>');
             }
 
-            if (gmailCategoryLabels.length) {
-                var catExpanded = !!gmailFolderExpandedKeys.__categories__;
-                parts.push('<div class="emailer-folder-separator" aria-hidden="true"></div>');
-                parts.push('<div class="emailer-folder-group">');
-                parts.push('<div class="emailer-folder-row">');
-                parts.push('<button type="button" class="emailer-folder-toggle' + (catExpanded ? ' is-expanded' : '') + '" data-expand-key="__categories__" aria-expanded="' + (catExpanded ? 'true' : 'false') + '" title="Show or hide categories">');
-                parts.push(catExpanded ? '▼' : '▶');
-                parts.push('</button>');
-                parts.push('<span class="emailer-folder-group-title">Categories</span>');
-                parts.push('</div>');
-                if (catExpanded) {
-                    parts.push('<div class="emailer-folder-nest">');
-                    for (var ci = 0; ci < gmailCategoryLabels.length; ci++) {
-                        var cl = gmailCategoryLabels[ci];
-                        var cid = String(cl.id || '');
-                        var ccls = 'emailer-folder-btn' + (cid === gmailSelectedLabelId ? ' is-active' : '');
-                        parts.push('<button type="button" class="' + ccls + '" data-label-id="' + escapeHtml(cid) + '">' + escapeHtml(gmailFriendlyCategoryName(cl)) + '</button>');
-                    }
-                    parts.push('</div>');
-                }
-                parts.push('</div>');
-            }
-
-            var userKeys = Object.keys(gmailUserRoots);
-            if (userKeys.length) {
-                parts.push('<div class="emailer-folder-separator" aria-hidden="true"></div>');
-                parts.push('<div class="emailer-folder-group">');
-                parts.push('<div class="emailer-folder-row">');
-                parts.push('<span class="emailer-folder-toggle-spacer" aria-hidden="true"></span>');
-                parts.push('<span class="emailer-folder-group-title">Labels</span>');
-                parts.push('</div>');
+            if (Object.keys(gmailUserRoots).length) {
                 parts.push(renderGmailUserBranch(gmailUserRoots, []));
-                parts.push('</div>');
             }
 
             listEl.innerHTML = parts.join('');
@@ -17165,10 +17122,10 @@
             var data = await gmailApiRequest('labels');
             gmailLabels = (data.labels || []).slice().sort(function(a, b) { return String(a.name || '').localeCompare(String(b.name || '')); });
             gmailUserRoots = buildGmailUserLabelTree(gmailLabels);
-            gmailCategoryLabels = gmailLabels.filter(isGmailCategoryLabel).sort(function(a, b) {
-                return String(a.id || '').localeCompare(String(b.id || ''));
-            });
             gmailFolderExpandedKeys = {};
+            if (String(gmailSelectedLabelId || '').indexOf('CATEGORY_') === 0) {
+                gmailSelectedLabelId = 'INBOX';
+            }
             var hasSelected = gmailLabels.some(function(l) { return l && l.id === gmailSelectedLabelId; });
             if (!hasSelected) {
                 gmailSelectedLabelId = 'INBOX';
