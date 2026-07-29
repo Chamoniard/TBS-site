@@ -3470,8 +3470,16 @@
             align-items: stretch;
         }
 
-        .eventnavigation .backend-current-event-line {
+        .backend-current-event-group {
             flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .eventnavigation .backend-current-event-line {
+            flex: 0 1 auto;
             min-width: 0;
             margin: 0;
             padding: 0.25rem 0.4rem 0;
@@ -3480,6 +3488,130 @@
             color: #f1f5f9;
             font-family: 'Inter', sans-serif;
             text-align: left;
+        }
+
+        body.backend-page button.backend-current-event-chevron {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            width: 1rem;
+            height: 1rem;
+            min-width: 1rem;
+            min-height: 1rem;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: var(--backend-tab-pale-pink);
+            color: #003153;
+            line-height: 0;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        body.backend-page button.backend-current-event-chevron:hover,
+        body.backend-page button.backend-current-event-chevron:focus-visible {
+            background: var(--backend-tab-pale-pink);
+            outline: 2px solid rgba(251, 207, 232, 0.85);
+            outline-offset: 2px;
+        }
+
+        body.backend-page button.backend-current-event-chevron svg {
+            display: block;
+            width: 0.55rem;
+            height: 0.55rem;
+            flex: 0 0 auto;
+            transition: transform 0.15s ease;
+        }
+
+        body.backend-page button.backend-current-event-chevron[aria-expanded="true"] svg {
+            transform: rotate(180deg);
+        }
+
+        .backend-current-event-picker {
+            position: relative;
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .backend-current-event-dropdown {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 6px);
+            z-index: 80;
+            min-width: 11rem;
+            max-width: min(20rem, 70vw);
+            max-height: 16rem;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0.2rem 0;
+            list-style: none;
+            background: #ffffff !important;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+            box-sizing: border-box;
+        }
+
+        .backend-current-event-dropdown[hidden] {
+            display: none;
+        }
+
+        .backend-current-event-dropdown > li {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Beat global gold `body.backend-page button` styles for the event picker list. */
+        body.backend-page button.backend-current-event-option {
+            display: block;
+            width: 100%;
+            margin: 0;
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 0;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: left;
+            cursor: pointer;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        body.backend-page button.backend-current-event-option:hover,
+        body.backend-page button.backend-current-event-option:focus,
+        body.backend-page button.backend-current-event-option:focus-visible {
+            background: #f8fafc;
+            outline: none;
+            color: #0f172a;
+        }
+
+        body.backend-page button.backend-current-event-option.is-selected,
+        body.backend-page button.backend-current-event-option.is-selected:hover,
+        body.backend-page button.backend-current-event-option.is-selected:focus,
+        body.backend-page button.backend-current-event-option.is-selected:focus-visible {
+            background: var(--backend-tab-pale-pink);
+            color: #003153;
+            font-weight: 600;
+        }
+
+        .backend-current-event-dropdown-empty {
+            margin: 0;
+            padding: 0.5rem 0.75rem;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 500;
         }
 
         .speaker-roster-list,
@@ -7059,7 +7191,29 @@
                 <div class="event-creator-bar">
                     <div class="backend-top-bar">
                         <img src="images/backendlogo.png?v=20260605-backendlogo-v3" alt="Backend logo" class="eventnavigation-logo" />
-                        <p class="backend-current-event-line" id="backend-current-event-display" aria-live="polite"></p>
+                        <div class="backend-current-event-group">
+                            <p class="backend-current-event-line" id="backend-current-event-display" aria-live="polite"></p>
+                            <div class="backend-current-event-picker">
+                                <button
+                                    type="button"
+                                    class="backend-current-event-chevron"
+                                    id="backend-current-event-chevron"
+                                    aria-label="Choose current event"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    aria-controls="backend-current-event-dropdown">
+                                    <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                                        <path d="M2.5 4.25L6 7.75L9.5 4.25" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <ul
+                                    class="backend-current-event-dropdown"
+                                    id="backend-current-event-dropdown"
+                                    role="listbox"
+                                    aria-label="All events"
+                                    hidden></ul>
+                            </div>
+                        </div>
                     </div>
                     <div id="status-container" class="backend-status-inline" aria-live="polite" aria-atomic="true">
                         <div id="status" class="status loading">Starting backend…</div>
@@ -11653,7 +11807,7 @@
             return '';
         }
 
-        function guestRecordEventMatchesCurrentEvent(rec) {
+        function rosterRecordEventMatchesCurrentEvent(rec) {
             var want = String(current_event || '').trim();
             if (!want) return false;
             var ev = String(rec && rec.event != null ? rec.event : '').trim();
@@ -11670,6 +11824,10 @@
                 if (parts[i].toLowerCase() === wantNorm) return true;
             }
             return false;
+        }
+
+        function guestRecordEventMatchesCurrentEvent(rec) {
+            return rosterRecordEventMatchesCurrentEvent(rec);
         }
 
         function updateBackendCurrentEventDisplay() {
@@ -11695,6 +11853,207 @@
                 selectedevent = '';
                 updateBackendCurrentEventDisplay();
             }
+        }
+
+        var FIRESTORE_TBS_SETTINGS_CURRENT_EVENT_FIELD = 'Current event';
+        var FIRESTORE_TBS_SETTINGS_ALLEVENTS_KEYS = [
+            'Allevents',
+            'All events',
+            'allEvents',
+            'AllEvents',
+            'ALL EVENTS',
+        ];
+        var currentEventSwitchInFlight = false;
+
+        /** Document `tbs/Settings` field `Allevents` (array or delimited string). */
+        function coalesceAlleventsField(data) {
+            if (!data || typeof data !== 'object') return [];
+            for (var ki = 0; ki < FIRESTORE_TBS_SETTINGS_ALLEVENTS_KEYS.length; ki++) {
+                var k = FIRESTORE_TBS_SETTINGS_ALLEVENTS_KEYS[ki];
+                if (!Object.prototype.hasOwnProperty.call(data, k) || data[k] == null) continue;
+                var list = guestNormalizeStringList(data[k]);
+                if (list.length) return list;
+            }
+            return [];
+        }
+
+        async function loadAlleventsFromTbsSettings(db) {
+            var snap = await db.collection('tbs').doc('Settings').get();
+            var data = snap && snap.exists ? snap.data() || {} : {};
+            return coalesceAlleventsField(data);
+        }
+
+        function closeCurrentEventDropdown() {
+            var btn = document.getElementById('backend-current-event-chevron');
+            var menu = document.getElementById('backend-current-event-dropdown');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+            if (menu) menu.hidden = true;
+        }
+
+        function renderCurrentEventDropdown(events) {
+            var menu = document.getElementById('backend-current-event-dropdown');
+            if (!menu) return;
+            var current = String(current_event || '').trim();
+            var list = Array.isArray(events) ? events : [];
+            if (!list.length) {
+                menu.innerHTML =
+                    '<li><p class="backend-current-event-dropdown-empty">No events in Allevents.</p></li>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var label = String(list[i] || '').trim();
+                if (!label) continue;
+                var selected = label.toLowerCase() === current.toLowerCase();
+                html +=
+                    '<li role="presentation">' +
+                    '<button type="button" class="backend-current-event-option' +
+                    (selected ? ' is-selected' : '') +
+                    '" role="option" data-event="' +
+                    escapeHtml(label) +
+                    '" aria-selected="' +
+                    (selected ? 'true' : 'false') +
+                    '">' +
+                    escapeHtml(label) +
+                    '</button></li>';
+            }
+            menu.innerHTML = html ||
+                '<li><p class="backend-current-event-dropdown-empty">No events in Allevents.</p></li>';
+        }
+
+        async function openCurrentEventDropdown() {
+            var btn = document.getElementById('backend-current-event-chevron');
+            var menu = document.getElementById('backend-current-event-dropdown');
+            if (!btn || !menu) return;
+            try {
+                var db = getFirestore();
+                var events = await loadAlleventsFromTbsSettings(db);
+                renderCurrentEventDropdown(events);
+                menu.hidden = false;
+                btn.setAttribute('aria-expanded', 'true');
+            } catch (err) {
+                console.error('openCurrentEventDropdown:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to load Allevents from Settings.'
+                    );
+                }
+                closeCurrentEventDropdown();
+            }
+        }
+
+        async function toggleCurrentEventDropdown() {
+            var btn = document.getElementById('backend-current-event-chevron');
+            if (!btn) return;
+            if (btn.getAttribute('aria-expanded') === 'true') {
+                closeCurrentEventDropdown();
+                return;
+            }
+            await openCurrentEventDropdown();
+        }
+
+        /**
+         * Write `Current event` on tbs/Settings, then reload Speakers + Guests for the new value.
+         * @param {string} eventName
+         */
+        async function setCurrentEventAndRefreshRosters(eventName) {
+            var next = String(eventName || '').trim();
+            if (!next) return;
+            var prev = String(current_event || '').trim();
+            closeCurrentEventDropdown();
+            if (next === prev) return;
+            if (currentEventSwitchInFlight) return;
+            currentEventSwitchInFlight = true;
+            try {
+                if (typeof showStatus === 'function') {
+                    showStatus('loading', 'Switching current event to ' + next + '…');
+                }
+                var db = getFirestore();
+                var patch = {};
+                patch[FIRESTORE_TBS_SETTINGS_CURRENT_EVENT_FIELD] = next;
+                await db.collection('tbs').doc('Settings').set(patch, { merge: true });
+                current_event = next;
+                selectedevent = next;
+                updateBackendCurrentEventDisplay();
+                await Promise.all([
+                    fetchAllGuestsIntoMemory({ force: true, showLoading: true }),
+                    fetchSpeakersForSelectedEvent(),
+                ]);
+                var selectedGuestId = String(guestFormEditingDocId || '').trim();
+                if (selectedGuestId && !findGuestInMemory(selectedGuestId)) {
+                    clearGuestEditorForm();
+                    clearGuestRosterItemSelection();
+                    setGuestEditorEmptyState(true);
+                }
+                var selectedSpeakerId = String(speakerFormEditingDocId || '').trim();
+                if (selectedSpeakerId && !findSpeakerInMemory(selectedSpeakerId)) {
+                    speakerFormEditingDocId = '';
+                    speakerDraftFormActive = false;
+                    speakerBioFormBaseline = null;
+                    clearSpeakerRosterItemSelection();
+                    clearSpeakerEditorFormFields();
+                    updateAddSpeakerSaveButtonState();
+                    updateAddSpeakerDeleteButtonState();
+                    updateSpeakerNavButtons();
+                    setSpeakerEditorEmptyState(true);
+                }
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Current event set to ' + next + '. Speakers and guests updated.');
+                }
+            } catch (err) {
+                console.error('setCurrentEventAndRefreshRosters:', err);
+                try {
+                    await syncSelectedAndCurrentEventFromSettings();
+                } catch (syncErr) {
+                    console.error('syncSelectedAndCurrentEventFromSettings:', syncErr);
+                }
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to update Current event.'
+                    );
+                }
+            } finally {
+                currentEventSwitchInFlight = false;
+            }
+        }
+
+        function initCurrentEventPicker() {
+            var btn = document.getElementById('backend-current-event-chevron');
+            var menu = document.getElementById('backend-current-event-dropdown');
+            var picker = btn && btn.closest ? btn.closest('.backend-current-event-picker') : null;
+            if (!btn || !menu) return;
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                void toggleCurrentEventDropdown();
+            });
+
+            menu.addEventListener('click', function (e) {
+                var opt = e.target && e.target.closest
+                    ? e.target.closest('.backend-current-event-option')
+                    : null;
+                if (!opt || !menu.contains(opt)) return;
+                e.preventDefault();
+                e.stopPropagation();
+                var eventName = opt.getAttribute('data-event') || opt.textContent || '';
+                void setCurrentEventAndRefreshRosters(eventName);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!picker) return;
+                if (picker.contains(e.target)) return;
+                closeCurrentEventDropdown();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape') return;
+                if (btn.getAttribute('aria-expanded') !== 'true') return;
+                closeCurrentEventDropdown();
+                btn.focus();
+            });
         }
 
         /**
@@ -14139,6 +14498,13 @@
             speakerRosterInMemory = [];
             try {
                 var db = getFirestore();
+                current_event = await loadCurrentEventFromTbsSettings(db);
+                selectedevent = String(current_event || '').trim();
+                updateBackendCurrentEventDisplay();
+                if (!String(current_event || '').trim()) {
+                    renderSpeakerRoster();
+                    return;
+                }
                 var ids = await listSpeakerIdsUnderTbsSpeakers(db);
                 if (!ids.length) {
                     renderSpeakerRoster();
@@ -14157,7 +14523,10 @@
                         var rowId = chunk[j];
                         var snap = snaps[j];
                         if (snap && snap.exists) {
-                            list.push(speakerRecordFromTbsItemDoc(rowId, snap.data() || {}));
+                            var rec = speakerRecordFromTbsItemDoc(rowId, snap.data() || {});
+                            if (rosterRecordEventMatchesCurrentEvent(rec)) {
+                                list.push(rec);
+                            }
                         }
                     }
                 }
@@ -14308,19 +14677,13 @@
                 addBtn.disabled = false;
                 addBtn.setAttribute('aria-disabled', 'false');
             }
-            if (!speakerRosterInMemory.length) {
-                itemsEl.innerHTML = '<p class="speaker-roster-empty">No speakers yet.</p>';
-                updateAddSpeakerDeleteButtonState();
-                updateSpeakerNavButtons();
-                renderProgrammeSpeakersTable();
-                return;
-            }
             speakerRosterSortInPlace();
             function speakerEventBadgeHtml(rawEvent) {
                 var label = String(rawEvent != null ? rawEvent : '').trim();
                 if (!label) label = '-';
                 return '<span class="content-badge content-badge--event-tbs26">' + escapeHtml(label) + '</span>';
             }
+            var colCount = 12;
             var html = '<table class="speakers-roster-table" role="grid" aria-label="Speaker roster">' +
                 '<thead><tr>' +
                 '<th scope="col">Speaker name</th>' +
@@ -14336,6 +14699,19 @@
                 '<th scope="col">CME sent</th>' +
                 '<th scope="col">Expenses</th>' +
                 '</tr></thead><tbody>';
+            if (!speakerRosterInMemory.length) {
+                var curEvEmpty = String(current_event || '').trim();
+                var emptyMsg = !curEvEmpty
+                    ? 'Set field “Current event” on Firestore document tbs/Settings to load speakers.'
+                    : 'No speakers listed for this event.';
+                html += '<tr class="speaker-roster-row">' +
+                    '<td class="speaker-roster-empty" colspan="' +
+                    colCount +
+                    '">' +
+                    escapeHtml(emptyMsg) +
+                    '</td>' +
+                    '</tr>';
+            } else {
             for (var i = 0; i < speakerRosterInMemory.length; i++) {
                 var s = speakerRosterInMemory[i];
                 var label = (String(s.firstName || '').trim() + ' ' + String(s.lastName || '').trim()).trim();
@@ -14397,6 +14773,7 @@
                     '<td class="speaker-roster-tag-cell">' +
                     '<button type="button" class="speaker-roster-tag ' + rfdCls + '" data-field="refunded" title="Expenses (click to change)" aria-label="Expenses: ' + escapeHtml(rfd) + '">' + escapeHtml(rfd) + '</button>' +
                     '</td></tr>';
+            }
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
@@ -19668,6 +20045,7 @@
                     TbsAuth.signOutStaff();
                 });
             }
+            initCurrentEventPicker();
             const texteditorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');

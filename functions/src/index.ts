@@ -504,22 +504,6 @@ function buildRegistrationGuestId(
 }
 
 /**
- * Reads `Current event` from `tbs/Settings`.
- * @param {Firestore} db Admin Firestore.
- * @return {Promise<string>} Event id/label.
- */
-async function loadCurrentEventFromSettings(db: Firestore): Promise<string> {
-  const snap = await db.collection("tbs").doc("Settings").get();
-  const data = (snap.data() || {}) as Record<string, unknown>;
-  const keys = ["Current event", "currentEvent", "Current Event"];
-  for (const k of keys) {
-    const v = String(data[k] || "").trim();
-    if (v) return v;
-  }
-  return "TBS27";
-}
-
-/**
  * YYYY-MM-DD for Application date.
  * @param {Date} date Submit timestamp.
  * @return {string} Date string.
@@ -611,7 +595,7 @@ export const submitRegistrationHttp = onRequest({
     }
 
     const db = getFirestore();
-    const event = await loadCurrentEventFromSettings(db);
+    const event = "TBS27";
     const submittedAt = new Date();
     const applicationDate = formatApplicationDate(submittedAt);
 

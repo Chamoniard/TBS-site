@@ -71,16 +71,6 @@ function buildRegistrationGuestId(event, firstName, lastName) {
     return id || 'guest';
 }
 
-async function loadCurrentEventFromSettings(db) {
-    const snap = await db.collection('tbs').doc('Settings').get();
-    const data = snap.data() || {};
-    for (const k of ['Current event', 'currentEvent', 'Current Event']) {
-        const v = String(data[k] || '').trim();
-        if (v) return v;
-    }
-    return 'TBS27';
-}
-
 function formatApplicationDate(date) {
     const yyyy = String(date.getFullYear());
     const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -140,7 +130,7 @@ async function handleSubmitRegistration(body) {
     }
 
     const db = initFirebase();
-    const event = await loadCurrentEventFromSettings(db);
+    const event = 'TBS27';
     const applicationDate = formatApplicationDate(new Date());
     const parentRef = db.collection('tbs').doc('Guests');
     const baseGuestId = buildRegistrationGuestId(event, firstName, lastName);
