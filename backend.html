@@ -3124,7 +3124,6 @@
 
         #speaker-editor .content-roster-published-cell,
         #guest-editor .guests-list-table .content-roster-published-cell {
-            width: 2.85rem;
             text-align: center;
             vertical-align: middle;
             padding: var(--backend-roster-row-pad-y) var(--backend-table-cell-pad-x);
@@ -3666,6 +3665,18 @@
             min-width: 100%;
         }
 
+        /* Pack guest columns to the left; headers + pills stay centered in each column. */
+        #guest-editor .guests-roster-items {
+            width: max-content;
+            min-width: max-content;
+            margin-right: auto;
+        }
+
+        #guest-editor .guests-list-table {
+            width: max-content;
+            min-width: max-content;
+        }
+
         .speakers-roster-table,
         .guests-list-table,
         .content-list-table,
@@ -3811,9 +3822,26 @@
         }
 
         .speakers-roster-table tbody td.speaker-roster-tag-cell,
-        .guests-list-table tbody td.guests-roster-tag-cell,
         .content-list-table tbody td.speaker-roster-tag-cell {
             text-align: left;
+        }
+
+        .guests-list-table tbody td.guests-roster-tag-cell {
+            text-align: center;
+        }
+
+        /*
+         * Guests has fewer columns than Speakers, so min-width:100% used to stretch
+         * tag columns and widen the gap between pills. Lock pill columns to the same
+         * content width Speakers uses (uniform pill + shared cell pad).
+         */
+        #guest-editor .guests-list-table thead th:not(:first-child),
+        #guest-editor .guests-list-table tbody td.guests-roster-tag-cell,
+        #guest-editor .guests-list-table tbody td.content-roster-published-cell {
+            width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
+            min-width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
+            max-width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
+            box-sizing: border-box;
         }
 
         #programme-editor .programme-speakers-table thead th.content-roster-published-col,
