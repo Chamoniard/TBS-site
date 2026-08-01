@@ -317,6 +317,19 @@
             white-space: nowrap;
         }
 
+        .backend-guests-count {
+            margin: 0 0 0 auto;
+            padding-right: 16px;
+            flex-shrink: 0;
+            align-self: center;
+            text-align: right;
+            font-size: 0.75rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #003153;
+            white-space: nowrap;
+        }
+
         .navigation {
             display: flex;
             justify-content: flex-end;
@@ -7271,6 +7284,7 @@
                 </nav>
                 <p class="backend-content-count" id="backend-content-count" hidden aria-live="polite">Content items 0</p>
                 <div class="programme-counter" id="programme-counter" hidden aria-live="polite">0 slots, 0 empty and 0 filled</div>
+                <p class="backend-guests-count" id="backend-guests-count" hidden aria-live="polite">0 guests have signed up for —.</p>
             </div>
 
             <section class="texteditor" id="texteditor" aria-hidden="true" data-name="texteditor">
@@ -14339,9 +14353,20 @@
             }
         }
 
+        function updateBackendGuestsCountDisplay() {
+            var el = document.getElementById('backend-guests-count');
+            if (!el) return;
+            var n = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
+            var eventLabel = String(current_event || '').trim() || '—';
+            el.textContent = n + ' guests have signed up for ' + eventLabel + '.';
+        }
+
         function renderGuestsRoster() {
             var itemsEl = document.getElementById('guests-roster-items');
-            if (!itemsEl) return;
+            if (!itemsEl) {
+                updateBackendGuestsCountDisplay();
+                return;
+            }
             guestsInvitedArmedDocId = '';
             guestsInvitedDropdownOpenDocId = '';
             guestsReadArmedDocId = '';
@@ -14415,6 +14440,7 @@
             syncGuestApplicationActionButtons();
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
+            updateBackendGuestsCountDisplay();
         }
 
         /**
@@ -17935,6 +17961,11 @@
                 programmeCounterEl.hidden = !isProgramme;
                 if (isProgramme) updateProgrammeCounterDisplay();
             }
+            var backendGuestsCountEl = document.getElementById('backend-guests-count');
+            if (backendGuestsCountEl) {
+                backendGuestsCountEl.hidden = !isGuests;
+                if (isGuests) updateBackendGuestsCountDisplay();
+            }
             var contentActionsEl = document.getElementById('content-actions');
             if (contentActionsEl) {
                 contentActionsEl.hidden = !isContent;
@@ -18117,6 +18148,8 @@
                 if (backendContentCountElNoEvent) backendContentCountElNoEvent.hidden = true;
                 var programmeCounterElNoEvent = document.getElementById('programme-counter');
                 if (programmeCounterElNoEvent) programmeCounterElNoEvent.hidden = true;
+                var backendGuestsCountElNoEvent = document.getElementById('backend-guests-count');
+                if (backendGuestsCountElNoEvent) backendGuestsCountElNoEvent.hidden = true;
                 var contentActionsElNoEvent = document.getElementById('content-actions');
                 if (contentActionsElNoEvent) contentActionsElNoEvent.hidden = true;
                 var lodgingActionsElNoEvent = document.getElementById('lodging-actions');
