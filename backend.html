@@ -1403,8 +1403,8 @@
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled,
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true'] {
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled:not(.is-active):not(.is-done):not(.guest-workflow-step-btn--applied),
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true']:not(.is-active):not(.is-done):not(.guest-workflow-step-btn--applied) {
             background: #f1f5f9;
             border: 1px solid #c5cdd4;
             color: #94a3b8;
@@ -1414,7 +1414,7 @@
             opacity: 1;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:hover:not(:disabled):not([aria-disabled='true']) {
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn:hover:not(:disabled):not([aria-disabled='true']) {
             transform: translateY(-2px);
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
         }
@@ -1431,7 +1431,7 @@
             animation: none;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-done:hover:not(:disabled):not([aria-disabled='true']) {
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.is-done:hover:not(:disabled):not([aria-disabled='true']) {
             animation: none;
             border-color: var(--backend-roster-status-yes-bg);
             background: var(--backend-roster-status-yes-bg);
@@ -1455,19 +1455,61 @@
             }
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active {
+        @keyframes guest-padlock-angry-shake {
+            0%,
+            100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            15% {
+                transform: translateX(-4px) rotate(-8deg);
+            }
+            30% {
+                transform: translateX(4px) rotate(8deg);
+            }
+            45% {
+                transform: translateX(-3px) rotate(-6deg);
+            }
+            60% {
+                transform: translateX(3px) rotate(6deg);
+            }
+            75% {
+                transform: translateX(-2px) rotate(-3deg);
+            }
+            90% {
+                transform: translateX(2px) rotate(3deg);
+            }
+        }
+
+        /* Active step: keep white + green border even while padlock is locked; pulse only when unlocked. */
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active[aria-disabled='true'],
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active[aria-disabled='false'] {
             border-color: var(--backend-roster-status-yes-bg);
             color: #0f172a;
             background: #ffffff;
             cursor: pointer;
+            animation: none;
+        }
+
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.is-active,
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.is-active[aria-disabled='false'] {
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
             animation: none;
             border-color: var(--backend-roster-status-yes-bg);
             background: #ffffff;
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        body.backend-page #guest-editor:not(.guest-padlock-unlocked) #guest-editor-actions .guest-workflow-step-btn.is-active {
+            cursor: pointer;
+        }
+
+        body.backend-page button.guest-editor-padlock-btn.is-angry-shake {
+            animation: guest-padlock-angry-shake 0.45s ease;
         }
 
         #guest-editor #guest-editor-actions .guest-workflow-step-arrow {
@@ -11306,6 +11348,7 @@
                 guestPadlockIsOpen = false;
                 syncGuestEditabilityFromPadlock();
                 syncGuestPadlockButtonUi();
+                refreshGuestWorkflowButtonsForPadlock();
                 updateSaveGuestToolbarButtonState();
                 updateAddGuestDeleteButtonState();
                 if (typeof showStatus === 'function') {
@@ -13216,6 +13259,40 @@
             padlock.setAttribute('aria-label', guestPadlockIsOpen ? 'Lock guest' : 'Unlock guest');
             padlock.setAttribute('title', guestPadlockIsOpen ? 'Lock' : 'Unlock');
             padlock.setAttribute('aria-pressed', guestPadlockIsOpen ? 'true' : 'false');
+            var guestEditorRoot = document.getElementById('guest-editor');
+            if (guestEditorRoot) {
+                guestEditorRoot.classList.toggle('guest-padlock-unlocked', !!guestPadlockIsOpen);
+            }
+        }
+
+        function shakeGuestPadlockAngrily() {
+            var padlock = document.getElementById('guest-editor-padlock-btn');
+            if (!padlock || padlock.disabled) return;
+            padlock.classList.remove('is-angry-shake');
+            // Restart animation if already shaking.
+            void padlock.offsetWidth;
+            padlock.classList.add('is-angry-shake');
+            if (padlock._angryShakeTimer) {
+                clearTimeout(padlock._angryShakeTimer);
+            }
+            padlock._angryShakeTimer = setTimeout(function () {
+                padlock.classList.remove('is-angry-shake');
+                padlock._angryShakeTimer = null;
+            }, 450);
+        }
+
+        /** Returns true if the workflow action may run; if locked but active, shakes padlock. */
+        function guestWorkflowActionAllowedOrShake(btn) {
+            if (!btn || !btn.classList.contains('is-active')) return false;
+            if (guestPadlockIsOpen) return true;
+            shakeGuestPadlockAngrily();
+            return false;
+        }
+
+        function refreshGuestWorkflowButtonsForPadlock() {
+            syncGuestWorkflowReadApplicationButton();
+            syncGuestWorkflowSendInviteButton();
+            syncGuestWorkflowSendInvoiceButton();
         }
 
         function scrollGuestEditorBottomToBio() {
@@ -13369,18 +13446,18 @@
             updateGuestEditorProfileFields(g);
             syncGuestRosterSelectionHighlight();
             updateGuestNavButtons();
-            updateAddGuestDeleteButtonState();
             syncGuestSendInviteButton();
+            guestPadlockIsOpen = false;
+            captureGuestBioFormBaseline();
+            syncGuestPadlockButtonUi();
+            syncGuestEditabilityFromPadlock();
             syncGuestWorkflowAppliedButton();
             syncGuestWorkflowReadApplicationButton();
             syncGuestApplicationActionButtons();
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
             resetGuestAddLogForm();
-            guestPadlockIsOpen = false;
-            captureGuestBioFormBaseline();
-            syncGuestPadlockButtonUi();
-            syncGuestEditabilityFromPadlock();
+            updateAddGuestDeleteButtonState();
             var openMgmt = guestEditorScrollToManagementOnNextPopulate;
             guestEditorScrollToManagementOnNextPopulate = false;
             requestAnimationFrame(function () {
@@ -13436,13 +13513,14 @@
             updateGuestEditorProfileFields(null);
             updateGuestNavButtons();
             syncGuestSendInviteButton();
+            guestPadlockIsOpen = false;
+            syncGuestPadlockButtonUi();
+            syncGuestEditabilityFromPadlock();
             syncGuestWorkflowAppliedButton();
             syncGuestWorkflowReadApplicationButton();
             syncGuestApplicationActionButtons();
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
-            guestPadlockIsOpen = false;
-            syncGuestEditabilityFromPadlock();
             updateSaveGuestToolbarButtonState();
             requestAnimationFrame(function () {
                 scrollGuestEditorBottomToBio();
@@ -14207,9 +14285,10 @@
             return guestInviteAllowedByRosterFields(g);
         }
 
-        /** Invoiced is the literal “No” (case-insensitive). */
+        /** Invoiced is the literal “No” (case-insensitive), or empty / unset. */
         function guestInvoicedFieldIsNo(invoicedVal) {
-            return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'no';
+            var t = String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase();
+            return !t || t === 'no' || t === 'n' || t === 'false';
         }
 
         /** Invoiced is the literal “Yes” (case-insensitive). */
@@ -14325,8 +14404,10 @@
             var g = id ? findGuestInMemory(id) : null;
             var awaiting = Boolean(g && guestReadIsNoAwaitingDecision(g.read));
             var done = Boolean(g && guestReadIsYes(g.read));
+            var canRun = awaiting && guestPadlockIsOpen;
+            // Keep enabled while awaiting so locked clicks can shake the padlock.
             btn.disabled = !awaiting;
-            btn.setAttribute('aria-disabled', awaiting ? 'false' : 'true');
+            btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
             btn.classList.toggle('is-active', awaiting);
             btn.classList.toggle('is-done', done);
         }
@@ -14359,6 +14440,7 @@
             if (g) email = String(g.email || g.guestEmail || '').trim();
             var invitedDone = Boolean(g && guestInvitedIsYes(g.invited));
             var canSend = Boolean(g && guestInviteAllowedByRosterFields(g));
+            var canRun = canSend && guestPadlockIsOpen;
             var label;
             if (invitedDone) {
                 var dateLabel = guestInvitedDateLabelFromRecord(g) || '—';
@@ -14369,8 +14451,9 @@
             btn.textContent = label;
             btn.setAttribute('aria-label', label);
             btn.setAttribute('title', label);
+            // Keep enabled while active so locked clicks can shake the padlock.
             btn.disabled = !canSend;
-            btn.setAttribute('aria-disabled', canSend ? 'false' : 'true');
+            btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
             btn.classList.toggle('is-active', canSend);
             btn.classList.toggle('is-done', invitedDone);
         }
@@ -14380,9 +14463,16 @@
             if (!btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
-            var active = Boolean(g && guestInvoicedisnoBlockShouldShow(g));
+            var active = Boolean(
+                g && guestInvitedFieldIsYes(g.invited) && guestInvoicedFieldIsNo(g.invoiced)
+            );
+            var canRun = active && guestPadlockIsOpen;
+            // Keep enabled while active so locked clicks can shake the padlock.
             btn.disabled = !active;
-            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
+            if (active) {
+                btn.removeAttribute('disabled');
+            }
             btn.classList.toggle('is-active', active);
             btn.classList.toggle('is-done', false);
         }
@@ -17667,6 +17757,7 @@
             guestPadlockIsOpen = false;
             syncGuestPadlockButtonUi();
             syncGuestEditabilityFromPadlock();
+            refreshGuestWorkflowButtonsForPadlock();
             updateAddGuestDeleteButtonState();
         }
 
@@ -21214,7 +21305,7 @@
                 guestWorkflowSendInviteBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    if (guestWorkflowSendInviteBtn.disabled) return;
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowSendInviteBtn)) return;
                     sendGuestInvitationEmail().catch(function(err) {
                         console.error('guest-workflow-send-invite:', err);
                         if (typeof showStatus === 'function') {
@@ -21363,7 +21454,7 @@
                 guestWorkflowSendInvoiceBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    if (guestWorkflowSendInvoiceBtn.disabled) return;
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowSendInvoiceBtn)) return;
                     sendGuestStripeInvoiceFromUi();
                 });
             }
@@ -21483,7 +21574,7 @@
                 guestWorkflowReadApplicationBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    if (guestWorkflowReadApplicationBtn.disabled) return;
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowReadApplicationBtn)) return;
                     openGuestApplicationReviewPopup();
                 });
             }
@@ -21616,13 +21707,12 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (guestPadlockBtn.disabled) return;
-                    var willOpen = !guestPadlockIsOpen;
-                    if (willOpen && guestEditorBottomPane !== 'bio') {
-                        scrollGuestEditorBottomToBio();
-                    }
-                    guestPadlockIsOpen = willOpen;
+                    guestPadlockIsOpen = !guestPadlockIsOpen;
                     syncGuestPadlockButtonUi();
                     syncGuestEditabilityFromPadlock();
+                    refreshGuestWorkflowButtonsForPadlock();
+                    updateAddGuestDeleteButtonState();
+                    updateSaveGuestToolbarButtonState();
                 });
                 syncGuestPadlockButtonUi();
                 syncGuestEditabilityFromPadlock();
