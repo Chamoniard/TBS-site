@@ -495,8 +495,8 @@
         }
 
         .content-editor-section.is-open {
-            padding-left: 0;
-            padding-right: 0;
+            padding-left: 16px;
+            padding-right: 16px;
         }
 
         .programme-section,
@@ -1902,7 +1902,7 @@
             background: #ffffff;
             color: #000000;
             font-weight: 500;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border-bottom: none;
         }
 
@@ -2477,7 +2477,7 @@
         #guest-editor,
         #programme-editor {
             --backend-roster-pill-width: 7.5rem;
-            --backend-roster-pill-min-height: calc(0.9rem * 1.2 + 10px);
+            --backend-roster-pill-min-height: calc(0.9rem * 1.2 + 4px);
         }
 
         /* Guest editor / management panel: match guests list border (#guest-editor .guests-list). */
@@ -2831,6 +2831,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
+            justify-content: flex-start;
             gap: 0.5rem;
             width: 100%;
             min-width: 0;
@@ -2851,7 +2852,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             flex: 0 0 auto;
         }
 
@@ -2903,10 +2904,10 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start;
             gap: 0.5rem;
             min-width: 0;
-            margin-left: auto;
+            margin-left: 0;
         }
 
         #content-editor .content-editor-toolbar-trailing .texteditor-save-btn {
@@ -3049,7 +3050,7 @@
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 5px;
+            padding: 2px 5px;
             border: 1px solid #4b5568;
             background: transparent;
             cursor: pointer;
@@ -3058,7 +3059,7 @@
             width: var(--content-badge-width);
             min-width: var(--content-badge-width);
             max-width: var(--content-badge-width);
-            min-height: calc(0.9rem * 1.2 + 10px);
+            min-height: calc(0.9rem * 1.2 + 4px);
             box-sizing: border-box;
         }
 
@@ -3148,7 +3149,7 @@
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 5px;
+            padding: 2px 5px;
             border: 1px solid #4b5568;
             background: transparent;
             cursor: pointer;
@@ -3334,20 +3335,21 @@
         }
 
         #content-editor .content-roster-table th.content-roster-title-col,
-        #content-editor .content-list-table th.content-roster-title-col {
-            max-width: 300px;
-        }
-
+        #content-editor .content-list-table th.content-roster-title-col,
         #content-editor .content-roster-table td.content-roster-title-col,
         #content-editor .content-list-table td.content-roster-title-col {
-            max-width: 300px;
-            min-width: 0;
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
             box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         #content-editor .content-roster-title-truncate {
             display: block;
-            max-width: 300px;
+            max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -3732,7 +3734,7 @@
             background: #ffffff;
             color: #000000;
             font-weight: 500;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-family: 'Inter', sans-serif;
             border-bottom: none;
             position: sticky;
@@ -3877,7 +3879,7 @@
         .speakers-overview .content-badge,
         .guest-overview-section .content-badge {
             margin: 0;
-            padding: 5px;
+            padding: 2px 5px;
             background: #ffffff;
             border: none;
             border-radius: 5px;
