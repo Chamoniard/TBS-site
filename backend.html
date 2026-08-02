@@ -1351,7 +1351,7 @@
         #guest-editor #guest-editor-actions .guest-workflow {
             display: flex;
             flex-direction: column;
-            align-items: stretch;
+            align-items: center;
             gap: 0.75rem;
             width: 100%;
             max-width: 100%;
@@ -1363,6 +1363,125 @@
             border: none;
             border-radius: 0;
             background: transparent;
+        }
+
+        #guest-editor #guest-editor-actions .guest-workflow-steps {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn {
+            display: block;
+            width: 250px;
+            max-width: 100%;
+            min-width: 0;
+            min-height: 35px;
+            height: auto;
+            margin: 0;
+            padding: 8px 12px;
+            box-sizing: border-box;
+            border: 1px solid #c5cdd4;
+            border-radius: var(--backend-square-btn-radius);
+            background: #f1f5f9;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true'] {
+            background: #f1f5f9;
+            border: 1px solid #c5cdd4;
+            color: #94a3b8;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            cursor: not-allowed;
+            transform: none;
+            opacity: 1;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:hover:not(:disabled):not([aria-disabled='true']) {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn--applied,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn--applied:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn--applied[aria-disabled='true'],
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-done,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-done:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-done[aria-disabled='true'] {
+            background: var(--backend-roster-status-yes-bg);
+            border-color: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
+            animation: none;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-done:hover:not(:disabled):not([aria-disabled='true']) {
+            animation: none;
+            border-color: var(--backend-roster-status-yes-bg);
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        @keyframes guest-workflow-pulse-border {
+            0%,
+            100% {
+                box-shadow:
+                    0 0 0 0 rgba(51, 138, 23, 0.45),
+                    0 1px 2px rgba(15, 23, 42, 0.08),
+                    0 2px 6px rgba(15, 23, 42, 0.06);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 4px rgba(51, 138, 23, 0.28),
+                    0 1px 2px rgba(15, 23, 42, 0.08),
+                    0 2px 6px rgba(15, 23, 42, 0.06);
+            }
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active {
+            border-color: var(--backend-roster-status-yes-bg);
+            color: #0f172a;
+            background: #f1f5f9;
+            cursor: pointer;
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
+            animation: none;
+            border-color: var(--backend-roster-status-yes-bg);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        #guest-editor #guest-editor-actions .guest-workflow-step-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: auto;
+            margin: 0;
+            color: #338a17;
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            pointer-events: none;
         }
 
         #speaker-editor .speaker-editor-bottom .speaker-workflow-nav {
@@ -5907,6 +6026,140 @@
             margin-top: 1.25rem;
         }
 
+        .guest-application-review[hidden] {
+            display: none !important;
+        }
+
+        .guest-application-review {
+            position: fixed;
+            inset: 0;
+            z-index: 10060;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .guest-application-review__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .guest-application-review__box {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: min(40rem, 100%);
+            max-height: min(90vh, 44rem);
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .guest-application-review__body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+            padding: 1.25rem 1.5rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .guest-application-review__title {
+            margin: 0 0 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .guest-application-review__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem 1rem;
+        }
+
+        .guest-application-review__field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            min-width: 0;
+        }
+
+        .guest-application-review__field--full {
+            grid-column: 1 / -1;
+        }
+
+        .guest-application-review__label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .guest-application-review__value {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .guest-application-review__footer {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0.75rem 1rem 1rem;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        body.backend-page .guest-application-review__confirm {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4rem;
+            height: 4rem;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 999px;
+            background: var(--backend-roster-status-yes-bg);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(51, 138, 23, 0.35);
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+        }
+
+        body.backend-page .guest-application-review__confirm:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 6px 18px rgba(51, 138, 23, 0.4);
+        }
+
+        body.backend-page .guest-application-review__confirm:disabled {
+            background: #86b56a;
+            color: #ffffff;
+            cursor: wait;
+            opacity: 1;
+            transform: none;
+        }
+
+        body.backend-page .guest-application-review__confirm svg {
+            width: 2rem;
+            height: 2rem;
+            display: block;
+        }
+
         .speaker-delete-confirm__backdrop {
             position: absolute;
             inset: 0;
@@ -7749,8 +8002,8 @@
                             </div>
                             <div class="guest-editor-bottom is-showing-management">
                             <div class="guest-workflow-nav" role="toolbar" aria-label="Guest editor sections">
-                                <button type="button" class="guest-workflow-nav-link" id="display-guest-actions" aria-label="Guest management actions" title="Guest management" disabled aria-disabled="true">
-                                    <span class="display-editor-actions-text">Actions</span>
+                                <button type="button" class="guest-workflow-nav-link" id="display-guest-actions" aria-label="Guest workflow" title="Guest workflow" disabled aria-disabled="true">
+                                    <span class="display-editor-actions-text">Workflow</span>
                                 </button>
                                 <button
                                     type="button"
@@ -7789,38 +8042,38 @@
                             <div class="guest-editor-bottom-panes">
                             <div class="guest-editor-actions" id="guest-editor-actions" role="region" aria-label="Guest management" hidden aria-hidden="true">
                                         <div class="guest-workflow" id="guest-workflow">
-                                            <h3 class="guest-workflow-title management-style">Workflow</h3>
-                                            <div id="readisno" class="readisno" hidden aria-hidden="true">
-                                                <p class="readisno-intro" id="readisno-intro"></p>
-                                                <div class="guest-application-actions">
-                                                    <button type="button" class="guest-accept-application-btn" id="guest-accept-application-btn">
-                                                        Accept application
-                                                    </button>
-                                                    <button type="button" class="guest-deny-application-btn" id="guest-deny-application-btn">
-                                                        Deny application
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div id="invitedisno" class="invitedisno readisyes" hidden aria-hidden="true">
-                                                <p class="readisyes-intro" id="readisyes-intro"></p>
-                                                <div class="readisyes-actions">
-                                                    <button type="button" class="guest-send-invite-btn" id="guest-send-invite-btn" hidden aria-hidden="true"></button>
-                                                    <button type="button" class="guest-send-to-reserves-btn" id="guest-send-to-reserves-btn">
-                                                        Send to reserves
-                                                    </button>
-                                                    <button type="button" class="guest-deny-sold-out-btn" id="guest-deny-sold-out-btn">
-                                                        Deny - Sold out
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div id="invoicedisno" class="invoicedisno" hidden aria-hidden="true">
-                                                <p class="invoicedisno-intro" id="invoicedisno-intro"></p>
-                                                <button type="button" class="guest-send-invoice-btn" id="guest-send-invoice-btn">
-                                                    Send invoice to Guest
+                                            <div class="guest-workflow-steps" role="group" aria-label="Guest workflow steps">
+                                                <button type="button" class="guest-workflow-step-btn guest-workflow-step-btn--applied" id="guest-workflow-applied-btn" disabled aria-disabled="true">
+                                                    Applied on —
                                                 </button>
-                                            </div>
-                                            <div id="invoicedisyes" class="invoicedisyes" hidden aria-hidden="true">
-                                                <p class="invoicedisyes-intro" id="invoicedisyes-intro"></p>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-read-application-btn" disabled aria-disabled="true">
+                                                    Read application
+                                                </button>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-invite-btn" disabled aria-disabled="true">
+                                                    Send invite to —
+                                                </button>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-invoice-btn" disabled aria-disabled="true">
+                                                    Send invoice
+                                                </button>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-payment-received-btn" disabled aria-disabled="true">
+                                                    Payment received
+                                                </button>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-briefing-btn" disabled aria-disabled="true">
+                                                    Send briefing
+                                                </button>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-attended-btn" disabled aria-disabled="true">
+                                                    Attended?
+                                                </button>
+                                                <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-cme-btn" disabled aria-disabled="true">
+                                                    Send CME
+                                                </button>
                                             </div>
                                         </div>
                                 </div>
@@ -8314,6 +8567,40 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" class="speaker-delete-cancel-btn" id="guest-delete-cancel">Cancel</button>
                 <button type="button" class="speaker-delete-yes-btn" id="guest-delete-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div
+        id="guest-application-review"
+        class="guest-application-review"
+        hidden
+        aria-hidden="true"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guest-application-review-title"
+    >
+        <div class="guest-application-review__backdrop" id="guest-application-review-backdrop"></div>
+        <div class="guest-application-review__box">
+            <div class="guest-application-review__body">
+                <h2 class="guest-application-review__title" id="guest-application-review-title">Guest application</h2>
+                <div class="guest-application-review__grid" id="guest-application-review-fields"></div>
+            </div>
+            <div class="guest-application-review__footer">
+                <button
+                    type="button"
+                    class="guest-application-review__confirm"
+                    id="guest-application-review-confirm"
+                    aria-label="Mark application as read"
+                    title="Mark application as read"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path
+                            fill="currentColor"
+                            d="M9.55 17.6 4.9 12.95l1.4-1.4 3.25 3.25 7.15-7.15 1.4 1.4z"
+                        ></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -11950,6 +12237,7 @@
                 ? 'Current event: ' + v
                 : 'Current event: — (set field “Current event” on tbs/Settings)';
             syncGuestInvoicedisnoBlock();
+            syncGuestWorkflowAppliedButton();
         }
 
         /** Programme / editor use `selectedevent`; keep it aligned with `tbs/Settings` → `Current event`. */
@@ -12560,6 +12848,15 @@
                 briefed: guestBriefedFieldFromDoc(d),
                 attended: guestAttendedFromDoc(d),
                 cmeStatus: guestCmeStatusFromDoc(d),
+                applicationDate: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'Application date',
+                    'Application Date',
+                    'applicationDate',
+                    'application_date',
+                    'Applied date',
+                    'Applied Date',
+                    'appliedDate',
+                ]),
             };
         }
 
@@ -13065,6 +13362,8 @@
             updateGuestNavButtons();
             updateAddGuestDeleteButtonState();
             syncGuestSendInviteButton();
+            syncGuestWorkflowAppliedButton();
+            syncGuestWorkflowReadApplicationButton();
             syncGuestApplicationActionButtons();
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
@@ -13128,6 +13427,8 @@
             updateGuestEditorProfileFields(null);
             updateGuestNavButtons();
             syncGuestSendInviteButton();
+            syncGuestWorkflowAppliedButton();
+            syncGuestWorkflowReadApplicationButton();
             syncGuestApplicationActionButtons();
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
@@ -13488,6 +13789,8 @@
             guestsInvitedDropdownOpenDocId = '';
             clearGuestsInvoicedUiState();
             renderGuestsRoster();
+            syncGuestWorkflowReadApplicationButton();
+            syncGuestWorkflowSendInviteButton();
             try {
                 var db = getFirestore();
                 await db
@@ -13503,6 +13806,8 @@
                 console.error('setGuestInvitedField:', err);
                 rec.invited = prev;
                 renderGuestsRoster();
+                syncGuestWorkflowReadApplicationButton();
+                syncGuestWorkflowSendInviteButton();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Invited.');
                 }
@@ -13532,6 +13837,8 @@
             clearGuestsInvitedUiState();
             clearGuestsInvoicedUiState();
             renderGuestsRoster();
+            syncGuestWorkflowReadApplicationButton();
+            syncGuestWorkflowSendInviteButton();
             try {
                 var db = getFirestore();
                 await db
@@ -13557,6 +13864,8 @@
                 rec.readTime = prevTime;
                 rec.status = prevStatus;
                 renderGuestsRoster();
+                syncGuestWorkflowReadApplicationButton();
+                syncGuestWorkflowSendInviteButton();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Read.');
                 }
@@ -13576,7 +13885,7 @@
         }
 
         function guestLogApplicationAcceptedLine() {
-            return guestLogYyMmDdPrefix() + ': Application accepted. Ready to send invite.';
+            return 'Read application ' + guestLogYyMmDdPrefix();
         }
 
         function guestLogApplicationDeniedLine() {
@@ -13723,7 +14032,7 @@
             var id = String(docId || '').trim();
             if (!id) return;
             var rec = findGuestInMemory(id);
-            if (!rec || !guestReadisnoBlockShouldShow(rec)) return;
+            if (!rec || !guestReadIsNoAwaitingDecision(rec.read)) return;
             var db = getFirestore();
             var itemRef = db.collection('tbs').doc('Guests').collection(id).doc('item');
             var snap;
@@ -13754,6 +14063,9 @@
             clearGuestsInvitedUiState();
             clearGuestsInvoicedUiState();
             renderGuestsRoster();
+            syncGuestWorkflowReadApplicationButton();
+            syncGuestWorkflowSendInviteButton();
+            syncGuestManagementLogPanel();
             try {
                 await itemRef.set(
                     {
@@ -13775,6 +14087,9 @@
                 rec.status = prevStatus;
                 rec.log = prevLog;
                 renderGuestsRoster();
+                syncGuestWorkflowReadApplicationButton();
+                syncGuestWorkflowSendInviteButton();
+                syncGuestManagementLogPanel();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to accept application.');
                 }
@@ -13970,7 +14285,156 @@
             }
         }
 
+        function syncGuestWorkflowAppliedButton() {
+            var btn = document.getElementById('guest-workflow-applied-btn');
+            if (!btn) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            var dateLabel = '—';
+            if (id) {
+                var g = findGuestInMemory(id);
+                if (g) {
+                    var rawDate = g.applicationDate != null ? String(g.applicationDate).trim() : '';
+                    if (rawDate) dateLabel = rawDate;
+                }
+            }
+            btn.textContent = 'Applied on ' + dateLabel;
+        }
+
+        function guestReadIsYes(readVal) {
+            return String(readVal != null ? readVal : '').trim().toLowerCase() === 'yes';
+        }
+
+        function syncGuestWorkflowReadApplicationButton() {
+            var btn = document.getElementById('guest-workflow-read-application-btn');
+            if (!btn) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            var g = id ? findGuestInMemory(id) : null;
+            var awaiting = Boolean(g && guestReadIsNoAwaitingDecision(g.read));
+            var done = Boolean(g && guestReadIsYes(g.read));
+            var active = awaiting || done;
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.classList.toggle('is-active', awaiting);
+            btn.classList.toggle('is-done', done);
+        }
+
+        function syncGuestWorkflowSendInviteButton() {
+            var btn = document.getElementById('guest-workflow-send-invite-btn');
+            if (!btn) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            var g = id ? findGuestInMemory(id) : null;
+            var email = '';
+            if (g) email = String(g.email || g.guestEmail || '').trim();
+            var label = email ? 'Send invite to ' + email : 'Send invite to —';
+            btn.textContent = label;
+            btn.setAttribute('aria-label', label);
+            btn.setAttribute('title', label);
+            var active = Boolean(g && guestInviteAllowedByRosterFields(g));
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.classList.toggle('is-active', active);
+        }
+
+        function guestApplicationReviewPlain(v) {
+            var s = v != null ? String(v) : '';
+            s = s
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/&nbsp;/gi, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            return s || '—';
+        }
+
+        function guestApplicationReviewFieldHtml(label, value, full) {
+            return (
+                '<div class="guest-application-review__field' +
+                (full ? ' guest-application-review__field--full' : '') +
+                '">' +
+                '<div class="guest-application-review__label">' +
+                escapeHtml(label) +
+                '</div>' +
+                '<div class="guest-application-review__value">' +
+                escapeHtml(guestApplicationReviewPlain(value)) +
+                '</div>' +
+                '</div>'
+            );
+        }
+
+        function fillGuestApplicationReviewPopup(g) {
+            var titleEl = document.getElementById('guest-application-review-title');
+            var fieldsEl = document.getElementById('guest-application-review-fields');
+            if (!fieldsEl) return;
+            if (!g) {
+                if (titleEl) titleEl.textContent = 'Guest application';
+                fieldsEl.innerHTML = '';
+                return;
+            }
+            var first = String(g.name || '').trim();
+            var last = String(g.lastName || '').trim();
+            var fullName = (first + ' ' + last).trim() || 'Guest';
+            if (titleEl) titleEl.textContent = fullName;
+            var specs = Array.isArray(g.baseSpecialities) ? g.baseSpecialities : [];
+            var specialty = specs
+                .map(function (s) {
+                    return String(s != null ? s : '').trim();
+                })
+                .filter(Boolean)
+                .join(', ');
+            var training = guestStringFromFirestoreValue(g.trainingLevel);
+            fieldsEl.innerHTML =
+                guestApplicationReviewFieldHtml('First name', first) +
+                guestApplicationReviewFieldHtml('Last name', last) +
+                guestApplicationReviewFieldHtml('Specialty', specialty) +
+                guestApplicationReviewFieldHtml('Level of training', training) +
+                guestApplicationReviewFieldHtml('City/region', g.cityRegion) +
+                guestApplicationReviewFieldHtml('Country', g.country) +
+                guestApplicationReviewFieldHtml('Employer 1', g.employer1) +
+                guestApplicationReviewFieldHtml('Employer 2', g.employer2) +
+                guestApplicationReviewFieldHtml('E-mail', g.email) +
+                guestApplicationReviewFieldHtml('Application date', g.applicationDate) +
+                guestApplicationReviewFieldHtml('Clinical context', g.clinicalContext, true) +
+                guestApplicationReviewFieldHtml('Bio', g.bio, true);
+        }
+
+        function openGuestApplicationReviewPopup() {
+            var dlg = document.getElementById('guest-application-review');
+            if (!dlg) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            var g = id ? findGuestInMemory(id) : null;
+            if (!g) return;
+            var canConfirm = guestReadIsNoAwaitingDecision(g.read);
+            var canView = canConfirm || guestReadIsYes(g.read);
+            if (!canView) return;
+            fillGuestApplicationReviewPopup(g);
+            dlg.hidden = false;
+            dlg.setAttribute('aria-hidden', 'false');
+            var confirmBtn = document.getElementById('guest-application-review-confirm');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.hidden = false;
+                confirmBtn.setAttribute('aria-hidden', 'false');
+                confirmBtn.focus();
+            }
+        }
+
+        function closeGuestApplicationReviewPopup() {
+            var dlg = document.getElementById('guest-application-review');
+            if (!dlg) return;
+            dlg.hidden = true;
+            dlg.setAttribute('aria-hidden', 'true');
+            var fieldsEl = document.getElementById('guest-application-review-fields');
+            if (fieldsEl) fieldsEl.innerHTML = '';
+            var confirmBtn = document.getElementById('guest-application-review-confirm');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.hidden = false;
+                confirmBtn.setAttribute('aria-hidden', 'false');
+            }
+        }
+
         function syncGuestApplicationActionButtons() {
+            syncGuestWorkflowReadApplicationButton();
+            syncGuestWorkflowSendInviteButton();
             var wrap = document.getElementById('readisno');
             var intro = document.getElementById('readisno-intro');
             if (!wrap) return;
@@ -20929,6 +21393,51 @@
             }
             var guestAcceptApplicationBtn = document.getElementById('guest-accept-application-btn');
             var guestDenyApplicationBtn = document.getElementById('guest-deny-application-btn');
+            var guestWorkflowReadApplicationBtn = document.getElementById('guest-workflow-read-application-btn');
+            var guestApplicationReviewConfirm = document.getElementById('guest-application-review-confirm');
+            var guestApplicationReviewBackdrop = document.getElementById('guest-application-review-backdrop');
+            if (guestWorkflowReadApplicationBtn) {
+                guestWorkflowReadApplicationBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (guestWorkflowReadApplicationBtn.disabled) return;
+                    openGuestApplicationReviewPopup();
+                });
+            }
+            if (guestApplicationReviewConfirm) {
+                guestApplicationReviewConfirm.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    var aid = String(guestFormEditingDocId || '').trim();
+                    var ag = aid ? findGuestInMemory(aid) : null;
+                    if (!aid || !ag || !guestReadIsNoAwaitingDecision(ag.read)) {
+                        closeGuestApplicationReviewPopup();
+                        return;
+                    }
+                    guestApplicationReviewConfirm.disabled = true;
+                    acceptGuestApplication(aid)
+                        .catch(function() {})
+                        .finally(function() {
+                            closeGuestApplicationReviewPopup();
+                            syncGuestApplicationActionButtons();
+                            syncGuestSendInviteButton();
+                            syncGuestInvoicedisnoBlock();
+                        });
+                });
+            }
+            if (guestApplicationReviewBackdrop) {
+                guestApplicationReviewBackdrop.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+            }
+            document.addEventListener('keydown', function(ev) {
+                if (ev.key !== 'Escape') return;
+                var reviewDlg = document.getElementById('guest-application-review');
+                if (!reviewDlg || reviewDlg.hidden) return;
+                ev.preventDefault();
+                closeGuestApplicationReviewPopup();
+            });
             if (guestAcceptApplicationBtn) {
                 guestAcceptApplicationBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
