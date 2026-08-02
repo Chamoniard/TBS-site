@@ -1458,7 +1458,7 @@
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active {
             border-color: var(--backend-roster-status-yes-bg);
             color: #0f172a;
-            background: #f1f5f9;
+            background: #ffffff;
             cursor: pointer;
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
@@ -1466,6 +1466,7 @@
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
             animation: none;
             border-color: var(--backend-roster-status-yes-bg);
+            background: #ffffff;
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
         }
 
@@ -13664,6 +13665,7 @@
             clearGuestsInvitedUiState();
             clearGuestsPaidUiState();
             renderGuestsRoster();
+            syncGuestWorkflowSendInvoiceButton();
             try {
                 var db = getFirestore();
                 await db
@@ -13679,6 +13681,7 @@
                 console.error('setGuestInvoicedField:', err);
                 rec.invoiced = prev;
                 renderGuestsRoster();
+                syncGuestWorkflowSendInvoiceButton();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Invoiced.');
                 }
@@ -13799,6 +13802,7 @@
             renderGuestsRoster();
             syncGuestWorkflowReadApplicationButton();
             syncGuestWorkflowSendInviteButton();
+            syncGuestWorkflowSendInvoiceButton();
             try {
                 var db = getFirestore();
                 await db
@@ -13816,6 +13820,7 @@
                 renderGuestsRoster();
                 syncGuestWorkflowReadApplicationButton();
                 syncGuestWorkflowSendInviteButton();
+                syncGuestWorkflowSendInvoiceButton();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Invited.');
                 }
@@ -14237,6 +14242,7 @@
         }
 
         function syncGuestInvoicedisnoBlock() {
+            syncGuestWorkflowSendInvoiceButton();
             var wrap = document.getElementById('invoicedisno');
             var intro = document.getElementById('invoicedisno-intro');
             var btn = document.getElementById('guest-send-invoice-btn');
@@ -14319,9 +14325,8 @@
             var g = id ? findGuestInMemory(id) : null;
             var awaiting = Boolean(g && guestReadIsNoAwaitingDecision(g.read));
             var done = Boolean(g && guestReadIsYes(g.read));
-            var active = awaiting || done;
-            btn.disabled = !active;
-            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.disabled = !awaiting;
+            btn.setAttribute('aria-disabled', awaiting ? 'false' : 'true');
             btn.classList.toggle('is-active', awaiting);
             btn.classList.toggle('is-done', done);
         }
@@ -14368,6 +14373,18 @@
             btn.setAttribute('aria-disabled', canSend ? 'false' : 'true');
             btn.classList.toggle('is-active', canSend);
             btn.classList.toggle('is-done', invitedDone);
+        }
+
+        function syncGuestWorkflowSendInvoiceButton() {
+            var btn = document.getElementById('guest-workflow-send-invoice-btn');
+            if (!btn) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            var g = id ? findGuestInMemory(id) : null;
+            var active = Boolean(g && guestInvoicedisnoBlockShouldShow(g));
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.classList.toggle('is-active', active);
+            btn.classList.toggle('is-done', false);
         }
 
         function guestApplicationReviewPlain(v) {
@@ -14470,6 +14487,7 @@
         function syncGuestApplicationActionButtons() {
             syncGuestWorkflowReadApplicationButton();
             syncGuestWorkflowSendInviteButton();
+            syncGuestWorkflowSendInvoiceButton();
             var wrap = document.getElementById('readisno');
             var intro = document.getElementById('readisno-intro');
             if (!wrap) return;
@@ -18261,6 +18279,7 @@
                 renderGuestsRoster();
                 syncGuestSendInviteButton();
                 syncGuestWorkflowSendInviteButton();
+                syncGuestWorkflowSendInvoiceButton();
                 syncGuestWorkflowReadApplicationButton();
                 syncGuestManagementLogPanel();
                 if (typeof showStatus === 'function') {
@@ -18274,6 +18293,7 @@
             } finally {
                 if (legacyBtn) legacyBtn.disabled = false;
                 syncGuestWorkflowSendInviteButton();
+                syncGuestWorkflowSendInvoiceButton();
             }
         }
 
@@ -21268,65 +21288,83 @@
                 });
             }
             var guestSendInvoiceBtn = document.getElementById('guest-send-invoice-btn');
+            var guestWorkflowSendInvoiceBtn = document.getElementById('guest-workflow-send-invoice-btn');
+            function sendGuestStripeInvoiceFromUi() {
+                var iid = String(guestFormEditingDocId || '').trim();
+                var ig = iid ? findGuestInMemory(iid) : null;
+                if (!iid || !ig || !guestInvoicedisnoBlockShouldShow(ig)) return;
+                if (guestSendInvoiceBtn) guestSendInvoiceBtn.disabled = true;
+                if (guestWorkflowSendInvoiceBtn) {
+                    guestWorkflowSendInvoiceBtn.disabled = true;
+                    guestWorkflowSendInvoiceBtn.setAttribute('aria-disabled', 'true');
+                }
+                if (typeof showStatus === 'function') {
+                    showStatus('loading', 'Sending invoice...');
+                }
+                var fnUrl =
+                    'https://us-central1-' +
+                    String(firebaseConfig.projectId || '').trim() +
+                    '.cloudfunctions.net/createGuestStripeInvoiceHttp';
+                fetch(fnUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ guestId: iid })
+                })
+                    .then(function(res) {
+                        if (!res.ok) {
+                            return res.json()
+                                .catch(function() { return {}; })
+                                .then(function(payload) {
+                                    var msg = payload && payload.error
+                                        ? String(payload.error)
+                                        : ('Function call failed (' + res.status + ')');
+                                    throw new Error(msg);
+                                });
+                        }
+                        return res.json();
+                    })
+                    .then(function(data) {
+                        if (ig) {
+                            ig.invoiced = 'Yes';
+                            ig.paid = 'No';
+                            renderGuestsRoster();
+                            syncGuestInvoicedisnoBlock();
+                            syncGuestWorkflowSendInvoiceButton();
+                        }
+                        var okMsg = 'Invoice sent';
+                        if (data && data.message) okMsg = String(data.message);
+                        if (typeof showStatus === 'function') showStatus('success', okMsg);
+                    })
+                    .catch(function(err) {
+                        console.error('guest-send-invoice:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message
+                                    ? err.message
+                                    : 'Failed to send invoice.'
+                            );
+                        }
+                    })
+                    .finally(function() {
+                        if (guestSendInvoiceBtn) guestSendInvoiceBtn.disabled = false;
+                        syncGuestWorkflowSendInvoiceButton();
+                    });
+            }
             if (guestSendInvoiceBtn) {
                 guestSendInvoiceBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    var iid = String(guestFormEditingDocId || '').trim();
-                    var ig = iid ? findGuestInMemory(iid) : null;
-                    if (!iid || !ig || !guestInvoicedisnoBlockShouldShow(ig)) return;
                     if (guestSendInvoiceBtn.disabled) return;
-                    guestSendInvoiceBtn.disabled = true;
-                    if (typeof showStatus === 'function') {
-                        showStatus('loading', 'Sending invoice...');
-                    }
-                    var fnUrl =
-                        'https://us-central1-' +
-                        String(firebaseConfig.projectId || '').trim() +
-                        '.cloudfunctions.net/createGuestStripeInvoiceHttp';
-                    fetch(fnUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ guestId: iid })
-                    })
-                        .then(function(res) {
-                            if (!res.ok) {
-                                return res.json()
-                                    .catch(function() { return {}; })
-                                    .then(function(payload) {
-                                        var msg = payload && payload.error
-                                            ? String(payload.error)
-                                            : ('Function call failed (' + res.status + ')');
-                                        throw new Error(msg);
-                                    });
-                            }
-                            return res.json();
-                        })
-                        .then(function(data) {
-                            if (ig) {
-                                ig.invoiced = 'Yes';
-                                ig.paid = 'No';
-                                renderGuestsRoster();
-                                syncGuestInvoicedisnoBlock();
-                            }
-                            var okMsg = 'Invoice sent';
-                            if (data && data.message) okMsg = String(data.message);
-                            if (typeof showStatus === 'function') showStatus('success', okMsg);
-                        })
-                        .catch(function(err) {
-                            console.error('guest-send-invoice-btn:', err);
-                            if (typeof showStatus === 'function') {
-                                showStatus(
-                                    'error',
-                                    err && err.message
-                                        ? err.message
-                                        : 'Failed to send invoice.'
-                                );
-                            }
-                        })
-                        .finally(function() {
-                            guestSendInvoiceBtn.disabled = false;
-                        });
+                    sendGuestStripeInvoiceFromUi();
+                });
+            }
+            if (guestWorkflowSendInvoiceBtn) {
+                guestWorkflowSendInvoiceBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (guestWorkflowSendInvoiceBtn.disabled) return;
+                    sendGuestStripeInvoiceFromUi();
                 });
             }
             var guestSendToReservesBtn = document.getElementById('guest-send-to-reserves-btn');
