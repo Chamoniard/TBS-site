@@ -586,15 +586,18 @@ export const sendGuestInviteHttp = onRequest({
     });
 
     const inviteLogLine = guestLogInvitationEmailedLine();
+    const invitedDate = formatGuestInvoicedDateDisplay(new Date());
     await itemRef.set({
-      Invited: "Yes",
-      Log: FieldValue.arrayUnion(inviteLogLine),
+      "Invited": "Yes",
+      "Invited date": invitedDate,
+      "Log": FieldValue.arrayUnion(inviteLogLine),
     }, {merge: true});
 
     logger.info("sendGuestInviteHttp ok", {
       guestId,
       to: email,
       from: fromAddress,
+      invitedDate,
     });
 
     res.status(200).json({
@@ -602,6 +605,7 @@ export const sendGuestInviteHttp = onRequest({
       guestId,
       to: email,
       from: fromAddress,
+      invitedDate,
       message: firstName ?
         "Invite is sent to " + firstName :
         "Invite is sent.",

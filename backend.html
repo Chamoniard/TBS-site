@@ -12829,6 +12829,14 @@
                     'inviteStatus',
                     'Invite Status',
                 ]),
+                invitedDate: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'Invited date',
+                    'Invited Date',
+                    'invitedDate',
+                    'invited_date',
+                    'Invite date',
+                    'Invite Date',
+                ]),
                 invoiced: guestCoalesceGuestItemFieldFromKeys(d, [
                     'Invoiced',
                     'invoiced',
@@ -14318,6 +14326,25 @@
             btn.classList.toggle('is-done', done);
         }
 
+        function guestInvitedIsYes(invitedVal) {
+            return String(invitedVal != null ? invitedVal : '').trim().toLowerCase() === 'yes';
+        }
+
+        /** Prefer stored Invited date; else parse latest “Invitation emailed” log (YYMMDD → YYYY-MM-DD). */
+        function guestInvitedDateLabelFromRecord(g) {
+            if (!g) return '';
+            var stored = g.invitedDate != null ? String(g.invitedDate).trim() : '';
+            if (stored) return stored;
+            var log = Array.isArray(g.log) ? g.log : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var m = String(log[i] != null ? log[i] : '').match(
+                    /^(\d{2})(\d{2})(\d{2}):\s*Invitation emailed/i
+                );
+                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
+            }
+            return '';
+        }
+
         function syncGuestWorkflowSendInviteButton() {
             var btn = document.getElementById('guest-workflow-send-invite-btn');
             if (!btn) return;
@@ -14325,14 +14352,22 @@
             var g = id ? findGuestInMemory(id) : null;
             var email = '';
             if (g) email = String(g.email || g.guestEmail || '').trim();
-            var label = email ? 'Send invite to ' + email : 'Send invite to —';
+            var invitedDone = Boolean(g && guestInvitedIsYes(g.invited));
+            var canSend = Boolean(g && guestInviteAllowedByRosterFields(g));
+            var label;
+            if (invitedDone) {
+                var dateLabel = guestInvitedDateLabelFromRecord(g) || '—';
+                label = 'Invite sent ' + dateLabel;
+            } else {
+                label = email ? 'Send invite to ' + email : 'Send invite to —';
+            }
             btn.textContent = label;
             btn.setAttribute('aria-label', label);
             btn.setAttribute('title', label);
-            var active = Boolean(g && guestInviteAllowedByRosterFields(g));
-            btn.disabled = !active;
-            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
-            btn.classList.toggle('is-active', active);
+            btn.disabled = !canSend;
+            btn.setAttribute('aria-disabled', canSend ? 'false' : 'true');
+            btn.classList.toggle('is-active', canSend);
+            btn.classList.toggle('is-done', invitedDone);
         }
 
         function guestApplicationReviewPlain(v) {
@@ -18208,6 +18243,15 @@
                           ? 'Invite is sent to ' + firstName
                           : 'Invite is sent.';
                 g.invited = 'Yes';
+                if (payload && payload.invitedDate) {
+                    g.invitedDate = String(payload.invitedDate);
+                } else {
+                    var now = new Date();
+                    var yyyy = String(now.getFullYear());
+                    var mm = String(now.getMonth() + 1).padStart(2, '0');
+                    var dd = String(now.getDate()).padStart(2, '0');
+                    g.invitedDate = yyyy + '-' + mm + '-' + dd;
+                }
                 if (payload && payload.logLine) {
                     g.log = (Array.isArray(g.log) ? g.log.slice() : []).concat([String(payload.logLine)]);
                 } else {
