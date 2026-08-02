@@ -1263,7 +1263,7 @@
         #guest-editor .guests-top-right {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start;
             flex: 1 1 0;
             min-width: 0;
             min-height: 55px;
@@ -4242,15 +4242,16 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start;
         }
 
         #speaker-editor .speaker-editor-toolbar {
             grid-template-columns: 1fr;
+            justify-content: flex-start;
         }
 
         #speaker-editor .speaker-editor-toolbar-trailing {
-            justify-self: stretch;
+            justify-self: start;
         }
 
         #guest-editor .guest-editor-toolbar-leading,
@@ -4271,8 +4272,8 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-end;
-            justify-self: end;
+            justify-content: flex-start;
+            justify-self: start;
             gap: 0.5rem;
             min-width: 0;
         }
@@ -5209,6 +5210,15 @@
             overflow: visible;
             min-height: 0;
             cursor: default;
+        }
+
+        #guest-editor .guest-bio-display[contenteditable='true'],
+        #guest-editor .guest-clinical-context-display[contenteditable='true'] {
+            cursor: text;
+            outline: 1px solid #cbd5e1;
+            outline-offset: 2px;
+            border-radius: 4px;
+            min-height: 1.5em;
         }
 
         #guest-editor .guest-editor-profile {
@@ -10908,18 +10918,30 @@
 
         var guestBioFormBaseline = null;
 
+        function readGuestDisplayFieldText(id) {
+            var el = document.getElementById(id);
+            if (!el) return '';
+            return String(el.textContent != null ? el.textContent : '');
+        }
+
         function readGuestBioFormSnapshot() {
+            var nameFirstEl = document.getElementById('edit-guest-bottom-name-first');
+            var nameLastEl = document.getElementById('edit-guest-bottom-name-last');
             var cityEl = document.getElementById('edit-guest-city-region');
             var countryEl = document.getElementById('edit-guest-country');
             var emp1El = document.getElementById('edit-guest-employer1');
             var emp2El = document.getElementById('edit-guest-employer2');
             var emailEl = document.getElementById('edit-guest-email');
             return {
+                name: nameFirstEl ? String(nameFirstEl.value || '') : '',
+                lastName: nameLastEl ? String(nameLastEl.value || '') : '',
                 cityRegion: cityEl ? String(cityEl.value || '') : '',
                 country: countryEl ? String(countryEl.value || '') : '',
                 employer1: emp1El ? String(emp1El.value || '') : '',
                 employer2: emp2El ? String(emp2El.value || '') : '',
                 email: emailEl ? String(emailEl.value || '') : '',
+                bio: readGuestDisplayFieldText('edit-guest-bio'),
+                clinicalContext: readGuestDisplayFieldText('clinicalcontext-text'),
             };
         }
 
@@ -10931,22 +10953,30 @@
             if (!guestBioFormBaseline) return false;
             var current = readGuestBioFormSnapshot();
             return (
+                current.name !== guestBioFormBaseline.name ||
+                current.lastName !== guestBioFormBaseline.lastName ||
                 current.cityRegion !== guestBioFormBaseline.cityRegion ||
                 current.country !== guestBioFormBaseline.country ||
                 current.employer1 !== guestBioFormBaseline.employer1 ||
                 current.employer2 !== guestBioFormBaseline.employer2 ||
-                current.email !== guestBioFormBaseline.email
+                current.email !== guestBioFormBaseline.email ||
+                current.bio !== guestBioFormBaseline.bio ||
+                current.clinicalContext !== guestBioFormBaseline.clinicalContext
             );
         }
 
         function readGuestFormIntoRecord(rec) {
             if (!rec) return;
             var snap = readGuestBioFormSnapshot();
+            rec.name = snap.name;
+            rec.lastName = snap.lastName;
             rec.cityRegion = snap.cityRegion;
             rec.country = snap.country;
             rec.employer1 = snap.employer1;
             rec.employer2 = snap.employer2;
             rec.email = snap.email;
+            rec.bio = snap.bio;
+            rec.clinicalContext = snap.clinicalContext;
         }
 
         function syncAddGuestFormToMemoryIfEditing() {
@@ -10955,6 +10985,10 @@
             var rec = findGuestInMemory(id);
             if (!rec) return;
             readGuestFormIntoRecord(rec);
+            var guestFirstEl = document.getElementById('edit-guest-name-first');
+            var guestLastEl = document.getElementById('edit-guest-name-last');
+            if (guestFirstEl) guestFirstEl.textContent = String(rec.name || '').trim();
+            if (guestLastEl) guestLastEl.textContent = String(rec.lastName || '').trim();
             guestsRosterSortInPlace();
             renderGuestsRoster();
             syncGuestRosterSelectionHighlight();
@@ -10998,25 +11032,58 @@
         function syncGuestEditabilityFromPadlock() {
             var panel = document.getElementById('guest-editor-panel');
             if (!panel) return;
-            var canEdit =
-                !panel.classList.contains('is-empty') &&
-                guestPadlockIsOpen &&
-                guestEditorBottomPane === 'bio';
-            panel
-                .querySelectorAll(
-                    '#guest-editor-profile input, #guest-editor-bio input[type="email"], #edit-guest-email'
-                )
-                .forEach(function (el) {
-                    el.disabled = !canEdit;
-                    if (canEdit) {
-                        el.removeAttribute('readonly');
-                        el.removeAttribute('aria-readonly');
-                    } else {
-                        el.readOnly = true;
-                        el.setAttribute('readonly', 'readonly');
-                        el.setAttribute('aria-readonly', 'true');
+            var canEdit = !panel.classList.contains('is-empty') && guestPadlockIsOpen;
+            var editableInputIds = [
+                'edit-guest-bottom-name-first',
+                'edit-guest-bottom-name-last',
+                'edit-guest-city-region',
+                'edit-guest-country',
+                'edit-guest-employer1',
+                'edit-guest-employer2',
+                'edit-guest-email',
+            ];
+            editableInputIds.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.disabled = !canEdit;
+                if (canEdit) {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('aria-readonly');
+                    el.removeAttribute('tabindex');
+                } else {
+                    el.readOnly = true;
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('aria-readonly', 'true');
+                    if (id === 'edit-guest-bottom-name-first' || id === 'edit-guest-bottom-name-last') {
+                        el.setAttribute('tabindex', '-1');
                     }
-                });
+                }
+            });
+            // Specialty / training come from registration and stay display-only.
+            ['edit-guest-specialty-display', 'edit-guest-training-display'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.disabled = true;
+                el.readOnly = true;
+                el.setAttribute('readonly', 'readonly');
+                el.setAttribute('aria-readonly', 'true');
+                el.setAttribute('tabindex', '-1');
+            });
+            ['edit-guest-bio', 'clinicalcontext-text'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                if (canEdit) {
+                    el.setAttribute('contenteditable', 'true');
+                    el.removeAttribute('aria-readonly');
+                    el.setAttribute('role', 'textbox');
+                    el.setAttribute('tabindex', '0');
+                } else {
+                    el.setAttribute('contenteditable', 'false');
+                    el.setAttribute('aria-readonly', 'true');
+                    el.setAttribute('role', 'region');
+                    el.removeAttribute('tabindex');
+                }
+            });
             updateSaveGuestToolbarButtonState();
             updateAddGuestDeleteButtonState();
         }
@@ -11294,10 +11361,11 @@
             var delBtn = document.getElementById('add-guest-delete-btn');
             var id = String(guestFormEditingDocId || '').trim();
             var hasGuest = id !== '';
+            var canDelete = hasGuest && guestPadlockIsOpen;
             if (delBtn) {
-                delBtn.disabled = !hasGuest;
-                delBtn.setAttribute('aria-disabled', hasGuest ? 'false' : 'true');
-                if (!hasGuest) delBtn.classList.remove('is-armed');
+                delBtn.disabled = !canDelete;
+                delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
+                if (!canDelete) delBtn.classList.remove('is-armed');
             }
         }
 
@@ -12820,7 +12888,7 @@
             logBtn.setAttribute('aria-disabled', selectionEmpty || pane === 'log' ? 'true' : 'false');
 
             if (padlock) {
-                var padlockActive = !selectionEmpty && pane === 'bio';
+                var padlockActive = !selectionEmpty;
                 padlock.disabled = !padlockActive;
                 padlock.setAttribute('aria-disabled', padlockActive ? 'false' : 'true');
             }
@@ -12837,8 +12905,8 @@
             var svg = padlock.querySelector('svg');
             var path = svg ? svg.querySelector('path') : null;
             if (path) path.setAttribute('d', guestPadlockIsOpen ? openPath : closedPath);
-            padlock.setAttribute('aria-label', guestPadlockIsOpen ? 'Unlock guest' : 'Lock guest');
-            padlock.setAttribute('title', guestPadlockIsOpen ? 'Unlock' : 'Lock');
+            padlock.setAttribute('aria-label', guestPadlockIsOpen ? 'Lock guest' : 'Unlock guest');
+            padlock.setAttribute('title', guestPadlockIsOpen ? 'Lock' : 'Unlock');
             padlock.setAttribute('aria-pressed', guestPadlockIsOpen ? 'true' : 'false');
         }
 
@@ -20954,7 +21022,11 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (guestPadlockBtn.disabled) return;
-                    guestPadlockIsOpen = !guestPadlockIsOpen;
+                    var willOpen = !guestPadlockIsOpen;
+                    if (willOpen && guestEditorBottomPane !== 'bio') {
+                        scrollGuestEditorBottomToBio();
+                    }
+                    guestPadlockIsOpen = willOpen;
                     syncGuestPadlockButtonUi();
                     syncGuestEditabilityFromPadlock();
                 });
@@ -21629,6 +21701,8 @@
                 syncAddGuestFormToMemoryIfEditing();
             }
             [
+                'edit-guest-bottom-name-first',
+                'edit-guest-bottom-name-last',
                 'edit-guest-city-region',
                 'edit-guest-country',
                 'edit-guest-employer1',
@@ -21639,6 +21713,12 @@
                 if (el) {
                     el.addEventListener('input', onGuestBioFormInput);
                     el.addEventListener('change', onGuestBioFormInput);
+                }
+            });
+            ['edit-guest-bio', 'clinicalcontext-text'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', onGuestBioFormInput);
                 }
             });
             var speakerLongBioResizeRaf = 0;
