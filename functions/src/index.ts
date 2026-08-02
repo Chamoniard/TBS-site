@@ -22,6 +22,10 @@ setGlobalOptions({maxInstances: 10});
 
 initializeApp();
 const stripeSecretParam = defineSecret("STRIPE_SECRET_KEY");
+const gmailSendClientIdParam = defineSecret("GMAIL_SEND_CLIENT_ID");
+const gmailSendClientSecretParam = defineSecret("GMAIL_SEND_CLIENT_SECRET");
+const gmailSendRefreshTokenParam = defineSecret("GMAIL_SEND_REFRESH_TOKEN");
+const gmailSendFromParam = defineSecret("GMAIL_SEND_FROM");
 const stripeInvoiceTemplateId = "inrtem_1TTPvLJh1HgAavTOwaRm4T4d";
 const stripeInvoicePriceId = "price_1TTix9Jh1HgAavTOyUmwFqzv";
 
@@ -105,6 +109,173 @@ function guestLogPrefixYyMmDd(): string {
  */
 function guestLogApplicationReceivedLine(): string {
   return `${guestLogPrefixYyMmDd()}: Application received`;
+}
+
+/**
+ * Log line after invitation e-mail is sent from the guest workflow.
+ * @return {string} e.g. `260802: Invitation emailed to guest.`
+ */
+function guestLogInvitationEmailedLine(): string {
+  return `${guestLogPrefixYyMmDd()}: Invitation emailed to guest.`;
+}
+
+/**
+ * Escape text for safe insertion into HTML e-mail templates.
+ * @param {string} text Raw text.
+ * @return {string} Escaped HTML text.
+ */
+function escapeHtml(text: string): string {
+  return String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Read Current event from tbs/Settings.
+ * @param {Firestore} db Firestore instance.
+ * @return {Promise<string>} Current event label or empty string.
+ */
+async function loadCurrentEventLabel(db: Firestore): Promise<string> {
+  const snap = await db.collection("tbs").doc("Settings").get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  const keys = [
+    "Current event",
+    "currentEvent",
+    "Current Event",
+    "CURRENT EVENT",
+  ];
+  for (const key of keys) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const v = String(data[key] || "").trim();
+      if (v) return v;
+    }
+  }
+  return "";
+}
+
+/**
+ * Load guest invitation HTML from tbs/Snippets.
+ * @param {Firestore} db Firestore instance.
+ * @return {Promise<string>} HTML template string.
+ */
+async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
+  const snap = await db.collection("tbs").doc("Snippets").get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  const raw = data["Guest invitation"];
+  return raw != null ? String(raw) : "";
+}
+
+/**
+ * Refresh a Gmail OAuth access token using the stored refresh token.
+ * @return {Promise<string>} Access token.
+ */
+async function refreshGmailSendAccessToken(): Promise<string> {
+  const clientId = String(gmailSendClientIdParam.value() || "").trim();
+  const clientSecret = String(gmailSendClientSecretParam.value() || "").trim();
+  const refreshToken = String(gmailSendRefreshTokenParam.value() || "").trim();
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error("Missing Gmail send OAuth secrets.");
+  }
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    refresh_token: refreshToken,
+    grant_type: "refresh_token",
+  });
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body: body.toString(),
+  });
+  const json = await res.json() as Record<string, unknown>;
+  if (!res.ok) {
+    const errMsg = String(
+      json.error_description || json.error || res.statusText,
+    );
+    throw new Error("Gmail token refresh failed: " + errMsg);
+  }
+  const accessToken = String(json.access_token || "").trim();
+  if (!accessToken) {
+    throw new Error("Gmail token refresh returned no access_token.");
+  }
+  return accessToken;
+}
+
+/**
+ * Encode an RFC822 message for Gmail API `raw`.
+ * @param {string} rfc822 Message text.
+ * @return {string} Base64url string.
+ */
+function gmailRfc822ToBase64Url(rfc822: string): string {
+  return Buffer.from(rfc822, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+/**
+ * Send an HTML e-mail via Gmail API as the configured From address.
+ * @param {string} accessToken OAuth access token.
+ * @param {object} opts Mail fields.
+ * @return {Promise<void>}
+ */
+async function sendGmailHtmlMessage(
+  accessToken: string,
+  opts: {from: string; to: string; subject: string; html: string},
+): Promise<void> {
+  const from = String(opts.from || "").trim();
+  const to = String(opts.to || "").trim();
+  const subject = String(opts.subject || "").replace(/[\r\n]/g, " ").trim();
+  const html = String(opts.html || "");
+  if (!from || !to || !subject) {
+    throw new Error("Missing From, To, or Subject for invite e-mail.");
+  }
+  const rfc822 = [
+    "From: " + from,
+    "To: " + to,
+    "Subject: " + subject,
+    "MIME-Version: 1.0",
+    "Content-Type: text/html; charset=UTF-8",
+    "",
+    html,
+  ].join("\r\n");
+  const raw = gmailRfc822ToBase64Url(rfc822);
+  const res = await fetch(
+    "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + accessToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({raw}),
+    },
+  );
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(
+      "Gmail send failed (" + res.status + "): " + (errText || res.statusText),
+    );
+  }
+}
+
+/**
+ * True when guest Read is Yes and Invited is No (invite workflow gate).
+ * @param {Record<string, unknown>} data Guest item data.
+ * @return {boolean} Whether invite may be sent.
+ */
+function guestInviteAllowed(data: Record<string, unknown>): boolean {
+  const read = String(
+    data.Read ?? data.read ?? data.READ ?? "",
+  ).trim();
+  const invited = String(
+    data.Invited ?? data.invited ?? "",
+  ).trim();
+  return read === "Yes" && invited === "No";
 }
 
 /**
@@ -311,6 +482,136 @@ export const createGuestStripeInvoiceHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Stripe invoice generation failed.",
+    });
+  }
+});
+
+/**
+ * Guest workflow: send invitation HTML from tbs/Snippets as Registration@…
+ * using server-side Gmail OAuth (refresh token). Sets Invited=Yes + log line.
+ * Expects JSON: { guestId }.
+ */
+export const sendGuestInviteHttp = onRequest({
+  secrets: [
+    gmailSendClientIdParam,
+    gmailSendClientSecretParam,
+    gmailSendRefreshTokenParam,
+    gmailSendFromParam,
+  ],
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const guestId = String(body.guestId || "").trim();
+  if (!guestId) {
+    res.status(400).json({error: "Missing guestId."});
+    return;
+  }
+
+  const fromAddress = String(gmailSendFromParam.value() || "").trim();
+  if (!fromAddress || !fromAddress.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SEND_FROM secret.",
+    });
+    return;
+  }
+
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Guests")
+    .collection(guestId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Guest item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    if (!guestInviteAllowed(data)) {
+      res.status(400).json({
+        error: "Invite is only available when Read is Yes and Invited is No.",
+      });
+      return;
+    }
+
+    const email = pickGuestEmail(data);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({error: "Guest has no valid email."});
+      return;
+    }
+
+    const htmlTemplate = await loadGuestInvitationHtml(db);
+    if (!String(htmlTemplate).trim()) {
+      res.status(500).json({
+        error: "Guest invitation template is empty in tbs/Snippets.",
+      });
+      return;
+    }
+
+    const firstName = String(
+      data.Name || data.name || data["First name"] || data.firstName || "",
+    ).trim();
+    const eventLabel = await loadCurrentEventLabel(db);
+    const subject = (eventLabel ? eventLabel + " - Invitation" : "Invitation")
+      .replace(/[\r\n]/g, " ");
+    const html = String(htmlTemplate)
+      .split("{{first_name}}")
+      .join(escapeHtml(firstName))
+      .split("{{Current event}}")
+      .join(escapeHtml(eventLabel));
+
+    const accessToken = await refreshGmailSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    const inviteLogLine = guestLogInvitationEmailedLine();
+    await itemRef.set({
+      Invited: "Yes",
+      Log: FieldValue.arrayUnion(inviteLogLine),
+    }, {merge: true});
+
+    logger.info("sendGuestInviteHttp ok", {
+      guestId,
+      to: email,
+      from: fromAddress,
+    });
+
+    res.status(200).json({
+      ok: true,
+      guestId,
+      to: email,
+      from: fromAddress,
+      message: firstName ?
+        "Invite is sent to " + firstName :
+        "Invite is sent.",
+    });
+  } catch (err) {
+    logger.error("sendGuestInviteHttp failed", {guestId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send invitation.",
     });
   }
 });

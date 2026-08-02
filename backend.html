@@ -18136,12 +18136,14 @@
         }
 
         /**
-         * Send invitation e-mail to the selected guest (Gmail API). Body from tbs/Snippets `Guest invitation`.
-         * Replaces `{{first_name}}` and `{{Current event}}` in the HTML; subject is `{Current event} - Invitation` (from tbs/Settings).
-         * Requires prior “Connect to Gmail” (same token as E-mailer).
+         * Send invitation e-mail to the selected guest via Cloud Function
+         * `sendGuestInviteHttp` (server Gmail as GMAIL_SEND_FROM).
+         * Body from tbs/Snippets `Guest invitation` (loaded in the function).
+         * On success sets Invited=Yes + log line in Firestore.
          */
         async function sendGuestInvitationEmail() {
-            var btn = document.getElementById('guest-send-invite-btn');
+            var legacyBtn = document.getElementById('guest-send-invite-btn');
+            var workflowBtn = document.getElementById('guest-workflow-send-invite-btn');
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) {
                 if (typeof showStatus === 'function') showStatus('error', 'Select a guest first.');
@@ -18167,74 +18169,58 @@
                 }
                 return;
             }
-            if (!(await ensureGmailAccessForSending())) return;
-            if (btn) btn.disabled = true;
+            if (legacyBtn) legacyBtn.disabled = true;
+            if (workflowBtn) {
+                workflowBtn.disabled = true;
+                workflowBtn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending invite...');
+            }
             try {
-                var html = await fetchGuestInvitationHtmlFromFirestore();
-                if (!String(html).trim()) {
-                    if (typeof showStatus === 'function') {
-                        showStatus('error', 'Guest invitation template is empty in tbs/Snippets.');
-                    }
-                    return;
-                }
-                var firstName = String(g.name || '').trim();
-                var eventLabel = String(current_event || '').trim();
-                var subject = eventLabel ? eventLabel + ' - Invitation' : 'Invitation';
-                subject = subject.replace(/[\r\n]/g, ' ');
-                html = String(html)
-                    .split('{{first_name}}')
-                    .join(escapeHtml(firstName))
-                    .split('{{Current event}}')
-                    .join(escapeHtml(eventLabel));
-                var rfc822 = [
-                    'To: ' + toRaw,
-                    'Subject: ' + subject,
-                    'MIME-Version: 1.0',
-                    'Content-Type: text/html; charset=UTF-8',
-                    '',
-                    html
-                ].join('\r\n');
-                var raw = gmailRfc822ToBase64Url(rfc822);
-                await gmailApiRequest('messages/send', {
+                var fnUrl =
+                    'https://us-central1-' +
+                    String(firebaseConfig.projectId || '').trim() +
+                    '.cloudfunctions.net/sendGuestInviteHttp';
+                var res = await fetch(fnUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ raw: raw })
+                    body: JSON.stringify({ guestId: id }),
                 });
-                var sentOkMsg = firstName ? 'Invite is sent to ' + firstName : 'Invite is sent.';
+                var payload = {};
                 try {
-                    var db = getFirestore();
-                    var itemRef = db.collection('tbs').doc('Guests').collection(id).doc('item');
+                    payload = await res.json();
+                } catch (parseErr) {
+                    payload = {};
+                }
+                if (!res.ok) {
+                    var errMsg =
+                        payload && payload.error
+                            ? String(payload.error)
+                            : 'Function call failed (' + res.status + ')';
+                    throw new Error(errMsg);
+                }
+                var firstName = String(g.name || '').trim();
+                var sentOkMsg =
+                    payload && payload.message
+                        ? String(payload.message)
+                        : firstName
+                          ? 'Invite is sent to ' + firstName
+                          : 'Invite is sent.';
+                g.invited = 'Yes';
+                if (payload && payload.logLine) {
+                    g.log = (Array.isArray(g.log) ? g.log.slice() : []).concat([String(payload.logLine)]);
+                } else {
                     var inviteLogLine = guestLogInvitationEmailedLine();
-                    var mergedLog;
-                    try {
-                        var snap = await itemRef.get();
-                        var data = snap.exists ? snap.data() || {} : {};
-                        mergedLog = guestLogFromDoc(data).concat([inviteLogLine]);
-                    } catch (readErr) {
-                        console.warn('sendGuestInvitationEmail: read item for Log merge:', readErr);
-                        mergedLog = (Array.isArray(g.log) ? g.log.slice() : guestLogFromDoc({})).concat([
-                            inviteLogLine,
-                        ]);
-                    }
-                    await itemRef.set({ Invited: 'Yes', Log: mergedLog }, { merge: true });
-                    g.invited = 'Yes';
-                    g.log = mergedLog.slice();
-                    renderGuestsRoster();
-                    syncGuestSendInviteButton();
-                    syncGuestManagementLogPanel();
-                    if (typeof showStatus === 'function') {
-                        showStatus('success', sentOkMsg);
-                    }
-                } catch (fsErr) {
-                    console.error('sendGuestInvitationEmail Firestore Invited:', fsErr);
-                    if (typeof showStatus === 'function') {
-                        showStatus(
-                            'error',
-                            (firstName ? 'Invite was sent to ' + firstName + ', but ' : 'Invite was sent, but ') +
-                                'Firestore could not be updated (Invited / Log): ' +
-                                (fsErr && fsErr.message ? fsErr.message : 'Firestore error')
-                        );
-                    }
+                    g.log = (Array.isArray(g.log) ? g.log.slice() : []).concat([inviteLogLine]);
+                }
+                renderGuestsRoster();
+                syncGuestSendInviteButton();
+                syncGuestWorkflowSendInviteButton();
+                syncGuestWorkflowReadApplicationButton();
+                syncGuestManagementLogPanel();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', sentOkMsg);
                 }
             } catch (err) {
                 console.error('sendGuestInvitationEmail:', err);
@@ -18242,7 +18228,8 @@
                     showStatus('error', err && err.message ? err.message : 'Failed to send invitation.');
                 }
             } finally {
-                if (btn) btn.disabled = false;
+                if (legacyBtn) legacyBtn.disabled = false;
+                syncGuestWorkflowSendInviteButton();
             }
         }
 
@@ -21152,6 +21139,20 @@
                     ev.preventDefault();
                     sendGuestInvitationEmail().catch(function(err) {
                         console.error('guest-send-invite:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', err && err.message ? err.message : 'Failed to send invitation.');
+                        }
+                    });
+                });
+            }
+            var guestWorkflowSendInviteBtn = document.getElementById('guest-workflow-send-invite-btn');
+            if (guestWorkflowSendInviteBtn) {
+                guestWorkflowSendInviteBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (guestWorkflowSendInviteBtn.disabled) return;
+                    sendGuestInvitationEmail().catch(function(err) {
+                        console.error('guest-workflow-send-invite:', err);
                         if (typeof showStatus === 'function') {
                             showStatus('error', err && err.message ? err.message : 'Failed to send invitation.');
                         }
