@@ -4,7 +4,12 @@ import {onRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
-import {FieldValue, Firestore, getFirestore} from "firebase-admin/firestore";
+import {
+  DocumentReference,
+  FieldValue,
+  Firestore,
+  getFirestore,
+} from "firebase-admin/firestore";
 import {getStorage} from "firebase-admin/storage";
 import Stripe from "stripe";
 
@@ -22,6 +27,7 @@ setGlobalOptions({maxInstances: 10});
 
 initializeApp();
 const stripeSecretParam = defineSecret("STRIPE_SECRET_KEY");
+const stripeWebhookSecretParam = defineSecret("STRIPE_WEBHOOK_SECRET");
 const gmailSendClientIdParam = defineSecret("GMAIL_SEND_CLIENT_ID");
 const gmailSendClientSecretParam = defineSecret("GMAIL_SEND_CLIENT_SECRET");
 const gmailSendRefreshTokenParam = defineSecret("GMAIL_SEND_REFRESH_TOKEN");
@@ -416,6 +422,10 @@ export const createGuestStripeInvoiceHttp = onRequest({
       auto_advance: false,
       currency: "eur",
       rendering: {template: stripeInvoiceTemplateId},
+      metadata: {
+        guestId: guestId,
+        tbsGuestPath: `tbs/Guests/${guestId}/item`,
+      },
     });
     await stripe.invoiceItems.create({
       customer: storedCustomerId,
@@ -485,6 +495,147 @@ export const createGuestStripeInvoiceHttp = onRequest({
         err.message :
         "Stripe invoice generation failed.",
     });
+  }
+});
+
+/**
+ * Minimal invoice fields used when matching a paid Stripe invoice to a guest.
+ */
+type StripePaidInvoiceFields = {
+  id?: string | null;
+  number?: string | null;
+  status?: string | null;
+  customer?: unknown;
+  metadata?: Record<string, string> | null;
+  hosted_invoice_url?: string | null;
+};
+
+/**
+ * Resolve guest item ref from a paid Stripe invoice.
+ * Prefers invoice.metadata.guestId; falls back to scanning Guests for
+ * Stripe Invoice Id.
+ * @param {Firestore} db Admin Firestore.
+ * @param {StripePaidInvoiceFields} invoice Paid invoice.
+ * @return {Promise<DocumentReference|null>} Guest item ref or null.
+ */
+async function findGuestItemRefForStripeInvoice(
+  db: Firestore,
+  invoice: StripePaidInvoiceFields,
+): Promise<DocumentReference | null> {
+  const metaGuestId = String(
+    (invoice.metadata && invoice.metadata.guestId) || "",
+  ).trim();
+  if (metaGuestId) {
+    return db.collection("tbs").doc("Guests")
+      .collection(metaGuestId).doc("item");
+  }
+  const invoiceId = String(invoice.id || "").trim();
+  if (!invoiceId) return null;
+  const guestCols = await db.collection("tbs").doc("Guests").listCollections();
+  for (const col of guestCols) {
+    const snap = await col.doc("item").get();
+    if (!snap.exists) continue;
+    const data = snap.data() || {};
+    const storedId = String(data["Stripe Invoice Id"] || "").trim();
+    if (storedId && storedId === invoiceId) {
+      return snap.ref;
+    }
+  }
+  return null;
+}
+
+/**
+ * Stripe webhook: on invoice.paid, set guest Paid=Yes + invoice fields.
+ * Configure endpoint in Stripe Live Dashboard → Developers → Webhooks.
+ */
+export const stripeWebhookHttp = onRequest({
+  secrets: [stripeSecretParam, stripeWebhookSecretParam],
+}, async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method not allowed");
+    return;
+  }
+
+  const stripeSecret = String(stripeSecretParam.value() || "").trim();
+  const webhookSecret = String(stripeWebhookSecretParam.value() || "").trim();
+  if (!stripeSecret || !webhookSecret) {
+    res.status(500).send("Missing Stripe secrets.");
+    return;
+  }
+
+  const stripe = new Stripe(stripeSecret);
+  const signature = String(req.headers["stripe-signature"] || "");
+  // Firebase provides the raw body buffer required for signature verification.
+  const rawBody = (req as {rawBody?: Buffer}).rawBody;
+  if (!rawBody || !Buffer.isBuffer(rawBody)) {
+    logger.error("stripeWebhookHttp: missing rawBody");
+    res.status(400).send("Missing raw body.");
+    return;
+  }
+
+  let event: {type: string; data: {object: StripePaidInvoiceFields}};
+  try {
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      webhookSecret,
+    ) as {type: string; data: {object: StripePaidInvoiceFields}};
+  } catch (err) {
+    logger.error("stripeWebhookHttp signature verify failed", {err});
+    res.status(400).send(
+      `Webhook signature verification failed: ${
+        err instanceof Error ? err.message : "unknown error"
+      }`,
+    );
+    return;
+  }
+
+  try {
+    if (event.type === "invoice.paid") {
+      const invoice = event.data.object;
+      const db = getFirestore();
+      const itemRef = await findGuestItemRefForStripeInvoice(db, invoice);
+      if (!itemRef) {
+        logger.warn("stripeWebhookHttp: no guest for invoice", {
+          invoiceId: invoice.id,
+          customer: invoice.customer,
+        });
+        res.status(200).json({ok: true, matched: false});
+        return;
+      }
+
+      const paidDate = formatGuestInvoicedDateDisplay(new Date());
+      const logLine = `${guestLogPrefixYyMmDd()}: ` +
+        `Payment received on ${paidDate}` +
+        (invoice.id ? ` (${invoice.id}` : "") +
+        (invoice.number ? `, number ${invoice.number}` : "") +
+        (invoice.id ? ")" : "") +
+        ".";
+      await itemRef.set({
+        "Paid": "Yes",
+        "Paid date": paidDate,
+        "Stripe Invoice Id": invoice.id || "",
+        "Stripe Invoice Status": invoice.status || "paid",
+        "Stripe Invoice Number": invoice.number || "",
+        "Stripe Invoice Url": invoice.hosted_invoice_url || "",
+        "Log": FieldValue.arrayUnion(logLine),
+      }, {merge: true});
+
+      logger.info("stripeWebhookHttp invoice.paid", {
+        invoiceId: invoice.id,
+        invoiceNumber: invoice.number,
+        guestPath: itemRef.path,
+      });
+      res.status(200).json({ok: true, matched: true});
+      return;
+    }
+
+    res.status(200).json({ok: true, ignored: event.type});
+  } catch (err) {
+    logger.error("stripeWebhookHttp handler error", {err, type: event.type});
+    res.status(500).send(
+      err instanceof Error ? err.message : "Webhook handler failed.",
+    );
   }
 });
 

@@ -354,7 +354,7 @@
             box-shadow: none !important;
         }
 
-        /* E-mailer tab: placeholder until the panel is built */
+        /* Placeholder tabs (Overview, Finances) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -7600,7 +7600,7 @@
             </div>
             <div class="eventnavigation-aspects-spacer" aria-hidden="true"></div>
             <div class="aspects">
-                <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, programme, lodging, snippets, content, E-mailer, and Settings">
+                <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, programme, lodging, snippets, content, E-mailer, Finances, and Settings">
                     <span
                         class="backend-editor-link backend-editor-link--inactive"
                         id="overview-toggle"
@@ -7616,6 +7616,14 @@
                     <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                     <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
                     <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
+                    <span
+                        class="backend-editor-link backend-editor-link--inactive"
+                        id="finances-toggle"
+                        role="button"
+                        aria-disabled="true"
+                        aria-expanded="false"
+                        tabindex="-1"
+                        title="Coming soon">Finances</span>
                     <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
                 </nav>
                 <p class="backend-content-count" id="backend-content-count" hidden aria-live="polite">Content items 0</p>
@@ -12934,6 +12942,14 @@
                     'payment',
                     'Payment status',
                 ]),
+                paidDate: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'Paid date',
+                    'Paid Date',
+                    'paidDate',
+                    'paid_date',
+                    'Payment date',
+                    'Payment Date',
+                ]),
                 briefed: guestBriefedFieldFromDoc(d),
                 attended: guestAttendedFromDoc(d),
                 cmeStatus: guestCmeStatusFromDoc(d),
@@ -13295,11 +13311,11 @@
             if (path) path.setAttribute('d', guestPadlockIsOpen ? openPath : closedPath);
             padlock.setAttribute(
                 'aria-label',
-                guestPadlockIsOpen ? 'Guest unlocked' : 'Unlock guest'
+                guestPadlockIsOpen ? 'Lock guest' : 'Unlock guest'
             );
             padlock.setAttribute(
                 'title',
-                guestPadlockIsOpen ? 'Unlocked' : 'Unlock'
+                guestPadlockIsOpen ? 'Lock' : 'Unlock'
             );
             padlock.setAttribute('aria-pressed', guestPadlockIsOpen ? 'true' : 'false');
             var guestEditorRoot = document.getElementById('guest-editor');
@@ -13746,6 +13762,29 @@
             var rec = findGuestInMemory(id);
             if (!rec) return;
             var prev = rec.paid;
+            var prevPaidDate = rec.paidDate;
+            var prevLog = Array.isArray(rec.log) ? rec.log.slice() : [];
+            var becomingPaid =
+                String(value).trim().toLowerCase() === 'yes' &&
+                String(prev != null ? prev : '').trim().toLowerCase() !== 'yes';
+            var paidDate = becomingPaid ? guestPaidDateYyyyMmDd() : '';
+            var logLine = becomingPaid ? guestLogPaymentReceivedLine(paidDate) : '';
+            var patch = { Paid: value };
+            if (becomingPaid) {
+                var dbPre = getFirestore();
+                var itemRefPre = dbPre.collection('tbs').doc('Guests').collection(id).doc('item');
+                try {
+                    var snapPre = await itemRefPre.get();
+                    var dataPre = snapPre.exists ? snapPre.data() || {} : {};
+                    prevLog = guestLogFromDoc(dataPre);
+                } catch (ge) {
+                    console.error('setGuestPaidField get:', ge);
+                }
+                patch['Paid date'] = paidDate;
+                patch.Log = prevLog.concat([logLine]);
+                rec.paidDate = paidDate;
+                rec.log = patch.Log.slice();
+            }
             rec.paid = value;
             guestsPaidArmedDocId = '';
             guestsPaidDropdownOpenDocId = '';
@@ -13753,6 +13792,11 @@
             clearGuestsInvitedUiState();
             clearGuestsInvoicedUiState();
             renderGuestsRoster();
+            syncGuestWorkflowPaymentReceivedButton();
+            syncGuestInvoicedisnoBlock();
+            if (typeof syncGuestManagementLogPanel === 'function') {
+                syncGuestManagementLogPanel();
+            }
             try {
                 var db = getFirestore();
                 await db
@@ -13760,14 +13804,21 @@
                     .doc('Guests')
                     .collection(id)
                     .doc('item')
-                    .set({ Paid: value }, { merge: true });
+                    .set(patch, { merge: true });
                 if (typeof showStatus === 'function') {
                     showStatus('success', 'Saved to Firebase: Paid = ' + value + '.');
                 }
             } catch (err) {
                 console.error('setGuestPaidField:', err);
                 rec.paid = prev;
+                rec.paidDate = prevPaidDate;
+                rec.log = prevLog;
                 renderGuestsRoster();
+                syncGuestWorkflowPaymentReceivedButton();
+                syncGuestInvoicedisnoBlock();
+                if (typeof syncGuestManagementLogPanel === 'function') {
+                    syncGuestManagementLogPanel();
+                }
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Paid.');
                 }
@@ -14039,6 +14090,21 @@
         function guestLogInvoiceSentLine(invoiceId) {
             var idPart = invoiceId ? ' (' + String(invoiceId) + ')' : '';
             return guestLogYyMmDdPrefix() + ': Stripe invoice finalized and sent' + idPart + '.';
+        }
+
+        function guestPaidDateYyyyMmDd(date) {
+            var d = date instanceof Date ? date : new Date();
+            var yyyy = String(d.getFullYear());
+            var mm = String(d.getMonth() + 1);
+            if (mm.length < 2) mm = '0' + mm;
+            var dd = String(d.getDate());
+            if (dd.length < 2) dd = '0' + dd;
+            return yyyy + '-' + mm + '-' + dd;
+        }
+
+        function guestLogPaymentReceivedLine(paidDateYyyyMmDd) {
+            var dateLabel = String(paidDateYyyyMmDd || '').trim() || guestPaidDateYyyyMmDd();
+            return guestLogYyMmDdPrefix() + ': Payment received on ' + dateLabel + '.';
         }
 
         function guestLogSentToReservesLine() {
@@ -14355,6 +14421,11 @@
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'no';
         }
 
+        /** Paid is the literal “Yes” (case-insensitive). */
+        function guestPaidFieldIsYes(paidVal) {
+            return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'yes';
+        }
+
         /** Invited is the literal “Yes” (case-insensitive). */
         function guestInvitedFieldIsYes(invitedVal) {
             return String(invitedVal != null ? invitedVal : '').trim().toLowerCase() === 'yes';
@@ -14558,23 +14629,50 @@
             return '';
         }
 
+        /** Prefer stored Paid date; else parse latest “Payment received on” log. */
+        function guestPaidDateLabelFromRecord(g) {
+            if (!g) return '';
+            var stored = g.paidDate != null ? String(g.paidDate).trim() : '';
+            if (stored) return stored;
+            var log = Array.isArray(g.log) ? g.log : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var line = String(log[i] != null ? log[i] : '');
+                var onDate = line.match(/Payment received on (\d{4}-\d{2}-\d{2})/i);
+                if (onDate) return onDate[1];
+                var m = line.match(
+                    /^(\d{2})(\d{2})(\d{2}):\s*(?:Payment received|Stripe invoice paid)/i
+                );
+                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
+            }
+            return '';
+        }
+
         function syncGuestWorkflowPaymentReceivedButton() {
             var btn = document.getElementById('guest-workflow-payment-received-btn');
             if (!btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
+            var paidDone = Boolean(g && guestPaidFieldIsYes(g.paid));
             var awaiting = Boolean(
                 g && guestInvoicedFieldIsYes(g.invoiced) && guestPaidFieldIsNo(g.paid)
             );
-            var label = awaiting ? 'Awaiting payment' : 'Payment received';
+            var label;
+            if (paidDone) {
+                var dateLabel = guestPaidDateLabelFromRecord(g);
+                label = dateLabel ? 'Payment received ' + dateLabel : 'Payment received';
+            } else if (awaiting) {
+                label = 'Awaiting payment';
+            } else {
+                label = 'Payment received';
+            }
             btn.textContent = label;
             btn.setAttribute('aria-label', label);
             btn.setAttribute('title', label);
             btn.disabled = true;
             btn.setAttribute('aria-disabled', 'true');
-            btn.classList.toggle('is-awaiting-payment', awaiting);
+            btn.classList.toggle('is-awaiting-payment', awaiting && !paidDone);
             btn.classList.toggle('is-active', false);
-            btn.classList.toggle('is-done', false);
+            btn.classList.toggle('is-done', paidDone);
         }
 
         function guestApplicationReviewPlain(v) {
@@ -21819,9 +21917,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (guestPadlockBtn.disabled) return;
-                    // Unlock only; stays open until another guest is selected (or selection cleared).
-                    if (guestPadlockIsOpen) return;
-                    guestPadlockIsOpen = true;
+                    guestPadlockIsOpen = !guestPadlockIsOpen;
                     syncGuestPadlockButtonUi();
                     syncGuestEditabilityFromPadlock();
                     refreshGuestWorkflowButtonsForPadlock();
