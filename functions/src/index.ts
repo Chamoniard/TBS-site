@@ -26,8 +26,8 @@ const gmailSendClientIdParam = defineSecret("GMAIL_SEND_CLIENT_ID");
 const gmailSendClientSecretParam = defineSecret("GMAIL_SEND_CLIENT_SECRET");
 const gmailSendRefreshTokenParam = defineSecret("GMAIL_SEND_REFRESH_TOKEN");
 const gmailSendFromParam = defineSecret("GMAIL_SEND_FROM");
-const stripeInvoiceTemplateId = "inrtem_1TTPvLJh1HgAavTOwaRm4T4d";
-const stripeInvoicePriceId = "price_1TTix9Jh1HgAavTOyUmwFqzv";
+const stripeInvoiceTemplateId = "inrtem_1U0L26J1nXZVJIUSnNARAePJ";
+const stripeInvoicePriceId = "price_1TnIigJ1nXZVJIUS4KTefGCf";
 
 /**
  * Picks the best available guest email field from Firestore data.
@@ -474,6 +474,8 @@ export const createGuestStripeInvoiceHttp = onRequest({
       customerId: storedCustomerId,
       customerExists: alreadyExisted,
       invoiceId: finalizedInvoice.id,
+      invoicedDate: invoicedDate,
+      logLine: sentLogLine,
       message: "Invoice sent",
     });
   } catch (err) {

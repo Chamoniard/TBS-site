@@ -12889,6 +12889,14 @@
                     'Invoice sent',
                     'Invoiced?',
                 ]),
+                invoicedDate: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'Invoiced date',
+                    'Invoiced Date',
+                    'invoicedDate',
+                    'invoiced_date',
+                    'Invoice date',
+                    'Invoice Date',
+                ]),
                 paid: guestCoalesceGuestItemFieldFromKeys(d, [
                     'Paid',
                     'paid',
@@ -13987,6 +13995,11 @@
             return guestLogYyMmDdPrefix() + ': Invitation emailed to guest.';
         }
 
+        function guestLogInvoiceSentLine(invoiceId) {
+            var idPart = invoiceId ? ' (' + String(invoiceId) + ')' : '';
+            return guestLogYyMmDdPrefix() + ': Stripe invoice finalized and sent' + idPart + '.';
+        }
+
         function guestLogSentToReservesLine() {
             return guestLogYyMmDdPrefix() + ': Sent to reserves.';
         }
@@ -14463,10 +14476,21 @@
             if (!btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
+            var invoicedDone = Boolean(g && guestInvoicedFieldIsYes(g.invoiced));
             var active = Boolean(
                 g && guestInvitedFieldIsYes(g.invited) && guestInvoicedFieldIsNo(g.invoiced)
             );
             var canRun = active && guestPadlockIsOpen;
+            var label;
+            if (invoicedDone) {
+                var dateLabel = guestInvoicedDateLabelFromRecord(g) || '—';
+                label = 'Invoiced ' + dateLabel;
+            } else {
+                label = 'Send invoice';
+            }
+            btn.textContent = label;
+            btn.setAttribute('aria-label', label);
+            btn.setAttribute('title', label);
             // Keep enabled while active so locked clicks can shake the padlock.
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
@@ -14474,7 +14498,22 @@
                 btn.removeAttribute('disabled');
             }
             btn.classList.toggle('is-active', active);
-            btn.classList.toggle('is-done', false);
+            btn.classList.toggle('is-done', invoicedDone);
+        }
+
+        /** Prefer stored Invoiced date; else parse latest “Stripe invoice finalized and sent” log. */
+        function guestInvoicedDateLabelFromRecord(g) {
+            if (!g) return '';
+            var stored = g.invoicedDate != null ? String(g.invoicedDate).trim() : '';
+            if (stored) return stored;
+            var log = Array.isArray(g.log) ? g.log : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var m = String(log[i] != null ? log[i] : '').match(
+                    /^(\d{2})(\d{2})(\d{2}):\s*Stripe invoice finalized and sent/i
+                );
+                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
+            }
+            return '';
         }
 
         function guestApplicationReviewPlain(v) {
@@ -21418,9 +21457,31 @@
                         if (ig) {
                             ig.invoiced = 'Yes';
                             ig.paid = 'No';
+                            if (data && data.invoicedDate) {
+                                ig.invoicedDate = String(data.invoicedDate);
+                            } else {
+                                var nowInv = new Date();
+                                var yyyyInv = String(nowInv.getFullYear());
+                                var mmInv = String(nowInv.getMonth() + 1).padStart(2, '0');
+                                var ddInv = String(nowInv.getDate()).padStart(2, '0');
+                                ig.invoicedDate = yyyyInv + '-' + mmInv + '-' + ddInv;
+                            }
+                            if (data && data.logLine) {
+                                ig.log = (Array.isArray(ig.log) ? ig.log.slice() : []).concat([
+                                    String(data.logLine),
+                                ]);
+                            } else {
+                                var invLogLine = guestLogInvoiceSentLine(
+                                    data && data.invoiceId ? data.invoiceId : ''
+                                );
+                                ig.log = (Array.isArray(ig.log) ? ig.log.slice() : []).concat([
+                                    invLogLine,
+                                ]);
+                            }
                             renderGuestsRoster();
                             syncGuestInvoicedisnoBlock();
                             syncGuestWorkflowSendInvoiceButton();
+                            syncGuestManagementLogPanel();
                         }
                         var okMsg = 'Invoice sent';
                         if (data && data.message) okMsg = String(data.message);
