@@ -1403,8 +1403,8 @@
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled:not(.is-active):not(.is-done):not(.guest-workflow-step-btn--applied),
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true']:not(.is-active):not(.is-done):not(.guest-workflow-step-btn--applied) {
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled:not(.is-active):not(.is-awaiting-payment):not(.is-done):not(.guest-workflow-step-btn--applied),
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true']:not(.is-active):not(.is-awaiting-payment):not(.is-done):not(.guest-workflow-step-btn--applied) {
             background: #f1f5f9;
             border: 1px solid #c5cdd4;
             color: #94a3b8;
@@ -1450,6 +1450,22 @@
             50% {
                 box-shadow:
                     0 0 0 4px rgba(51, 138, 23, 0.28),
+                    0 1px 2px rgba(15, 23, 42, 0.08),
+                    0 2px 6px rgba(15, 23, 42, 0.06);
+            }
+        }
+
+        @keyframes guest-workflow-pulse-border-red {
+            0%,
+            100% {
+                box-shadow:
+                    0 0 0 0 rgba(186, 30, 69, 0.5),
+                    0 1px 2px rgba(15, 23, 42, 0.08),
+                    0 2px 6px rgba(15, 23, 42, 0.06);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 4px rgba(186, 30, 69, 0.32),
                     0 1px 2px rgba(15, 23, 42, 0.08),
                     0 2px 6px rgba(15, 23, 42, 0.06);
             }
@@ -1506,6 +1522,18 @@
 
         body.backend-page #guest-editor:not(.guest-padlock-unlocked) #guest-editor-actions .guest-workflow-step-btn.is-active {
             cursor: pointer;
+        }
+
+        /* Invoiced=Yes, Paid=No: red pulsing “Awaiting payment”. */
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment[aria-disabled='true'],
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment[aria-disabled='false'] {
+            border-color: #ba1e45;
+            color: #0f172a;
+            background: #ffffff;
+            cursor: default;
+            animation: guest-workflow-pulse-border-red 1.6s ease-in-out infinite;
         }
 
         body.backend-page button.guest-editor-padlock-btn.is-angry-shake {
@@ -8725,6 +8753,8 @@
         let contentPadlockIsOpen = false;
         let contentDeleteConfirmArmed = false;
         let guestPadlockIsOpen = false;
+        /** Ignore guest-roster row clicks until this timestamp (ms), e.g. after application-review confirm. */
+        var suppressGuestRosterSelectUntil = 0;
         let speakerPadlockIsOpen = false;
         let speakerEditorBottomPane = 'management';
         let texteditorPadlockIsOpen = false;
@@ -13306,6 +13336,7 @@
             syncGuestWorkflowReadApplicationButton();
             syncGuestWorkflowSendInviteButton();
             syncGuestWorkflowSendInvoiceButton();
+            syncGuestWorkflowPaymentReceivedButton();
         }
 
         function scrollGuestEditorBottomToBio() {
@@ -14345,6 +14376,7 @@
 
         function syncGuestInvoicedisnoBlock() {
             syncGuestWorkflowSendInvoiceButton();
+            syncGuestWorkflowPaymentReceivedButton();
             var wrap = document.getElementById('invoicedisno');
             var intro = document.getElementById('invoicedisno-intro');
             var btn = document.getElementById('guest-send-invoice-btn');
@@ -14526,6 +14558,25 @@
             return '';
         }
 
+        function syncGuestWorkflowPaymentReceivedButton() {
+            var btn = document.getElementById('guest-workflow-payment-received-btn');
+            if (!btn) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            var g = id ? findGuestInMemory(id) : null;
+            var awaiting = Boolean(
+                g && guestInvoicedFieldIsYes(g.invoiced) && guestPaidFieldIsNo(g.paid)
+            );
+            var label = awaiting ? 'Awaiting payment' : 'Payment received';
+            btn.textContent = label;
+            btn.setAttribute('aria-label', label);
+            btn.setAttribute('title', label);
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+            btn.classList.toggle('is-awaiting-payment', awaiting);
+            btn.classList.toggle('is-active', false);
+            btn.classList.toggle('is-done', false);
+        }
+
         function guestApplicationReviewPlain(v) {
             var s = v != null ? String(v) : '';
             s = s
@@ -14627,6 +14678,7 @@
             syncGuestWorkflowReadApplicationButton();
             syncGuestWorkflowSendInviteButton();
             syncGuestWorkflowSendInvoiceButton();
+            syncGuestWorkflowPaymentReceivedButton();
             var wrap = document.getElementById('readisno');
             var intro = document.getElementById('readisno-intro');
             if (!wrap) return;
@@ -21639,14 +21691,23 @@
                         closeGuestApplicationReviewPopup();
                         return;
                     }
-                    guestApplicationReviewConfirm.disabled = true;
+                    // Closing/disabling the dialog in this click can fall through to the
+                    // roster underneath and re-lock the padlock — suppress that briefly.
+                    suppressGuestRosterSelectUntil = Date.now() + 600;
+                    var keepPadlockOpen = guestPadlockIsOpen;
+                    closeGuestApplicationReviewPopup();
                     acceptGuestApplication(aid)
                         .catch(function() {})
                         .finally(function() {
-                            closeGuestApplicationReviewPopup();
+                            guestPadlockIsOpen = keepPadlockOpen;
+                            syncGuestPadlockButtonUi();
+                            syncGuestEditabilityFromPadlock();
+                            refreshGuestWorkflowButtonsForPadlock();
                             syncGuestApplicationActionButtons();
                             syncGuestSendInviteButton();
                             syncGuestInvoicedisnoBlock();
+                            updateAddGuestDeleteButtonState();
+                            updateSaveGuestToolbarButtonState();
                         });
                 });
             }
@@ -22001,6 +22062,11 @@
                     }
                     var guestRow = ev.target.closest('.guests-roster-row');
                     if (!guestRow) return;
+                    if (Date.now() < suppressGuestRosterSelectUntil) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        return;
+                    }
                     if (
                         ev.target.closest('.guests-invited-wrap') ||
                         ev.target.closest('.guests-read-wrap') ||
