@@ -11345,7 +11345,6 @@
                 var db = getFirestore();
                 await tbsGuestItemRef(db, id).set(guestPayloadFromRecord(rec), { merge: true });
                 captureGuestBioFormBaseline();
-                guestPadlockIsOpen = false;
                 syncGuestEditabilityFromPadlock();
                 syncGuestPadlockButtonUi();
                 refreshGuestWorkflowButtonsForPadlock();
@@ -13264,8 +13263,14 @@
             var svg = padlock.querySelector('svg');
             var path = svg ? svg.querySelector('path') : null;
             if (path) path.setAttribute('d', guestPadlockIsOpen ? openPath : closedPath);
-            padlock.setAttribute('aria-label', guestPadlockIsOpen ? 'Lock guest' : 'Unlock guest');
-            padlock.setAttribute('title', guestPadlockIsOpen ? 'Lock' : 'Unlock');
+            padlock.setAttribute(
+                'aria-label',
+                guestPadlockIsOpen ? 'Guest unlocked' : 'Unlock guest'
+            );
+            padlock.setAttribute(
+                'title',
+                guestPadlockIsOpen ? 'Unlocked' : 'Unlock'
+            );
             padlock.setAttribute('aria-pressed', guestPadlockIsOpen ? 'true' : 'false');
             var guestEditorRoot = document.getElementById('guest-editor');
             if (guestEditorRoot) {
@@ -13443,7 +13448,10 @@
 
         function populateEditGuestFormFromRecord(g) {
             if (!g) return;
-            guestFormEditingDocId = String(g.id || '').trim();
+            var nextGuestId = String(g.id || '').trim();
+            var switchingGuest =
+                nextGuestId !== String(guestFormEditingDocId || '').trim();
+            guestFormEditingDocId = nextGuestId;
             var guestEmailEl = document.getElementById('edit-guest-email');
             var guestCollEl = document.getElementById('guest-editor-collection');
             var guestIdMetaEl = document.getElementById('guest-editor-id');
@@ -13455,7 +13463,9 @@
             syncGuestRosterSelectionHighlight();
             updateGuestNavButtons();
             syncGuestSendInviteButton();
-            guestPadlockIsOpen = false;
+            if (switchingGuest) {
+                guestPadlockIsOpen = false;
+            }
             captureGuestBioFormBaseline();
             syncGuestPadlockButtonUi();
             syncGuestEditabilityFromPadlock();
@@ -17768,13 +17778,6 @@
             );
         }
 
-        function isPointerInsideGuestViewerOrTopChrome(target) {
-            if (!target || typeof target.closest !== 'function') return false;
-            return Boolean(
-                target.closest('#guest-viewer') || target.closest('#guest-editor .guests-top-row')
-            );
-        }
-
         async function saveAndLockContentIfSelectionFromViewerBlur() {
             var id = String(contentFormEditingDocId || '').trim();
             if (!id) return;
@@ -17789,15 +17792,6 @@
             syncContentEditabilityFromPadlock();
             syncContentRosterSelectionHighlight();
             updateContentSaveButtonState();
-        }
-
-        function lockGuestIfSelectionFromViewerBlur() {
-            if (!String(guestFormEditingDocId || '').trim()) return;
-            guestPadlockIsOpen = false;
-            syncGuestPadlockButtonUi();
-            syncGuestEditabilityFromPadlock();
-            refreshGuestWorkflowButtonsForPadlock();
-            updateAddGuestDeleteButtonState();
         }
 
         function isPointerInsideSpeakerViewerOrTopChrome(target) {
@@ -17830,10 +17824,6 @@
                         viewerBlurSaveLockInFlight = null;
                     });
                 }
-            }
-            var gid = String(guestFormEditingDocId || '').trim();
-            if (gid && !isPointerInsideGuestViewerOrTopChrome(t)) {
-                lockGuestIfSelectionFromViewerBlur();
             }
             var sid = String(speakerFormEditingDocId || '').trim();
             if (sid && !isPointerInsideSpeakerViewerOrTopChrome(t)) {
@@ -21768,7 +21758,9 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (guestPadlockBtn.disabled) return;
-                    guestPadlockIsOpen = !guestPadlockIsOpen;
+                    // Unlock only; stays open until another guest is selected (or selection cleared).
+                    if (guestPadlockIsOpen) return;
+                    guestPadlockIsOpen = true;
                     syncGuestPadlockButtonUi();
                     syncGuestEditabilityFromPadlock();
                     refreshGuestWorkflowButtonsForPadlock();
