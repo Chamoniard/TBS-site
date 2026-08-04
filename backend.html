@@ -2044,7 +2044,7 @@
         #content-editor .content-list .content-list-scroll,
         #finances-editor .finances-panel .guests-roster-list,
         #finances-editor .finances-panel .finances-panel-body {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
         }
 
@@ -2779,6 +2779,14 @@
             padding: 16px;
         }
 
+        #finances-editor.is-open,
+        .finances-section.is-open {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            min-height: 0;
+        }
+
         #finances-editor,
         #finances-editor .finances-panel,
         #finances-editor .finances-panel-body {
@@ -2792,7 +2800,7 @@
         }
 
         #finances-editor .finances-panel .finances-panel-body {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
             background: #ffffff;
             border-radius: 0 0 5px 5px;
@@ -2806,22 +2814,41 @@
             gap: 16px;
             margin-top: 0;
             min-width: 0;
-            flex: 1;
+            flex: 1 1 0;
             min-height: 0;
             overflow: hidden;
             height: 100%;
+            align-self: stretch;
+            box-sizing: border-box;
         }
 
         #finances-editor .finances-panel {
             flex: 1 1 0;
             min-width: 0;
             min-height: 0;
+            height: 100%;
+            align-self: stretch;
             background: transparent;
             padding: 0;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: stretch;
+            box-sizing: border-box;
+        }
+
+        #finances-editor .finances-panel .guests-roster-list {
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #finances-editor .finances-panel .guests-roster-scroll {
+            flex: 1 1 0;
+            min-height: 0;
+            height: auto;
         }
 
         #speaker-editor,
@@ -7247,6 +7274,7 @@
         body.backend-page #lodging-editor,
         body.backend-page #content-editor,
         body.backend-page #emailer-editor,
+        body.backend-page #finances-editor,
         body.backend-page #settings-editor {
             flex: 1 1 0;
             min-height: 0;
@@ -7476,21 +7504,49 @@
             min-width: 0;
         }
 
-        #programme-editor .programme-toolbar .programme-padlock-btn {
-            flex: 0 0 auto;
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
-            min-height: 35px;
-            max-width: 35px;
-            max-height: 35px;
+        #programme-editor .programme-toolbar .programme-padlock-btn,
+        #programme-editor .programme-toolbar .programme-session-order-btn,
+        #programme-editor .programme-toolbar #save-programme-btn,
+        #programme-editor .programme-toolbar .programme-restore-btn,
+        #programme-editor .programme-toolbar #programme-delete-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
             padding: 0;
-            border-radius: var(--backend-icon-btn-radius);
+            gap: 0;
             box-sizing: border-box;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+            font-size: 0;
         }
 
-        #programme-editor .programme-toolbar .programme-padlock-btn svg {
+        #programme-editor .programme-toolbar .programme-padlock-btn svg,
+        #programme-editor .programme-toolbar .programme-restore-btn svg,
+        #programme-editor .programme-toolbar #programme-delete-btn svg {
+            width: 22px;
+            height: 22px;
             flex-shrink: 0;
+            display: block;
+        }
+
+        #programme-editor .programme-toolbar #save-programme-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #programme-editor .programme-toolbar .programme-padlock-btn {
+            background: #ffd700;
+            color: #003153;
         }
 
         #programme-editor .programme-toolbar .programme-padlock-btn:disabled {
@@ -7514,14 +7570,15 @@
             flex: 0 0 auto;
             width: auto;
             min-width: var(--backend-gold-toolbar-btn-width);
-            height: 35px;
-            min-height: 35px;
-            max-height: 35px;
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
             padding: 0 0.85rem;
             font-family: var(--backend-gold-toolbar-btn-font);
             font-size: 0.8125rem;
             font-weight: 600;
             line-height: 1;
+            box-sizing: border-box;
         }
 
         #programme-editor .programme-toolbar .programme-add-session-btn:disabled,
@@ -7548,23 +7605,10 @@
         }
 
         #programme-editor .programme-toolbar .programme-session-order-btn {
-            flex: 0 0 auto;
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
-            min-height: 35px;
-            max-height: 35px;
-            padding: 0;
-            border: none;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             background: #FFD700;
             color: #003153;
             font-size: 1rem;
             font-weight: 700;
-            line-height: 1;
             cursor: pointer;
         }
 
@@ -7592,62 +7636,21 @@
         }
 
         #programme-editor .programme-toolbar .programme-restore-btn {
-            flex: 0 0 var(--backend-square-btn-size);
-            width: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            border-radius: var(--backend-icon-btn-radius);
             background: #ffd700;
             color: #003153;
-            font-size: 0;
-            line-height: 0;
-            box-sizing: border-box;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
 
         #programme-editor .programme-toolbar .programme-restore-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
-        #programme-editor .programme-toolbar .programme-restore-btn svg {
-            flex-shrink: 0;
-            display: block;
-        }
-
-        /* Programme Save / Delete: round icon buttons (match guest tab). */
         #programme-editor .programme-toolbar #save-programme-btn {
-            flex: 0 0 var(--backend-square-btn-size);
-            width: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            border-radius: var(--backend-icon-btn-radius);
             background: #ffd700;
             color: #003153;
-            font-size: 0;
-            line-height: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
         }
 
         #programme-editor .programme-toolbar #save-programme-btn:hover:not(:disabled) {
             filter: brightness(0.92);
-        }
-
-        #programme-editor .programme-toolbar #save-programme-btn svg {
-            flex-shrink: 0;
-            display: block;
         }
 
         #programme-editor .programme-toolbar .programme-toolbar-create-btn {
@@ -7659,25 +7662,8 @@
         }
 
         #programme-editor .programme-toolbar #programme-delete-btn {
-            flex: 0 0 var(--backend-square-btn-size);
-            width: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            gap: 0;
-            border: none;
-            border-radius: var(--backend-icon-btn-radius);
             background: #ff0000 !important;
             color: #ffffff !important;
-            font-size: 0;
-            line-height: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
         }
 
         #programme-editor .programme-toolbar #programme-delete-btn:hover:not(:disabled) {
@@ -7710,13 +7696,12 @@
         #programme-editor .programme-toolbar #programme-delete-btn svg path {
             fill: #ffffff !important;
             color: #ffffff;
-            flex-shrink: 0;
-            display: block;
         }
 
         #programme-editor .programme-editor .editor-body {
             flex: 1;
             min-height: 0;
+            min-width: 0;
             display: flex;
             flex-direction: row;
             align-items: stretch;
@@ -7771,8 +7756,8 @@
             padding: 0 0 24px 0;
             margin: 0;
             box-sizing: border-box;
-            border: none;
-            border-radius: 0 5px 5px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
         }
 
         #programme-editor .programme-grid-row {
@@ -8812,7 +8797,7 @@
                             <div class="selected-guestname-wrap">
                                 <div class="selected-guestname" role="group" aria-label="Programme list title">
                                     <span class="edit-guest-name-first" id="programme-list-heading-event" aria-live="polite">—</span>
-                                    <span class="edit-guest-name-last" id="programme-list-heading-suffix">programme</span>
+                                    <span class="edit-guest-name-last" id="programme-list-heading-suffix">PROGRAMME</span>
                                 </div>
                             </div>
                             <div class="edit-guest-top-trailing">
@@ -8857,7 +8842,7 @@
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
                                 <div class="selected-guestname" role="group" aria-label="Activities list title">
-                                    <span class="edit-guest-name-first" id="programme-activities-heading-label">activities</span>
+                                    <span class="edit-guest-name-first" id="programme-activities-heading-label">ACTIVITIES</span>
                                 </div>
                             </div>
                             <div class="edit-guest-top-trailing">
@@ -9096,7 +9081,13 @@
                                     <span class="edit-guest-name-first">Invoices</span>
                                 </div>
                             </div>
-                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                            <div class="edit-guest-top-trailing">
+                                <button type="button" class="add-speaker-button" id="finances-import-invoices-btn" aria-label="Import invoices from Stripe" title="Import invoices from Stripe">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="guests-roster-list" id="finances-invoices-roster-list">
                             <div class="guests-roster-scroll">
@@ -15799,6 +15790,194 @@
                 });
         }
 
+        var financesInvoicesInMemory = [];
+        var financesInvoicesLoadError = '';
+        var financesInvoicesLoaded = false;
+        var financesInvoicesImportInFlight = null;
+
+        function formatStripeAmountCents(amount, currency) {
+            var cents = Number(amount);
+            if (!Number.isFinite(cents)) return '—';
+            var cur = String(currency || 'eur').trim().toUpperCase() || 'EUR';
+            try {
+                return new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency: cur
+                }).format(cents / 100);
+            } catch (e) {
+                return (cents / 100).toFixed(2) + ' ' + cur;
+            }
+        }
+
+        function formatStripeUnixDate(unix) {
+            var n = Number(unix);
+            if (!Number.isFinite(n) || n <= 0) return '—';
+            try {
+                return new Date(n * 1000).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                return '—';
+            }
+        }
+
+        function financesInvoiceStatusBadgeHtml(status) {
+            var s = String(status || '').trim().toLowerCase();
+            if (!s) {
+                return '<span class="content-badge content-badge--guest-field-empty">—</span>';
+            }
+            var label = s.charAt(0).toUpperCase() + s.slice(1);
+            var mod = ' content-badge--guest-status-neutral';
+            if (s === 'paid') mod = ' content-badge--guest-status-yes';
+            else if (s === 'open' || s === 'draft') mod = ' content-badge--guest-status-no';
+            return '<span class="content-badge' + mod + '">' + escapeHtml(label) + '</span>';
+        }
+
+        function renderFinancesInvoicesTable() {
+            var itemsEl = document.getElementById('finances-invoices-items');
+            if (!itemsEl) return;
+            var colCount = 6;
+            var html = '<table class="guests-list-table" role="grid" aria-label="Invoices">' +
+                '<thead><tr>' +
+                '<th scope="col">Invoice</th>' +
+                '<th scope="col">Customer</th>' +
+                '<th scope="col">Email</th>' +
+                '<th scope="col">Total</th>' +
+                '<th scope="col">Status</th>' +
+                '<th scope="col">Created</th>' +
+                '</tr></thead><tbody>';
+            if (financesInvoicesLoadError) {
+                html += '<tr class="guests-roster-row">' +
+                    '<td class="guests-roster-empty" colspan="' + colCount + '">' +
+                    escapeHtml(financesInvoicesLoadError) +
+                    '</td></tr>';
+            } else if (!financesInvoicesInMemory.length) {
+                html += '<tr class="guests-roster-row">' +
+                    '<td class="guests-roster-empty" colspan="' + colCount + '">' +
+                    'No invoices yet.' +
+                    '</td></tr>';
+            } else {
+                for (var i = 0; i < financesInvoicesInMemory.length; i++) {
+                    var inv = financesInvoicesInMemory[i] || {};
+                    var number = String(inv.number || '').trim() || String(inv.id || '').trim() || '—';
+                    var customer = String(inv.customer_name || '').trim() || '—';
+                    var email = String(inv.customer_email || '').trim() || '—';
+                    var total = formatStripeAmountCents(inv.total, inv.currency);
+                    var created = formatStripeUnixDate(inv.created);
+                    var url = String(inv.hosted_invoice_url || '').trim();
+                    var numberCell = url
+                        ? ('<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' +
+                            escapeHtml(number) + '</a>')
+                        : escapeHtml(number);
+                    html += '<tr class="guests-roster-row" data-invoice-id="' +
+                        escapeHtml(String(inv.id || '')) + '">' +
+                        '<td class="guests-roster-name-cell">' + numberCell + '</td>' +
+                        '<td>' + escapeHtml(customer) + '</td>' +
+                        '<td>' + escapeHtml(email) + '</td>' +
+                        '<td>' + escapeHtml(total) + '</td>' +
+                        '<td class="guests-roster-tag-cell">' +
+                        financesInvoiceStatusBadgeHtml(inv.status) +
+                        '</td>' +
+                        '<td>' + escapeHtml(created) + '</td>' +
+                        '</tr>';
+                }
+            }
+            html += '</tbody></table>';
+            itemsEl.innerHTML = html;
+        }
+
+        /**
+         * Import Stripe invoices (one invoice = one JSON) via Cloud Function and render the table.
+         * @param {{ force?: boolean, showLoading?: boolean, silent?: boolean }} opts
+         * @return {Promise<object>}
+         */
+        function importFinancesInvoicesFromStripe(opts) {
+            opts = opts || {};
+            if (financesInvoicesLoaded && !opts.force && financesInvoicesInMemory.length) {
+                renderFinancesInvoicesTable();
+                return Promise.resolve({ ok: true, cached: true, invoices: financesInvoicesInMemory });
+            }
+            if (financesInvoicesImportInFlight) return financesInvoicesImportInFlight;
+
+            var itemsEl = document.getElementById('finances-invoices-items');
+            if (opts.showLoading && itemsEl) {
+                itemsEl.innerHTML = '<p class="guests-roster-empty">Importing invoices from Stripe…</p>';
+            }
+            financesInvoicesLoadError = '';
+            if (!opts.silent && typeof showStatus === 'function') {
+                showStatus('loading', 'Importing invoices from Stripe…');
+            }
+
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/importStripeInvoicesHttp';
+            var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            var timeoutId = null;
+            if (controller) {
+                timeoutId = setTimeout(function() {
+                    try { controller.abort(); } catch (e) { /* ignore */ }
+                }, 280000);
+            }
+
+            financesInvoicesImportInFlight = fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lookbackDays: 365 }),
+                signal: controller ? controller.signal : undefined
+            })
+                .then(function(res) {
+                    if (!res.ok) {
+                        return res.json()
+                            .catch(function() { return {}; })
+                            .then(function(payload) {
+                                var msg = payload && payload.error
+                                    ? String(payload.error)
+                                    : ('Invoice import failed (' + res.status + ')');
+                                throw new Error(msg);
+                            });
+                    }
+                    return res.json();
+                })
+                .then(function(data) {
+                    var list = data && Array.isArray(data.invoices) ? data.invoices : [];
+                    financesInvoicesInMemory = list;
+                    financesInvoicesLoaded = true;
+                    financesInvoicesLoadError = '';
+                    renderFinancesInvoicesTable();
+                    var n = list.length;
+                    if (!opts.silent && typeof showStatus === 'function') {
+                        showStatus(
+                            'success',
+                            n === 0
+                                ? 'No Stripe invoices found.'
+                                : ('Imported ' + n + ' invoice' + (n === 1 ? '' : 's') + ' from Stripe')
+                        );
+                    }
+                    return data;
+                })
+                .catch(function(err) {
+                    console.error('importFinancesInvoicesFromStripe:', err);
+                    var aborted = err && (err.name === 'AbortError' || /aborted/i.test(String(err.message || '')));
+                    financesInvoicesLoadError = aborted
+                        ? 'Invoice import timed out. Try again.'
+                        : (err && err.message ? err.message : 'Failed to import invoices from Stripe.');
+                    renderFinancesInvoicesTable();
+                    if (!opts.silent && typeof showStatus === 'function') {
+                        showStatus('error', financesInvoicesLoadError);
+                    }
+                    throw err;
+                })
+                .finally(function() {
+                    if (timeoutId) clearTimeout(timeoutId);
+                    financesInvoicesImportInFlight = null;
+                });
+
+            return financesInvoicesImportInFlight;
+        }
+
         function guestApplicationReviewPlain(v) {
             var s = v != null ? String(v) : '';
             s = s
@@ -19958,6 +20137,15 @@
             }
             if (isProgramme) {
                 renderGridFromState();
+                updateGuestsListHeadingDisplay();
+                if (speakerRosterInMemory.length) {
+                    renderProgrammeSpeakersTable();
+                } else {
+                    void fetchSpeakersForSelectedEvent().catch(function(err) {
+                        console.error('Programme activities speakers load:', err);
+                        renderProgrammeSpeakersTable();
+                    });
+                }
             }
             if (isLodging) {
                 void refreshLodgingSubcollectionsList();
@@ -19978,6 +20166,9 @@
                         showStatus('error', err && err.message ? err.message : 'Failed to load site settings.');
                     }
                 });
+            }
+            if (isFinances) {
+                void importFinancesInvoicesFromStripe({ showLoading: true });
             }
         }
 
@@ -20129,6 +20320,12 @@
         function updateSaveButtonState() {
             const btn = document.getElementById('save-programme-btn');
             if (!btn) return;
+            if (!btn.querySelector('svg')) {
+                btn.innerHTML =
+                    '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
+                    '<path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>' +
+                    '</svg>';
+            }
             const canEdit = Boolean(programmeState && programmeState.eventId) && programmePadlockIsOpen;
             const hasUnsaved =
                 programmeSessionNamesDirty ||
@@ -20137,7 +20334,8 @@
             if (!canEdit) {
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
-                btn.textContent = 'Save';
+                btn.setAttribute('title', 'Save programme');
+                btn.setAttribute('aria-label', 'Save programme');
                 btn.classList.remove('texteditor-save-btn--saved');
                 updateProgrammeRestoreButtonState();
                 return;
@@ -20145,14 +20343,16 @@
             if (hasUnsaved) {
                 btn.disabled = false;
                 btn.setAttribute('aria-disabled', 'false');
-                btn.textContent = 'Save';
+                btn.setAttribute('title', 'Save programme');
+                btn.setAttribute('aria-label', 'Save programme');
                 btn.classList.remove('texteditor-save-btn--saved');
                 updateProgrammeRestoreButtonState();
                 return;
             }
             btn.disabled = true;
             btn.setAttribute('aria-disabled', 'true');
-            btn.textContent = 'Saved';
+            btn.setAttribute('title', 'Programme saved');
+            btn.setAttribute('aria-label', 'Programme saved');
             btn.classList.add('texteditor-save-btn--saved');
             updateProgrammeRestoreButtonState();
         }
@@ -22919,6 +23119,22 @@
                         .finally(function() {
                             syncGuestPaymentsBtn.disabled = false;
                             syncGuestPaymentsBtn.setAttribute('aria-disabled', 'false');
+                        });
+                });
+            }
+            var financesImportInvoicesBtn = document.getElementById('finances-import-invoices-btn');
+            if (financesImportInvoicesBtn) {
+                financesImportInvoicesBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (financesImportInvoicesBtn.disabled) return;
+                    financesImportInvoicesBtn.disabled = true;
+                    financesImportInvoicesBtn.setAttribute('aria-disabled', 'true');
+                    importFinancesInvoicesFromStripe({ force: true, showLoading: true })
+                        .catch(function() {})
+                        .finally(function() {
+                            financesImportInvoicesBtn.disabled = false;
+                            financesImportInvoicesBtn.setAttribute('aria-disabled', 'false');
                         });
                 });
             }

@@ -876,7 +876,10 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           summary.openOrUnpaid++;
           return;
         }
-        const result = await applyStripePaidInvoiceToGuest(entry.ref, invoiceFields);
+        const result = await applyStripePaidInvoiceToGuest(
+          entry.ref,
+          invoiceFields,
+        );
         if (result.updated) {
           summary.updated++;
           summary.updatedGuestIds.push(entry.guestId);
@@ -940,7 +943,10 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
         if (filterGuestId && !itemRef.path.includes(`/${filterGuestId}/`)) {
           continue;
         }
-        const result = await applyStripePaidInvoiceToGuest(itemRef, invoiceFields);
+        const result = await applyStripePaidInvoiceToGuest(
+          itemRef,
+          invoiceFields,
+        );
         const guestIdFromPath = itemRef.parent.id;
         if (result.updated) {
           summary.updated++;
@@ -963,6 +969,175 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Stripe paid-invoice reconcile failed.",
+    });
+  }
+});
+
+/**
+ * Flatten a Stripe Invoice into a plain JSON object safe for Firestore / UI.
+ * @param {Record<string, unknown>} invoice Stripe invoice-like object.
+ * @return {Record<string, unknown>} Plain JSON representation.
+ */
+function stripeInvoiceToJson(
+  invoice: Record<string, unknown>
+): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(invoice)) as Record<string, unknown>;
+}
+
+/**
+ * Build a display/import row from a Stripe Invoice (one invoice = one JSON).
+ * @param {Record<string, unknown>} invoice Stripe invoice-like object.
+ * @return {Record<string, unknown>} Import document fields.
+ */
+function stripeInvoiceImportFields(
+  invoice: Record<string, unknown>
+): Record<string, unknown> {
+  const meta = (invoice.metadata || {}) as Record<string, string>;
+  const customerRaw = invoice.customer;
+  let customerId = "";
+  let customerNameFromObj = "";
+  if (typeof customerRaw === "string") {
+    customerId = customerRaw;
+  } else if (customerRaw && typeof customerRaw === "object") {
+    const cust = customerRaw as Record<string, unknown>;
+    customerId = String(cust.id || "").trim();
+    if (!cust.deleted) {
+      customerNameFromObj = String(cust.name || "").trim();
+    }
+  }
+  let customerName = String(invoice.customer_name || "").trim();
+  if (!customerName) customerName = customerNameFromObj;
+  return {
+    id: String(invoice.id || "").trim(),
+    number: invoice.number != null ? String(invoice.number) : null,
+    status: invoice.status != null ? String(invoice.status) : null,
+    currency: invoice.currency != null ? String(invoice.currency) : null,
+    total: invoice.total ?? null,
+    amount_due: invoice.amount_due ?? null,
+    amount_paid: invoice.amount_paid ?? null,
+    amount_remaining: invoice.amount_remaining ?? null,
+    customer: customerId || null,
+    customer_email: invoice.customer_email != null ?
+      String(invoice.customer_email) :
+      null,
+    customer_name: customerName || null,
+    hosted_invoice_url: invoice.hosted_invoice_url != null ?
+      String(invoice.hosted_invoice_url) :
+      null,
+    invoice_pdf: invoice.invoice_pdf != null ?
+      String(invoice.invoice_pdf) :
+      null,
+    created: invoice.created ?? null,
+    due_date: invoice.due_date ?? null,
+    guestId: String(meta.guestId || "").trim() || null,
+    stripe: stripeInvoiceToJson(invoice),
+  };
+}
+
+/**
+ * Import Stripe invoices into Firestore (one invoice = one JSON doc) and
+ * return them for the Finances Invoices table.
+ * POST JSON: { lookbackDays?: number } (default 365, max 730; 0 = all).
+ * Writes: tbs/Invoices/items/{invoiceId}
+ */
+export const importStripeInvoicesHttp = onRequest({
+  secrets: [stripeSecretParam],
+  timeoutSeconds: 300,
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const stripeSecret = String(stripeSecretParam.value() || "").trim();
+  if (!stripeSecret) {
+    res.status(500).json({
+      error: "Missing STRIPE_SECRET_KEY in functions environment.",
+    });
+    return;
+  }
+  const stripe = new Stripe(stripeSecret);
+  const body = (req.body || {}) as Record<string, unknown>;
+  const lookbackDaysRaw = Number(body.lookbackDays);
+  const lookbackDays = Number.isFinite(lookbackDaysRaw) ?
+    Math.min(Math.max(Math.floor(lookbackDaysRaw), 0), 730) :
+    365;
+  const createdGte = lookbackDays > 0 ?
+    Math.floor(Date.now() / 1000) - (lookbackDays * 86400) :
+    undefined;
+
+  const db = getFirestore();
+  const itemsCol = db.collection("tbs").doc("Invoices").collection("items");
+  const invoices: Record<string, unknown>[] = [];
+  let imported = 0;
+  let startingAfter: string | undefined;
+
+  try {
+    for (let page = 0; page < 20; page++) {
+      const listParams: {
+        limit: number;
+        expand: string[];
+        created?: {gte: number};
+        starting_after?: string;
+      } = {
+        limit: 100,
+        expand: ["data.customer"],
+      };
+      if (createdGte != null) {
+        listParams.created = {gte: createdGte};
+      }
+      if (startingAfter) listParams.starting_after = startingAfter;
+      const list = await stripe.invoices.list(listParams);
+      for (const invoice of list.data) {
+        const fields = stripeInvoiceImportFields(
+          invoice as unknown as Record<string, unknown>
+        );
+        const docId = String(fields.id || "").trim();
+        if (!docId) continue;
+        await itemsCol.doc(docId).set({
+          ...fields,
+          importedAt: FieldValue.serverTimestamp(),
+        }, {merge: true});
+        imported++;
+        invoices.push(fields);
+      }
+      if (!list.has_more || list.data.length === 0) break;
+      startingAfter = list.data[list.data.length - 1].id;
+    }
+
+    invoices.sort((a, b) => {
+      const ac = Number(a.created || 0);
+      const bc = Number(b.created || 0);
+      return bc - ac;
+    });
+
+    const summary = {
+      ok: true,
+      imported,
+      lookbackDays,
+      invoices,
+    };
+    logger.info("importStripeInvoicesHttp done", {
+      imported,
+      lookbackDays,
+      count: invoices.length,
+    });
+    res.status(200).json(summary);
+  } catch (err) {
+    logger.error("importStripeInvoicesHttp", {err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Stripe invoice import failed.",
     });
   }
 });
