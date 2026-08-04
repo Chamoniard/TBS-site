@@ -28,10 +28,13 @@
             /* Guests roster + Speakers roster: Yes / No / Ready pill colours */
             --backend-roster-status-yes-bg: #338a17;
             --backend-roster-status-yes-color: #ffffff;
-            --backend-roster-status-no-bg: #ff0000;
+            --backend-roster-status-no-bg: #F71941;
             --backend-roster-status-no-color: #ffffff;
-            --backend-roster-status-ready-bg: #ffd007;
+            --backend-roster-status-ready-bg: #FECB00;
             --backend-roster-status-ready-color: #000000;
+            --backend-roster-pill-black: #675F61;
+            --backend-button-yellow: #FECB00;
+            --backend-button-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.06);
             --backend-square-btn-size: 35px;
             /* Rounded rectangles (labels, multi-icon controls, table cells) */
             --backend-square-btn-radius: 5px;
@@ -69,7 +72,7 @@
             overscroll-behavior: none;
         }
 
-        /* Backend buttons: gold + Prussian blue (Editor/Speakers links use site pink — see .backend-editor-link) */
+        /* Backend buttons: yellow (nav links use yellow text — see .backend-editor-link) */
         body.backend-page button {
             appearance: none;
             -webkit-appearance: none;
@@ -80,15 +83,16 @@
             border-radius: 5px;
             border: none;
             padding: 0.5rem 1.25rem;
-            background: #FFD700;
+            background: var(--backend-button-yellow);
             color: #003153;
             cursor: pointer;
             box-sizing: border-box;
             margin: 0;
+            box-shadow: var(--backend-button-shadow);
         }
 
         body.backend-page button:disabled {
-            background: #fef3c7;
+            background: var(--backend-button-yellow);
             border: none;
             color: #94a3b8;
             cursor: not-allowed;
@@ -116,10 +120,11 @@
         }
 
         body.backend-page button.texteditor-save-btn.texteditor-save-btn--saved:disabled {
-            background: #FFD700;
+            background: var(--backend-button-yellow);
             border: none;
             color: #003153;
             cursor: default;
+            opacity: 1;
         }
 
         /* Pre-sets tab: preset selectors match standard backend gold buttons; equal width in column */
@@ -167,7 +172,7 @@
         body.backend-page button.add-speaker-button:disabled,
         body.backend-page button.add-content-btn:disabled,
         body.backend-page button.add-lodging-btn:disabled {
-            background: #fef3c7;
+            background: var(--backend-button-yellow);
             border: none;
             color: #94a3b8;
         }
@@ -282,7 +287,7 @@
         }
 
         .backend-status-ticker-segment.is-error {
-            color: #fecaca;
+            color: #F71941;
         }
 
         .backend-status-ticker-segment.is-loading,
@@ -431,7 +436,7 @@
         }
 
         .aspects .navigation .backend-editor-link.is-active {
-            color: #FFD700;
+            color: #FECB00;
             background: transparent;
             border: none !important;
             border-radius: 0;
@@ -444,7 +449,7 @@
         }
 
         .backend-editor-link.is-active {
-            color: #FFD700;
+            color: #FECB00;
             background: transparent;
             border: none !important;
             border-radius: 0;
@@ -670,24 +675,24 @@
         }
 
         body.backend-page button.emailer-folder-btn:focus-visible {
-            outline: 2px solid #0077b6;
+            outline: 2px solid #71C7FE;
             outline-offset: 2px;
         }
 
         body.backend-page button.emailer-folder-btn.is-active {
             background: transparent;
-            color: #0077b6;
+            color: #71C7FE;
             font-weight: 600;
         }
 
         body.backend-page button.emailer-folder-btn.is-active:hover {
-            background: rgba(0, 119, 182, 0.08);
+            background: rgba(113, 199, 254, 0.08);
         }
 
         .emailer-message-btn.is-active {
-            background: #0077b6;
+            background: #71C7FE;
             color: #ffffff;
-            border-color: #0077b6;
+            border-color: #71C7FE;
         }
 
         .emailer-folder-group {
@@ -939,7 +944,7 @@
             font-weight: 500;
             line-height: 1.25;
             cursor: pointer;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
             box-sizing: border-box;
         }
 
@@ -948,7 +953,7 @@
         }
 
         body.backend-page button.settings-site-toggle-option:hover:not(.is-active) {
-            background: #e0f2fe;
+            background: #71C7FE;
         }
 
         body.backend-page button.settings-site-toggle-option[data-value='yes'].is-active,
@@ -959,7 +964,7 @@
 
         body.backend-page button.settings-site-toggle-option[data-value='no'].is-active,
         body.backend-page button.settings-site-toggle-option[data-value='no'][aria-pressed='true'] {
-            background: #dc2626;
+            background: #F71941;
             color: #ffffff;
         }
 
@@ -1466,13 +1471,13 @@
             0%,
             100% {
                 box-shadow:
-                    0 0 0 0 rgba(186, 30, 69, 0.5),
+                    0 0 0 0 rgba(247, 25, 65, 0.5),
                     0 1px 2px rgba(15, 23, 42, 0.08),
                     0 2px 6px rgba(15, 23, 42, 0.06);
             }
             50% {
                 box-shadow:
-                    0 0 0 4px rgba(186, 30, 69, 0.32),
+                    0 0 0 4px rgba(247, 25, 65, 0.32),
                     0 1px 2px rgba(15, 23, 42, 0.08),
                     0 2px 6px rgba(15, 23, 42, 0.06);
             }
@@ -1536,7 +1541,7 @@
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment:disabled,
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment[aria-disabled='true'],
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.is-awaiting-payment[aria-disabled='false'] {
-            border-color: #ba1e45;
+            border-color: #F71941;
             color: #0f172a;
             background: #ffffff;
             cursor: default;
@@ -1866,9 +1871,9 @@
             padding: 0;
             box-sizing: border-box;
             border-radius: var(--backend-icon-btn-radius);
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             border: none;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
             color: #003153;
             cursor: pointer;
         }
@@ -1880,8 +1885,8 @@
 
         #guest-editor .guest-editor-log .guest-add-log-btn:disabled,
         #speaker-editor .speaker-editor-log .speaker-add-log-btn:disabled {
-            background: #fef3c7;
-            color: #94a3b8;
+            background: var(--backend-button-yellow);
+            color: #003153;
             cursor: not-allowed;
         }
 
@@ -1959,7 +1964,7 @@
             font-weight: 600;
             line-height: 1.25;
             cursor: pointer;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
         }
 
         #guest-editor .guest-editor-log .guest-add-log-send-btn:hover:not(:disabled),
@@ -2054,7 +2059,7 @@
         .speaker-viewer {
             min-height: 8rem;
             padding: 12px 16px;
-            background: #e0f2fe;
+            background: #71C7FE;
             border-radius: 8px;
             box-sizing: border-box;
         }
@@ -2230,9 +2235,9 @@
             border-radius: var(--backend-icon-btn-radius);
             padding: 0;
             box-sizing: border-box;
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             border: none;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
             color: #003153;
             cursor: pointer;
         }
@@ -2285,9 +2290,9 @@
             max-width: var(--backend-square-btn-size);
             max-height: var(--backend-square-btn-size);
             box-sizing: border-box;
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             border: none;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
             color: #003153;
             cursor: pointer;
             border-radius: var(--backend-icon-btn-radius);
@@ -2404,6 +2409,63 @@
             overflow: auto;
             box-sizing: border-box;
             padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+        }
+
+        #guest-editor .guest-overwatch-body .guests-registered,
+        #guest-editor .guest-overwatch-body .guests-invited,
+        #guest-editor .guest-overwatch-body .guests-paid {
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 16rem;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 1rem 1.1rem;
+            background: #71C7FE;
+            border: 1px solid #71C7FE;
+            border-radius: 5px;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+        }
+
+        #guest-editor .guest-overwatch-body .guests-registered-label,
+        #guest-editor .guest-overwatch-body .guests-invited-label,
+        #guest-editor .guest-overwatch-body .guests-paid-label {
+            margin: 0 0 0.35rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25;
+            color: #003153;
+        }
+
+        #guest-editor .guest-overwatch-body .guests-registered-count,
+        #guest-editor .guest-overwatch-body .guests-invited-count,
+        #guest-editor .guest-overwatch-body .guests-paid-count {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #003153;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #guest-editor .guest-overwatch-body .guest-overwatch-step-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 16rem;
+            margin: 0;
+            color: #338a17;
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            pointer-events: none;
         }
 
         #guest-editor .guests-actions #guests-overwatch-btn,
@@ -2413,7 +2475,7 @@
         #guest-editor .guests-actions #guests-overwatch-btn:active {
             border: none;
             outline: none;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
         }
 
         #speaker-editor .speaker-editor-bottom {
@@ -3083,7 +3145,7 @@
             align-self: flex-start;
             gap: 16px;
             min-width: 0;
-            background: #dbeafe;
+            background: #71C7FE;
             border-radius: 5px;
             padding: 8px;
             box-sizing: border-box;
@@ -3133,7 +3195,7 @@
         }
 
         #content-editor .content-editor-featured-btn.is-active .content-roster-featured-col-star {
-            color: #b8860b;
+            color: #FECB00;
         }
 
         #content-editor .content-viewer > .edit-content-bottom {
@@ -3241,9 +3303,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             border: none;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
             color: #003153;
             cursor: pointer;
         }
@@ -3274,7 +3336,7 @@
             max-height: var(--backend-square-btn-size);
             padding: 0;
             border-radius: var(--backend-icon-btn-radius);
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             color: #003153;
             font-size: 0;
             line-height: 0;
@@ -3303,7 +3365,7 @@
             max-height: var(--backend-square-btn-size);
             padding: 0;
             border-radius: var(--backend-icon-btn-radius);
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             color: #003153;
             font-size: 0;
             line-height: 0;
@@ -3351,20 +3413,20 @@
             gap: 0;
             border: none;
             border-radius: var(--backend-icon-btn-radius);
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             font-size: 0;
             line-height: 0;
         }
 
         #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn:hover:not(:disabled) {
-            background: #cc0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             filter: none;
         }
 
         #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn:disabled {
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             opacity: 0.45;
             cursor: not-allowed;
@@ -3372,7 +3434,7 @@
         }
 
         #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn.content-editor-delete-btn--no-selection:disabled {
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             opacity: 0.3;
         }
@@ -3478,7 +3540,7 @@
         }
 
         #content-editor .content-roster-featured-star {
-            color: #b8860b;
+            color: #FECB00;
             font-size: 1.15rem;
             line-height: 1;
             display: inline-block;
@@ -3524,7 +3586,7 @@
         }
 
         #content-editor .content-roster-published-btn:focus-visible {
-            outline: 2px solid #3b82f6;
+            outline: 2px solid #71C7FE;
             outline-offset: 2px;
         }
 
@@ -3561,7 +3623,7 @@
         }
 
         #content-editor .content-roster-published-x {
-            color: #dc2626;
+            color: #F71941;
             font-size: 1.05rem;
             font-weight: 800;
             line-height: 1;
@@ -3621,7 +3683,7 @@
 
         #speaker-editor .content-roster-published-btn:focus-visible,
         #guest-editor .guests-list-table .content-roster-published-btn:focus-visible {
-            outline: 2px solid #3b82f6;
+            outline: 2px solid #71C7FE;
             outline-offset: 2px;
         }
 
@@ -3664,7 +3726,7 @@
 
         #speaker-editor .content-roster-published-x,
         #guest-editor .guests-list-table .content-roster-published-x {
-            color: #dc2626;
+            color: #F71941;
             font-size: 1.05rem;
             font-weight: 800;
             line-height: 1;
@@ -3729,7 +3791,7 @@
         }
 
         #content-editor .content-editor-published-btn:focus-visible {
-            outline: 2px solid #3b82f6;
+            outline: 2px solid #71C7FE;
             outline-offset: 2px;
         }
 
@@ -3893,7 +3955,7 @@
         }
 
         #content-editor .content-badge.content-badge--type-edit {
-            background: #ffd700;
+            background: #FECB00;
             color: #003153;
         }
 
@@ -3908,12 +3970,12 @@
         }
 
         #content-editor .content-badge.content-badge--event-tbs26 {
-            background: #1e3a8a;
+            background: #71C7FE;
             color: #f1f5f9;
         }
 
         .speakers-overview .content-badge.content-badge--event-tbs26 {
-            background: #1e3a8a;
+            background: #71C7FE;
             color: #f1f5f9;
         }
 
@@ -3923,13 +3985,13 @@
         }
 
         .guest-overview-section .content-badge.content-badge--event-tbs26 {
-            background: #1e3a8a;
+            background: #71C7FE;
             color: #f1f5f9;
         }
 
         .guest-overview-section .content-badge.content-badge--event-default,
         #content-editor .content-badge.content-badge--event-default {
-            background: #0369a1;
+            background: #71C7FE;
             color: #ffffff;
         }
 
@@ -4248,7 +4310,7 @@
 
         #speaker-editor .speakers-roster-table tbody tr:hover td.speaker-roster-name-cell,
         #speaker-editor .speakers-roster-table tbody tr.is-selected td.speaker-roster-name-cell {
-            background: #f0f9ff;
+            background: #71C7FE;
         }
 
         /* Guests roster: first column stays fixed while the table scrolls horizontally. */
@@ -4266,7 +4328,7 @@
 
         #guest-editor .guests-list-table tbody tr:hover td.guests-roster-name-cell,
         #guest-editor .guests-list-table tbody tr.is-selected td.guests-roster-name-cell {
-            background: #f0f9ff;
+            background: #71C7FE;
         }
 
         .speakers-roster-table tbody td,
@@ -4488,13 +4550,13 @@
         .speaker-roster-row:hover,
         .guests-roster-row:hover,
         .content-roster-row:hover {
-            background: #f0f9ff;
+            background: #71C7FE;
         }
 
         .speaker-roster-row.is-selected,
         .guests-roster-row.is-selected,
         .content-roster-row.is-selected {
-            background: #f0f9ff;
+            background: #71C7FE;
         }
 
         .speaker-roster-empty,
@@ -4879,7 +4941,7 @@
             max-height: var(--backend-square-btn-size);
             padding: 0;
             border-radius: var(--backend-icon-btn-radius);
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             color: #003153;
             font-size: 0;
             line-height: 0;
@@ -4917,20 +4979,20 @@
             gap: 0;
             border: none;
             border-radius: var(--backend-icon-btn-radius);
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             font-size: 0;
             line-height: 0;
         }
 
         #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn:hover:not(:disabled) {
-            background: #cc0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             filter: none;
         }
 
         #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn:disabled {
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             opacity: 0.45;
             cursor: not-allowed;
@@ -4946,9 +5008,9 @@
 
         #guest-editor .guest-editor-toolbar .add-speaker-delete-btn.is-armed,
         #speaker-editor .speaker-editor-toolbar-trailing .add-speaker-delete-btn.is-armed {
-            outline: 2px solid #ff1493;
+            outline: 2px solid #F71941;
             outline-offset: 0;
-            box-shadow: 0 0 10px rgba(255, 20, 147, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
         /* Toolbars: inactive buttons use the same transparent yellow as other disabled backend controls. */
@@ -4968,9 +5030,9 @@
         #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved),
         #programme-editor .programme-toolbar .programme-restore-btn:disabled,
         #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved) {
-            background: #fef3c7;
+            background: var(--backend-button-yellow);
             border: none;
-            color: #94a3b8;
+            color: #003153;
             cursor: not-allowed;
             filter: none;
             opacity: 1;
@@ -5012,9 +5074,9 @@
             padding: 0;
             box-sizing: border-box;
             border-radius: var(--backend-square-btn-radius);
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             border: none;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
             color: #003153;
             font-family: var(--backend-gold-toolbar-btn-font);
             font-size: 0.8125rem;
@@ -5152,7 +5214,7 @@
             font-weight: 600;
             line-height: 1.25;
             cursor: pointer;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
         }
 
         #guest-editor #guest-editor-actions .guest-send-to-reserves-btn:hover:not(:disabled) {
@@ -5175,14 +5237,14 @@
             box-sizing: border-box;
             border-radius: 5px;
             border: none;
-            background: #000000;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
             font-family: 'Inter', sans-serif;
             font-size: 0.875rem;
             font-weight: 600;
             line-height: 1.25;
             cursor: pointer;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
         }
 
         #guest-editor #guest-editor-actions .guest-deny-sold-out-btn:hover:not(:disabled) {
@@ -5296,14 +5358,14 @@
             box-sizing: border-box;
             border-radius: 5px;
             border: none;
-            background: #000000;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
             font-family: 'Inter', sans-serif;
             font-size: 0.875rem;
             font-weight: 600;
             line-height: 1.25;
             cursor: pointer;
-            box-shadow: none;
+            box-shadow: var(--backend-button-shadow);
         }
 
         #guest-editor #guest-editor-actions .guest-deny-application-btn:hover:not(:disabled) {
@@ -5512,7 +5574,7 @@
             top: 50%;
             right: 12px;
             transform: translateY(-50%);
-            color: #dc2626;
+            color: #F71941;
             font-size: 1.1rem;
             font-weight: 700;
             line-height: 1;
@@ -5520,7 +5582,7 @@
         }
 
         #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn:disabled .speaker-own-lodging-cross {
-            color: #dc2626;
+            color: #F71941;
         }
 
         #speaker-editor #speaker-editor-actions .speaker-request-lodging-check {
@@ -5544,7 +5606,7 @@
             top: 50%;
             right: 12px;
             transform: translateY(-50%);
-            color: #dc2626;
+            color: #F71941;
             font-size: 1.1rem;
             font-weight: 700;
             line-height: 1;
@@ -5552,7 +5614,7 @@
         }
 
         #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn:disabled .speaker-request-lodging-cross {
-            color: #dc2626;
+            color: #F71941;
         }
 
         #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn,
@@ -5923,7 +5985,7 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-neutral {
-            background: #0369a1;
+            background: #71C7FE;
             color: #ffffff;
         }
 
@@ -5944,7 +6006,7 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-soldout {
-            background: #000000;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
         }
 
@@ -5974,9 +6036,9 @@
         #guest-editor .guests-list-table .guests-read-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-invoiced-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-paid-badge-btn.is-armed {
-            outline: 2px solid #ff1493;
+            outline: 2px solid #F71941;
             outline-offset: 0;
-            box-shadow: 0 0 10px rgba(255, 20, 147, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
         #guest-editor .guests-invited-dropdown,
@@ -6106,18 +6168,18 @@
         #speaker-editor .speakers-roster-table .speaker-roster-lodging-btn.is-armed,
         #speaker-editor .speakers-roster-table .speaker-roster-bio-btn.is-armed,
         #speaker-editor .speakers-roster-table .speaker-roster-programmed-btn.is-armed {
-            outline: 2px solid #ff1493;
+            outline: 2px solid #F71941;
             outline-offset: 0;
-            box-shadow: 0 0 10px rgba(255, 20, 147, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-cancelled {
-            background: #000000;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-read-denied {
-            background: #000000;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
         }
 
@@ -6422,7 +6484,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.35rem;
-            background: #dc2626;
+            background: #F71941;
             color: #ffffff;
             border: none;
             padding: 0.5rem 0.75rem;
@@ -6433,7 +6495,7 @@
         }
 
         body.backend-page button.add-speaker-delete-btn:hover:not(:disabled) {
-            background: #b91c1c;
+            background: #F71941;
             color: #ffffff;
         }
 
@@ -6443,7 +6505,7 @@
         }
 
         body.backend-page button.add-speaker-delete-btn:disabled {
-            background: #dc2626;
+            background: #F71941;
             color: #ffffff;
             opacity: 0.45;
             cursor: not-allowed;
@@ -6688,7 +6750,7 @@
         }
 
         body.backend-page button.speaker-delete-yes-btn {
-            background: #dc2626 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             border: none;
             padding: 0.45rem 1rem;
@@ -6698,7 +6760,7 @@
         }
 
         body.backend-page button.speaker-delete-yes-btn:hover {
-            background: #b91c1c !important;
+            background: #F71941 !important;
             color: #ffffff !important;
         }
 
@@ -6911,7 +6973,7 @@
         #texteditor .texteditor-main > .html-editor,
         #texteditor .texteditor-main > .renderbox {
             flex: 3 3 0;
-            background-color: #0077b6;
+            background-color: #71C7FE;
             border: 1px solid #e2e8f0;
             border-radius: 5px;
             box-sizing: border-box;
@@ -6980,7 +7042,7 @@
         }
 
         .texteditor-render-surface .texteditor-render-error {
-            color: #b91c1c;
+            color: #F71941;
         }
 
         .renderbox--idle .texteditor-render-surface {
@@ -7005,15 +7067,15 @@
         }
 
         .renderbox.renderbox--preset-email .texteditor-render-surface .texteditor-render-error {
-            color: #b91c1c;
+            color: #F71941;
         }
 
         .renderbox.renderbox--preset-email .texteditor-render-surface .texteditor-render-html a {
-            color: #0369a1;
+            color: #71C7FE;
         }
 
         .renderbox.renderbox--preset-email .texteditor-render-surface .texteditor-render-html a:hover {
-            color: #0c4a6e;
+            color: #71C7FE;
         }
 
         .renderbox.renderbox--preset-email .texteditor-render-html .programme-day-content p,
@@ -7036,11 +7098,11 @@
         }
 
         .texteditor-render-surface .texteditor-render-html a {
-            color: #0369a1;
+            color: #71C7FE;
         }
 
         .texteditor-render-surface .texteditor-render-html a:hover {
-            color: #0c4a6e;
+            color: #71C7FE;
         }
 
         .texteditor-render-html .programme-day-content p,
@@ -7092,7 +7154,7 @@
         }
 
         .texteditor-render-error {
-            color: #b91c1c;
+            color: #F71941;
         }
 
         .texteditor-code-label {
@@ -7212,7 +7274,7 @@
             color: #0f172a !important;
             border: none !important;
             border-radius: 0;
-            box-shadow: none !important;
+            box-shadow: var(--backend-button-shadow) !important;
             filter: none !important;
             font-family: 'Inter', sans-serif;
             font-size: 0.875rem;
@@ -7226,12 +7288,12 @@
         }
 
         #texteditor .texteditor-preset-table tbody tr:hover {
-            background: #f0f9ff;
+            background: #71C7FE;
         }
 
         #texteditor .texteditor-preset-table tbody tr:has(.texteditor-day-btn.is-active),
         #texteditor .texteditor-preset-table tbody tr:has(.texteditor-snippet-btn.is-active) {
-            background: #f0f9ff;
+            background: #71C7FE;
         }
 
         #texteditor .texteditor-preset-table .texteditor-day-btn:disabled,
@@ -7545,14 +7607,14 @@
         }
 
         #programme-editor .programme-toolbar .programme-padlock-btn {
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             color: #003153;
         }
 
         #programme-editor .programme-toolbar .programme-padlock-btn:disabled {
-            background: #fef3c7;
+            background: var(--backend-button-yellow);
             border: none;
-            color: #94a3b8;
+            color: #003153;
             cursor: not-allowed;
             filter: none;
             opacity: 1;
@@ -7583,7 +7645,7 @@
 
         #programme-editor .programme-toolbar .programme-add-session-btn:disabled,
         #programme-editor .programme-toolbar .programme-add-slot-btn:disabled {
-            background: #FFD700;
+            background: var(--backend-button-yellow);
             border: none;
             color: #003153;
             opacity: 0.45;
@@ -7605,7 +7667,7 @@
         }
 
         #programme-editor .programme-toolbar .programme-session-order-btn {
-            background: #FFD700;
+            background: var(--backend-button-yellow);
             color: #003153;
             font-size: 1rem;
             font-weight: 700;
@@ -7636,7 +7698,7 @@
         }
 
         #programme-editor .programme-toolbar .programme-restore-btn {
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             color: #003153;
         }
 
@@ -7645,7 +7707,7 @@
         }
 
         #programme-editor .programme-toolbar #save-programme-btn {
-            background: #ffd700;
+            background: var(--backend-button-yellow);
             color: #003153;
         }
 
@@ -7662,24 +7724,24 @@
         }
 
         #programme-editor .programme-toolbar #programme-delete-btn {
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
         }
 
         #programme-editor .programme-toolbar #programme-delete-btn:hover:not(:disabled) {
-            background: #cc0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             filter: none;
         }
 
         #programme-editor .programme-toolbar #programme-delete-btn.is-armed {
-            outline: 2px solid #ff1493;
+            outline: 2px solid #F71941;
             outline-offset: 0;
-            box-shadow: 0 0 10px rgba(255, 20, 147, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
         body.backend-page #programme-editor .programme-toolbar #programme-delete-btn:disabled {
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             opacity: 0.45;
             cursor: not-allowed;
@@ -7687,7 +7749,7 @@
         }
 
         body.backend-page #programme-editor .programme-toolbar #programme-delete-btn:disabled:hover {
-            background: #ff0000 !important;
+            background: #F71941 !important;
             color: #ffffff !important;
             filter: none;
         }
@@ -7897,7 +7959,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: #e0f2fe;
+            background: #71C7FE;
             padding: 16px 0;
             margin: 0 4px;
             box-sizing: border-box;
@@ -7946,7 +8008,7 @@
             left: 0;
             right: 0;
             box-sizing: border-box;
-            background: #FFD700;
+            background: #FECB00;
             border: none;
             border-radius: 0;
             padding: 0.25rem 0.4rem;
@@ -7985,20 +8047,20 @@
 
         #programme-editor .programme-editor .grid .grid-top {
             flex-shrink: 0;
-            background: #FFD700;
+            background: #FECB00;
             padding: 0;
             border-radius: 5px 5px 0 0;
-            border-bottom: 1px solid #a67c00;
+            border-bottom: 1px solid #FECB00;
             border-right: 1px solid #003153;
         }
 
         #programme-editor .programme-editor .grid .grid-bottom {
             height: 30px;
             flex-shrink: 0;
-            background: #FFD700;
+            background: #FECB00;
             padding: 0;
             border-radius: 0 0 5px 5px;
-            border-top: 1px solid #a67c00;
+            border-top: 1px solid #FECB00;
         }
 
         #programme-editor .programme-editor .grid .grid-column-title {
@@ -8780,7 +8842,22 @@
                             <p class="guest-editor-empty" id="guest-editor-empty" role="status">Select guest</p>
                             <div class="guest-overwatch" id="guest-overwatch-panel" hidden aria-hidden="true" aria-label="Guest overview">
                                 <h2 class="guest-overwatch-title" id="guest-overwatch-title">Overview</h2>
-                                <div class="guest-overwatch-body" id="guest-overwatch-body"></div>
+                                <div class="guest-overwatch-body" id="guest-overwatch-body">
+                                    <div class="guests-registered" id="guests-registered" data-name="guests.registered" aria-label="Registered guests">
+                                        <div class="guests-registered-label">Registered:</div>
+                                        <div class="guests-registered-count" id="guests-registered-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
+                                    <div class="guests-invited" id="guests-invited" data-name="guests.invited" aria-label="Invited guests not paid">
+                                        <div class="guests-invited-label">Invited:</div>
+                                        <div class="guests-invited-count" id="guests-invited-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
+                                    <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
+                                        <div class="guests-paid-label">Paid:</div>
+                                        <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -12341,6 +12418,7 @@
                     overwatch.classList.add('is-open');
                     overwatch.setAttribute('aria-hidden', 'false');
                 }
+                updateGuestsOverwatchRegisteredCount();
                 var actions = document.getElementById('guest-editor-actions');
                 if (actions) {
                     actions.hidden = true;
@@ -12366,6 +12444,52 @@
             if (!guestsOverwatchOpen) return;
             guestsOverwatchOpen = false;
             applyGuestsOverwatchUi();
+        }
+
+        /** Count of guests in memory for Current event (roster is already event-filtered). */
+        function countGuestsRegisteredForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                if (guestRecordEventMatchesCurrentEvent(guestsRosterInMemory[i])) n++;
+            }
+            return n;
+        }
+
+        /** Invited=Yes and Paid=No for Current event. */
+        function countGuestsInvitedUnpaidForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestInvitedFieldIsYes(g.invited) && guestPaidFieldIsNo(g.paid)) n++;
+            }
+            return n;
+        }
+
+        /** Paid=Yes for Current event. */
+        function countGuestsPaidForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestPaidFieldIsYes(g.paid)) n++;
+            }
+            return n;
+        }
+
+        function updateGuestsOverwatchRegisteredCount() {
+            var registeredEl = document.getElementById('guests-registered-count');
+            if (registeredEl) registeredEl.textContent = String(countGuestsRegisteredForCurrentEvent());
+            var invitedEl = document.getElementById('guests-invited-count');
+            if (invitedEl) invitedEl.textContent = String(countGuestsInvitedUnpaidForCurrentEvent());
+            var paidEl = document.getElementById('guests-paid-count');
+            if (paidEl) paidEl.textContent = String(countGuestsPaidForCurrentEvent());
         }
 
         async function openGuestsOverwatch() {
@@ -16612,6 +16736,7 @@
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
             updateGuestsListHeadingDisplay();
+            if (guestsOverwatchOpen) updateGuestsOverwatchRegisteredCount();
         }
 
         /**
@@ -22032,9 +22157,9 @@
             var ghostLeft = (e && e.clientX != null) ? (e.clientX - p.offsetX) : p.rect.left;
             var ghostTop = (e && e.clientY != null) ? (e.clientY - p.offsetY) : p.rect.top;
             var ghost = document.createElement('div');
-            var styleStr = 'position:fixed;left:' + ghostLeft + 'px;top:' + ghostTop + 'px;width:' + p.rect.width + 'px;height:' + p.rect.height + 'px;margin:0;padding:0.25rem 0.5rem;background:#FFD700;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;gap:0.5rem;font-size:0.75rem;z-index:10002;pointer-events:none;opacity:0.9;';
+            var styleStr = 'position:fixed;left:' + ghostLeft + 'px;top:' + ghostTop + 'px;width:' + p.rect.width + 'px;height:' + p.rect.height + 'px;margin:0;padding:0.25rem 0.5rem;background:#FECB00;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;gap:0.5rem;font-size:0.75rem;z-index:10002;pointer-events:none;opacity:0.9;';
             if (p.source === 'programme') {
-                styleStr = 'position:fixed;left:' + ghostLeft + 'px;top:' + ghostTop + 'px;width:' + p.rect.width + 'px;height:' + p.rect.height + 'px;margin:0;padding:0.25rem 0.4rem;background:#FFD700;box-sizing:border-box;font-size:0.75rem;color:#1e293b;line-height:1.3;z-index:10002;pointer-events:none;opacity:0.9;';
+                styleStr = 'position:fixed;left:' + ghostLeft + 'px;top:' + ghostTop + 'px;width:' + p.rect.width + 'px;height:' + p.rect.height + 'px;margin:0;padding:0.25rem 0.4rem;background:#FECB00;box-sizing:border-box;font-size:0.75rem;color:#1e293b;line-height:1.3;z-index:10002;pointer-events:none;opacity:0.9;';
             }
             ghost.className = 'programme-activity-ghost';
             ghost.setAttribute('style', styleStr);
