@@ -458,9 +458,15 @@ export const createGuestStripeInvoiceHttp = onRequest({
     const sentLogLine = `${guestLogPrefixYyMmDd()}: ` +
       `Stripe invoice finalized and sent (${finalizedInvoice.id}).`;
     const invoicedDate = formatGuestInvoicedDateDisplay(new Date());
+    const alreadyPaid = String(refreshedData["Paid"] || "")
+      .trim()
+      .toLowerCase() === "yes";
+    const paidPatch: Record<string, unknown> = alreadyPaid ?
+      {} :
+      {"Paid": "No"};
     await itemRef.set({
       "Invoiced": "Yes",
-      "Paid": "No",
+      ...paidPatch,
       "Invoiced date": invoicedDate,
       "Stripe Invoice Id": finalizedInvoice.id,
       "Stripe Invoice Status": finalizedInvoice.status || "open",
@@ -506,46 +512,156 @@ type StripePaidInvoiceFields = {
   number?: string | null;
   status?: string | null;
   customer?: unknown;
+  customer_email?: string | null;
   metadata?: Record<string, string> | null;
   hosted_invoice_url?: string | null;
+  created?: number | null;
+};
+
+type GuestItemIndexEntry = {
+  guestId: string;
+  ref: DocumentReference;
+  data: Record<string, unknown>;
 };
 
 /**
+ * Load every tbs/Guests/{id}/item doc for matching and reconcile.
+ * @param {Firestore} db Admin Firestore.
+ * @return {Promise<GuestItemIndexEntry[]>} Guest item entries.
+ */
+async function loadAllGuestItemEntries(
+  db: Firestore,
+): Promise<GuestItemIndexEntry[]> {
+  const guestCols = await db.collection("tbs").doc("Guests").listCollections();
+  const entries: GuestItemIndexEntry[] = [];
+  for (const col of guestCols) {
+    const snap = await col.doc("item").get();
+    if (!snap.exists) continue;
+    entries.push({
+      guestId: col.id,
+      ref: snap.ref,
+      data: snap.data() || {},
+    });
+  }
+  return entries;
+}
+
+/**
  * Resolve guest item ref from a paid Stripe invoice.
- * Prefers invoice.metadata.guestId; falls back to scanning Guests for
- * Stripe Invoice Id.
+ * Order: metadata.guestId (if doc exists) → Stripe Invoice Id →
+ * Stripe Customer Id → guest email vs invoice.customer_email.
  * @param {Firestore} db Admin Firestore.
  * @param {StripePaidInvoiceFields} invoice Paid invoice.
+ * @param {GuestItemIndexEntry[]=} guestEntries Optional preloaded guests.
  * @return {Promise<DocumentReference|null>} Guest item ref or null.
  */
 async function findGuestItemRefForStripeInvoice(
   db: Firestore,
   invoice: StripePaidInvoiceFields,
+  guestEntries?: GuestItemIndexEntry[],
 ): Promise<DocumentReference | null> {
+  const entries = guestEntries || await loadAllGuestItemEntries(db);
   const metaGuestId = String(
     (invoice.metadata && invoice.metadata.guestId) || "",
   ).trim();
   if (metaGuestId) {
-    return db.collection("tbs").doc("Guests")
+    const byMeta = entries.find((e) => e.guestId === metaGuestId);
+    if (byMeta) return byMeta.ref;
+    const metaRef = db.collection("tbs").doc("Guests")
       .collection(metaGuestId).doc("item");
+    const metaSnap = await metaRef.get();
+    if (metaSnap.exists) return metaRef;
   }
+
   const invoiceId = String(invoice.id || "").trim();
-  if (!invoiceId) return null;
-  const guestCols = await db.collection("tbs").doc("Guests").listCollections();
-  for (const col of guestCols) {
-    const snap = await col.doc("item").get();
-    if (!snap.exists) continue;
-    const data = snap.data() || {};
-    const storedId = String(data["Stripe Invoice Id"] || "").trim();
-    if (storedId && storedId === invoiceId) {
-      return snap.ref;
-    }
+  if (invoiceId) {
+    const byInvoice = entries.find((e) => {
+      const storedId = String(e.data["Stripe Invoice Id"] || "").trim();
+      return storedId && storedId === invoiceId;
+    });
+    if (byInvoice) return byInvoice.ref;
   }
+
+  const customerId = typeof invoice.customer === "string" ?
+    String(invoice.customer).trim() :
+    "";
+  if (customerId) {
+    const byCustomer = entries.find((e) => {
+      const stored = String(e.data["Stripe Customer Id"] || "").trim();
+      return stored && stored === customerId;
+    });
+    if (byCustomer) return byCustomer.ref;
+  }
+
+  const invoiceEmail = String(invoice.customer_email || "")
+    .trim()
+    .toLowerCase();
+  if (invoiceEmail) {
+    const byEmail = entries.find((e) => {
+      const guestEmail = pickGuestEmail(e.data).toLowerCase();
+      return guestEmail && guestEmail === invoiceEmail;
+    });
+    if (byEmail) return byEmail.ref;
+  }
+
   return null;
 }
 
 /**
- * Stripe webhook: on invoice.paid, set guest Paid=Yes + invoice fields.
+ * Mark a guest Paid=Yes from a Stripe paid invoice (idempotent log).
+ * @param {DocumentReference} itemRef Guest item ref.
+ * @param {StripePaidInvoiceFields} invoice Paid invoice.
+ * @return {Promise<{updated: boolean, alreadyPaid: boolean}>} Result.
+ */
+async function applyStripePaidInvoiceToGuest(
+  itemRef: DocumentReference,
+  invoice: StripePaidInvoiceFields,
+): Promise<{updated: boolean; alreadyPaid: boolean}> {
+  const snap = await itemRef.get();
+  if (!snap.exists) {
+    return {updated: false, alreadyPaid: false};
+  }
+  const data = snap.data() || {};
+  const alreadyPaid = String(data["Paid"] || "").trim().toLowerCase() === "yes";
+  const paidDate = alreadyPaid && String(data["Paid date"] || "").trim() ?
+    String(data["Paid date"]).trim() :
+    formatGuestInvoicedDateDisplay(
+      invoice.created ? new Date(invoice.created * 1000) : new Date(),
+    );
+  const patch: Record<string, unknown> = {
+    "Paid": "Yes",
+    "Paid date": paidDate,
+    "Stripe Invoice Id": invoice.id || data["Stripe Invoice Id"] || "",
+    "Stripe Invoice Status": invoice.status || "paid",
+    "Stripe Invoice Number": invoice.number || "",
+    "Stripe Invoice Url":
+      invoice.hosted_invoice_url || data["Stripe Invoice Url"] || "",
+  };
+  if (!alreadyPaid) {
+    const logLine = `${guestLogPrefixYyMmDd()}: ` +
+      `Payment received on ${paidDate}` +
+      (invoice.id ? ` (${invoice.id}` : "") +
+      (invoice.number ? `, number ${invoice.number}` : "") +
+      (invoice.id ? ")" : "") +
+      ".";
+    patch["Log"] = FieldValue.arrayUnion(logLine);
+  }
+  await itemRef.set(patch, {merge: true});
+  return {updated: !alreadyPaid, alreadyPaid};
+}
+
+/**
+ * Whether a Stripe webhook event should mark a guest paid.
+ * @param {string} type Stripe event type.
+ * @return {boolean} True for paid invoice events.
+ */
+function isStripePaidInvoiceEventType(type: string): boolean {
+  return type === "invoice.paid" || type === "invoice.payment_succeeded";
+}
+
+/**
+ * Stripe webhook: on invoice.paid / invoice.payment_succeeded,
+ * set guest Paid=Yes + invoice fields.
  * Configure endpoint in Stripe Live Dashboard → Developers → Webhooks.
  */
 export const stripeWebhookHttp = onRequest({
@@ -591,42 +707,47 @@ export const stripeWebhookHttp = onRequest({
   }
 
   try {
-    if (event.type === "invoice.paid") {
+    if (isStripePaidInvoiceEventType(event.type)) {
       const invoice = event.data.object;
+      if (String(invoice.status || "").trim() &&
+        String(invoice.status).trim() !== "paid") {
+        res.status(200).json({
+          ok: true,
+          ignored: event.type,
+          reason: "not_paid",
+          status: invoice.status,
+        });
+        return;
+      }
       const db = getFirestore();
       const itemRef = await findGuestItemRefForStripeInvoice(db, invoice);
       if (!itemRef) {
         logger.warn("stripeWebhookHttp: no guest for invoice", {
           invoiceId: invoice.id,
           customer: invoice.customer,
+          customerEmail: invoice.customer_email,
+          metaGuestId: invoice.metadata && invoice.metadata.guestId,
         });
-        res.status(200).json({ok: true, matched: false});
+        // Non-2xx so Stripe retries; guest may get linked later.
+        res.status(404).json({ok: false, matched: false});
         return;
       }
 
-      const paidDate = formatGuestInvoicedDateDisplay(new Date());
-      const logLine = `${guestLogPrefixYyMmDd()}: ` +
-        `Payment received on ${paidDate}` +
-        (invoice.id ? ` (${invoice.id}` : "") +
-        (invoice.number ? `, number ${invoice.number}` : "") +
-        (invoice.id ? ")" : "") +
-        ".";
-      await itemRef.set({
-        "Paid": "Yes",
-        "Paid date": paidDate,
-        "Stripe Invoice Id": invoice.id || "",
-        "Stripe Invoice Status": invoice.status || "paid",
-        "Stripe Invoice Number": invoice.number || "",
-        "Stripe Invoice Url": invoice.hosted_invoice_url || "",
-        "Log": FieldValue.arrayUnion(logLine),
-      }, {merge: true});
-
-      logger.info("stripeWebhookHttp invoice.paid", {
+      const result = await applyStripePaidInvoiceToGuest(itemRef, invoice);
+      logger.info("stripeWebhookHttp paid invoice applied", {
+        eventType: event.type,
         invoiceId: invoice.id,
         invoiceNumber: invoice.number,
         guestPath: itemRef.path,
+        updated: result.updated,
+        alreadyPaid: result.alreadyPaid,
       });
-      res.status(200).json({ok: true, matched: true});
+      res.status(200).json({
+        ok: true,
+        matched: true,
+        updated: result.updated,
+        alreadyPaid: result.alreadyPaid,
+      });
       return;
     }
 
@@ -636,6 +757,180 @@ export const stripeWebhookHttp = onRequest({
     res.status(500).send(
       err instanceof Error ? err.message : "Webhook handler failed.",
     );
+  }
+});
+
+/**
+ * Backfill Paid=Yes for guests whose Stripe invoices are already paid.
+ * POST JSON: { guestId?: string, lookbackDays?: number }
+ * Checks each unpaid invoiced guest's Stripe Invoice Id, then also scans
+ * recent Stripe paid invoices for unmatched guests.
+ */
+export const reconcileStripePaidInvoicesHttp = onRequest({
+  secrets: [stripeSecretParam],
+  timeoutSeconds: 300,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const stripeSecret = String(stripeSecretParam.value() || "").trim();
+  if (!stripeSecret) {
+    res.status(500).json({
+      error: "Missing STRIPE_SECRET_KEY in functions environment.",
+    });
+    return;
+  }
+  const stripe = new Stripe(stripeSecret);
+  const body = (req.body || {}) as Record<string, unknown>;
+  const filterGuestId = String(body.guestId || "").trim();
+  const lookbackDaysRaw = Number(body.lookbackDays);
+  const lookbackDays = Number.isFinite(lookbackDaysRaw) && lookbackDaysRaw > 0 ?
+    Math.min(Math.floor(lookbackDaysRaw), 365) :
+    90;
+  const createdGte = Math.floor(Date.now() / 1000) - (lookbackDays * 86400);
+
+  const db = getFirestore();
+  const summary = {
+    ok: true,
+    checked: 0,
+    updated: 0,
+    alreadyPaid: 0,
+    openOrUnpaid: 0,
+    unmatchedStripe: 0,
+    updatedGuestIds: [] as string[],
+    unmatchedInvoiceIds: [] as string[],
+  };
+
+  try {
+    const entries = await loadAllGuestItemEntries(db);
+    const scoped = filterGuestId ?
+      entries.filter((e) => e.guestId === filterGuestId) :
+      entries;
+
+    for (const entry of scoped) {
+      const paidYes = String(entry.data["Paid"] || "")
+        .trim()
+        .toLowerCase() === "yes";
+      const invoiceId = String(entry.data["Stripe Invoice Id"] || "").trim();
+      if (!invoiceId) continue;
+      if (paidYes) {
+        summary.alreadyPaid++;
+        continue;
+      }
+      summary.checked++;
+      try {
+        const invoice = await stripe.invoices.retrieve(invoiceId);
+        if (String(invoice.status || "") !== "paid") {
+          summary.openOrUnpaid++;
+          continue;
+        }
+        const result = await applyStripePaidInvoiceToGuest(entry.ref, {
+          id: invoice.id,
+          number: invoice.number,
+          status: invoice.status,
+          customer: invoice.customer,
+          customer_email: invoice.customer_email,
+          metadata: invoice.metadata as Record<string, string> | null,
+          hosted_invoice_url: invoice.hosted_invoice_url,
+          created: invoice.created,
+        });
+        if (result.updated) {
+          summary.updated++;
+          summary.updatedGuestIds.push(entry.guestId);
+        } else if (result.alreadyPaid) {
+          summary.alreadyPaid++;
+        }
+      } catch (err) {
+        logger.warn("reconcileStripePaidInvoicesHttp retrieve failed", {
+          guestId: entry.guestId,
+          invoiceId,
+          err,
+        });
+      }
+    }
+
+    // Second pass: recent paid Stripe invoices for unpaid / unlinked guests.
+    let startingAfter: string | undefined;
+    for (let page = 0; page < 10; page++) {
+      const listParams: {
+        status: "paid";
+        created: {gte: number};
+        limit: number;
+        starting_after?: string;
+      } = {
+        status: "paid",
+        created: {gte: createdGte},
+        limit: 100,
+      };
+      if (startingAfter) listParams.starting_after = startingAfter;
+      const list = await stripe.invoices.list(listParams);
+      for (const invoice of list.data) {
+        const itemRef = await findGuestItemRefForStripeInvoice(
+          db,
+          {
+            id: invoice.id,
+            number: invoice.number,
+            status: invoice.status,
+            customer: invoice.customer,
+            customer_email: invoice.customer_email,
+            metadata: invoice.metadata as Record<string, string> | null,
+            hosted_invoice_url: invoice.hosted_invoice_url,
+            created: invoice.created,
+          },
+          entries,
+        );
+        if (!itemRef) {
+          summary.unmatchedStripe++;
+          if (summary.unmatchedInvoiceIds.length < 40) {
+            summary.unmatchedInvoiceIds.push(invoice.id);
+          }
+          continue;
+        }
+        if (filterGuestId && !itemRef.path.includes(`/${filterGuestId}/`)) {
+          continue;
+        }
+        const result = await applyStripePaidInvoiceToGuest(itemRef, {
+          id: invoice.id,
+          number: invoice.number,
+          status: invoice.status,
+          customer: invoice.customer,
+          customer_email: invoice.customer_email,
+          metadata: invoice.metadata as Record<string, string> | null,
+          hosted_invoice_url: invoice.hosted_invoice_url,
+          created: invoice.created,
+        });
+        const guestIdFromPath = itemRef.parent.id;
+        if (result.updated) {
+          summary.updated++;
+          if (!summary.updatedGuestIds.includes(guestIdFromPath)) {
+            summary.updatedGuestIds.push(guestIdFromPath);
+          }
+        } else if (result.alreadyPaid) {
+          summary.alreadyPaid++;
+        }
+      }
+      if (!list.has_more || list.data.length === 0) break;
+      startingAfter = list.data[list.data.length - 1].id;
+    }
+
+    logger.info("reconcileStripePaidInvoicesHttp done", summary);
+    res.status(200).json(summary);
+  } catch (err) {
+    logger.error("reconcileStripePaidInvoicesHttp", {err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Stripe paid-invoice reconcile failed.",
+    });
   }
 });
 

@@ -323,7 +323,6 @@
             min-width: 0;
         }
 
-        .eventnavigation .aspects .backend-content-count,
         .eventnavigation .aspects .programme-counter {
             color: rgba(255, 255, 255, 0.9);
             padding-right: 0;
@@ -335,19 +334,6 @@
             justify-content: flex-start;
             gap: 4px;
             flex-shrink: 0;
-        }
-
-        .backend-content-count {
-            margin: 0;
-            padding-right: 16px;
-            flex-shrink: 0;
-            align-self: center;
-            text-align: right;
-            font-size: 0.875rem;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            color: #003153;
-            white-space: nowrap;
         }
 
         .programme-counter {
@@ -384,7 +370,7 @@
             box-shadow: none !important;
         }
 
-        /* Placeholder tabs (Overview, Finances) until their panels are built */
+        /* Placeholder tabs (Overview) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -426,6 +412,7 @@
         .aspects .navigation #content-toggle:not(.is-active),
         .aspects .navigation #texteditor-toggle:not(.is-active),
         .aspects .navigation #emailer-toggle:not(.is-active),
+        .aspects .navigation #finances-toggle:not(.is-active),
         .aspects .navigation #settings-toggle:not(.is-active) {
             background: transparent;
             border: none;
@@ -480,6 +467,7 @@
         .lodging-section,
         .content-editor-section,
         .emailer-section,
+        .finances-section,
         .settings-section {
             display: none;
             margin-bottom: 0;
@@ -497,14 +485,12 @@
         .guest-overview-section .guest-viewer,
         .content-editor-section .content-viewer {
             border: none;
-            box-shadow: none;
         }
 
         .speakers-overview .speaker-roster-list,
         .speakers-overview .content-list,
         .content-editor-section .content-list {
             border: none;
-            box-shadow: none;
         }
 
         .speakers-overview.is-open,
@@ -513,6 +499,7 @@
         .lodging-section.is-open,
         .content-editor-section.is-open,
         .emailer-section.is-open,
+        .finances-section.is-open,
         .settings-section.is-open {
             display: flex;
             padding-top: 0;
@@ -1219,7 +1206,10 @@
         }
 
         #guest-editor .guests-list-heading .edit-guest-top-trailing,
-        #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing {
+        #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -1230,7 +1220,8 @@
             box-sizing: border-box;
         }
 
-        #guest-editor .guests-list-heading .guests-actions {
+        #guest-editor .guests-list-heading .guests-actions,
+        #speaker-editor .speakers-list-top .speakers-actions {
             flex: 0 0 auto;
             margin: 0;
             height: auto;
@@ -2010,28 +2001,13 @@
 
         #guest-editor .guests-list,
         #speaker-editor .speakers-list,
-        #content-editor .content-list {
+        #content-editor .content-list,
+        #finances-editor .finances-panel {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             min-height: 0;
             overflow: hidden;
-        }
-
-        #speaker-editor .speakers-list-top,
-        #content-editor .content-list-top {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.75rem;
-            flex: 0 0 auto;
-            width: 100%;
-            min-width: 0;
-            box-sizing: border-box;
-            padding: 8px 8px;
-            border-bottom: 1px solid #cbd5e1;
-            background: #ffffff;
-            border-radius: 5px 5px 0 0;
         }
 
         #speaker-editor .speakers-list .speakers-actions,
@@ -2041,9 +2017,22 @@
             justify-content: flex-start;
         }
 
+        #speaker-editor .speakers-list-top .speakers-actions,
+        #content-editor .content-list-top .content-actions {
+            flex: 0 0 auto;
+            margin: 0;
+            height: auto;
+            min-height: 0;
+            width: auto;
+            max-width: 100%;
+            justify-content: flex-end;
+        }
+
         #guest-editor .guests-list .guests-roster-list,
         #speaker-editor .speakers-list .speaker-roster-list,
-        #content-editor .content-list .content-list-scroll {
+        #content-editor .content-list .content-list-scroll,
+        #finances-editor .finances-panel .guests-roster-list,
+        #finances-editor .finances-panel .finances-panel-body {
             flex: 1 1 auto;
             min-height: 0;
         }
@@ -2070,15 +2059,18 @@
 
         #guest-editor .guests-list,
 #speaker-editor .speakers-list,
-#content-editor .content-list {
+#content-editor .content-list,
+#finances-editor .finances-panel {
             border: 1px solid #e2e8f0;
             border-radius: 5px;
             box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
         #content-editor .content-list-table,
         #content-editor .content-roster-table,
         #guest-editor .guests-list-table,
+        #finances-editor .guests-list-table,
         #speaker-editor .speakers-roster-table,
         #programme-editor .programme-speakers-table,
         #texteditor .texteditor-preset-table {
@@ -2094,6 +2086,7 @@
         #content-editor .content-list-table thead th,
         #content-editor .content-roster-table thead th,
         #guest-editor .guests-list-table thead th,
+        #finances-editor .guests-list-table thead th,
         #speaker-editor .speakers-roster-table thead th,
         #programme-editor .programme-speakers-table thead th {
             background: #ffffff;
@@ -2106,6 +2099,7 @@
         #content-editor .content-list-table tbody td,
         #content-editor .content-roster-table tbody td,
         #guest-editor .guests-list-table tbody td,
+        #finances-editor .guests-list-table tbody td,
         #speaker-editor .speakers-roster-table tbody td,
         #programme-editor .programme-speakers-table tbody td,
         #texteditor .texteditor-preset-table tbody td {
@@ -2317,7 +2311,7 @@
             border: var(--guest-editor-bw) solid #e2e8f0;
             border-radius: var(--guest-editor-shell-r);
             overflow: hidden;
-            box-shadow: none;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
         #guest-editor .guest-viewer > .guest-editor {
@@ -2335,7 +2329,7 @@
             border: var(--guest-editor-bw) solid #e2e8f0;
             border-radius: var(--guest-editor-shell-r);
             overflow: hidden;
-            box-shadow: none;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
         #speaker-editor .speaker-editor-bottom {
@@ -2692,6 +2686,48 @@
             padding: 16px;
         }
 
+        #finances-editor,
+        .finances-section,
+        .finances-section.is-open {
+            --editor-gunmetal-border: #e2e8f0;
+            background: #e2e8f0;
+            border: none;
+            padding: 16px;
+        }
+
+        #finances-editor .finances-panel .finances-panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            background: #ffffff;
+            border-radius: 0 0 5px 5px;
+            overflow: auto;
+        }
+
+        #finances-editor .finances-overview {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 16px;
+            margin-top: 0;
+            min-width: 0;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        #finances-editor .finances-panel {
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 0;
+            background: transparent;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
         #speaker-editor,
         .speakers-overview,
         .speakers-overview.is-open {
@@ -2708,13 +2744,13 @@
             box-sizing: border-box;
         }
 
-        /* Roster | toolbar row 1, inner + empty overlay row 2 (grid on .content-viewer). */
+        /* Content viewer: editor fill + empty overlay. */
         #content-editor .content-viewer {
             position: relative;
             flex: 1 1 0;
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: auto auto minmax(0, 1fr);
+            grid-template-rows: minmax(0, 1fr);
             min-width: 0;
             min-height: 8rem;
             overflow: hidden;
@@ -2723,11 +2759,12 @@
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
         #content-editor .content-editor-empty {
             grid-column: 1;
-            grid-row: 1 / 4;
+            grid-row: 1;
             z-index: 5;
             margin: 0;
             align-self: stretch;
@@ -2759,10 +2796,6 @@
         }
 
         #content-editor .content-viewer--no-selection .add-content-form {
-            display: none !important;
-        }
-
-        #content-editor .content-viewer--no-selection > .edit-content-top {
             display: none !important;
         }
 
@@ -2980,18 +3013,9 @@
             color: #b8860b;
         }
 
-        #content-editor .edit-content-top:has(#edit-content-title-display:empty) {
-            margin-bottom: 0;
-        }
-
-        #content-editor .content-viewer > .edit-content-top {
-            grid-column: 1;
-            grid-row: 1;
-        }
-
         #content-editor .content-viewer > .edit-content-bottom {
             grid-column: 1;
-            grid-row: 2;
+            grid-row: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
@@ -3047,7 +3071,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: flex-end;
             gap: 0.5rem;
             width: 100%;
             min-width: 0;
@@ -3105,24 +3129,6 @@
             filter: brightness(0.92);
         }
 
-        #content-editor .content-editor-toolbar .content-editor-delete-btn,
-        #content-editor .content-editor-toolbar .content-editor-delete-btn:hover:not(:disabled) {
-            background: #dc2626 !important;
-            color: #ffffff !important;
-        }
-
-        #content-editor .content-editor-toolbar .content-editor-delete-btn:disabled {
-            background: rgba(220, 38, 38, 0.45) !important;
-            color: rgba(255, 255, 255, 0.9) !important;
-            opacity: 1;
-            filter: none;
-        }
-
-        #content-editor .content-editor-toolbar .content-editor-delete-btn.content-editor-delete-btn--no-selection:disabled {
-            background: rgba(220, 38, 38, 0.3) !important;
-            color: rgba(255, 255, 255, 0.75) !important;
-        }
-
         #content-editor .content-editor-toolbar-trailing {
             display: flex;
             flex-direction: row;
@@ -3134,23 +3140,126 @@
             margin-left: 0;
         }
 
-        #content-editor .content-editor-toolbar-trailing .texteditor-save-btn {
-            flex: 0 0 var(--backend-gold-toolbar-btn-width);
-            width: var(--backend-gold-toolbar-btn-width);
-            min-width: var(--backend-gold-toolbar-btn-width);
-            max-width: var(--backend-gold-toolbar-btn-width);
-            height: 35px;
-            min-height: 35px;
-            max-height: 35px;
+        /* Content Save: round yellow icon button (match guests). */
+        #content-editor .content-editor-toolbar-trailing #add-content-save-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
             padding: 0;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #ffd700;
+            color: #003153;
+            font-size: 0;
+            line-height: 0;
             box-sizing: border-box;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-family: var(--backend-gold-toolbar-btn-font);
-            font-size: 0.8125rem;
-            line-height: 1;
-            text-align: center;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #add-content-save-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #content-editor .content-editor-toolbar-trailing #add-content-save-btn svg {
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #ffd700;
+            color: #003153;
+            font-size: 0;
+            line-height: 0;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn .content-publish-icon {
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn .content-publish-icon--open {
+            display: none;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn .content-publish-icon--closed {
+            display: block;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn.is-published .content-publish-icon--open {
+            display: block;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-toolbar-publish-btn.is-published .content-publish-icon--closed {
+            display: none;
+        }
+
+        /* Content Delete: round red trash icon (match guests). */
+        #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            gap: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #ff0000 !important;
+            color: #ffffff !important;
+            font-size: 0;
+            line-height: 0;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn:hover:not(:disabled) {
+            background: #cc0000 !important;
+            color: #ffffff !important;
+            filter: none;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn:disabled {
+            background: #ff0000 !important;
+            color: #ffffff !important;
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn.content-editor-delete-btn--no-selection:disabled {
+            background: #ff0000 !important;
+            color: #ffffff !important;
+            opacity: 0.3;
+        }
+
+        #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn svg,
+        #content-editor .content-editor-toolbar-trailing #content-editor-delete-btn svg path {
+            fill: #ffffff !important;
+            color: #ffffff;
+            flex-shrink: 0;
+            display: block;
         }
 
         #content-editor .content-editor-toolbar .content-editor-padlock-btn svg {
@@ -4280,7 +4389,6 @@
         }
 
         .edit-speaker-top,
-        .edit-content-top,
         .edit-guest-top {
             display: flex;
             flex-direction: row;
@@ -4303,7 +4411,10 @@
             color: #000000;
         }
 
-        #guest-editor .edit-guest-top {
+        #guest-editor .edit-guest-top,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading {
             background-color: #ffffff;
             padding: 8px 0;
             margin: 0;
@@ -4317,90 +4428,86 @@
             box-sizing: border-box;
         }
 
-        #guest-editor .guests-list > .edit-guest-top.guests-list-heading {
+        #guest-editor .guests-list > .edit-guest-top.guests-list-heading,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading {
             flex: 0 0 auto;
             width: 100%;
             border-radius: 5px 5px 0 0;
             padding-top: 8px;
             padding-bottom: 8px;
+            padding-left: var(--backend-table-cell-pad-x);
+            padding-right: 0;
             border-bottom: 1px solid #cbd5e1;
             box-sizing: border-box;
         }
 
-        #guest-editor .edit-guest-top .edit-guest-top-spacer {
+        #guest-editor .edit-guest-top .edit-guest-top-spacer,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer {
             display: none;
         }
 
-        #guest-editor .edit-guest-top .edit-guest-top-trailing {
+        #guest-editor .edit-guest-top .edit-guest-top-trailing,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             flex: 1 1 auto;
         }
 
         #guest-editor .edit-guest-top .selected-guestname,
         #guest-editor .edit-guest-top .edit-guest-name-first,
-        #guest-editor .edit-guest-top .edit-guest-name-last {
+        #guest-editor .edit-guest-top .edit-guest-name-last,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last {
             color: #000000;
             justify-content: flex-start;
             text-align: left;
             text-transform: uppercase;
         }
 
-        #content-editor .edit-content-top {
-            background-color: #0077b6;
-            padding: 0;
-            margin: 0;
-            border-radius: 7px 7px 0 0;
-            align-items: center;
-            gap: 0;
-            justify-content: flex-start;
-        }
-
         /* Flag sits in the trailing side; name is left-aligned (spacer unused). */
         #guest-editor .edit-guest-top-spacer,
-        #guest-editor .edit-guest-top-trailing {
+        #guest-editor .edit-guest-top-trailing,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             flex: 1 1 0;
             min-width: 0;
             min-height: 0;
         }
 
-        #guest-editor .edit-guest-top-trailing {
+        #guest-editor .edit-guest-top-trailing,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             display: flex;
             align-items: center;
             justify-content: flex-end;
         }
 
-        #content-editor .edit-content-top-spacer,
-        #content-editor .edit-content-top-trailing {
-            flex: 1 1 0;
-            min-width: 0;
-            min-height: 0;
-        }
-
-        #content-editor .edit-content-top-trailing {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        #guest-editor .edit-guest-top .selected-guestname-wrap {
+        #guest-editor .edit-guest-top .selected-guestname-wrap,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap {
             flex: 0 1 auto;
             min-width: 0;
             display: flex;
             flex-direction: row;
             justify-content: flex-start;
             align-items: center;
-        }
-
-        #content-editor .edit-content-top .edit-content-name-heading-wrap {
-            flex: 0 1 auto;
-            min-width: 0;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #content-editor .edit-content-name-heading-wrap {
-            display: none;
         }
 
         #speaker-editor .edit-speaker-top .edit-speaker-name-heading {
@@ -4420,28 +4527,10 @@
             box-sizing: border-box;
         }
 
-        #content-editor .edit-content-name-heading {
-            margin: 0;
-            flex: 0 1 auto;
-            min-width: 0;
-            max-width: 100%;
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.2;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 0.5rem;
-            padding: 8px var(--backend-table-cell-pad-x);
-            box-sizing: border-box;
-            color: #ffffff;
-        }
 
-        #guest-editor .edit-guest-top .selected-guestname {
+        #guest-editor .edit-guest-top .selected-guestname,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname {
             color: #000000;
         }
 
@@ -4484,7 +4573,9 @@
             box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.2);
         }
 
-        #guest-editor .selected-guestname {
+        #guest-editor .selected-guestname,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname {
             flex-direction: row;
             flex-wrap: wrap;
             align-items: center;
@@ -4496,6 +4587,13 @@
             flex: 0 1 auto;
             min-width: 0;
             max-width: 100%;
+        }
+
+        #guest-editor .guests-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname {
+            padding-left: 0;
+            padding-right: 0;
         }
 
         #guest-editor .guest-editor-toolbar,
@@ -5444,7 +5542,11 @@
         }
 
         #guest-editor .edit-guest-name-first,
-        #guest-editor .edit-guest-name-last {
+        #guest-editor .edit-guest-name-last,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last {
             font-size: 1.2rem;
             display: inline;
             min-width: 0;
@@ -5859,7 +5961,6 @@
         }
 
         .edit-speaker-name-heading,
-        .edit-content-name-heading,
         .selected-guestname {
             margin: 0;
             flex: 1 1 auto;
@@ -5877,20 +5978,9 @@
         .edit-speaker-name-first,
         .edit-speaker-name-last,
         .edit-guest-name-first,
-        .edit-guest-name-last,
-        .edit-content-title-text {
+        .edit-guest-name-last {
             display: block;
             word-break: break-word;
-        }
-
-        #content-editor .edit-content-title-text {
-            display: block;
-            word-break: break-word;
-            font-family: 'Inter', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 500;
-            line-height: 1.2;
-            color: #ffffff;
         }
 
         .content-editor .add-content-form-field label {
@@ -7754,17 +7844,9 @@
                             <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                             <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
                             <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
-                            <span
-                                class="backend-editor-link backend-editor-link--inactive"
-                                id="finances-toggle"
-                                role="button"
-                                aria-disabled="true"
-                                aria-expanded="false"
-                                tabindex="-1"
-                                title="Coming soon">Finances</span>
+                            <a href="#finances-editor" class="backend-editor-link" id="finances-toggle" role="button" aria-expanded="false" aria-controls="finances-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Finances</a>
                             <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
                         </nav>
-                        <p class="backend-content-count" id="backend-content-count" hidden aria-live="polite">Content items 0</p>
                         <div class="programme-counter" id="programme-counter" hidden aria-live="polite">0 slots, 0 empty and 0 filled</div>
                     </div>
                     <div class="backend-top-trailing">
@@ -7934,7 +8016,15 @@
                 <div class="speakers-bottom-row" id="speakers-bottom-row">
                     <div class="speakers-bottom-track" id="speakers-bottom-track">
                     <div class="speakers-list speakers-list--roster" id="speakers-list" aria-label="Roster">
-                        <div class="speakers-list-top">
+                        <div class="edit-guest-top guests-list-heading speakers-list-top" id="speakers-list-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Speakers list title">
+                                    <span class="edit-guest-name-first" id="speakers-list-heading-event" aria-live="polite">—</span>
+                                    <span class="edit-guest-name-last" id="speakers-list-heading-suffix">speakers</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing">
                             <div id="speakers-actions" class="speakers-actions" aria-label="Speaker actions">
                                 <button type="button" class="add-speaker-button" id="previous-speaker" aria-label="Previous speaker" title="Previous speaker">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -7956,6 +8046,7 @@
                                         <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                                     </svg>
                                 </button>
+                            </div>
                             </div>
                         </div>
                         <div class="speaker-roster-list" id="speaker-roster-list">
@@ -8206,6 +8297,11 @@
                                     <button type="button" class="add-speaker-button" id="filter-guests" disabled aria-disabled="true" aria-label="Filter guests (inactive)" title="Filter (inactive)">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="sync-guest-payments-btn" aria-label="Sync Stripe payments" title="Sync Stripe payments">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
                                         </svg>
                                     </button>
                                 </div>
@@ -8567,7 +8663,14 @@
             <section class="content-editor-section" id="content-editor" aria-hidden="true" aria-label="Content" data-name="content-editor">
                 <div class="content-editor-panels">
                     <div class="content-list" id="content-list" aria-label="Content list">
-                        <div class="content-list-top">
+                        <div class="edit-guest-top guests-list-heading content-list-top" id="content-list-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Content list title">
+                                    <span class="edit-guest-name-first">CONTENT</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing">
                             <div id="content-actions" class="content-actions" hidden aria-label="Content actions">
                                 <button type="button" class="add-content-btn" id="previous-content" aria-label="Previous content" title="Previous content">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -8591,6 +8694,7 @@
                                     </svg>
                                 </button>
                             </div>
+                            </div>
                         </div>
                         <div class="content-list-scroll">
                             <div class="content-list-items" id="content-list-items" aria-live="polite"></div>
@@ -8602,16 +8706,20 @@
                         </div>
                     </div>
                     <div class="content-viewer">
-                        <div class="edit-content-top">
-                            <div class="edit-content-top-spacer" aria-hidden="true"></div>
-                            <div class="edit-content-name-heading-wrap">
-                                <div class="edit-content-name-heading" role="group" aria-label="Title">
-                                    <span class="edit-content-title-text" id="edit-content-title-display" aria-live="polite"></span>
+                        <div class="edit-content-bottom">
+                            <div class="content-editor-media" aria-label="Content image">
+                                <div class="content-editor-image-block" id="edit-content-image-block" hidden>
+                                    <div class="content-editor-image-frame">
+                                        <img id="edit-content-image" alt="" decoding="async" referrerpolicy="no-referrer" />
+                                        <div class="content-editor-image-placeholder" id="edit-content-image-placeholder" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                                                <path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5 11 16.51 14.5 12l4.5 6H5l3.5-4.5zM7 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="edit-content-image-upload" accept="image/*" hidden aria-hidden="true">
                                 </div>
                             </div>
-                            <div class="edit-content-top-trailing" aria-hidden="true"></div>
-                        </div>
-                        <div class="edit-content-bottom">
                             <div class="content-editor-toolbar" role="toolbar" aria-label="Content editor tools">
                                 <div class="guest-editor-toolbar-leading" aria-hidden="true"></div>
                                 <div class="content-editor-toolbar-center">
@@ -8625,26 +8733,22 @@
                                     </button>
                                 </div>
                                 <div class="content-editor-toolbar-trailing">
-                                    <button type="button" class="texteditor-save-btn" id="add-content-save-btn" disabled aria-disabled="true">Save</button>
-                                    <button type="button" class="texteditor-save-btn" id="content-toolbar-publish-btn" disabled aria-disabled="true">Publish</button>
-                                    <button type="button" class="add-content-btn content-editor-delete-btn" id="content-editor-delete-btn" aria-disabled="true" aria-label="Delete selected content" title="Delete selected content" disabled>
-                                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                                            <path fill="currentColor" d="M9 3h6l1 1h4v2H4V4h4l1-1zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 11h8a2 2 0 0 0 2-2V8H6v10a2 2 0 0 0 2 2z"/>
+                                    <button type="button" class="texteditor-save-btn" id="add-content-save-btn" disabled aria-disabled="true" title="Save content" aria-label="Save content">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
                                         </svg>
                                     </button>
-                                </div>
-                            </div>
-                            <div class="content-editor-media" aria-label="Content image">
-                                <div class="content-editor-image-block" id="edit-content-image-block" hidden>
-                                    <div class="content-editor-image-frame">
-                                        <img id="edit-content-image" alt="" decoding="async" referrerpolicy="no-referrer" />
-                                        <div class="content-editor-image-placeholder" id="edit-content-image-placeholder" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
-                                                <path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5 11 16.51 14.5 12l4.5 6H5l3.5-4.5zM7 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <input type="file" id="edit-content-image-upload" accept="image/*" hidden aria-hidden="true">
+                                    <button type="button" class="texteditor-save-btn content-toolbar-publish-btn" id="content-toolbar-publish-btn" disabled aria-disabled="true" aria-pressed="false" title="Publish selected content" aria-label="Publish selected content">
+                                        <svg class="content-publish-icon content-publish-icon--open" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                        </svg>
+                                        <svg class="content-publish-icon content-publish-icon--closed" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-content-btn content-editor-delete-btn" id="content-editor-delete-btn" aria-disabled="true" aria-label="Delete selected content" title="Delete selected content" disabled>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                    </button>
                                 </div>
                             </div>
                             <div class="add-content-form" id="add-content-form">
@@ -8720,6 +8824,77 @@
                             </div>
                         </div>
                         <p class="content-editor-empty" id="content-editor-empty" hidden aria-hidden="true" role="status">Select content</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="finances-section" id="finances-editor" aria-hidden="true" aria-label="Finances" data-name="finances-editor">
+                <div class="finances-overview">
+                    <div class="finances-panel finances-invoices-list" id="finances-invoices-list" aria-label="Invoices list">
+                        <div class="edit-guest-top guests-list-heading" id="finances-invoices-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Invoices list title">
+                                    <span class="edit-guest-name-first">INVOICES</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                        </div>
+                        <div class="guests-roster-list" id="finances-invoices-roster-list">
+                            <div class="guests-roster-scroll">
+                                <div class="guests-roster-items" id="finances-invoices-items" aria-live="polite">
+                                    <table class="guests-list-table" role="grid" aria-label="Invoices">
+                                        <thead>
+                                            <tr></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="guests-roster-row">
+                                                <td class="guests-roster-empty">No invoices yet.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="finances-panel finances-expenses-list" id="finances-expenses-list" aria-label="Expenses list">
+                        <div class="edit-guest-top guests-list-heading" id="finances-expenses-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Expenses list title">
+                                    <span class="edit-guest-name-first">EXPENSES</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                        </div>
+                        <div class="guests-roster-list" id="finances-expenses-roster-list">
+                            <div class="guests-roster-scroll">
+                                <div class="guests-roster-items" id="finances-expenses-items" aria-live="polite">
+                                    <table class="guests-list-table" role="grid" aria-label="Expenses">
+                                        <thead>
+                                            <tr></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="guests-roster-row">
+                                                <td class="guests-roster-empty">No expenses yet.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="finances-panel finances-projections" id="finances-projections" aria-label="Projections">
+                        <div class="edit-guest-top guests-list-heading" id="finances-projections-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Projections title">
+                                    <span class="edit-guest-name-first">PROJECTIONS</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                        </div>
+                        <div class="finances-panel-body" id="finances-projections-body" aria-live="polite"></div>
                     </div>
                 </div>
             </section>
@@ -12491,8 +12666,9 @@
 
         function updateGuestsListHeadingDisplay() {
             var eventEl = document.getElementById('guests-list-heading-event');
-            if (!eventEl) return;
-            eventEl.textContent = String(current_event || '').trim() || '—';
+            if (eventEl) eventEl.textContent = String(current_event || '').trim() || '—';
+            var speakersEventEl = document.getElementById('speakers-list-heading-event');
+            if (speakersEventEl) speakersEventEl.textContent = String(current_event || '').trim() || '—';
         }
 
         function updateBackendCurrentEventDisplay() {
@@ -14863,12 +15039,81 @@
             }
             btn.textContent = label;
             btn.setAttribute('aria-label', label);
-            btn.setAttribute('title', label);
-            btn.disabled = true;
-            btn.setAttribute('aria-disabled', 'true');
+            btn.setAttribute(
+                'title',
+                awaiting
+                    ? 'Check Stripe for this guest’s payment'
+                    : label
+            );
+            // Clickable while awaiting so missed webhooks can be backfilled.
+            btn.disabled = !awaiting;
+            btn.setAttribute('aria-disabled', awaiting ? 'false' : 'true');
             btn.classList.toggle('is-awaiting-payment', awaiting && !paidDone);
             btn.classList.toggle('is-active', false);
             btn.classList.toggle('is-done', paidDone);
+        }
+
+        function reconcileGuestStripePaymentsFromUi(opts) {
+            opts = opts || {};
+            var guestId = opts.guestId != null ? String(opts.guestId).trim() : '';
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/reconcileStripePaidInvoicesHttp';
+            var body = { lookbackDays: 120 };
+            if (guestId) body.guestId = guestId;
+            if (typeof showStatus === 'function') {
+                showStatus(
+                    'loading',
+                    guestId ? 'Checking Stripe for this guest…' : 'Syncing Stripe payments…'
+                );
+            }
+            return fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+                .then(function(res) {
+                    if (!res.ok) {
+                        return res.json()
+                            .catch(function() { return {}; })
+                            .then(function(payload) {
+                                var msg = payload && payload.error
+                                    ? String(payload.error)
+                                    : ('Payment sync failed (' + res.status + ')');
+                                throw new Error(msg);
+                            });
+                    }
+                    return res.json();
+                })
+                .then(function(data) {
+                    var updated = data && data.updated != null ? Number(data.updated) : 0;
+                    return fetchAllGuestsIntoMemory({ force: true, showLoading: false })
+                        .then(function() {
+                            renderGuestsRoster();
+                            syncGuestWorkflowPaymentReceivedButton();
+                            syncGuestWorkflowSendInvoiceButton();
+                            syncGuestManagementLogPanel();
+                            syncGuestInvoicedisnoBlock();
+                            var msg = updated > 0
+                                ? ('Marked ' + updated + ' guest' + (updated === 1 ? '' : 's') + ' paid')
+                                : (guestId
+                                    ? 'No paid invoice found yet for this guest'
+                                    : 'No new paid invoices to sync');
+                            if (typeof showStatus === 'function') showStatus('success', msg);
+                            return data;
+                        });
+                })
+                .catch(function(err) {
+                    console.error('reconcileGuestStripePaymentsFromUi:', err);
+                    if (typeof showStatus === 'function') {
+                        showStatus(
+                            'error',
+                            err && err.message ? err.message : 'Failed to sync Stripe payments.'
+                        );
+                    }
+                    throw err;
+                });
         }
 
         function guestApplicationReviewPlain(v) {
@@ -17555,7 +17800,6 @@
                 rows.sort(contentRosterDateSortCompare);
                 contentRosterInMemory = localDrafts.concat(rows);
                 contentMemoryLoaded = true;
-                updateBackendContentCountDisplay();
             } catch (err) {
                 contentMemoryLoaded = false;
                 throw err;
@@ -17576,13 +17820,6 @@
             await startContentBackgroundHydration();
         }
 
-        function updateBackendContentCountDisplay() {
-            var el = document.getElementById('backend-content-count');
-            if (!el) return;
-            var n = Array.isArray(contentRosterInMemory) ? contentRosterInMemory.length : 0;
-            el.textContent = 'Content items ' + n;
-        }
-
         function renderContentTableFromMemory() {
             var itemsEl = document.getElementById('content-list-items');
             if (!itemsEl) {
@@ -17596,7 +17833,6 @@
                     escapeHtml(firebaseConfig.projectId || '') +
                     '</code>). Ensure document <code>tbs/Content</code> has an array field <code>rowIds</code> listing each row subcollection id, ' +
                     'or allow a collection-group query on <code>item</code> so this tab can discover rows. Rules must allow <code>read</code> on <code>tbs/Content</code> and <code>tbs/Content/**/item</code>.</p>';
-                updateBackendContentCountDisplay();
                 updateContentNavButtons();
                 return;
             }
@@ -17676,7 +17912,6 @@
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
             syncContentRosterSelectionHighlight();
-            updateBackendContentCountDisplay();
             updateContentNavButtons();
         }
 
@@ -17742,14 +17977,6 @@
             void switchToContentRecord(rec, null);
         }
 
-        function updateContentHeadingFromForm() {
-            var titleHead = document.getElementById('edit-content-title-display');
-            var titleEl = document.getElementById('edit-content-title');
-            if (!titleHead) return;
-            var t = titleEl ? String(titleEl.value || '').trim() : '';
-            titleHead.textContent = t;
-        }
-
         function updateContentSaveButtonState() {
             var btn = document.getElementById('add-content-save-btn');
             if (!btn) return;
@@ -17785,11 +18012,16 @@
         function updateContentToolbarPublishButtonUi() {
             var btn = document.getElementById('content-toolbar-publish-btn');
             if (!btn) return;
+            function setPublishIcons(isPublished) {
+                var published = Boolean(isPublished);
+                btn.setAttribute('aria-pressed', published ? 'true' : 'false');
+                btn.classList.toggle('is-published', published);
+            }
             var id = String(contentFormEditingDocId || '').trim();
             if (!id) {
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
-                btn.textContent = 'Publish';
+                setPublishIcons(false);
                 btn.setAttribute('title', 'Select a content row to change publish state');
                 btn.setAttribute('aria-label', 'Publish selected content');
                 return;
@@ -17798,7 +18030,7 @@
             if (!rec) {
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
-                btn.textContent = 'Publish';
+                setPublishIcons(false);
                 btn.setAttribute('title', 'Select a content row to change publish state');
                 btn.setAttribute('aria-label', 'Publish selected content');
                 return;
@@ -17807,7 +18039,7 @@
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
                 var lockedPublished = rec.published === true;
-                btn.textContent = lockedPublished ? 'Unpublish' : 'Publish';
+                setPublishIcons(lockedPublished);
                 btn.setAttribute('title', 'Unlock content to change publish state');
                 btn.setAttribute(
                     'aria-label',
@@ -17838,7 +18070,7 @@
             if (!allFilled) {
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
-                btn.textContent = 'Publish';
+                setPublishIcons(rec.published === true);
                 btn.setAttribute('title', 'Fill all content fields to enable publish');
                 btn.setAttribute('aria-label', 'Publish selected content');
                 return;
@@ -17846,7 +18078,7 @@
             var isPublished = rec.published === true;
             btn.disabled = false;
             btn.setAttribute('aria-disabled', 'false');
-            btn.textContent = isPublished ? 'Unpublish' : 'Publish';
+            setPublishIcons(isPublished);
             btn.setAttribute('title', isPublished ? 'Unpublish selected content' : 'Publish selected content');
             btn.setAttribute('aria-label', isPublished ? 'Unpublish selected content' : 'Publish selected content');
         }
@@ -17928,7 +18160,6 @@
                     scheduleContentFirebaseSync();
                 }
             }
-            updateContentHeadingFromForm();
             updateContentSaveButtonState();
             if (!opts.noDirtySync && rec.localOnly === true && contentRecordRequiredFieldsMet(rec)) {
                 void autosaveLocalContentDraftIfReady(id);
@@ -18202,7 +18433,6 @@
         }
 
         function populateContentEditorFromRecord(rec) {
-            var titleHead = document.getElementById('edit-content-title-display');
             var dateEl = document.getElementById('edit-content-date');
             var titleEl = document.getElementById('edit-content-title');
             var nameEl = document.getElementById('edit-content-name');
@@ -18216,7 +18446,6 @@
             var ytEl = document.getElementById('edit-content-youtube');
             if (!rec) {
                 contentFormEditingDocId = '';
-                if (titleHead) titleHead.textContent = '';
                 if (dateEl) dateEl.value = '';
                 if (titleEl) titleEl.value = '';
                 if (nameEl) nameEl.value = '';
@@ -18251,7 +18480,6 @@
             var title = rec.title != null ? String(rec.title) : '';
             var date = rec.date != null ? String(rec.date) : '';
             var name = rec.name != null ? String(rec.name) : '';
-            if (titleHead) titleHead.textContent = title;
             if (dateEl) dateEl.value = formatContentDateForDisplay(date) || date;
             if (titleEl) titleEl.value = title;
             if (nameEl) nameEl.value = name;
@@ -18371,7 +18599,6 @@
                     '<p class="content-list-empty">' +
                     escapeHtml(err && err.message ? err.message : 'Failed to load content.') +
                     '</p>';
-                updateBackendContentCountDisplay();
                 syncContentEditorEmptyState();
                 return;
             }
@@ -18907,13 +19134,14 @@
             const isEditor = panel === 'editor';
             const isContent = panel === 'content';
             const isEmailer = panel === 'emailer';
+            const isFinances = panel === 'finances';
             const isSettings = panel === 'settings';
             const isGuests = panel === 'guests';
             const isProgramme = panel === 'programme';
             const isLodging = panel === 'lodging';
             const isSpeakers =
                 panel === 'speakers' ||
-                (!isEditor && !isContent && !isEmailer && !isSettings && !isGuests && !isProgramme && !isLodging);
+                (!isEditor && !isContent && !isEmailer && !isFinances && !isSettings && !isGuests && !isProgramme && !isLodging);
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
@@ -18921,6 +19149,7 @@
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
             const emailerSection = document.getElementById('emailer-editor');
+            const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const editorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
@@ -18929,6 +19158,7 @@
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
             const emailerToggle = document.getElementById('emailer-toggle');
+            const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
             if (texteditorSection) {
                 texteditorSection.classList.toggle('is-open', isEditor);
@@ -18957,6 +19187,10 @@
             if (emailerSection) {
                 emailerSection.classList.toggle('is-open', isEmailer);
                 emailerSection.setAttribute('aria-hidden', isEmailer ? 'false' : 'true');
+            }
+            if (financesSection) {
+                financesSection.classList.toggle('is-open', isFinances);
+                financesSection.setAttribute('aria-hidden', isFinances ? 'false' : 'true');
             }
             if (settingsSection) {
                 settingsSection.classList.toggle('is-open', isSettings);
@@ -18990,20 +19224,20 @@
                 emailerToggle.setAttribute('aria-expanded', isEmailer ? 'true' : 'false');
                 emailerToggle.classList.toggle('is-active', isEmailer);
             }
+            if (financesToggle) {
+                financesToggle.setAttribute('aria-expanded', isFinances ? 'true' : 'false');
+                financesToggle.classList.toggle('is-active', isFinances);
+            }
             if (settingsToggle) {
                 settingsToggle.setAttribute('aria-expanded', isSettings ? 'true' : 'false');
                 settingsToggle.classList.toggle('is-active', isSettings);
-            }
-            var backendContentCountEl = document.getElementById('backend-content-count');
-            if (backendContentCountEl) {
-                backendContentCountEl.hidden = !isContent;
             }
             var programmeCounterEl = document.getElementById('programme-counter');
             if (programmeCounterEl) {
                 programmeCounterEl.hidden = !isProgramme;
                 if (isProgramme) updateProgrammeCounterDisplay();
             }
-            if (isGuests) updateGuestsListHeadingDisplay();
+            if (isGuests || isSpeakers) updateGuestsListHeadingDisplay();
             var contentActionsEl = document.getElementById('content-actions');
             if (contentActionsEl) {
                 contentActionsEl.hidden = !isContent;
@@ -19064,6 +19298,7 @@
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
             const emailerToggle = document.getElementById('emailer-toggle');
+            const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
@@ -19072,6 +19307,7 @@
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
             const emailerSection = document.getElementById('emailer-editor');
+            const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const hasEvent = Boolean(selectedevent && String(selectedevent).trim());
             if (navigationEl) {
@@ -19081,6 +19317,11 @@
                 emailerToggle.setAttribute('aria-hidden', 'false');
                 emailerToggle.setAttribute('tabindex', '0');
                 emailerToggle.setAttribute('aria-disabled', 'false');
+            }
+            if (financesToggle) {
+                financesToggle.setAttribute('aria-hidden', 'false');
+                financesToggle.setAttribute('tabindex', '0');
+                financesToggle.setAttribute('aria-disabled', 'false');
             }
             if (settingsToggle) {
                 settingsToggle.setAttribute('aria-hidden', 'false');
@@ -19182,8 +19423,6 @@
                     settingsToggle.setAttribute('aria-expanded', 'false');
                     settingsToggle.classList.remove('is-active');
                 }
-                var backendContentCountElNoEvent = document.getElementById('backend-content-count');
-                if (backendContentCountElNoEvent) backendContentCountElNoEvent.hidden = true;
                 var programmeCounterElNoEvent = document.getElementById('programme-counter');
                 if (programmeCounterElNoEvent) programmeCounterElNoEvent.hidden = true;
                 var contentActionsElNoEvent = document.getElementById('content-actions');
@@ -21317,6 +21556,13 @@
                     setBackendPanel('emailer');
                 });
             }
+            const financesToggle = document.getElementById('finances-toggle');
+            if (financesToggle) {
+                financesToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setBackendPanel('finances');
+                });
+            }
             const settingsToggle = document.getElementById('settings-toggle');
             if (settingsToggle) {
                 settingsToggle.addEventListener('click', function(e) {
@@ -21893,6 +22139,41 @@
                     ev.stopPropagation();
                     if (!guestWorkflowActionAllowedOrShake(guestWorkflowSendInvoiceBtn)) return;
                     sendGuestStripeInvoiceFromUi();
+                });
+            }
+            var guestWorkflowPaymentReceivedBtn = document.getElementById(
+                'guest-workflow-payment-received-btn'
+            );
+            if (guestWorkflowPaymentReceivedBtn) {
+                guestWorkflowPaymentReceivedBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (guestWorkflowPaymentReceivedBtn.disabled) return;
+                    var pid = String(guestFormEditingDocId || '').trim();
+                    if (!pid) return;
+                    guestWorkflowPaymentReceivedBtn.disabled = true;
+                    guestWorkflowPaymentReceivedBtn.setAttribute('aria-disabled', 'true');
+                    reconcileGuestStripePaymentsFromUi({ guestId: pid })
+                        .catch(function() {})
+                        .finally(function() {
+                            syncGuestWorkflowPaymentReceivedButton();
+                        });
+                });
+            }
+            var syncGuestPaymentsBtn = document.getElementById('sync-guest-payments-btn');
+            if (syncGuestPaymentsBtn) {
+                syncGuestPaymentsBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (syncGuestPaymentsBtn.disabled) return;
+                    syncGuestPaymentsBtn.disabled = true;
+                    syncGuestPaymentsBtn.setAttribute('aria-disabled', 'true');
+                    reconcileGuestStripePaymentsFromUi({})
+                        .catch(function() {})
+                        .finally(function() {
+                            syncGuestPaymentsBtn.disabled = false;
+                            syncGuestPaymentsBtn.setAttribute('aria-disabled', 'false');
+                        });
                 });
             }
             var guestSendToReservesBtn = document.getElementById('guest-send-to-reserves-btn');
@@ -23213,7 +23494,6 @@
             }
             syncGuestEditorToolbarForBottomScroll();
             syncSpeakerEditorToolbarForBottomScroll();
-            updateBackendContentCountDisplay();
             setBackendPanel('speakers');
             document.addEventListener('click', function(e) {
                 var slotEl = e.target.closest('.programme-day-slot');
