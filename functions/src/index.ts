@@ -317,6 +317,8 @@ function pickCustomerFullName(
 
 export const createGuestStripeInvoiceHttp = onRequest({
   secrets: [stripeSecretParam],
+  invoker: "public",
+  cors: true,
 }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -511,12 +513,34 @@ type StripePaidInvoiceFields = {
   id?: string | null;
   number?: string | null;
   status?: string | null;
+  paid?: boolean | null;
+  amount_remaining?: number | null;
   customer?: unknown;
   customer_email?: string | null;
   metadata?: Record<string, string> | null;
   hosted_invoice_url?: string | null;
   created?: number | null;
 };
+
+/**
+ * Whether a Stripe invoice should count as paid for guest reconciliation.
+ * @param {StripePaidInvoiceFields} invoice Stripe invoice-like object.
+ * @return {boolean} True when paid.
+ */
+function isStripeInvoicePaid(invoice: StripePaidInvoiceFields): boolean {
+  if (!invoice) return false;
+  if (String(invoice.status || "").trim().toLowerCase() === "paid") return true;
+  if (invoice.paid === true) return true;
+  if (
+    typeof invoice.amount_remaining === "number" &&
+    invoice.amount_remaining === 0 &&
+    String(invoice.status || "").trim().toLowerCase() !== "draft" &&
+    String(invoice.status || "").trim().toLowerCase() !== "void"
+  ) {
+    return true;
+  }
+  return false;
+}
 
 type GuestItemIndexEntry = {
   guestId: string;
@@ -666,6 +690,7 @@ function isStripePaidInvoiceEventType(type: string): boolean {
  */
 export const stripeWebhookHttp = onRequest({
   secrets: [stripeSecretParam, stripeWebhookSecretParam],
+  invoker: "public",
 }, async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).send("Method not allowed");
@@ -769,6 +794,8 @@ export const stripeWebhookHttp = onRequest({
 export const reconcileStripePaidInvoicesHttp = onRequest({
   secrets: [stripeSecretParam],
   timeoutSeconds: 300,
+  invoker: "public",
+  cors: true,
 }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -816,33 +843,40 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
       entries.filter((e) => e.guestId === filterGuestId) :
       entries;
 
-    for (const entry of scoped) {
+    const unpaidWithInvoice = scoped.filter((entry) => {
       const paidYes = String(entry.data["Paid"] || "")
         .trim()
         .toLowerCase() === "yes";
       const invoiceId = String(entry.data["Stripe Invoice Id"] || "").trim();
-      if (!invoiceId) continue;
+      if (!invoiceId) return false;
       if (paidYes) {
         summary.alreadyPaid++;
-        continue;
+        return false;
       }
+      return true;
+    });
+
+    const retrieveOne = async (entry: GuestItemIndexEntry) => {
+      const invoiceId = String(entry.data["Stripe Invoice Id"] || "").trim();
       summary.checked++;
       try {
         const invoice = await stripe.invoices.retrieve(invoiceId);
-        if (String(invoice.status || "") !== "paid") {
-          summary.openOrUnpaid++;
-          continue;
-        }
-        const result = await applyStripePaidInvoiceToGuest(entry.ref, {
+        const invoiceFields: StripePaidInvoiceFields = {
           id: invoice.id,
           number: invoice.number,
           status: invoice.status,
+          amount_remaining: invoice.amount_remaining,
           customer: invoice.customer,
           customer_email: invoice.customer_email,
           metadata: invoice.metadata as Record<string, string> | null,
           hosted_invoice_url: invoice.hosted_invoice_url,
           created: invoice.created,
-        });
+        };
+        if (!isStripeInvoicePaid(invoiceFields)) {
+          summary.openOrUnpaid++;
+          return;
+        }
+        const result = await applyStripePaidInvoiceToGuest(entry.ref, invoiceFields);
         if (result.updated) {
           summary.updated++;
           summary.updatedGuestIds.push(entry.guestId);
@@ -856,6 +890,12 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           err,
         });
       }
+    };
+
+    const concurrency = 8;
+    for (let i = 0; i < unpaidWithInvoice.length; i += concurrency) {
+      const batch = unpaidWithInvoice.slice(i, i + concurrency);
+      await Promise.all(batch.map((entry) => retrieveOne(entry)));
     }
 
     // Second pass: recent paid Stripe invoices for unpaid / unlinked guests.
@@ -874,18 +914,20 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
       if (startingAfter) listParams.starting_after = startingAfter;
       const list = await stripe.invoices.list(listParams);
       for (const invoice of list.data) {
+        const invoiceFields: StripePaidInvoiceFields = {
+          id: invoice.id,
+          number: invoice.number,
+          status: invoice.status,
+          amount_remaining: invoice.amount_remaining,
+          customer: invoice.customer,
+          customer_email: invoice.customer_email,
+          metadata: invoice.metadata as Record<string, string> | null,
+          hosted_invoice_url: invoice.hosted_invoice_url,
+          created: invoice.created,
+        };
         const itemRef = await findGuestItemRefForStripeInvoice(
           db,
-          {
-            id: invoice.id,
-            number: invoice.number,
-            status: invoice.status,
-            customer: invoice.customer,
-            customer_email: invoice.customer_email,
-            metadata: invoice.metadata as Record<string, string> | null,
-            hosted_invoice_url: invoice.hosted_invoice_url,
-            created: invoice.created,
-          },
+          invoiceFields,
           entries,
         );
         if (!itemRef) {
@@ -898,16 +940,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
         if (filterGuestId && !itemRef.path.includes(`/${filterGuestId}/`)) {
           continue;
         }
-        const result = await applyStripePaidInvoiceToGuest(itemRef, {
-          id: invoice.id,
-          number: invoice.number,
-          status: invoice.status,
-          customer: invoice.customer,
-          customer_email: invoice.customer_email,
-          metadata: invoice.metadata as Record<string, string> | null,
-          hosted_invoice_url: invoice.hosted_invoice_url,
-          created: invoice.created,
-        });
+        const result = await applyStripePaidInvoiceToGuest(itemRef, invoiceFields);
         const guestIdFromPath = itemRef.parent.id;
         if (result.updated) {
           summary.updated++;
@@ -946,6 +979,8 @@ export const sendGuestInviteHttp = onRequest({
     gmailSendRefreshTokenParam,
     gmailSendFromParam,
   ],
+  invoker: "public",
+  cors: true,
 }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -1074,6 +1109,8 @@ export const sendGuestInviteHttp = onRequest({
  */
 export const uploadContentImageHttp = onRequest({
   serviceAccount: "tbs-app-e2062@appspot.gserviceaccount.com",
+  invoker: "public",
+  cors: true,
 }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -1274,6 +1311,7 @@ function formatApplicationDate(date: Date): string {
  */
 export const submitRegistrationHttp = onRequest({
   invoker: "public",
+  cors: true,
 }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");

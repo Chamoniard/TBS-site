@@ -323,12 +323,6 @@
             min-width: 0;
         }
 
-        .eventnavigation .aspects .programme-counter {
-            color: rgba(255, 255, 255, 0.9);
-            padding-right: 0;
-            margin: 0;
-        }
-
         .aspects .navigation {
             margin-left: 0;
             justify-content: flex-start;
@@ -337,8 +331,8 @@
         }
 
         .programme-counter {
-            margin: 0 0 0 auto;
-            padding-right: 16px;
+            margin: 0;
+            padding: 0;
             flex-shrink: 0;
             align-self: center;
             text-align: right;
@@ -347,6 +341,23 @@
             font-family: 'Inter', sans-serif;
             color: #003153;
             white-space: nowrap;
+        }
+
+        #programme-editor .activities .programme-counter {
+            margin: 0;
+            padding: 0 var(--backend-table-cell-pad-x) 0 0;
+            color: #64748b;
+        }
+
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         .navigation {
@@ -2332,6 +2343,79 @@
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
+        /* Overwatch replaces the guest editor entirely in the viewer. */
+        #guest-editor .guest-viewer.guest-viewer--overwatch {
+            background: transparent;
+            position: relative;
+        }
+
+        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-editor,
+        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-editor[hidden],
+        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-editor-empty {
+            display: none !important;
+        }
+
+        #guest-editor .guest-overwatch {
+            --guest-editor-shell-r: 8px;
+            --guest-editor-bw: 1px;
+            display: none !important;
+            flex-direction: column;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: var(--guest-editor-bw) solid #e2e8f0;
+            border-radius: var(--guest-editor-shell-r);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-overwatch.is-open {
+            display: flex !important;
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            width: auto;
+            height: auto;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        #guest-editor .guest-overwatch-title {
+            flex: 0 0 auto;
+            margin: 0;
+            padding: 16px var(--backend-table-cell-pad-x) 12px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            border-bottom: 1px solid #cbd5e1;
+            background: #ffffff;
+        }
+
+        #guest-editor .guest-overwatch-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            width: 100%;
+            background: #ffffff;
+            overflow: auto;
+            box-sizing: border-box;
+            padding: 16px;
+        }
+
+        #guest-editor .guests-actions #guests-overwatch-btn,
+        #guest-editor .guests-actions #guests-overwatch-btn.is-active,
+        #guest-editor .guests-actions #guests-overwatch-btn:focus,
+        #guest-editor .guests-actions #guests-overwatch-btn:focus-visible,
+        #guest-editor .guests-actions #guests-overwatch-btn:active {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+
         #speaker-editor .speaker-editor-bottom {
             display: flex;
             flex-direction: column;
@@ -2693,6 +2777,18 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+        }
+
+        #finances-editor,
+        #finances-editor .finances-panel,
+        #finances-editor .finances-panel-body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        #finances-editor .finances-panel-body {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
         }
 
         #finances-editor .finances-panel .finances-panel-body {
@@ -4414,7 +4510,9 @@
         #guest-editor .edit-guest-top,
         #content-editor .content-list > .edit-guest-top.guests-list-heading,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading {
             background-color: #ffffff;
             padding: 8px 0;
             margin: 0;
@@ -4431,7 +4529,9 @@
         #guest-editor .guests-list > .edit-guest-top.guests-list-heading,
         #content-editor .content-list > .edit-guest-top.guests-list-heading,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading {
             flex: 0 0 auto;
             width: 100%;
             border-radius: 5px 5px 0 0;
@@ -4443,17 +4543,26 @@
             box-sizing: border-box;
         }
 
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading {
+            border-bottom: none;
+        }
+
         #guest-editor .edit-guest-top .edit-guest-top-spacer,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-spacer {
             display: none;
         }
 
         #guest-editor .edit-guest-top .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             flex: 1 1 auto;
         }
 
@@ -4468,7 +4577,13 @@
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-last {
             color: #000000;
             justify-content: flex-start;
             text-align: left;
@@ -4483,7 +4598,11 @@
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             flex: 1 1 0;
             min-width: 0;
             min-height: 0;
@@ -4492,7 +4611,9 @@
         #guest-editor .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -4501,7 +4622,9 @@
         #guest-editor .edit-guest-top .selected-guestname-wrap,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
-        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap {
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname-wrap {
             flex: 0 1 auto;
             min-width: 0;
             display: flex;
@@ -4530,7 +4653,10 @@
 
         #guest-editor .edit-guest-top .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
-        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname {
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             color: #000000;
         }
 
@@ -4575,7 +4701,10 @@
 
         #guest-editor .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
-        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname {
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             flex-direction: row;
             flex-wrap: wrap;
             align-items: center;
@@ -4591,7 +4720,10 @@
 
         #guest-editor .guests-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
-        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname {
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             padding-left: 0;
             padding-right: 0;
         }
@@ -4806,7 +4938,7 @@
         #guest-editor .guests-actions .add-speaker-button:disabled,
         #speaker-editor .speakers-actions .add-speaker-button:disabled,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled,
-        #programme-editor .programme-toolbar .texteditor-save-btn:disabled:not(.texteditor-save-btn--saved),
+        #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved),
         #programme-editor .programme-toolbar .programme-restore-btn:disabled,
         #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved) {
             background: #fef3c7;
@@ -4830,7 +4962,7 @@
         #guest-editor .guests-actions .add-speaker-button:disabled:hover,
         #speaker-editor .speakers-actions .add-speaker-button:disabled:hover,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled:hover,
-        #programme-editor .programme-toolbar .texteditor-save-btn:disabled:not(.texteditor-save-btn--saved):hover,
+        #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved):hover,
         #programme-editor .programme-toolbar .programme-restore-btn:disabled:hover,
         #texteditor .snippets-top-row button:disabled:not(.texteditor-save-btn--saved):hover {
             filter: none;
@@ -5546,7 +5678,13 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
-        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last {
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-last {
             font-size: 1.2rem;
             display: inline;
             min-width: 0;
@@ -7301,19 +7439,30 @@
         }
 
         #programme-editor .programme-toolbar {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
+            display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 0;
             flex: 0 0 auto;
-            width: 100%;
+            width: auto;
             min-width: 0;
+            max-width: 100%;
             box-sizing: border-box;
-            height: 55px;
-            min-height: 55px;
-            flex-shrink: 0;
-            background: #ffffff;
-            padding: 0 8px;
+            height: auto;
+            min-height: 0;
+            background: transparent;
+            padding: 0;
+            border-bottom: none;
+        }
+
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 0 var(--backend-table-cell-pad-x) 0 0;
+            box-sizing: border-box;
         }
 
         #programme-editor .programme-toolbar-leading {
@@ -7323,7 +7472,7 @@
             align-items: center;
             justify-content: flex-start;
             justify-self: start;
-            gap: 16px;
+            gap: 0.5rem;
             min-width: 0;
         }
 
@@ -7394,7 +7543,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
             flex: 0 0 auto;
         }
 
@@ -7438,34 +7587,67 @@
             align-items: center;
             justify-content: flex-end;
             justify-self: end;
-            gap: 16px;
+            gap: 0.5rem;
             flex-wrap: nowrap;
         }
 
-        #programme-editor .programme-toolbar .texteditor-save-btn,
         #programme-editor .programme-toolbar .programme-restore-btn {
-            flex: 0 0 var(--backend-gold-toolbar-btn-width);
-            width: var(--backend-gold-toolbar-btn-width);
-            min-width: var(--backend-gold-toolbar-btn-width);
-            max-width: var(--backend-gold-toolbar-btn-width);
-            height: 35px;
-            min-height: 35px;
-            max-height: 35px;
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
             padding: 0;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #ffd700;
+            color: #003153;
+            font-size: 0;
+            line-height: 0;
             box-sizing: border-box;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-family: var(--backend-gold-toolbar-btn-font);
-            font-size: 0.8125rem;
-            font-weight: 600;
-            line-height: 1;
-            text-align: center;
         }
 
-        #programme-editor .programme-toolbar .texteditor-save-btn:hover:not(:disabled),
         #programme-editor .programme-toolbar .programme-restore-btn:hover:not(:disabled) {
             filter: brightness(0.92);
+        }
+
+        #programme-editor .programme-toolbar .programme-restore-btn svg {
+            flex-shrink: 0;
+            display: block;
+        }
+
+        /* Programme Save / Delete: round icon buttons (match guest tab). */
+        #programme-editor .programme-toolbar #save-programme-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #ffd700;
+            color: #003153;
+            font-size: 0;
+            line-height: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        #programme-editor .programme-toolbar #save-programme-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #programme-editor .programme-toolbar #save-programme-btn svg {
+            flex-shrink: 0;
+            display: block;
         }
 
         #programme-editor .programme-toolbar .programme-toolbar-create-btn {
@@ -7476,34 +7658,60 @@
             padding: 0 0.85rem;
         }
 
-        #programme-editor .programme-toolbar .add-speaker-delete-btn {
-            height: 35px;
-            min-height: 35px;
-            max-height: 35px;
-            padding: 0 0.75rem;
+        #programme-editor .programme-toolbar #programme-delete-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            gap: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #ff0000 !important;
+            color: #ffffff !important;
+            font-size: 0;
+            line-height: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             box-sizing: border-box;
-            font-size: 0.8125rem;
-            line-height: 1;
         }
 
-        #programme-editor .programme-toolbar .add-speaker-delete-btn.is-armed {
+        #programme-editor .programme-toolbar #programme-delete-btn:hover:not(:disabled) {
+            background: #cc0000 !important;
+            color: #ffffff !important;
+            filter: none;
+        }
+
+        #programme-editor .programme-toolbar #programme-delete-btn.is-armed {
             outline: 2px solid #ff1493;
             outline-offset: 0;
             box-shadow: 0 0 10px rgba(255, 20, 147, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
-        body.backend-page #programme-editor .programme-toolbar .add-speaker-delete-btn:disabled {
-            background: #dc2626;
-            color: #ffffff;
+        body.backend-page #programme-editor .programme-toolbar #programme-delete-btn:disabled {
+            background: #ff0000 !important;
+            color: #ffffff !important;
             opacity: 0.45;
             cursor: not-allowed;
             filter: none;
         }
 
-        body.backend-page #programme-editor .programme-toolbar .add-speaker-delete-btn:disabled:hover {
-            background: #dc2626;
-            color: #ffffff;
+        body.backend-page #programme-editor .programme-toolbar #programme-delete-btn:disabled:hover {
+            background: #ff0000 !important;
+            color: #ffffff !important;
             filter: none;
+        }
+
+        #programme-editor .programme-toolbar #programme-delete-btn svg,
+        #programme-editor .programme-toolbar #programme-delete-btn svg path {
+            fill: #ffffff !important;
+            color: #ffffff;
+            flex-shrink: 0;
+            display: block;
         }
 
         #programme-editor .programme-editor .editor-body {
@@ -7511,10 +7719,11 @@
             min-height: 0;
             display: flex;
             flex-direction: row;
+            align-items: stretch;
             gap: 16px;
-            background: #ffffff;
-            padding-right: 16px;
-            padding-bottom: 0;
+            background: #e2e8f0;
+            padding: 16px;
+            box-sizing: border-box;
             border: none;
             outline: none;
             box-shadow: none;
@@ -7535,6 +7744,15 @@
             overflow: hidden;
         }
 
+        #programme-editor .programme-activities-body {
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         #programme-editor .programme-activities-scroll {
             flex: 1 1 0;
             min-width: 0;
@@ -7543,7 +7761,7 @@
         }
 
         #programme-editor .editor-body > .programme-grid {
-            flex: 2 1 0;
+            flex: 4 1 0;
             min-width: 0;
             min-height: 0;
             display: flex;
@@ -7847,7 +8065,6 @@
                             <a href="#finances-editor" class="backend-editor-link" id="finances-toggle" role="button" aria-expanded="false" aria-controls="finances-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Finances</a>
                             <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
                         </nav>
-                        <div class="programme-counter" id="programme-counter" hidden aria-live="polite">0 slots, 0 empty and 0 filled</div>
                     </div>
                     <div class="backend-top-trailing">
                         <div
@@ -8299,6 +8516,11 @@
                                             <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                                         </svg>
                                     </button>
+                                    <button type="button" class="add-speaker-button" id="guests-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                                        </svg>
+                                    </button>
                                     <button type="button" class="add-speaker-button" id="sync-guest-payments-btn" aria-label="Sync Stripe payments" title="Sync Stripe payments">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
@@ -8569,7 +8791,12 @@
                                 </div>
                             </div>
                             </div>
+                            </div>
                             <p class="guest-editor-empty" id="guest-editor-empty" role="status">Select guest</p>
+                            <div class="guest-overwatch" id="guest-overwatch-panel" hidden aria-hidden="true" aria-label="Guest overview">
+                                <h2 class="guest-overwatch-title" id="guest-overwatch-title">Overview</h2>
+                                <div class="guest-overwatch-body" id="guest-overwatch-body"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -8578,36 +8805,67 @@
 
             <section class="programme-section" id="programme-editor" aria-hidden="true" aria-label="Programme" data-name="programme-editor">
             <div class="programme-editor">
-                <div class="programme-toolbar">
-                    <div class="programme-toolbar-leading">
-                        <button type="button" class="programme-padlock-btn" id="programme-editor-padlock-btn" aria-label="Unlock programme" title="Lock" aria-pressed="false" disabled aria-disabled="true">
-                            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                <path
-                                    fill="currentColor"
-                                    d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
-                                />
-                            </svg>
-                        </button>
-                        <button type="button" class="programme-add-session-btn" id="programme-add-session-btn" disabled aria-disabled="true">Add session</button>
-                        <button type="button" class="programme-add-slot-btn" id="programme-add-slot-btn" disabled aria-disabled="true">Add slot</button>
-                        <div class="programme-session-order-controls" aria-label="Session and slot order">
-                            <button type="button" class="programme-session-order-btn" id="programme-session-order-up-btn" disabled aria-disabled="true" aria-label="Move selection up" title="Move selection up">↑</button>
-                            <button type="button" class="programme-session-order-btn" id="programme-session-order-down-btn" disabled aria-disabled="true" aria-label="Move selection down" title="Move selection down">↓</button>
-                            <button type="button" class="programme-session-order-btn swap-slots" id="swap-slots-btn" disabled aria-disabled="true" aria-label="Swap slots" title="Shift+click a second slot, then swap">⇆</button>
-                        </div>
-                        <button type="button" class="texteditor-save-btn" id="save-programme-btn" disabled aria-disabled="true">Save</button>
-                        <button type="button" class="texteditor-save-btn programme-restore-btn" id="restore-programme-btn" disabled aria-disabled="true">Restore</button>
-                        <button type="button" class="add-speaker-delete-btn" id="programme-delete-btn" disabled aria-disabled="true" title="Delete session or slot" aria-label="Delete session or slot">
-                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                            <span>Delete</span>
-                        </button>
-                    </div>
-                </div>
                 <div class="editor-body">
                     <div class="programme-grid" id="programme-editor-grid">
+                        <div class="edit-guest-top guests-list-heading" id="programme-grid-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Programme list title">
+                                    <span class="edit-guest-name-first" id="programme-list-heading-event" aria-live="polite">—</span>
+                                    <span class="edit-guest-name-last" id="programme-list-heading-suffix">programme</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing">
+                                <div class="programme-toolbar">
+                                    <div class="programme-toolbar-leading">
+                                        <button type="button" class="programme-padlock-btn" id="programme-editor-padlock-btn" aria-label="Unlock programme" title="Lock" aria-pressed="false" disabled aria-disabled="true">
+                                            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                                <path
+                                                    fill="currentColor"
+                                                    d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="programme-add-session-btn" id="programme-add-session-btn" disabled aria-disabled="true">Add session</button>
+                                        <button type="button" class="programme-add-slot-btn" id="programme-add-slot-btn" disabled aria-disabled="true">Add slot</button>
+                                        <div class="programme-session-order-controls" aria-label="Session and slot order">
+                                            <button type="button" class="programme-session-order-btn" id="programme-session-order-up-btn" disabled aria-disabled="true" aria-label="Move selection up" title="Move selection up">↑</button>
+                                            <button type="button" class="programme-session-order-btn" id="programme-session-order-down-btn" disabled aria-disabled="true" aria-label="Move selection down" title="Move selection down">↓</button>
+                                            <button type="button" class="programme-session-order-btn swap-slots" id="swap-slots-btn" disabled aria-disabled="true" aria-label="Swap slots" title="Shift+click a second slot, then swap">⇆</button>
+                                        </div>
+                                        <button type="button" class="texteditor-save-btn" id="save-programme-btn" disabled aria-disabled="true" title="Save programme" aria-label="Save programme">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                                <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="texteditor-save-btn programme-restore-btn" id="restore-programme-btn" disabled aria-disabled="true" title="Restore programme" aria-label="Restore programme">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                                <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="add-speaker-delete-btn" id="programme-delete-btn" disabled aria-disabled="true" title="Delete session or slot" aria-label="Delete session or slot">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="programme-grid-row" id="programme-editor-grid-row" aria-live="polite"></div>
                     </div>
-                    <div class="activities" id="programme-editor-activities" aria-label="Activities"></div>
+                    <div class="activities" id="programme-editor-activities" aria-label="Activities">
+                        <div class="edit-guest-top guests-list-heading" id="programme-activities-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Activities list title">
+                                    <span class="edit-guest-name-first" id="programme-activities-heading-label">activities</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing">
+                                <div class="programme-counter" id="programme-counter" hidden aria-live="polite">0 slots, 0 empty and 0 filled</div>
+                            </div>
+                        </div>
+                        <div class="programme-activities-body" id="programme-editor-activities-body"></div>
+                    </div>
                 </div>
             </div>
             </section>
@@ -8835,7 +9093,7 @@
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
                                 <div class="selected-guestname" role="group" aria-label="Invoices list title">
-                                    <span class="edit-guest-name-first">INVOICES</span>
+                                    <span class="edit-guest-name-first">Invoices</span>
                                 </div>
                             </div>
                             <div class="edit-guest-top-trailing" aria-hidden="true"></div>
@@ -8862,7 +9120,7 @@
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
                                 <div class="selected-guestname" role="group" aria-label="Expenses list title">
-                                    <span class="edit-guest-name-first">EXPENSES</span>
+                                    <span class="edit-guest-name-first">Expenses</span>
                                 </div>
                             </div>
                             <div class="edit-guest-top-trailing" aria-hidden="true"></div>
@@ -8889,7 +9147,7 @@
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
                                 <div class="selected-guestname" role="group" aria-label="Projections title">
-                                    <span class="edit-guest-name-first">PROJECTIONS</span>
+                                    <span class="edit-guest-name-first">Projections</span>
                                 </div>
                             </div>
                             <div class="edit-guest-top-trailing" aria-hidden="true"></div>
@@ -9080,6 +9338,8 @@
         /** From `tbs/Settings` field `Current event` (and aliases); guests roster only includes rows whose `Event` matches. */
         var current_event = '';
         let guestFormEditingDocId = '';
+        /** Guests Overwatch overview panel is open in the guest viewer. */
+        var guestsOverwatchOpen = false;
         /** After prev/next guest: open **Guest management** strip if it was visible before navigation. */
         let guestEditorScrollToManagementOnNextPopulate = false;
         let guestEditorBottomPane = 'management';
@@ -9879,6 +10139,10 @@
         // In-memory programme model: all UI reads/writes this until Save
         const programmeState = {
             eventId: null,
+            /** Actual subcollection id under `tbs/Programme` (case may differ from Current event). */
+            programmeCollectionKey: null,
+            /** True when Current event has no matching subcollection under `tbs/Programme` (case-insensitive). */
+            programmeCollectionMissing: false,
             meta: null,
             dayDates: [],  // [date, ...] order of day columns
             days: {},     // { [date]: [activity, ...] }
@@ -9886,7 +10150,7 @@
             htmlDateByDay: {},
             /** Per ISO date: display name string; stored on same programme doc as field "name" (default: date) */
             nameDateByDay: {},
-            /** Per ISO date: session docs (`Session-*`) in `tbs/Programme/{ISO}/` */
+        /** Per ISO date: session docs (`Session-*`) in `tbs/Programme/{Current event}/days/{ISO}/` */
             sessionsByDay: {},
         };
         let programmeStateDirty = false;
@@ -10228,18 +10492,20 @@
         }
 
         /**
-         * Firestore REST listCollectionIds — lists real subcollection ids (same as Firebase Console).
+         * Firestore REST listCollectionIds under any document path
+         * (e.g. `tbs/Lodging` or `tbs/Programme/TBS27/days`).
          * Sends Authorization: Bearer & API key (REST expects both for browser clients).
          */
-        async function firestoreRestListCollectionIdsUnderParent(lodgingDocId, idToken) {
+        async function firestoreRestListCollectionIdsUnderDocumentPath(docPath, idToken) {
             var projectId = firebaseConfig.projectId;
             var apiKey = firebaseConfig.apiKey;
-            var docPath = 'tbs/' + String(lodgingDocId || 'Lodging');
+            var path = String(docPath || '').replace(/^\/+|\/+$/g, '');
+            if (!path) return null;
             var parent =
                 'projects/' +
                 projectId +
                 '/databases/(default)/documents/' +
-                docPath;
+                path;
             var all = [];
             var pageToken = '';
             try {
@@ -10260,8 +10526,8 @@
                     });
                     if (!res.ok) {
                         console.warn(
-                            'firestoreRestListCollectionIdsUnderParent',
-                            docPath,
+                            'firestoreRestListCollectionIdsUnderDocumentPath',
+                            path,
                             res.status,
                             await res.text()
                         );
@@ -10275,9 +10541,17 @@
                 } while (pageToken);
                 return all;
             } catch (e) {
-                console.warn('firestoreRestListCollectionIdsUnderParent', docPath, e);
+                console.warn('firestoreRestListCollectionIdsUnderDocumentPath', path, e);
                 return null;
             }
+        }
+
+        /** Lodging helper: listCollectionIds under `tbs/{lodgingDocId}`. */
+        async function firestoreRestListCollectionIdsUnderParent(lodgingDocId, idToken) {
+            return firestoreRestListCollectionIdsUnderDocumentPath(
+                'tbs/' + String(lodgingDocId || 'Lodging'),
+                idToken
+            );
         }
 
         /**
@@ -10734,18 +11008,300 @@
             return db.collection('events').doc(eventId).collection('items');
         }
 
-        /** Programme day metadata under events (doc ids per ISO date). Day card HTML is `tbs/Programme/{ISO}/Programme`; intro is `tbs/Snippets.Programmeinfo`. */
+        /** Programme day metadata under events (doc ids per ISO date). Day card HTML is `tbs/Programme/{Current event}/days/{ISO}/Programme`; intro is `tbs/Snippets.Programmeinfo`. */
         function eventProgrammeHtmlCollection(db, eventId) {
             if (!eventId) return null;
             return db.collection('events').doc(eventId).collection('programme');
         }
 
-        /** Day collection: `tbs/Programme/{ISO-date}/…` (metadata doc id `Programme`, slot docs use auto ids). */
-        function tbsProgrammeDayCollection(db, isoDate) {
-            return db.collection('tbs').doc('Programme').collection(String(isoDate || '').trim());
+        /** Subcollection under `tbs/Programme` named like `tbs/Settings` → `Current event` (e.g. TBS27). */
+        function tbsProgrammeEventKey() {
+            if (programmeState && programmeState.programmeCollectionKey) {
+                return String(programmeState.programmeCollectionKey).trim();
+            }
+            return String(selectedevent || current_event || '').trim();
         }
 
-        /** Day card HTML for Snippets + home: `tbs/Programme/{ISO-date}/Programme` fields `html`, `name`. */
+        function isIsoProgrammeDateId(id) {
+            return /^\d{4}-\d{2}-\d{2}$/.test(String(id || '').trim());
+        }
+
+        /** List subcollection ids directly under `tbs/Programme`. */
+        async function listTbsProgrammeEventCollectionIds(db) {
+            var seen = {};
+            var ids = [];
+            function addId(raw) {
+                var id = String(raw != null ? raw : '').trim();
+                if (!id || seen[id]) return;
+                seen[id] = true;
+                ids.push(id);
+            }
+            try {
+                var idToken = await ensureFirebaseAuthForFirestoreRest();
+                var restIds = await firestoreRestListCollectionIdsUnderDocumentPath('tbs/Programme', idToken);
+                if (Array.isArray(restIds)) restIds.forEach(addId);
+            } catch (restErr) {
+                console.warn('listTbsProgrammeEventCollectionIds REST', restErr);
+            }
+            if (!ids.length) {
+                try {
+                    var rootRef = db.collection('tbs').doc('Programme');
+                    if (typeof rootRef.listCollections === 'function') {
+                        var cols = await rootRef.listCollections();
+                        (cols || []).forEach(function (col) {
+                            addId(col && col.id);
+                        });
+                    }
+                } catch (sdkErr) {
+                    console.warn('listTbsProgrammeEventCollectionIds SDK', sdkErr);
+                }
+            }
+            // Browser clients cannot listCollectionIds (403); fall back to manifest on tbs/Programme.
+            if (!ids.length) {
+                try {
+                    var rootSnap = await db.collection('tbs').doc('Programme').get();
+                    var rootData = rootSnap.exists ? (rootSnap.data() || {}) : {};
+                    var manifestKeys = [
+                        'eventKeys',
+                        'events',
+                        'programmeEvents',
+                        'collectionIds',
+                        'subcollections',
+                    ];
+                    for (var mi = 0; mi < manifestKeys.length; mi++) {
+                        var raw = rootData[manifestKeys[mi]];
+                        if (!Array.isArray(raw)) continue;
+                        for (var ri = 0; ri < raw.length; ri++) addId(raw[ri]);
+                    }
+                } catch (manifestErr) {
+                    console.warn('listTbsProgrammeEventCollectionIds manifest', manifestErr);
+                }
+            }
+            return ids.sort(function (a, b) {
+                return String(a).localeCompare(String(b), undefined, { sensitivity: 'base' });
+            });
+        }
+
+        /** Candidate Firestore collection ids for a Current event label (case variants). */
+        function tbsProgrammeEventKeyCandidates(eventName) {
+            var wanted = String(eventName || '').trim();
+            if (!wanted) return [];
+            var seen = {};
+            var out = [];
+            function add(v) {
+                var s = String(v || '').trim();
+                if (!s || seen[s]) return;
+                seen[s] = true;
+                out.push(s);
+            }
+            add(wanted);
+            add(wanted.toUpperCase());
+            add(wanted.toLowerCase());
+            return out;
+        }
+
+        /** True when `tbs/Programme/{eventKey}/days` exists or already has known day ids. */
+        async function tbsProgrammeCollectionExists(db, eventKey) {
+            var key = String(eventKey || '').trim();
+            if (!key) return false;
+            try {
+                var daysSnap = await db
+                    .collection('tbs')
+                    .doc('Programme')
+                    .collection(key)
+                    .doc('days')
+                    .get();
+                if (daysSnap.exists) return true;
+            } catch (e) {
+                console.warn('tbsProgrammeCollectionExists', key, e);
+            }
+            return false;
+        }
+
+        /**
+         * Resolve Current event to the real `tbs/Programme/{id}` subcollection (case-insensitive).
+         * @return {Promise<string|null>} Actual collection id, or null if none matches.
+         */
+        async function resolveTbsProgrammeCollectionKey(db, eventName) {
+            var wanted = String(eventName || '').trim();
+            if (!wanted) return null;
+            var ids = await listTbsProgrammeEventCollectionIds(db);
+            var lower = wanted.toLowerCase();
+            var i;
+            for (i = 0; i < ids.length; i++) {
+                if (String(ids[i] || '').toLowerCase() === lower) return String(ids[i]);
+            }
+            // Listing often unavailable in browser — probe case variants via days doc get().
+            var candidates = tbsProgrammeEventKeyCandidates(wanted);
+            for (i = 0; i < candidates.length; i++) {
+                if (await tbsProgrammeCollectionExists(db, candidates[i])) return candidates[i];
+            }
+            return null;
+        }
+
+        /** Read ISO day ids stored on `tbs/Programme/{event}/days` (browser-safe fallback). */
+        function programmeDayIdsFromDaysRootData(data) {
+            if (!data || typeof data !== 'object') return [];
+            var keys = ['dayIds', 'days', 'isoDates', 'programmeDays', 'dates'];
+            var out = [];
+            var seen = {};
+            for (var ki = 0; ki < keys.length; ki++) {
+                var raw = data[keys[ki]];
+                if (!Array.isArray(raw)) continue;
+                for (var ri = 0; ri < raw.length; ri++) {
+                    var id = String(raw[ri] != null ? raw[ri] : '').trim();
+                    if (!isIsoProgrammeDateId(id) || seen[id]) continue;
+                    seen[id] = true;
+                    out.push(id);
+                }
+                if (out.length) break;
+            }
+            return out.sort();
+        }
+
+        async function persistTbsProgrammeDayIdsManifest(db, eventKey, dayIds) {
+            var key = String(eventKey || '').trim();
+            if (!key) return;
+            var dates = (Array.isArray(dayIds) ? dayIds : [])
+                .map(function (d) { return String(d || '').trim(); })
+                .filter(isIsoProgrammeDateId)
+                .sort();
+            try {
+                await db
+                    .collection('tbs')
+                    .doc('Programme')
+                    .collection(key)
+                    .doc('days')
+                    .set(
+                        {
+                            role: 'programme-days-root',
+                            eventKey: key,
+                            dayIds: dates,
+                        },
+                        { merge: true }
+                    );
+                await ensureTbsProgrammeEventKeyOnRoot(db, key);
+            } catch (e) {
+                console.warn('persistTbsProgrammeDayIdsManifest', key, e);
+            }
+        }
+
+        /** Keep `tbs/Programme.eventKeys` in sync so browser clients can resolve without listCollectionIds. */
+        async function ensureTbsProgrammeEventKeyOnRoot(db, eventKey) {
+            var key = String(eventKey || '').trim();
+            if (!key) return;
+            try {
+                if (
+                    typeof firebase !== 'undefined' &&
+                    firebase.firestore &&
+                    firebase.firestore.FieldValue &&
+                    typeof firebase.firestore.FieldValue.arrayUnion === 'function'
+                ) {
+                    await db.collection('tbs').doc('Programme').set(
+                        { eventKeys: firebase.firestore.FieldValue.arrayUnion(key) },
+                        { merge: true }
+                    );
+                    return;
+                }
+                var snap = await db.collection('tbs').doc('Programme').get();
+                var data = snap.exists ? (snap.data() || {}) : {};
+                var existing = Array.isArray(data.eventKeys) ? data.eventKeys.slice() : [];
+                var lower = key.toLowerCase();
+                var found = false;
+                for (var i = 0; i < existing.length; i++) {
+                    if (String(existing[i] || '').toLowerCase() === lower) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    existing.push(key);
+                    await db.collection('tbs').doc('Programme').set({ eventKeys: existing }, { merge: true });
+                }
+            } catch (e) {
+                console.warn('ensureTbsProgrammeEventKeyOnRoot', key, e);
+            }
+        }
+
+        /** `tbs/Programme/{Current event}/days` document ref (parent of ISO day subcollections). */
+        function tbsProgrammeDaysRootDocRef(db, eventKeyOpt) {
+            var eventKey = String(eventKeyOpt != null ? eventKeyOpt : tbsProgrammeEventKey() || '').trim();
+            if (!eventKey) {
+                throw new Error('Set Current event on tbs/Settings before loading programme days.');
+            }
+            return db.collection('tbs').doc('Programme').collection(eventKey).doc('days');
+        }
+
+        /**
+         * ISO day ids under `tbs/Programme/{event}/days/{ISO}`.
+         * Prefer listCollectionIds when available; otherwise read `dayIds` on the days root doc
+         * (browser clients get 403 on listCollectionIds).
+         */
+        async function listTbsProgrammeIsoDayIds(db, eventKeyOpt) {
+            var eventKey = String(eventKeyOpt != null ? eventKeyOpt : tbsProgrammeEventKey() || '').trim();
+            if (!eventKey) return [];
+            var seen = {};
+            var dates = [];
+            function addId(raw) {
+                var id = String(raw != null ? raw : '').trim();
+                if (!isIsoProgrammeDateId(id) || seen[id]) return;
+                seen[id] = true;
+                dates.push(id);
+            }
+            try {
+                var idToken = await ensureFirebaseAuthForFirestoreRest();
+                var restIds = await firestoreRestListCollectionIdsUnderDocumentPath(
+                    'tbs/Programme/' + eventKey + '/days',
+                    idToken
+                );
+                if (Array.isArray(restIds)) {
+                    restIds.forEach(addId);
+                }
+            } catch (restErr) {
+                console.warn('listTbsProgrammeIsoDayIds REST', eventKey, restErr);
+            }
+            if (!dates.length) {
+                try {
+                    var daysRef = tbsProgrammeDaysRootDocRef(db, eventKey);
+                    if (typeof daysRef.listCollections === 'function') {
+                        var cols = await daysRef.listCollections();
+                        (cols || []).forEach(function (col) {
+                            addId(col && col.id);
+                        });
+                    }
+                } catch (sdkErr) {
+                    console.warn('listTbsProgrammeIsoDayIds SDK', eventKey, sdkErr);
+                }
+            }
+            if (!dates.length) {
+                try {
+                    var daysSnap = await tbsProgrammeDaysRootDocRef(db, eventKey).get();
+                    var fromManifest = programmeDayIdsFromDaysRootData(
+                        daysSnap.exists ? (daysSnap.data() || {}) : {}
+                    );
+                    fromManifest.forEach(addId);
+                } catch (manifestErr) {
+                    console.warn('listTbsProgrammeIsoDayIds manifest', eventKey, manifestErr);
+                }
+            }
+            return dates.sort();
+        }
+
+        /** Day collection: `tbs/Programme/{Current event}/days/{ISO-date}/…` (metadata doc id `Programme`, slot docs use auto ids). */
+        function tbsProgrammeDayCollection(db, isoDate, eventKeyOpt) {
+            var eventKey = String(eventKeyOpt != null ? eventKeyOpt : tbsProgrammeEventKey() || '').trim();
+            if (!eventKey) {
+                throw new Error('Set Current event on tbs/Settings before loading programme days.');
+            }
+            return db
+                .collection('tbs')
+                .doc('Programme')
+                .collection(eventKey)
+                .doc('days')
+                .collection(String(isoDate || '').trim());
+        }
+
+        /** Day card HTML for Snippets + home: `tbs/Programme/{Current event}/days/{ISO-date}/Programme` fields `html`, `name`. */
         function tbsProgrammeDayDocRef(db, isoDate) {
             return tbsProgrammeDayCollection(db, isoDate).doc('Programme');
         }
@@ -11584,9 +12140,6 @@
             }).join('') + '</div>';
         }
 
-        /** Union with `events/{id}/programme` when building Snippets programme day buttons. */
-        var TBS_SNIPPET_PROGRAMME_ISO_DATES = ['2027-02-09', '2027-02-10', '2027-02-11', '2027-02-12'];
-
         /** Legacy per-event speakers path (still used when creating a new event). Main roster uses `tbs/Speakers`. */
         function eventSpeakersCollection(db, eventId) {
             if (!eventId) return null;
@@ -11729,9 +12282,9 @@
 
         async function saveGuestFromEditor() {
             var id = String(guestFormEditingDocId || '').trim();
-            if (!id) return;
+            if (!id) return true;
             var rec = findGuestInMemory(id);
-            if (!rec) return;
+            if (!rec) return false;
             syncAddGuestFormToMemoryIfEditing();
             try {
                 var db = getFirestore();
@@ -11745,12 +12298,99 @@
                 if (typeof showStatus === 'function') {
                     showStatus('success', 'Guest saved to Firebase.');
                 }
+                return true;
             } catch (err) {
                 console.error('Save guest failed:', err);
                 if (typeof showStatus === 'function') {
                     showStatus('error', err.message || 'Failed to save guest.');
                 }
+                return false;
             }
+        }
+
+        function applyGuestsOverwatchUi() {
+            var overwatch = document.getElementById('guest-overwatch-panel');
+            var panel = document.getElementById('guest-editor-panel');
+            var viewer = document.getElementById('guest-viewer');
+            var emptyEl = document.getElementById('guest-editor-empty');
+            var btn = document.getElementById('guests-overwatch-btn');
+
+            // Keep overview as a direct child of the viewer so it can fill that pane.
+            if (viewer && overwatch && overwatch.parentElement !== viewer) {
+                viewer.appendChild(overwatch);
+            }
+            if (viewer && emptyEl && emptyEl.parentElement !== viewer) {
+                viewer.insertBefore(emptyEl, overwatch || null);
+            }
+
+            if (btn) {
+                btn.classList.toggle('is-active', !!guestsOverwatchOpen);
+                btn.setAttribute('aria-pressed', guestsOverwatchOpen ? 'true' : 'false');
+            }
+
+            if (guestsOverwatchOpen) {
+                if (viewer) {
+                    viewer.classList.remove('guest-viewer--no-selection');
+                    viewer.classList.add('guest-viewer--overwatch');
+                }
+                if (panel) {
+                    panel.hidden = true;
+                    panel.setAttribute('hidden', '');
+                    panel.setAttribute('aria-hidden', 'true');
+                    panel.classList.add('is-empty');
+                }
+                if (emptyEl) {
+                    emptyEl.hidden = true;
+                    emptyEl.setAttribute('hidden', '');
+                    emptyEl.setAttribute('aria-hidden', 'true');
+                }
+                if (overwatch) {
+                    overwatch.hidden = false;
+                    overwatch.removeAttribute('hidden');
+                    overwatch.classList.add('is-open');
+                    overwatch.setAttribute('aria-hidden', 'false');
+                }
+                var actions = document.getElementById('guest-editor-actions');
+                if (actions) {
+                    actions.hidden = true;
+                    actions.setAttribute('aria-hidden', 'true');
+                }
+            } else {
+                if (viewer) viewer.classList.remove('guest-viewer--overwatch');
+                if (panel) {
+                    panel.hidden = false;
+                    panel.removeAttribute('hidden');
+                    panel.removeAttribute('aria-hidden');
+                }
+                if (overwatch) {
+                    overwatch.hidden = true;
+                    overwatch.setAttribute('hidden', '');
+                    overwatch.classList.remove('is-open');
+                    overwatch.setAttribute('aria-hidden', 'true');
+                }
+            }
+        }
+
+        function closeGuestsOverwatch() {
+            if (!guestsOverwatchOpen) return;
+            guestsOverwatchOpen = false;
+            applyGuestsOverwatchUi();
+        }
+
+        async function openGuestsOverwatch() {
+            var id = String(guestFormEditingDocId || '').trim();
+            if (id) {
+                if (guestBioFormChangedFromBaseline()) {
+                    var saved = await saveGuestFromEditor();
+                    if (!saved) return;
+                } else {
+                    syncAddGuestFormToMemoryIfEditing();
+                }
+            }
+            guestsOverwatchOpen = true;
+            clearGuestRosterItemSelection();
+            clearGuestEditorForm();
+            applyGuestsOverwatchUi();
         }
 
         function syncGuestEditabilityFromPadlock() {
@@ -12198,10 +12838,18 @@
         }
 
         function setGuestEditorEmptyState(isEmpty) {
+            if (guestsOverwatchOpen) {
+                applyGuestsOverwatchUi();
+                return;
+            }
             var panel = document.getElementById('guest-editor-panel');
             var viewer = document.getElementById('guest-viewer');
             var emptyEl = document.getElementById('guest-editor-empty');
-            if (panel) panel.classList.toggle('is-empty', !!isEmpty);
+            if (panel) {
+                panel.hidden = false;
+                panel.removeAttribute('aria-hidden');
+                panel.classList.toggle('is-empty', !!isEmpty);
+            }
             if (viewer) viewer.classList.toggle('guest-viewer--no-selection', !!isEmpty);
             if (emptyEl) {
                 emptyEl.hidden = !isEmpty;
@@ -12665,10 +13313,13 @@
         }
 
         function updateGuestsListHeadingDisplay() {
+            var eventLabel = String(current_event || '').trim() || '—';
             var eventEl = document.getElementById('guests-list-heading-event');
-            if (eventEl) eventEl.textContent = String(current_event || '').trim() || '—';
+            if (eventEl) eventEl.textContent = eventLabel;
             var speakersEventEl = document.getElementById('speakers-list-heading-event');
-            if (speakersEventEl) speakersEventEl.textContent = String(current_event || '').trim() || '—';
+            if (speakersEventEl) speakersEventEl.textContent = eventLabel;
+            var programmeEventEl = document.getElementById('programme-list-heading-event');
+            if (programmeEventEl) programmeEventEl.textContent = eventLabel;
         }
 
         function updateBackendCurrentEventDisplay() {
@@ -12803,7 +13454,7 @@
         }
 
         /**
-         * Write `Current event` on tbs/Settings, then reload Speakers + Guests for the new value.
+         * Write `Current event` on tbs/Settings, then reload Speakers, Guests, and Programme for the new value.
          * @param {string} eventName
          */
         async function setCurrentEventAndRefreshRosters(eventName) {
@@ -12828,6 +13479,7 @@
                 await Promise.all([
                     fetchAllGuestsIntoMemory({ force: true, showLoading: true }),
                     fetchSpeakersForSelectedEvent(),
+                    loadProgrammeFromFirestore(next),
                 ]);
                 var selectedGuestId = String(guestFormEditingDocId || '').trim();
                 if (selectedGuestId && !findGuestInMemory(selectedGuestId)) {
@@ -12848,7 +13500,7 @@
                     setSpeakerEditorEmptyState(true);
                 }
                 if (typeof showStatus === 'function') {
-                    showStatus('success', 'Current event set to ' + next + '. Speakers and guests updated.');
+                    showStatus('success', 'Current event set to ' + next + '. Speakers, guests, and programme updated.');
                 }
             } catch (err) {
                 console.error('setCurrentEventAndRefreshRosters:', err);
@@ -13867,6 +14519,7 @@
 
         function populateEditGuestFormFromRecord(g) {
             if (!g) return;
+            closeGuestsOverwatch();
             var nextGuestId = String(g.id || '').trim();
             var switchingGuest =
                 nextGuestId !== String(guestFormEditingDocId || '').trim();
@@ -15068,10 +15721,18 @@
                     guestId ? 'Checking Stripe for this guest…' : 'Syncing Stripe payments…'
                 );
             }
+            var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            var timeoutId = null;
+            if (controller) {
+                timeoutId = setTimeout(function() {
+                    try { controller.abort(); } catch (e) { /* ignore */ }
+                }, 280000);
+            }
             return fetch(fnUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                signal: controller ? controller.signal : undefined
             })
                 .then(function(res) {
                     if (!res.ok) {
@@ -15088,31 +15749,53 @@
                 })
                 .then(function(data) {
                     var updated = data && data.updated != null ? Number(data.updated) : 0;
-                    return fetchAllGuestsIntoMemory({ force: true, showLoading: false })
+                    var checked = data && data.checked != null ? Number(data.checked) : 0;
+                    var alreadyPaid = data && data.alreadyPaid != null ? Number(data.alreadyPaid) : 0;
+                    var openOrUnpaid = data && data.openOrUnpaid != null ? Number(data.openOrUnpaid) : 0;
+                    var msg;
+                    if (updated > 0) {
+                        msg = 'Marked ' + updated + ' guest' + (updated === 1 ? '' : 's') + ' paid';
+                    } else if (guestId) {
+                        msg = openOrUnpaid > 0
+                            ? 'Invoice still unpaid in Stripe for this guest'
+                            : 'No paid invoice found yet for this guest';
+                    } else {
+                        msg = 'Stripe sync done — ' +
+                            checked + ' checked, ' +
+                            alreadyPaid + ' already paid, ' +
+                            openOrUnpaid + ' still unpaid, ' +
+                            updated + ' newly marked paid';
+                    }
+                    if (typeof showStatus === 'function') showStatus('success', msg);
+                    // Refresh roster in background so a slow reload cannot leave the sync button stuck.
+                    fetchAllGuestsIntoMemory({ force: true, showLoading: false })
                         .then(function() {
                             renderGuestsRoster();
                             syncGuestWorkflowPaymentReceivedButton();
                             syncGuestWorkflowSendInvoiceButton();
                             syncGuestManagementLogPanel();
                             syncGuestInvoicedisnoBlock();
-                            var msg = updated > 0
-                                ? ('Marked ' + updated + ' guest' + (updated === 1 ? '' : 's') + ' paid')
-                                : (guestId
-                                    ? 'No paid invoice found yet for this guest'
-                                    : 'No new paid invoices to sync');
-                            if (typeof showStatus === 'function') showStatus('success', msg);
-                            return data;
+                        })
+                        .catch(function(reloadErr) {
+                            console.error('reconcileGuestStripePaymentsFromUi reload:', reloadErr);
                         });
+                    return data;
                 })
                 .catch(function(err) {
                     console.error('reconcileGuestStripePaymentsFromUi:', err);
+                    var aborted = err && (err.name === 'AbortError' || /aborted/i.test(String(err.message || '')));
                     if (typeof showStatus === 'function') {
                         showStatus(
                             'error',
-                            err && err.message ? err.message : 'Failed to sync Stripe payments.'
+                            aborted
+                                ? 'Stripe sync timed out. Try again.'
+                                : (err && err.message ? err.message : 'Failed to sync Stripe payments.')
                         );
                     }
                     throw err;
+                })
+                .finally(function() {
+                    if (timeoutId) clearTimeout(timeoutId);
                 });
         }
 
@@ -15988,7 +16671,8 @@
         }
 
         function renderProgrammeSpeakersTable() {
-            var root = document.getElementById('programme-editor-activities');
+            var root = document.getElementById('programme-editor-activities-body') ||
+                document.getElementById('programme-editor-activities');
             if (!root) return;
             if (!speakerRosterInMemory.length) {
                 root.innerHTML = '<p class="speaker-roster-empty">No speakers yet.</p>';
@@ -16975,6 +17659,14 @@
             if (!container) return;
             if (!selectedevent) {
                 container.innerHTML = '';
+                return;
+            }
+            if (programmeState && programmeState.programmeCollectionMissing) {
+                var missingLabel = String(selectedevent || current_event || '').trim() || 'this event';
+                container.innerHTML =
+                    '<p class="texteditor-selectors-empty">No programme collection for “' +
+                    escapeHtml(missingLabel) +
+                    '” under tbs/Programme.</p>';
                 return;
             }
             var dates = (programmeState.dayDates && programmeState.dayDates.length)
@@ -20421,6 +21113,22 @@
                 updateProgrammeCounterDisplay();
                 return;
             }
+            if (programmeState.programmeCollectionMissing) {
+                selectedProgrammeEditorDayDate = null;
+                selectedProgrammeEditorSessionId = null;
+                selectedProgrammeEditorSlotId = null;
+                selectedProgrammeEditorSlotSessionId = null;
+                var missingLabel = String(programmeState.eventId || selectedevent || '').trim() || 'this event';
+                rowEl.innerHTML =
+                    '<p class="programme-editor-days-empty">No programme collection for “' +
+                    escapeHtml(missingLabel) +
+                    '” under tbs/Programme.</p>';
+                applyProgrammeEditorDaySelection();
+                updateProgrammePadlockButtonState();
+                syncProgrammeEditabilityFromPadlock();
+                updateProgrammeCounterDisplay();
+                return;
+            }
             var dates = (programmeState.dayDates && programmeState.dayDates.length)
                 ? programmeState.dayDates.slice().sort()
                 : [];
@@ -20540,13 +21248,15 @@
         }
 
         /**
-         * Loads programme day list from `events/{id}/programme` doc IDs (and `TBS_SNIPPET_PROGRAMME_ISO_DATES`), then
-         * reads each day's `html` / `name` from `tbs/Programme/{ISO}/Programme`. Does not read schedule `items` per day.
+         * Loads programme for Current event from `tbs/Programme/{matching collection}/days/{ISO}`.
+         * Collection name match is case-insensitive; if none exists, UI reports that clearly.
          */
         async function loadProgrammeFromFirestore(eventId) {
             programmePadlockIsOpen = false;
             if (!eventId) {
                 programmeState.eventId = null;
+                programmeState.programmeCollectionKey = null;
+                programmeState.programmeCollectionMissing = false;
                 programmeState.meta = null;
                 programmeState.dayDates = [];
                 programmeState.days = {};
@@ -20557,6 +21267,10 @@
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
                 programmePersistedSessionsByDay = {};
+                selectedProgrammeEditorDayDate = null;
+                selectedProgrammeEditorSessionId = null;
+                selectedProgrammeEditorSlotId = null;
+                selectedProgrammeEditorSlotSessionId = null;
                 renderGridFromState();
                 updateSaveButtonState();
                 rebuildTexteditorProgrammeButtons();
@@ -20564,7 +21278,11 @@
             }
             try {
                 const db = getFirestore();
-                programmeState.eventId = eventId;
+                var eventKey = String(eventId || '').trim();
+                selectedevent = eventKey;
+                programmeState.eventId = eventKey;
+                programmeState.programmeCollectionKey = null;
+                programmeState.programmeCollectionMissing = false;
                 programmeState.meta = null;
                 programmeState.days = {};
                 programmeState.dayDates = [];
@@ -20574,22 +21292,33 @@
                 programmeStateDirty = false;
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
-                var progHtmlCol = eventProgrammeHtmlCollection(db, eventId);
-                var progHtmlSnap = await progHtmlCol.get();
-                var dateSet = {};
-                progHtmlSnap.forEach(function(docSnap) {
-                    var id = docSnap.id;
-                    if (!id || id === '_init') return;
-                    dateSet[id] = true;
-                });
-                for (var si = 0; si < TBS_SNIPPET_PROGRAMME_ISO_DATES.length; si++) {
-                    dateSet[TBS_SNIPPET_PROGRAMME_ISO_DATES[si]] = true;
+                selectedProgrammeEditorDayDate = null;
+                selectedProgrammeEditorSessionId = null;
+                selectedProgrammeEditorSlotId = null;
+                selectedProgrammeEditorSlotSessionId = null;
+
+                var resolvedKey = await resolveTbsProgrammeCollectionKey(db, eventKey);
+                if (!resolvedKey) {
+                    programmeState.programmeCollectionMissing = true;
+                    programmeState.programmeCollectionKey = null;
+                    syncProgrammePersistedSnapshotFromState();
+                    renderGridFromState();
+                    updateSaveButtonState();
+                    rebuildTexteditorProgrammeButtons();
+                    return;
                 }
-                programmeState.dayDates = Object.keys(dateSet).sort();
+                programmeState.programmeCollectionKey = resolvedKey;
+                programmeState.programmeCollectionMissing = false;
+                programmeState.dayDates = await listTbsProgrammeIsoDayIds(db, resolvedKey);
+                if (programmeState.dayDates.length) {
+                    await persistTbsProgrammeDayIdsManifest(db, resolvedKey, programmeState.dayDates);
+                } else {
+                    await ensureTbsProgrammeEventKeyOnRoot(db, resolvedKey);
+                }
                 for (var dxi = 0; dxi < programmeState.dayDates.length; dxi++) {
                     var id = programmeState.dayDates[dxi];
                     programmeState.days[id] = [];
-                    var tbsSnap = await tbsProgrammeDayDocRef(db, id).get();
+                    var tbsSnap = await tbsProgrammeDayCollection(db, id, resolvedKey).doc('Programme').get();
                     var tbsData = tbsSnap.exists ? (tbsSnap.data() || {}) : {};
                     programmeState.htmlDateByDay[id] = tbsData.html != null ? String(tbsData.html) : '';
                     programmeState.nameDateByDay[id] = (tbsData.name != null && String(tbsData.name).trim() !== '')
@@ -20607,6 +21336,12 @@
             } catch (err) {
                 console.error('Failed to load programme from Firestore:', err);
                 if (typeof showStatus === 'function') showStatus('error', err.message || 'Failed to load.');
+                programmeState.programmeCollectionKey = null;
+                programmeState.programmeCollectionMissing = false;
+                programmeState.dayDates = [];
+                programmeState.days = {};
+                programmeState.htmlDateByDay = {};
+                programmeState.nameDateByDay = {};
                 programmeState.sessionsByDay = {};
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
@@ -21945,8 +22680,19 @@
             var addGuestBtn = document.getElementById('add-guest-button');
             if (addGuestBtn) {
                 addGuestBtn.addEventListener('click', function() {
+                    closeGuestsOverwatch();
                     clearGuestRosterItemSelection();
                     clearGuestEditorForm();
+                });
+            }
+            var guestsOverwatchBtn = document.getElementById('guests-overwatch-btn');
+            if (guestsOverwatchBtn) {
+                guestsOverwatchBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openGuestsOverwatch().catch(function (err) {
+                        console.error('guests-overwatch-btn:', err);
+                    });
                 });
             }
             var guestSendInviteBtn = document.getElementById('guest-send-invite-btn');

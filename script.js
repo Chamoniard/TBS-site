@@ -4541,7 +4541,7 @@ const HOME_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
 const HOME_SNIPPETS_PROGRAMMEINFO_FIELD = 'Programmeinfo';
 /** localStorage key for Programme intro snippet (must match backend `data-snippet-key`). */
 const TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = 'tbsBackend:texteditor:home:programmeinfo';
-/** ISO date per slider day card; `html` is read from `tbs/Programme/{ISO}/Programme` (same as backend Snippets). */
+/** ISO date per slider day card; `html` is read from `tbs/Programme/{event}/days/{ISO}/Programme` (same as backend Snippets). */
 const HOME_PROGRAMME_FIREBASE_DATE_BY_DAY = {
     tuesday: '2027-02-09',
     wednesday: '2027-02-10',
@@ -4566,8 +4566,17 @@ function homeEscapeHtml(value) {
         .replace(/"/g, '&quot;');
 }
 
+function homeTbsProgrammeEventKey() {
+    return String(TBS27_HOME_PROGRAMME_EVENT_ID || 'TBS27').trim();
+}
+
 function homeTbsProgrammeDayCollection(db, isoDate) {
-    return db.collection('tbs').doc('Programme').collection(String(isoDate || '').trim());
+    return db
+        .collection('tbs')
+        .doc('Programme')
+        .collection(homeTbsProgrammeEventKey())
+        .doc('days')
+        .collection(String(isoDate || '').trim());
 }
 
 function homeIsProgrammeSessionDocId(docId) {
@@ -4795,13 +4804,17 @@ async function fetchHomeProgrammeIsoDatesFromFirebase() {
     const promise = (async function () {
         try {
             const db = getFirestore();
-            const programmeDocRef = db.collection('tbs').doc('Programme');
+            const programmeDaysDocRef = db
+                .collection('tbs')
+                .doc('Programme')
+                .collection(homeTbsProgrammeEventKey())
+                .doc('days');
             let dates = [];
-            if (typeof programmeDocRef.listCollections === 'function') {
+            if (typeof programmeDaysDocRef.listCollections === 'function') {
                 const collections = await withTimeout(
-                    programmeDocRef.listCollections(),
+                    programmeDaysDocRef.listCollections(),
                     10000,
-                    'Firestore tbs/Programme listCollections'
+                    'Firestore tbs/Programme/{event}/days listCollections'
                 );
                 dates = collections
                     .map(function (col) {
@@ -4941,7 +4954,7 @@ function wrapProgrammeSlideCard(dayKey, innerHtml) {
 
 /**
  * Reads programme **day** slide HTML (Tuesday–Friday cards, not the intro card) from Firestore.
- * Path: `tbs/Programme/{ISO-date}/Programme` field `html`.
+ * Path: `tbs/Programme/{event}/days/{ISO-date}/Programme` field `html`.
  * @returns {Promise<string>} HTML string or '' if missing / offline / error.
  */
 async function fetchHomeProgrammeDayHtmlFromFirebase(dayKey) {
@@ -4954,9 +4967,9 @@ async function fetchHomeProgrammeDayHtmlFromFirebase(dayKey) {
     try {
         const db = getFirestore();
         const tbsSnap = await withTimeout(
-            db.collection('tbs').doc('Programme').collection(isoDate).doc('Programme').get(),
+            homeTbsProgrammeDayCollection(db, isoDate).doc('Programme').get(),
             10000,
-            'Firestore tbs/Programme/{date}/Programme html'
+            'Firestore tbs/Programme/{event}/days/{date}/Programme html'
         );
         if (!tbsSnap.exists) return '';
         const tbsData = tbsSnap.data() || {};
