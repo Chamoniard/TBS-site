@@ -19,7 +19,7 @@
     "firebase:deploy:registration": "firebase deploy --only functions:submitRegistrationHttp --project tbs-app-e2062"
   },
   "devDependencies": {
-    "firebase-tools": "^14.27.0"
+    "firebase-tools": "^15.25.1"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0"
