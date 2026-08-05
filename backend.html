@@ -8848,7 +8848,7 @@
                                         <div class="guests-registered-count" id="guests-registered-count" aria-live="polite">0</div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
-                                    <div class="guests-invited" id="guests-invited" data-name="guests.invited" aria-label="Invited guests not paid">
+                                    <div class="guests-invited" id="guests-invited" data-name="guests.invited" aria-label="Invited guests">
                                         <div class="guests-invited-label">Invited:</div>
                                         <div class="guests-invited-count" id="guests-invited-count" aria-live="polite">0</div>
                                     </div>
@@ -12457,15 +12457,15 @@
             return n;
         }
 
-        /** Invited=Yes and Paid=No for Current event. */
-        function countGuestsInvitedUnpaidForCurrentEvent() {
+        /** Invited=Yes for Current event. */
+        function countGuestsInvitedForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
             var n = 0;
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
-                if (guestInvitedFieldIsYes(g.invited) && guestPaidFieldIsNo(g.paid)) n++;
+                if (guestInvitedFieldIsYes(g.invited)) n++;
             }
             return n;
         }
@@ -12487,7 +12487,7 @@
             var registeredEl = document.getElementById('guests-registered-count');
             if (registeredEl) registeredEl.textContent = String(countGuestsRegisteredForCurrentEvent());
             var invitedEl = document.getElementById('guests-invited-count');
-            if (invitedEl) invitedEl.textContent = String(countGuestsInvitedUnpaidForCurrentEvent());
+            if (invitedEl) invitedEl.textContent = String(countGuestsInvitedForCurrentEvent());
             var paidEl = document.getElementById('guests-paid-count');
             if (paidEl) paidEl.textContent = String(countGuestsPaidForCurrentEvent());
         }
@@ -20259,6 +20259,9 @@
             }
             if (isGuests) {
                 void loadAndRenderGuestsTable();
+                void openGuestsOverwatch().catch(function (err) {
+                    console.error('openGuestsOverwatch on Guests tab:', err);
+                });
             }
             if (isProgramme) {
                 renderGridFromState();
