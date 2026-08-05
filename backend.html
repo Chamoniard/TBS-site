@@ -1552,7 +1552,8 @@
             animation: guest-padlock-angry-shake 0.45s ease;
         }
 
-        #guest-editor #guest-editor-actions .guest-workflow-step-arrow {
+        #guest-editor #guest-editor-actions .guest-workflow-step-arrow,
+        #guest-editor .guest-overwatch-body .guest-overwatch-step-arrow {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1565,6 +1566,12 @@
             line-height: 1;
             text-align: center;
             pointer-events: none;
+        }
+
+        #guest-editor .guest-overwatch-body .guest-overwatch-step-arrow {
+            align-self: flex-start;
+            width: 8rem;
+            min-height: 1.875rem;
         }
 
         #speaker-editor .speaker-editor-bottom .speaker-workflow-nav {
@@ -2221,6 +2228,36 @@
             outline: none;
         }
 
+        #guest-editor .guests-actions .guests-roster-search {
+            flex: 0 1 11rem;
+            width: 11rem;
+            min-width: 7rem;
+            max-width: 14rem;
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0 0.65rem;
+            border: 1px solid #71C7FE;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            line-height: 1.2;
+            outline: none;
+        }
+
+        #guest-editor .guests-actions .guests-roster-search::placeholder {
+            color: #94a3b8;
+        }
+
+        #guest-editor .guests-actions .guests-roster-search:focus {
+            border-color: #003153;
+            box-shadow: 0 0 0 2px rgba(113, 199, 254, 0.35);
+        }
+
         #speaker-editor .speakers-actions .add-speaker-button,
         #guest-editor .guests-actions .add-speaker-button,
         #guest-editor .guest-editor-toolbar .add-speaker-button,
@@ -2420,7 +2457,7 @@
         #guest-editor .guest-overwatch-body .guests-paid {
             flex: 0 0 auto;
             width: 100%;
-            max-width: 16rem;
+            max-width: 8rem;
             box-sizing: border-box;
             margin: 0;
             padding: 1rem 1.1rem;
@@ -2428,7 +2465,7 @@
             border: 1px solid #71C7FE;
             border-radius: 5px;
             font-family: 'Inter', sans-serif;
-            color: #0f172a;
+            color: #ffffff;
         }
 
         #guest-editor .guest-overwatch-body .guests-registered-label,
@@ -2438,7 +2475,7 @@
             font-size: 0.875rem;
             font-weight: 600;
             line-height: 1.25;
-            color: #003153;
+            color: #ffffff;
         }
 
         #guest-editor .guest-overwatch-body .guests-registered-count,
@@ -2448,24 +2485,8 @@
             font-size: 1.75rem;
             font-weight: 700;
             line-height: 1.2;
-            color: #003153;
+            color: #ffffff;
             font-variant-numeric: tabular-nums;
-        }
-
-        #guest-editor .guest-overwatch-body .guest-overwatch-step-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 auto;
-            width: 100%;
-            max-width: 16rem;
-            margin: 0;
-            color: #338a17;
-            font-size: 1.875rem;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            pointer-events: none;
         }
 
         #guest-editor .guests-actions #guests-overwatch-btn,
@@ -6569,6 +6590,153 @@
             margin-top: 1.25rem;
         }
 
+        .filter-guests-btn {
+            position: relative;
+            overflow: visible;
+        }
+
+        .filter-guests-active-mark {
+            position: absolute;
+            top: -0.2rem;
+            right: -0.2rem;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 0.85rem;
+            height: 0.85rem;
+            border-radius: 50%;
+            background: #FF00FF;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #ffffff;
+            pointer-events: none;
+            animation: filter-guests-mark-pulse 2.4s ease-in-out infinite;
+        }
+
+        @keyframes filter-guests-mark-pulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.55;
+                transform: scale(0.92);
+            }
+        }
+
+        .filter-guests-active-mark[hidden] {
+            display: none !important;
+        }
+
+        .guests-filter-popup[hidden] {
+            display: none !important;
+        }
+
+        .guests-filter-popup {
+            position: fixed;
+            inset: 0;
+            z-index: 10055;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        .guests-filter-popup__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .guests-filter-popup__box {
+            position: relative;
+            width: min(22rem, 100%);
+            background: #d9effc;
+            border: 1px solid #71C7FE;
+            border-radius: 10px;
+            padding: 1.15rem 1.25rem 1rem;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            overflow: visible;
+        }
+
+        .guests-filter-popup__title {
+            margin: 0 0 1rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #003153;
+            line-height: 1.3;
+        }
+
+        .guests-filter-popup__fields {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .guests-filter-popup__field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .guests-filter-popup__field label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: #003153;
+        }
+
+        .guests-filter-popup__field select {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            color: #0f172a;
+            background: #ffffff;
+            border: 1px solid #71C7FE;
+            border-radius: 6px;
+            padding: 0.4rem 0.5rem;
+        }
+
+        .guests-filter-popup__actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.15rem;
+        }
+
+        .guests-filter-popup__actions .guests-filter-clear-btn,
+        .guests-filter-popup__actions .guests-filter-apply-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 0.45rem 0.9rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .guests-filter-popup__actions .guests-filter-clear-btn {
+            background: #ffffff;
+            color: #003153;
+            border-color: #71C7FE;
+        }
+
+        .guests-filter-popup__actions .guests-filter-apply-btn {
+            background: var(--backend-button-yellow);
+            color: #0f172a;
+            border-color: #e0b400;
+            box-shadow: var(--backend-button-shadow, none);
+        }
+
         .guest-application-review[hidden] {
             display: none !important;
         }
@@ -8543,6 +8711,15 @@
                                 </div>
                                 <div class="edit-guest-top-trailing">
                                 <div id="guests-actions" class="guests-actions" aria-label="Guests actions">
+                                    <input
+                                        type="search"
+                                        id="guests-roster-search"
+                                        class="guests-roster-search"
+                                        placeholder="Search"
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                        aria-label="Search guests"
+                                    />
                                     <button type="button" class="add-speaker-button" id="previous-guest" aria-label="Previous guest" title="Previous guest" disabled aria-disabled="true">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M14 6L8 12l6 6z" />
@@ -8558,10 +8735,11 @@
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button" id="filter-guests" disabled aria-disabled="true" aria-label="Filter guests (inactive)" title="Filter (inactive)">
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-guests" aria-label="Filter guests" title="Filter guests">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                                         </svg>
+                                        <span class="filter-guests-active-mark" id="filter-guests-active-mark" hidden aria-hidden="true">!</span>
                                     </button>
                                     <button type="button" class="add-speaker-button" id="guests-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -9330,6 +9508,47 @@
         </div>
     </div>
 
+    <div id="guests-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guests-filter-popup-title">
+        <div class="guests-filter-popup__backdrop" id="guests-filter-popup-backdrop"></div>
+        <div class="guests-filter-popup__box">
+            <h2 class="guests-filter-popup__title" id="guests-filter-popup-title">Filter guests</h2>
+            <div class="guests-filter-popup__fields">
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-read">Read</label>
+                    <select id="guests-filter-read" data-filter-key="read"></select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-invited">Invited</label>
+                    <select id="guests-filter-invited" data-filter-key="invited"></select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-invoiced">Invoiced</label>
+                    <select id="guests-filter-invoiced" data-filter-key="invoiced"></select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-paid">Paid</label>
+                    <select id="guests-filter-paid" data-filter-key="paid"></select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-briefed">Briefed</label>
+                    <select id="guests-filter-briefed" data-filter-key="briefed"></select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-attended">Attended</label>
+                    <select id="guests-filter-attended" data-filter-key="attended"></select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label for="guests-filter-cme">CME sent</label>
+                    <select id="guests-filter-cme" data-filter-key="cme"></select>
+                </div>
+            </div>
+            <div class="guests-filter-popup__actions">
+                <button type="button" class="guests-filter-clear-btn" id="guests-filter-clear">Clear</button>
+                <button type="button" class="guests-filter-apply-btn" id="guests-filter-apply">Filter</button>
+            </div>
+        </div>
+    </div>
+
     <div
         id="guest-application-review"
         class="guest-application-review"
@@ -9437,6 +9656,18 @@
         let guestsMemoryLoaded = false;
         /** Promise from initial page load preload; Guests tab awaits this instead of refetching. */
         var backendGuestsPreloadPromise = null;
+        /** Active guests roster filters from Firestore `tbs/Settings.filterguests`. */
+        var guestsFilterSettings = {
+            read: '',
+            invited: '',
+            invoiced: '',
+            paid: '',
+            briefed: '',
+            attended: '',
+            cme: '',
+        };
+        /** Live case-insensitive guests roster name search (local only). */
+        var guestsRosterSearchQuery = '';
         /** In-memory rows for Content tab; Image URL is read for editor preview only (Alt-image omitted). */
         let contentRosterInMemory = [];
         let contentFormEditingDocId = '';
@@ -13222,6 +13453,8 @@
         var FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
         var FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
         var FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
+        /** Document `tbs/Settings` field `filterguests` (JSON map of guests-table filters). */
+        var FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD = 'filterguests';
         var siteSettingsSaveInFlight = false;
 
         function tbsSettingsFirestoreFieldForSettingKey(settingKey) {
@@ -14157,9 +14390,18 @@
         function updateGuestNavButtons() {
             var prevGuestBtn = document.getElementById('previous-guest');
             var nextGuestBtn = document.getElementById('next-guest');
-            var guestN = guestsRosterInMemory.length;
+            var visibleGuests = guestsRosterRowsAfterFilter();
+            var guestN = visibleGuests.length;
             var guestId = String(guestFormEditingDocId || '').trim();
-            var guestIdx = guestId ? findGuestRosterIndexById(guestId) : -1;
+            var guestIdx = -1;
+            if (guestId) {
+                for (var vi = 0; vi < visibleGuests.length; vi++) {
+                    if (String(visibleGuests[vi].id || '') === guestId) {
+                        guestIdx = vi;
+                        break;
+                    }
+                }
+            }
             var guestCanPrev = guestIdx > 0;
             var guestCanNext = guestIdx >= 0 && guestIdx < guestN - 1;
             if (guestN <= 1 || !guestId || guestIdx < 0) {
@@ -14736,11 +14978,18 @@
             syncAddGuestFormToMemoryIfEditing();
             var navId = String(guestFormEditingDocId || '').trim();
             if (!navId) return;
-            var navIdx = findGuestRosterIndexById(navId);
+            var visibleGuests = guestsRosterRowsAfterFilter();
+            var navIdx = -1;
+            for (var i = 0; i < visibleGuests.length; i++) {
+                if (String(visibleGuests[i].id || '') === navId) {
+                    navIdx = i;
+                    break;
+                }
+            }
             if (navIdx < 0) return;
             var navNextIdx = navIdx + delta;
-            if (navNextIdx < 0 || navNextIdx >= guestsRosterInMemory.length) return;
-            var navG = guestsRosterInMemory[navNextIdx];
+            if (navNextIdx < 0 || navNextIdx >= visibleGuests.length) return;
+            var navG = visibleGuests[navNextIdx];
             guestEditorScrollToManagementOnNextPopulate = isGuestEditorBottomShowingManagement();
             populateEditGuestFormFromRecord(navG);
             syncGuestRosterSelectionHighlight();
@@ -14765,6 +15014,242 @@
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Cancelled'];
+        var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
+        var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
+        var GUEST_CME_FILTER_VALUES = ['Sent', 'Ready', 'No CME'];
+
+        function emptyGuestsFilterSettings() {
+            return {
+                read: '',
+                invited: '',
+                invoiced: '',
+                paid: '',
+                briefed: '',
+                attended: '',
+                cme: '',
+            };
+        }
+
+        function normalizeGuestsFilterSettings(raw) {
+            var out = emptyGuestsFilterSettings();
+            var src = raw;
+            if (typeof src === 'string') {
+                var trimmed = String(src).trim();
+                if (!trimmed) return out;
+                try {
+                    src = JSON.parse(trimmed);
+                } catch (err) {
+                    return out;
+                }
+            }
+            if (!src || typeof src !== 'object') return out;
+            var keys = Object.keys(out);
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                if (src[k] == null) continue;
+                var v = String(src[k]).trim();
+                if (v) out[k] = v;
+            }
+            return out;
+        }
+
+        function guestsFilterIsActive(filter) {
+            var f = filter || guestsFilterSettings;
+            if (!f || typeof f !== 'object') return false;
+            var keys = Object.keys(emptyGuestsFilterSettings());
+            for (var i = 0; i < keys.length; i++) {
+                if (String(f[keys[i]] || '').trim()) return true;
+            }
+            return false;
+        }
+
+        function syncFilterGuestsButtonBadge() {
+            var mark = document.getElementById('filter-guests-active-mark');
+            var btn = document.getElementById('filter-guests');
+            var active = guestsFilterIsActive(guestsFilterSettings);
+            if (mark) {
+                mark.hidden = !active;
+                mark.setAttribute('aria-hidden', active ? 'false' : 'true');
+            }
+            if (btn) {
+                btn.setAttribute('aria-label', active ? 'Filter guests (filter active)' : 'Filter guests');
+                btn.title = active ? 'Filter guests (filter active)' : 'Filter guests';
+            }
+        }
+
+        function guestsFilterValuesEqual(a, b) {
+            return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+        }
+
+        function guestMatchesFilterSettings(g, filter) {
+            var f = filter || guestsFilterSettings;
+            if (!guestsFilterIsActive(f)) return true;
+            if (!g) return false;
+            if (f.read && !guestsFilterValuesEqual(g.read, f.read)) return false;
+            if (f.invited && !guestsFilterValuesEqual(g.invited, f.invited)) return false;
+            if (f.invoiced && !guestsFilterValuesEqual(g.invoiced, f.invoiced)) return false;
+            if (f.paid && !guestsFilterValuesEqual(g.paid, f.paid)) return false;
+            if (f.briefed && !guestsFilterValuesEqual(g.briefed, f.briefed)) return false;
+            if (f.attended) {
+                var wantAttended = guestsFilterValuesEqual(f.attended, 'Yes');
+                if (!!g.attended !== wantAttended) return false;
+            }
+            if (f.cme) {
+                var cmeLabel = normalizeGuestCmeStatusDisplay(g.cmeStatus);
+                if (!guestsFilterValuesEqual(cmeLabel, f.cme)) return false;
+            }
+            return true;
+        }
+
+        function guestMatchesRosterSearch(g, query) {
+            var q = String(query != null ? query : guestsRosterSearchQuery || '')
+                .trim()
+                .toLowerCase();
+            if (!q) return true;
+            if (!g) return false;
+            var fullName = (
+                String(g.name || '').trim() +
+                ' ' +
+                String(g.lastName || '').trim()
+            )
+                .trim()
+                .toLowerCase();
+            if (fullName.indexOf(q) !== -1) return true;
+            var email = String(g.email || '')
+                .trim()
+                .toLowerCase();
+            if (email && email.indexOf(q) !== -1) return true;
+            return false;
+        }
+
+        function guestsRosterRowsAfterFilter() {
+            var src = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory : [];
+            var filterActive = guestsFilterIsActive(guestsFilterSettings);
+            var searchActive = String(guestsRosterSearchQuery || '').trim() !== '';
+            if (!filterActive && !searchActive) return src.slice();
+            return src.filter(function (g) {
+                if (filterActive && !guestMatchesFilterSettings(g, guestsFilterSettings)) return false;
+                if (searchActive && !guestMatchesRosterSearch(g, guestsRosterSearchQuery)) return false;
+                return true;
+            });
+        }
+
+        function fillGuestsFilterSelect(selectEl, values, selected) {
+            if (!selectEl) return;
+            var html = '<option value="">Any</option>';
+            var list = Array.isArray(values) ? values : [];
+            var sel = String(selected || '').trim();
+            for (var i = 0; i < list.length; i++) {
+                var v = String(list[i] || '').trim();
+                if (!v) continue;
+                html +=
+                    '<option value="' +
+                    escapeHtml(v) +
+                    '"' +
+                    (guestsFilterValuesEqual(v, sel) ? ' selected' : '') +
+                    '>' +
+                    escapeHtml(v) +
+                    '</option>';
+            }
+            selectEl.innerHTML = html;
+        }
+
+        function readGuestsFilterFormValues() {
+            var out = emptyGuestsFilterSettings();
+            var keys = Object.keys(out);
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var el = document.getElementById('guests-filter-' + k);
+                if (!el) continue;
+                var v = String(el.value || '').trim();
+                if (v) out[k] = v;
+            }
+            return out;
+        }
+
+        function populateGuestsFilterPopupForm() {
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-read'),
+                GUEST_READ_MENU_VALUES,
+                guestsFilterSettings.read
+            );
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-invited'),
+                GUEST_INVITED_MENU_VALUES,
+                guestsFilterSettings.invited
+            );
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-invoiced'),
+                GUEST_INVOICED_MENU_VALUES,
+                guestsFilterSettings.invoiced
+            );
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-paid'),
+                GUEST_PAID_MENU_VALUES,
+                guestsFilterSettings.paid
+            );
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-briefed'),
+                GUEST_BRIEFED_FILTER_VALUES,
+                guestsFilterSettings.briefed
+            );
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-attended'),
+                GUEST_ATTENDED_FILTER_VALUES,
+                guestsFilterSettings.attended
+            );
+            fillGuestsFilterSelect(
+                document.getElementById('guests-filter-cme'),
+                GUEST_CME_FILTER_VALUES,
+                guestsFilterSettings.cme
+            );
+        }
+
+        function closeGuestsFilterPopup() {
+            var popup = document.getElementById('guests-filter-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function openGuestsFilterPopup() {
+            populateGuestsFilterPopupForm();
+            var popup = document.getElementById('guests-filter-popup');
+            if (!popup) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+        }
+
+        function applyGuestsFilterSettingsLocal(next) {
+            guestsFilterSettings = normalizeGuestsFilterSettings(next);
+            syncFilterGuestsButtonBadge();
+            renderGuestsRoster();
+        }
+
+        async function saveGuestsFilterSettingsToFirestore(next) {
+            var normalized = normalizeGuestsFilterSettings(next);
+            var db = getFirestore();
+            var patch = {};
+            patch[FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD] = guestsFilterIsActive(normalized)
+                ? normalized
+                : {};
+            await db.collection('tbs').doc('Settings').set(patch, { merge: true });
+            applyGuestsFilterSettingsLocal(normalized);
+        }
+
+        async function clearGuestsFilterSettings() {
+            await saveGuestsFilterSettingsToFirestore(emptyGuestsFilterSettings());
+            populateGuestsFilterPopupForm();
+        }
+
+        function applyGuestsFilterSettingsFromSettingsData(settingsData) {
+            var raw =
+                settingsData && typeof settingsData === 'object'
+                    ? settingsData[FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD]
+                    : null;
+            guestsFilterSettings = normalizeGuestsFilterSettings(raw);
+            syncFilterGuestsButtonBadge();
+        }
 
         function guestReadBadgeModifierClass(readVal) {
             var t = String(readVal != null ? readVal : '').trim();
@@ -16705,26 +17190,36 @@
                     '</td>' +
                     '</tr>';
             } else {
-                for (var i = 0; i < guestsRosterInMemory.length; i++) {
-                    var g = guestsRosterInMemory[i];
-                    var guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
-                    if (!guestLabel) guestLabel = '-';
-                    var eventLabel = String(g.event || '').trim();
-                    if (!eventLabel) eventLabel = '-';
-                    var eventBadgeClass = contentEventBadgeClassForLabel(eventLabel);
-                    html += '<tr class="guests-roster-row" data-guests-id="' + escapeHtml(g.id) + '">' +
-                        '<td class="guests-roster-name-cell">' + escapeHtml(guestLabel) + '</td>' +
-                        '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>' +
-                        guestRosterReadCellHtml(g.id, g.read) +
-                        guestRosterInvitedCellHtml(g.id, g.invited) +
-                        guestRosterInvoicedCellHtml(g.id, g.invoiced) +
-                        guestRosterPaidCellHtml(g.id, g.paid) +
-                        '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.briefed) + '</td>' +
-                        guestRosterSquareToggleHtml('attended', 'Attended', !!g.attended) +
-                        '<td class="guests-roster-tag-cell">' +
-                        guestRosterCmeBadgeHtml(g.cmeStatus) +
-                        '</td>' +
+                var filteredGuests = guestsRosterRowsAfterFilter();
+                if (!filteredGuests.length) {
+                    html +=
+                        '<tr class="guests-roster-row">' +
+                        '<td class="guests-roster-empty" colspan="' +
+                        colCount +
+                        '">No guests match the current filter.</td>' +
                         '</tr>';
+                } else {
+                    for (var i = 0; i < filteredGuests.length; i++) {
+                        var g = filteredGuests[i];
+                        var guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
+                        if (!guestLabel) guestLabel = '-';
+                        var eventLabel = String(g.event || '').trim();
+                        if (!eventLabel) eventLabel = '-';
+                        var eventBadgeClass = contentEventBadgeClassForLabel(eventLabel);
+                        html += '<tr class="guests-roster-row" data-guests-id="' + escapeHtml(g.id) + '">' +
+                            '<td class="guests-roster-name-cell">' + escapeHtml(guestLabel) + '</td>' +
+                            '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>' +
+                            guestRosterReadCellHtml(g.id, g.read) +
+                            guestRosterInvitedCellHtml(g.id, g.invited) +
+                            guestRosterInvoicedCellHtml(g.id, g.invoiced) +
+                            guestRosterPaidCellHtml(g.id, g.paid) +
+                            '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.briefed) + '</td>' +
+                            guestRosterSquareToggleHtml('attended', 'Attended', !!g.attended) +
+                            '<td class="guests-roster-tag-cell">' +
+                            guestRosterCmeBadgeHtml(g.cmeStatus) +
+                            '</td>' +
+                            '</tr>';
+                    }
                 }
             }
             html += '</tbody></table>';
@@ -16736,6 +17231,7 @@
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
             updateGuestsListHeadingDisplay();
+            syncFilterGuestsButtonBadge();
             if (guestsOverwatchOpen) updateGuestsOverwatchRegisteredCount();
         }
 
@@ -16765,6 +17261,7 @@
                 current_event = guestCoalesceCurrentEventField(settingsData);
                 selectedevent = String(current_event || '').trim();
                 updateBackendCurrentEventDisplay();
+                applyGuestsFilterSettingsFromSettingsData(settingsData);
                 if (!String(current_event || '').trim()) {
                     guestsRosterInMemory = [];
                     guestsMemoryLoaded = true;
@@ -23021,6 +23518,83 @@
                     openGuestsOverwatch().catch(function (err) {
                         console.error('guests-overwatch-btn:', err);
                     });
+                });
+            }
+            var filterGuestsBtn = document.getElementById('filter-guests');
+            if (filterGuestsBtn) {
+                filterGuestsBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openGuestsFilterPopup();
+                });
+            }
+            var guestsRosterSearchInput = document.getElementById('guests-roster-search');
+            if (guestsRosterSearchInput) {
+                guestsRosterSearchInput.addEventListener('input', function () {
+                    guestsRosterSearchQuery = String(guestsRosterSearchInput.value || '');
+                    renderGuestsRoster();
+                });
+                guestsRosterSearchInput.addEventListener('keydown', function (ev) {
+                    if (ev.key === 'Escape') {
+                        guestsRosterSearchInput.value = '';
+                        guestsRosterSearchQuery = '';
+                        renderGuestsRoster();
+                    }
+                });
+            }
+            var guestsFilterBackdrop = document.getElementById('guests-filter-popup-backdrop');
+            if (guestsFilterBackdrop) {
+                guestsFilterBackdrop.addEventListener('click', function () {
+                    closeGuestsFilterPopup();
+                });
+            }
+            var guestsFilterApplyBtn = document.getElementById('guests-filter-apply');
+            if (guestsFilterApplyBtn) {
+                guestsFilterApplyBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    var next = readGuestsFilterFormValues();
+                    saveGuestsFilterSettingsToFirestore(next)
+                        .then(function () {
+                            closeGuestsFilterPopup();
+                            if (typeof showStatus === 'function') {
+                                showStatus(
+                                    'success',
+                                    guestsFilterIsActive(next)
+                                        ? 'Guest filter saved.'
+                                        : 'Guest filter cleared.'
+                                );
+                            }
+                        })
+                        .catch(function (err) {
+                            console.error('guests-filter-apply:', err);
+                            if (typeof showStatus === 'function') {
+                                showStatus(
+                                    'error',
+                                    err && err.message ? err.message : 'Failed to save guest filter.'
+                                );
+                            }
+                        });
+                });
+            }
+            var guestsFilterClearBtn = document.getElementById('guests-filter-clear');
+            if (guestsFilterClearBtn) {
+                guestsFilterClearBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    clearGuestsFilterSettings()
+                        .then(function () {
+                            if (typeof showStatus === 'function') {
+                                showStatus('success', 'Guest filter cleared.');
+                            }
+                        })
+                        .catch(function (err) {
+                            console.error('guests-filter-clear:', err);
+                            if (typeof showStatus === 'function') {
+                                showStatus(
+                                    'error',
+                                    err && err.message ? err.message : 'Failed to clear guest filter.'
+                                );
+                            }
+                        });
                 });
             }
             var guestSendInviteBtn = document.getElementById('guest-send-invite-btn');
