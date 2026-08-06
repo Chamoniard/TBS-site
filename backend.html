@@ -2499,6 +2499,10 @@
             box-shadow: var(--backend-button-shadow);
         }
 
+        #guest-editor .guests-actions #sync-guest-payments-btn.is-syncing svg {
+            animation: spin 1s linear infinite;
+        }
+
         #speaker-editor .speaker-editor-bottom {
             display: flex;
             flex-direction: column;
@@ -16366,20 +16370,30 @@
                             openOrUnpaid + ' still unpaid, ' +
                             updated + ' newly marked paid';
                     }
-                    if (typeof showStatus === 'function') showStatus('success', msg);
-                    // Refresh roster in background so a slow reload cannot leave the sync button stuck.
-                    fetchAllGuestsIntoMemory({ force: true, showLoading: false })
+                    if (typeof showStatus === 'function') {
+                        showStatus('loading', 'Checking database for payment changes…');
+                    }
+                    // Await Firestore reload so the sync spinner stays until DB changes are visible.
+                    return fetchAllGuestsIntoMemory({ force: true, showLoading: false })
                         .then(function() {
                             renderGuestsRoster();
                             syncGuestWorkflowPaymentReceivedButton();
                             syncGuestWorkflowSendInvoiceButton();
                             syncGuestManagementLogPanel();
                             syncGuestInvoicedisnoBlock();
+                            if (typeof showStatus === 'function') showStatus('success', msg);
+                            return data;
                         })
                         .catch(function(reloadErr) {
                             console.error('reconcileGuestStripePaymentsFromUi reload:', reloadErr);
+                            if (typeof showStatus === 'function') {
+                                showStatus(
+                                    'error',
+                                    'Stripe sync finished, but reloading guests from the database failed.'
+                                );
+                            }
+                            return data;
                         });
-                    return data;
                 })
                 .catch(function(err) {
                     console.error('reconcileGuestStripePaymentsFromUi:', err);
@@ -23816,11 +23830,15 @@
                     if (syncGuestPaymentsBtn.disabled) return;
                     syncGuestPaymentsBtn.disabled = true;
                     syncGuestPaymentsBtn.setAttribute('aria-disabled', 'true');
+                    syncGuestPaymentsBtn.setAttribute('aria-busy', 'true');
+                    syncGuestPaymentsBtn.classList.add('is-syncing');
                     reconcileGuestStripePaymentsFromUi({})
                         .catch(function() {})
                         .finally(function() {
                             syncGuestPaymentsBtn.disabled = false;
                             syncGuestPaymentsBtn.setAttribute('aria-disabled', 'false');
+                            syncGuestPaymentsBtn.removeAttribute('aria-busy');
+                            syncGuestPaymentsBtn.classList.remove('is-syncing');
                         });
                 });
             }
