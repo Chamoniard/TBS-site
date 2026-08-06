@@ -10,9 +10,11 @@ permissions:
   pages: write
   id-token: write
 
+# Pages deploys must not cancel each other mid-flight — that yields
+# "Deployment cancelled" from actions/deploy-pages.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -32,8 +34,6 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site
-          # Copy the published site only — skip Cloud Functions / local deps that
-          # are not needed on Pages and can stall or bloat deploys.
           rsync -a \
             --exclude '.git/' \
             --exclude '.github/' \
