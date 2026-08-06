@@ -2454,10 +2454,19 @@
 
         #guest-editor .guest-overwatch-body .guests-registered,
         #guest-editor .guest-overwatch-body .guests-invited,
+        #guest-editor .guest-overwatch-body .guests-invoiced,
+        #guest-editor .guest-overwatch-body .guests-direct-transfer,
         #guest-editor .guest-overwatch-body .guests-paid {
-            flex: 0 0 auto;
-            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            flex: 0 0 8rem;
+            width: 8rem;
+            min-width: 8rem;
             max-width: 8rem;
+            height: 5.75rem;
+            min-height: 5.75rem;
+            max-height: 5.75rem;
             box-sizing: border-box;
             margin: 0;
             padding: 1rem 1.1rem;
@@ -2468,8 +2477,54 @@
             color: #ffffff;
         }
 
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+            width: auto;
+            max-width: none;
+            box-sizing: border-box;
+        }
+
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invoiced,
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer {
+            flex: 0 0 8rem;
+            width: 8rem;
+            min-width: 8rem;
+            max-width: 8rem;
+            height: 5.75rem;
+            min-height: 5.75rem;
+            max-height: 5.75rem;
+        }
+
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-plus {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            margin: 0;
+            color: #338a17;
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        #guest-editor .guest-overwatch-body .guests-direct-transfer {
+            background: var(--backend-button-yellow);
+            border-color: var(--backend-button-yellow);
+            color: #003153;
+        }
+
         #guest-editor .guest-overwatch-body .guests-registered-label,
         #guest-editor .guest-overwatch-body .guests-invited-label,
+        #guest-editor .guest-overwatch-body .guests-invoiced-label,
+        #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
         #guest-editor .guest-overwatch-body .guests-paid-label {
             margin: 0 0 0.35rem;
             font-size: 0.875rem;
@@ -2478,8 +2533,14 @@
             color: #ffffff;
         }
 
+        #guest-editor .guest-overwatch-body .guests-direct-transfer-label {
+            color: #003153;
+        }
+
         #guest-editor .guest-overwatch-body .guests-registered-count,
         #guest-editor .guest-overwatch-body .guests-invited-count,
+        #guest-editor .guest-overwatch-body .guests-invoiced-count,
+        #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
         #guest-editor .guest-overwatch-body .guests-paid-count {
             margin: 0;
             font-size: 1.75rem;
@@ -2487,6 +2548,10 @@
             line-height: 1.2;
             color: #ffffff;
             font-variant-numeric: tabular-nums;
+        }
+
+        #guest-editor .guest-overwatch-body .guests-direct-transfer-count {
+            color: #003153;
         }
 
         #guest-editor .guests-actions #guests-overwatch-btn,
@@ -2499,8 +2564,26 @@
             box-shadow: var(--backend-button-shadow);
         }
 
-        #guest-editor .guests-actions #sync-guest-payments-btn.is-syncing svg {
-            animation: spin 1s linear infinite;
+        #guest-editor .guests-actions #sync-guest-payments-btn.is-syncing {
+            cursor: wait;
+            pointer-events: none;
+        }
+
+        #guest-editor .guests-actions #sync-guest-payments-btn.is-syncing > svg {
+            display: block;
+            width: 22px;
+            height: 22px;
+            flex: 0 0 auto;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            -webkit-transform-origin: 50% 50%;
+            animation: sync-guest-payments-spin 0.85s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes sync-guest-payments-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         #speaker-editor .speaker-editor-bottom {
@@ -9035,6 +9118,18 @@
                                         <div class="guests-invited-count" id="guests-invited-count" aria-live="polite">0</div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
+                                    <div class="guest-overwatch-split-row" role="group" aria-label="Invoiced and direct">
+                                        <div class="guests-invoiced" id="guests-invoiced" data-name="guests.invoiced" aria-label="Invoiced guests">
+                                            <div class="guests-invoiced-label">Invoiced:</div>
+                                            <div class="guests-invoiced-count" id="guests-invoiced-count" aria-live="polite">0</div>
+                                        </div>
+                                        <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                        <div class="guests-direct-transfer" id="guests-direct-transfer" data-name="guests.direct-transfer" aria-label="Direct guests">
+                                            <div class="guests-direct-transfer-label">Direct:</div>
+                                            <div class="guests-direct-transfer-count" id="guests-direct-transfer-count" aria-live="polite">0</div>
+                                        </div>
+                                    </div>
+                                    <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
                                     <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
                                         <div class="guests-paid-label">Paid:</div>
                                         <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
@@ -9640,7 +9735,7 @@
         /** Read column: same two-step interaction as Invited. */
         var guestsReadArmedDocId = '';
         var guestsReadDropdownOpenDocId = '';
-        /** Invoiced column: Yes / No; same two-step interaction as Read. */
+        /** Invoiced column: Yes / No / Direct; same two-step interaction as Read. */
         var guestsInvoicedArmedDocId = '';
         var guestsInvoicedDropdownOpenDocId = '';
         /** Paid column: Yes / No / Cancelled; same two-step interaction. */
@@ -12718,11 +12813,41 @@
             return n;
         }
 
+        /** Invoiced=Yes for Current event. */
+        function countGuestsInvoicedForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestInvoicedFieldIsYes(g.invoiced)) n++;
+            }
+            return n;
+        }
+
+        /** Invoiced=Direct for Current event. */
+        function countGuestsDirectForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestInvoicedFieldIsDirect(g.invoiced)) n++;
+            }
+            return n;
+        }
+
         function updateGuestsOverwatchRegisteredCount() {
             var registeredEl = document.getElementById('guests-registered-count');
             if (registeredEl) registeredEl.textContent = String(countGuestsRegisteredForCurrentEvent());
             var invitedEl = document.getElementById('guests-invited-count');
             if (invitedEl) invitedEl.textContent = String(countGuestsInvitedForCurrentEvent());
+            var invoicedEl = document.getElementById('guests-invoiced-count');
+            if (invoicedEl) invoicedEl.textContent = String(countGuestsInvoicedForCurrentEvent());
+            var directEl = document.getElementById('guests-direct-transfer-count');
+            if (directEl) directEl.textContent = String(countGuestsDirectForCurrentEvent());
             var paidEl = document.getElementById('guests-paid-count');
             if (paidEl) paidEl.textContent = String(countGuestsPaidForCurrentEvent());
         }
@@ -15016,7 +15141,7 @@
 
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
-        var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No'];
+        var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct'];
         var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Cancelled'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -15269,7 +15394,9 @@
             var t = String(invoicedVal != null ? invoicedVal : '').trim();
             if (!t) return ' content-badge--guest-field-empty';
             var low = t.toLowerCase();
-            if (low === 'yes' || low === 'y' || low === 'true') return ' content-badge--guest-status-yes';
+            if (low === 'yes' || low === 'y' || low === 'true' || low === 'direct') {
+                return ' content-badge--guest-status-yes';
+            }
             if (low === 'no' || low === 'n' || low === 'false') return ' content-badge--guest-status-no';
             return ' content-badge--guest-status-neutral';
         }
@@ -16043,6 +16170,11 @@
         /** Invoiced is the literal “Yes” (case-insensitive). */
         function guestInvoicedFieldIsYes(invoicedVal) {
             return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'yes';
+        }
+
+        /** Invoiced is the literal “Direct” (case-insensitive). */
+        function guestInvoicedFieldIsDirect(invoicedVal) {
+            return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'direct';
         }
 
         /** Paid is the literal “No” (case-insensitive). */
@@ -23827,15 +23959,20 @@
                 syncGuestPaymentsBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    if (syncGuestPaymentsBtn.disabled) return;
-                    syncGuestPaymentsBtn.disabled = true;
+                    if (
+                        syncGuestPaymentsBtn.disabled ||
+                        syncGuestPaymentsBtn.classList.contains('is-syncing') ||
+                        syncGuestPaymentsBtn.getAttribute('aria-disabled') === 'true'
+                    ) {
+                        return;
+                    }
+                    // Do not set disabled=true — browsers often freeze CSS animations on disabled buttons.
                     syncGuestPaymentsBtn.setAttribute('aria-disabled', 'true');
                     syncGuestPaymentsBtn.setAttribute('aria-busy', 'true');
                     syncGuestPaymentsBtn.classList.add('is-syncing');
                     reconcileGuestStripePaymentsFromUi({})
                         .catch(function() {})
                         .finally(function() {
-                            syncGuestPaymentsBtn.disabled = false;
                             syncGuestPaymentsBtn.setAttribute('aria-disabled', 'false');
                             syncGuestPaymentsBtn.removeAttribute('aria-busy');
                             syncGuestPaymentsBtn.classList.remove('is-syncing');
