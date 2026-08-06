@@ -5,32 +5,25 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Publish a static tree to the gh-pages branch.
+# Prefer this over actions/deploy-pages, which has been timing out
+# ("Timeout reached, aborting!") on this repo.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Pages deploys must not cancel each other mid-flight — that yields
-# "Deployment cancelled" from actions/deploy-pages.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Prepare static site artifact
+      - name: Prepare static site
         run: |
           set -euo pipefail
           mkdir -p _site
@@ -44,12 +37,14 @@ jobs:
             --exclude 'firebase-debug.*.log' \
             --exclude '*.bak' \
             ./ _site/
+          # Keep custom domain for tbs-zermatt.org
+          if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
 
-      - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          force_orphan: true
+          cname: tbs-zermatt.org
+          commit_message: Deploy ${{ github.sha }}
