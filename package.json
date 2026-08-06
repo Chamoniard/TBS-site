@@ -16,6 +16,8 @@
     "content:sync-tbs": "node scripts/sync-contents-to-tbs-firestore.mjs",
     "content:rebuild-index": "node scripts/rebuild-tbs-content-row-index.mjs",
     "firebase:login": "firebase login",
+    "firebase:prepare:hosting": "bash scripts/prepare-firebase-hosting.sh",
+    "firebase:deploy:hosting": "bash scripts/prepare-firebase-hosting.sh && firebase deploy --only hosting --project tbs-app-e2062",
     "firebase:deploy:registration": "firebase deploy --only functions:submitRegistrationHttp --project tbs-app-e2062"
   },
   "devDependencies": {

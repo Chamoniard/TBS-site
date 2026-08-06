@@ -4082,9 +4082,19 @@
             color: #f1f5f9;
         }
 
+        #content-editor .content-badge.content-badge--event-tbs27 {
+            background: #003153;
+            color: #ffffff;
+        }
+
         .speakers-overview .content-badge.content-badge--event-tbs26 {
             background: #71C7FE;
             color: #f1f5f9;
+        }
+
+        .speakers-overview .content-badge.content-badge--event-tbs27 {
+            background: #003153;
+            color: #ffffff;
         }
 
         .guest-overview-section .content-badge.content-badge--event-tbs25 {
@@ -4095,6 +4105,11 @@
         .guest-overview-section .content-badge.content-badge--event-tbs26 {
             background: #71C7FE;
             color: #f1f5f9;
+        }
+
+        .guest-overview-section .content-badge.content-badge--event-tbs27 {
+            background: #003153;
+            color: #ffffff;
         }
 
         .guest-overview-section .content-badge.content-badge--event-default,
@@ -17675,7 +17690,8 @@
             function speakerEventBadgeHtml(rawEvent) {
                 var label = String(rawEvent != null ? rawEvent : '').trim();
                 if (!label) label = '-';
-                return '<span class="content-badge content-badge--event-tbs26">' + escapeHtml(label) + '</span>';
+                var cls = contentEventBadgeClassForLabel(label === '-' ? '' : label);
+                return '<span class="' + cls + '">' + escapeHtml(label) + '</span>';
             }
             var colCount = 12;
             var html = '<table class="speakers-roster-table" role="grid" aria-label="Speaker roster">' +
@@ -19096,6 +19112,7 @@
             if (!s) return 'content-badge content-badge--event-default';
             if (s === 'TBS25' || s.toLowerCase() === 'tbs25') return 'content-badge content-badge--event-tbs25';
             if (s === 'TBS26' || s.toLowerCase() === 'tbs26') return 'content-badge content-badge--event-tbs26';
+            if (s === 'TBS27' || s.toLowerCase() === 'tbs27') return 'content-badge content-badge--event-tbs27';
             return 'content-badge content-badge--event-default';
         }
 
