@@ -5,11 +5,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Publish a static tree to the gh-pages branch.
-# Prefer this over actions/deploy-pages, which has been timing out
-# ("Timeout reached, aborting!") on this repo.
+# Official GitHub Pages deploy (Actions). Requires:
+# Settings → Pages → Source = GitHub Actions
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
@@ -17,13 +18,19 @@ concurrency:
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare static site
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare static site artifact
         run: |
           set -euo pipefail
           mkdir -p _site
@@ -33,18 +40,28 @@ jobs:
             --exclude '_site/' \
             --exclude 'node_modules/' \
             --exclude 'functions/' \
+            --exclude 'scripts/' \
+            --exclude 'data/' \
+            --exclude '.firebase/' \
             --exclude 'firebase-debug.log' \
             --exclude 'firebase-debug.*.log' \
+            --exclude 'firebase.json' \
+            --exclude '.firebaserc' \
+            --exclude 'package.json' \
+            --exclude 'package-lock.json' \
+            --exclude 'storage.rules' \
+            --exclude 'firestore.rules.example' \
+            --exclude 'blog-website.code-workspace' \
             --exclude '*.bak' \
+            --exclude '*.md' \
             ./ _site/
-          # Keep custom domain for tbs-zermatt.org
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          force_orphan: true
-          cname: tbs-zermatt.org
-          commit_message: Deploy ${{ github.sha }}
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
