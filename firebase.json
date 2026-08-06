@@ -17,26 +17,6 @@
       ]
     }
   ],
-  "hosting": {
-    "public": "_site",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "**/*.bak"
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(html|js|css)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      }
-    ]
-  },
   "storage": {
     "rules": "storage.rules"
   }
