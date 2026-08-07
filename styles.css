@@ -58,14 +58,14 @@ html, body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    background-color: #F4F3F2;
+    background-color: #f0f4f8;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 1.6;
     color: #000000;
-    background-color: #F4F3F2;
+    background-color: #f0f4f8;
     margin: 0;
     padding: 0;
     transition: opacity 0.3s ease;
@@ -3072,8 +3072,8 @@ body.horizontal-slider-dragging * {
 /* Wide screens: introslider pink bar; programme + speakers scroll with no visible bar */
 @media (min-width: 769px) {
     :root {
-        --horizontal-slider-scrollbar-height: 8px;
-        --horizontal-slider-scrollbar-radius: 4px;
+        --horizontal-slider-scrollbar-height: 12px;
+        --horizontal-slider-scrollbar-radius: 6px;
     }
 
     .introslider,
@@ -3161,12 +3161,14 @@ body.horizontal-slider-dragging * {
         display: block;
         visibility: visible;
         flex-shrink: 0;
-        width: 100%;
-        max-width: 100%;
+        align-self: center;
+        /* Full scrollbar (gray track + pink thumb) = 2/3 of introslider width */
+        width: calc(100% * 2 / 3);
+        max-width: calc(100% * 2 / 3);
         height: var(--horizontal-slider-scrollbar-height);
         box-sizing: border-box;
         padding: 0;
-        margin: 6px 0 0 0;
+        margin: 22px auto 0;
         opacity: 1;
         pointer-events: auto;
     }
@@ -3183,6 +3185,7 @@ body.horizontal-slider-dragging * {
     .home-section .introslider-inner-wrapper > .home-introslider-scrollbar .home-introslider-scrollbar-track {
         position: relative;
         width: 100%;
+        max-width: 100%;
         height: 100%;
         border-radius: var(--horizontal-slider-scrollbar-radius);
         background-color: rgba(240, 224, 235, 0.45);
@@ -8756,7 +8759,7 @@ h4 {
 
 /* Footer - outer band matches page; inner block Prussian (matches site chrome) */
 .footer {
-    background: #F4F3F2 !important;
+    background: #f0f4f8 !important;
     color: #003153;
     padding: 0;
     margin: 0 0 50px 0;
@@ -8793,7 +8796,7 @@ h4 {
 /* Equal side columns + invisible third column → logo centered in footer */
 @media (min-width: 769px) {
     .footer {
-        background: #F4F3F2 !important;
+        background: #f0f4f8 !important;
         color: #003153;
         margin-bottom: 0;
         padding-bottom: 50px;
