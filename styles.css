@@ -8,9 +8,9 @@ html {
     --navbar-margin-inline: 193px;
     /* Register / Apply / More / Less pills and matching surfaces (e.g. introslider cards) */
     --tbs-action-btn-shadow: 0 2px 8px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
-    /* Matches INTROSLIDER_NAV_GLASS in script.js (navbar + hero introslider cards) */
-    --introslider-nav-glass-bg: rgba(0, 49, 83, 0.6);
-    --introslider-nav-glass-blur: 5px;
+    /* Matches INTROSLIDER_NAV_GLASS in script.js (navbar). Cards use solid wash — no live blur. */
+    --introslider-nav-glass-bg: rgba(0, 49, 83, 0.82);
+    --introslider-nav-glass-blur: 0px;
     --introslider-nav-glass-border: rgba(255, 255, 255, 0.2);
     --introslider-nav-glass-shadow: 0 4px 28px rgba(0, 0, 0, 0.22);
     --introslider-hover-lift: 2px;
@@ -1320,8 +1320,18 @@ body.home-view .home-section > picture > .poster-snow-canvas {
     display: block;
 }
 
-body.past-talks-open .home-section > picture > .poster-snow-canvas {
-    display: none !important;
+/* Soft navbar scroll: hide snow canvas so it does not composite-flicker over scrolling bands */
+body.home-nav-soft-scrolling .home-section > picture > .poster-snow-canvas {
+    visibility: hidden !important;
+}
+
+/* While scrolling: drop live backdrop-filter on glass carousels (not snow — keep snow visible). */
+body.home-is-scrolling .introslider-section .introslider > *,
+body.home-is-scrolling .programme-slider,
+body.home-is-scrolling .speakerslider-innerwrapper,
+body.home-is-scrolling .home-programme-section {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 /* When Past talks / video viewer is open, hide home chrome; only the top Prussian strip (picture) stays. */
@@ -1371,14 +1381,15 @@ body.home-view img.event-section-divider,
     background-image: none !important;
 }
 
-/* Hero poster: event divider flush below navbar (was +100px) */
+/* Hero poster: event divider under navbar — absolute inside fixed poster so it does not
+   float over Speakers/Latest after scroll (fixed + z-index:5 sat above scrolling bands). */
 body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
-    position: fixed;
+    position: absolute;
     top: var(--navbar-height);
     left: 50%;
     transform: translateX(-50%);
     width: 70%;
-    max-width: calc(min(1725px, 100vw) * 0.7);
+    max-width: calc(min(1725px, 100%) * 0.7);
     margin: 0;
     padding: 0;
     z-index: 5;
@@ -1685,8 +1696,8 @@ body.home-view .home-section > .speaker-section {
     body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
         background: var(--introslider-nav-glass-bg) !important;
         background-color: var(--introslider-nav-glass-bg) !important;
-        backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
-        -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
         border-radius: 0 !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;
@@ -4992,8 +5003,8 @@ body.home-view .home-section > .home-social-row-container {
         background-color: var(--introslider-nav-glass-bg) !important;
         border-radius: 5px !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;
-        backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
-        -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
         padding-top: 8px !important;
         padding-bottom: 0 !important;
@@ -7988,7 +7999,7 @@ h4 {
     border-radius: 5px;
     font-family: inherit;
     color: #1e293b;
-    background: #fc70d7;
+    background: var(--tbs-loading-pink, #fce7f3);
     transition: border-color 0.2s ease;
     box-sizing: border-box;
 }
@@ -11428,11 +11439,21 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
     max-height: none !important;
     background-color: var(--introslider-nav-glass-bg) !important;
     background: var(--introslider-nav-glass-bg) !important;
-    backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
-    -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: var(--introslider-nav-glass-shadow) !important;
     border: 1px solid var(--introslider-nav-glass-border) !important;
     box-sizing: border-box !important;
+}
+
+/*
+ * Hero introslider cards must never use live backdrop-filter.
+ * Horizontal card scroll samples the poster/gradient underneath and paints slower than the swipe
+ * (“scrolls faster than it renders”; never improves on repeat passes).
+ */
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 @media (min-width: 769px) {
@@ -11789,8 +11810,8 @@ body.home-view :is(.maintitle-heading) {
         position: relative !important;
         background-color: var(--introslider-nav-glass-bg) !important;
         background: var(--introslider-nav-glass-bg) !important;
-        backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
-        -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
     }
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
