@@ -1800,6 +1800,13 @@ body.home-view .home-section > .speaker-section {
     border-radius: 0 !important;
 }
 
+@media (min-width: 769px) {
+    .home-section > .sponsors-section {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+}
+
 .home-section > .sponsors-section .sponsors-section-inner-wrapper {
     width: 100%;
     max-width: 100%;
@@ -2073,8 +2080,11 @@ body.home-view .home-section > .speaker-section {
 body.home-view:not(.past-talks-open) .home-section > picture {
     --poster-hero-title-color: #f4f0e8;
     --poster-hero-title-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.35),
-        0 2px 8px rgba(0, 0, 0, 0.28);
+        0 1px 2px rgba(0, 0, 0, 0.16),
+        0 1px 4px rgba(0, 0, 0, 0.1);
+    --poster-hero-logo-shadow:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.16))
+        drop-shadow(0 1px 4px rgba(0, 0, 0, 0.1));
     --poster-maintitles-lift: 130px;
 }
 
@@ -2121,7 +2131,7 @@ body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
     -webkit-text-fill-color: var(--poster-hero-title-color, #f4f0e8) !important;
     font-family: var(--title-font) !important;
     font-size: 4rem !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     letter-spacing: 0.01em;
     line-height: 1.1;
     text-align: left;
@@ -2143,7 +2153,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     -webkit-text-fill-color: var(--poster-hero-title-color, #f4f0e8) !important;
     font-family: var(--title-font) !important;
     font-size: 1.5rem !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     letter-spacing: 0.02em;
     line-height: 1.2;
     text-align: left;
@@ -2164,7 +2174,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         margin: 0;
         object-fit: contain;
         object-position: left center;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.28));
+        filter: var(--poster-hero-logo-shadow);
     }
 
     body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
@@ -2536,7 +2546,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 @media (min-width: 769px) {
     .home-section > .speaker-section .speakers-inner-wrapper {
-        padding-bottom: 24px;
+        padding-top: 40px;
+        padding-bottom: 40px;
     }
 }
 
@@ -3641,7 +3652,7 @@ body.home-view .home-section > .home-social-row-container {
 
     body.home-view .home-section > picture .poster-maintitles .maintitle-heading {
         font-size: 5rem !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
         line-height: 1.12 !important;
         overflow: visible;
         text-overflow: clip;
@@ -3663,7 +3674,7 @@ body.home-view .home-section > .home-social-row-container {
         margin: 0 auto;
         object-fit: contain;
         object-position: center center;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.28));
+        filter: var(--poster-hero-logo-shadow);
     }
 
     body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
@@ -5973,6 +5984,12 @@ h3.section-titles {
     align-items: stretch;
 }
 
+@media (min-width: 769px) {
+    .news-grid {
+        gap: 32px;
+    }
+}
+
 .feed-section-inner-wrapper .news-grid {
     background-color: #ffffff;
 }
@@ -5994,6 +6011,12 @@ h3.section-titles {
     background: #ffffff !important;
     background-color: #ffffff !important;
     box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+    .home-section .feed-section > .feed-latest-chevron-row {
+        padding-bottom: 40px;
+    }
 }
 
 .home-section .feed-section-inner-wrapper {
@@ -6566,13 +6589,6 @@ h4 {
 
 
 
-
-/* Responsive design for news grid */
-@media (max-width: 1200px) {
-    .news-grid {
-        gap: 24px;
-    }
-}
 
 /* Mobile: news cards — title + meta only (no body text), fixed image size */
 @media (max-width: 768px) {
@@ -8394,6 +8410,12 @@ h4 {
     margin-bottom: 0;
     min-width: 0;
     max-width: 100%;
+}
+
+@media (min-width: 769px) {
+    .home-section .feed-section-inner-wrapper .home-skeleton-feed {
+        gap: 32px;
+    }
 }
 
 .home-section .skeleton-card--home-feed.news-card {
@@ -11697,6 +11719,11 @@ body.home-view .introslider :is(
 
 body.home-view :is(.maintitle-heading) {
     font-weight: 800 !important;
+}
+
+body.home-view .home-section > picture .poster-maintitles .maintitle-heading,
+body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
+    font-weight: 500 !important;
 }
 
 /* Mobile: hero About introslider — flush cards; dots in `.about-text` (script.js) */

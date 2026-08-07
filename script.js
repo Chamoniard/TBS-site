@@ -1874,7 +1874,7 @@ function setupHomeHeroIntrosliderMobileLayout() {
     }
     apply();
     requestAnimationFrame(function () {
-        syncIntrosliderTextHeightsForTrack(introslider);
+        syncHomeIntrosliderLayout({ force: true });
     });
 }
 
@@ -3593,8 +3593,12 @@ function runHomeDeferredHydration(homeSection, ctx) {
     const revealHomeBands = function () {
         if (introOuter) {
             introOuter.classList.remove('home-stage-hidden');
-            syncHomeIntrosliderLayout();
-            fitHomeMaintitleHeadingFontSize();
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    syncHomeIntrosliderLayout({ force: true });
+                    fitHomeMaintitleHeadingFontSize();
+                });
+            });
         }
         revealStuckHomeStageBands(homeSection);
         if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
@@ -7268,14 +7272,64 @@ function setHomeIntrosliderTrackHeightLock(track, patch) {
 function clearHomeIntrosliderHeightLocks() {
     getHomeIntrosliderTracks().forEach(function (track) {
         homeIntrosliderTrackHeightLocks.delete(track);
-        track.style.removeProperty('--home-introslider-card-height');
-        track.style.removeProperty('--introslider-text-height');
+        resetHomeIntrosliderTrackMeasureStyles(track);
     });
+}
+
+/** Drop locked/min heights so flex stretch cannot inflate the next measure. */
+function resetHomeIntrosliderTrackMeasureStyles(track) {
+    if (!track) return;
+    track.style.removeProperty('--home-introslider-card-height');
+    track.style.removeProperty('--introslider-text-height');
+    Array.from(track.children).forEach(function (slide) {
+        if (slide.nodeType !== 1) return;
+        slide.style.removeProperty('min-height');
+        slide.style.removeProperty('height');
+        slide.style.removeProperty('align-self');
+        const about = slide.querySelector(':scope > .about-text');
+        if (about) {
+            about.style.removeProperty('flex');
+            about.style.removeProperty('min-height');
+            about.style.removeProperty('height');
+        }
+        slide.querySelectorAll('.introslider-text').forEach(function (el) {
+            el.style.removeProperty('min-height');
+            el.style.removeProperty('height');
+            el.style.removeProperty('flex');
+        });
+    });
+}
+
+/**
+ * Natural content height only — ignore stretched flex used during equal-height layout.
+ * getBoundingClientRect on a flex-grown child re-locks the previous (often viewport-tall) size.
+ */
+function measureHomeIntrosliderNaturalBlockHeight(el) {
+    if (!el) return 0;
+    const prevFlex = el.style.flex;
+    const prevMinHeight = el.style.minHeight;
+    const prevHeight = el.style.height;
+    const prevAlignSelf = el.style.alignSelf;
+    el.style.flex = '0 0 auto';
+    el.style.minHeight = '0';
+    el.style.height = 'auto';
+    el.style.alignSelf = 'flex-start';
+    void el.offsetHeight;
+    const h = el.scrollHeight;
+    if (prevFlex) el.style.flex = prevFlex;
+    else el.style.removeProperty('flex');
+    if (prevMinHeight) el.style.minHeight = prevMinHeight;
+    else el.style.removeProperty('min-height');
+    if (prevHeight) el.style.height = prevHeight;
+    else el.style.removeProperty('height');
+    if (prevAlignSelf) el.style.alignSelf = prevAlignSelf;
+    else el.style.removeProperty('align-self');
+    return h;
 }
 
 /** Natural content height of one introslider slide (tallest slide sets row height). */
 function measureHomeIntrosliderSlideContentHeight(slide) {
-    return Math.max(slide.scrollHeight, slide.offsetHeight, slide.getBoundingClientRect().height);
+    return measureHomeIntrosliderNaturalBlockHeight(slide);
 }
 
 function getHomeIntrosliderTracks() {
@@ -7300,11 +7354,7 @@ function syncHomeIntrosliderCardHeights(options) {
         });
         if (!slides.length) return;
 
-        track.style.removeProperty('--home-introslider-card-height');
-        slides.forEach(function (slide) {
-            slide.style.removeProperty('min-height');
-            slide.style.removeProperty('height');
-        });
+        resetHomeIntrosliderTrackMeasureStyles(track);
         void track.offsetHeight;
 
         let maxHeight = 0;
@@ -7340,6 +7390,13 @@ function syncIntrosliderTextHeightsForTrack(track, options) {
         return;
     }
 
+    // Clear card min-heights first — stretched cards inflate text scrollHeight via flex:grow.
+    track.style.removeProperty('--home-introslider-card-height');
+    Array.from(track.children).forEach(function (slide) {
+        if (slide.nodeType !== 1) return;
+        slide.style.removeProperty('min-height');
+        slide.style.removeProperty('height');
+    });
     texts.forEach(function (el) {
         el.style.removeProperty('min-height');
         el.style.removeProperty('height');
@@ -7349,7 +7406,7 @@ function syncIntrosliderTextHeightsForTrack(track, options) {
 
     let maxHeight = 0;
     texts.forEach(function (el) {
-        const h = Math.max(el.scrollHeight, el.getBoundingClientRect().height);
+        const h = measureHomeIntrosliderNaturalBlockHeight(el);
         if (h > maxHeight) maxHeight = h;
     });
 
@@ -7377,6 +7434,20 @@ function syncHomeIntrosliderTextHeights(options) {
 }
 
 function syncHomeIntrosliderLayout(options) {
+    const force = Boolean(options && options.force);
+    if (force) {
+        clearHomeIntrosliderHeightLocks();
+    } else {
+        // Always drop card min-height before text equalize so flex-grow cannot re-lock a tall frame.
+        getHomeIntrosliderTracks().forEach(function (track) {
+            track.style.removeProperty('--home-introslider-card-height');
+            Array.from(track.children).forEach(function (slide) {
+                if (slide.nodeType !== 1) return;
+                slide.style.removeProperty('min-height');
+                slide.style.removeProperty('height');
+            });
+        });
+    }
     syncHomeIntrosliderTextHeights(options);
     syncHomeIntrosliderCardHeights(options);
 }
