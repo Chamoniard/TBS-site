@@ -261,10 +261,10 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     background: transparent !important;
     background-color: transparent !important;
     box-shadow: none !important;
-    /* Align frosted navbar with centered max 1725px main column (main.everything has no horizontal padding) */
+    /* Align frosted navbar with centered max 1400px main column (main.everything has no horizontal padding) */
     --_home-nav-pad: 0px;
     --_home-nav-avail: calc(100vw - 2 * var(--_home-nav-pad));
-    --_home-nav-w: min(1725px, var(--_home-nav-avail));
+    --_home-nav-w: min(1400px, var(--_home-nav-avail));
     left: calc(var(--_home-nav-pad) + max(0px, (var(--_home-nav-avail) - var(--_home-nav-w)) / 2)) !important;
     right: auto !important;
     width: var(--_home-nav-w) !important;
@@ -275,7 +275,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 /* Unified layout: viewer now lives inside .everything, so no special top offset here */
 
 .nav-container {
-    max-width: 1725px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 16px;
     display: flex;
@@ -1078,8 +1078,9 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 body.home-view .home-section {
     margin-top: 0 !important;
     background-color: #003153 !important;
-    /* 1920×1300 scaled to max 1725px column width */
-    --home-poster-layout-height: 1168px;
+    max-width: min(1400px, 100%);
+    /* 1920×1300 scaled to max 1400px column width */
+    --home-poster-layout-height: 948px;
     --home-poster-visual-height: var(--home-poster-layout-height);
     --home-poster-effective-pull: var(--home-poster-content-pull);
     --home-hero-poster-slider-gap: 16px;
@@ -1087,8 +1088,9 @@ body.home-view .home-section {
 
 @media (min-width: 769px) {
     body.home-view .home-section {
-        --home-poster-visual-height: min(1168px, 67.7083333333vw);
-        --home-poster-effective-pull: min(var(--home-poster-content-pull), 19.1304347826vw);
+        --home-poster-visual-height: min(948px, 67.7083333333vw);
+        /* 200px less pull than before → content starts 200px lower vs poster */
+        --home-poster-effective-pull: max(0px, min(var(--home-poster-content-pull), 19.1304347826vw) - 200px);
     }
 }
 
@@ -1262,7 +1264,7 @@ body.home-view .hero {
     padding-bottom: 0;
     padding-left: 0;
     padding-right: 0;
-    max-width: min(1725px, 100%);
+    max-width: min(1725px, 100%); /* backend preview; public home overrides via body.home-view */
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -1342,7 +1344,7 @@ body.past-talks-open .home-section > picture {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
-    max-width: min(1725px, 100%);
+    max-width: min(1400px, 100%);
     height: var(--navbar-height);
     min-height: var(--navbar-height);
     box-sizing: border-box;
@@ -1378,7 +1380,7 @@ body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider
     left: 50%;
     transform: translateX(-50%);
     width: 70%;
-    max-width: calc(min(1725px, 100vw) * 0.7);
+    max-width: calc(min(1400px, 100vw) * 0.7);
     margin: 0;
     padding: 0;
     z-index: 5;
@@ -1436,7 +1438,7 @@ body.home-view .home-section > picture::after {
 
 /*
  * Hero poster: fixed in the viewport; bands below scroll over it.
- * Centered to match the 1725px home column (no horizontal bleed past .home-section).
+ * Centered to match the 1400px home column (no horizontal bleed past .home-section).
  */
 body.home-view:not(.past-talks-open) .home-section > picture {
     position: fixed;
@@ -1446,7 +1448,7 @@ body.home-view:not(.past-talks-open) .home-section > picture {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
-    max-width: min(1725px, 100%);
+    max-width: min(1400px, 100%);
     height: var(--home-poster-visual-height);
     box-sizing: border-box;
     z-index: 0;
@@ -1507,7 +1509,7 @@ body.home-view:not(.past-talks-open) .home-section > :not(picture) {
 /* Hero introslider: blue gradient section shell; frosted glass slide cards. */
 body.home-view .home-section > .introslider-section.home-hero-introslider-outer {
     margin: 0;
-    padding: 0 8px;
+    padding: 0;
     z-index: 2;
     position: relative;
     width: 100%;
@@ -5089,7 +5091,7 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > .location:first-child {
-    margin-left: 0 !important;
+    margin-left: 8px !important;
 }
 
 .home-section .introslider > .about .about-text,
@@ -7801,10 +7803,10 @@ h4 {
     background: transparent;
 }
 
-/* Video Section (Past talks): Prussian blue; 8px horizontal padding inside the centered max 1725px column */
+/* Video Section (Past talks): Prussian blue; 8px horizontal padding inside the centered max 1400px column */
 .past-talks-section {
     width: 100%;
-    max-width: 1725px;
+    max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
@@ -8742,9 +8744,9 @@ h4 {
     box-sizing: border-box;
 }
 
-/* Same column as main: centered max 1725px (.home-section / .everything) */
+/* Same column as main: centered max 1400px (.home-section / .everything) */
 .footer-content {
-    max-width: 1725px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 16px 16px 0 16px;
     width: 100%;
@@ -8782,7 +8784,7 @@ h4 {
         top: 0;
         left: 50%;
         width: 100%;
-        max-width: 1725px;
+        max-width: 1400px;
         height: 50px;
         background: #003153;
         transform: translateX(-50%);
@@ -9821,7 +9823,7 @@ h4 {
         box-shadow: none !important;
         --_home-nav-pad: 0px;
         --_home-nav-avail: calc(100vw - 2 * var(--_home-nav-pad));
-        --_home-nav-w: min(1725px, var(--_home-nav-avail));
+        --_home-nav-w: min(1400px, var(--_home-nav-avail));
         left: calc(var(--_home-nav-pad) + max(0px, (var(--_home-nav-avail) - var(--_home-nav-w)) / 2)) !important;
         right: auto !important;
         width: var(--_home-nav-w) !important;
@@ -9832,7 +9834,7 @@ h4 {
         height: auto !important;
         min-height: 0 !important;
         max-height: none !important;
-        max-width: 1725px;
+        max-width: 1400px;
         align-items: center !important;
         padding: 0 16px !important;
     }
@@ -10121,7 +10123,7 @@ h4 {
 
 /* Post Content Styles (Same Page) */
 .viewer-section {
-    max-width: 1725px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 8px;
     background-color: #003153;
@@ -11387,16 +11389,13 @@ body.login-page .auth-title {
  * Blue gradient section; transparent wrapper / track; frosted glass cards.
  */
 body.home-view .home-section > .introslider-section.home-hero-introslider-outer {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    padding: 0 !important;
     background-color: transparent !important;
     background-image: var(--introslider-section-gradient) !important;
 }
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > *:first-child {
-    margin-left: 0 !important;
+    margin-left: 8px !important;
 }
 
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > *:last-child {
@@ -11825,7 +11824,7 @@ body.home-view :is(.maintitle-heading) {
     }
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > *:first-child {
-        margin-left: 0 !important;
+        margin-left: 8px !important;
     }
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > *:last-child {

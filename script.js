@@ -609,7 +609,7 @@ function warmHomePageFirestoreCache() {
     }
 }
 
-/** Max time the pink loader waits for the hero poster (feed / event / speakers hydrate after unlock). */
+/** Max time the pink loader waits for the hero poster before continuing other home waits. */
 const HOME_LOAD_POSTER_MAX_MS = 1200;
 /** Never keep the pink loader visible longer than this (failsafe). */
 const HOME_LOADING_FAILSAFE_MS = 15000;
@@ -3576,38 +3576,40 @@ function mountHomeSectionIntoMain(main) {
     return main.querySelector(':scope > .home-section');
 }
 
-/** Feed / event / speakers / intro — after pink loader hides. */
+/** Finish home bands behind the pink loader, then unlock scrolling. */
 function runHomeDeferredHydration(homeSection, ctx) {
-    if (!homeSection || !ctx) return;
+    if (!homeSection || !ctx) return Promise.resolve();
 
     const introReady = ctx.introReady || Promise.resolve();
     const introOuter = ctx.introOuter;
     const newsFeedPromise = ctx.newsFeedPromise || Promise.resolve();
     const speakersPromise = ctx.speakersPromise || Promise.resolve();
+    const programmeReady = ctx.programmeReady || Promise.resolve();
     const speakersWrap = ctx.speakersWrap;
     const regWrap = ctx.regWrap;
     const sponsorsWrap = ctx.sponsorsWrap;
     const registrationManifestoPromise = ctx.registrationManifestoPromise;
 
-    void introReady
-        .then(function () {
-            if (introOuter) introOuter.classList.remove('home-stage-hidden');
+    const revealHomeBands = function () {
+        if (introOuter) {
+            introOuter.classList.remove('home-stage-hidden');
             syncHomeIntrosliderLayout();
             fitHomeMaintitleHeadingFontSize();
-        })
-        .catch(function (err) {
-            console.warn('introslider deferred hydrate', err);
-            if (introOuter) introOuter.classList.remove('home-stage-hidden');
-            fitHomeMaintitleHeadingFontSize();
-        });
-
-    const revealDeferredHomeBands = function () {
+        }
         revealStuckHomeStageBands(homeSection);
         if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
         wireSliderIndicators();
     };
 
-    void Promise.all([
+    // Registration copy can finish after unlock — do not block scroll on it.
+    runHomePageBackgroundHydration(homeSection, {
+        speakersWrap: speakersWrap,
+        regWrap: regWrap,
+        sponsorsWrap: sponsorsWrap,
+        promises: [registrationManifestoPromise]
+    });
+
+    return Promise.all([
         Promise.race([
             newsFeedPromise,
             new Promise(function (resolve) {
@@ -3619,20 +3621,27 @@ function runHomeDeferredHydration(homeSection, ctx) {
             new Promise(function (resolve) {
                 setTimeout(resolve, HOME_LOAD_SPEAKERS_MAX_MS);
             })
+        ]),
+        Promise.race([
+            introReady,
+            new Promise(function (resolve) {
+                setTimeout(resolve, 4000);
+            })
+        ]),
+        Promise.race([
+            programmeReady,
+            new Promise(function (resolve) {
+                setTimeout(resolve, 8000);
+            })
         ])
     ])
-        .then(revealDeferredHomeBands)
+        .then(function () {
+            revealHomeBands();
+        })
         .catch(function (err) {
             console.error('home deferred hydrate', err);
-            revealDeferredHomeBands();
+            revealHomeBands();
         });
-
-    runHomePageBackgroundHydration(homeSection, {
-        speakersWrap: speakersWrap,
-        regWrap: regWrap,
-        sponsorsWrap: sponsorsWrap,
-        promises: [registrationManifestoPromise]
-    });
 }
 
 // Show the feed content (different from blog posts)
@@ -3660,10 +3669,13 @@ async function showFeedContent() {
         mountHomeProgrammeSliderShell(homeSection);
         positionHomeSponsorsAfterIntroslider(homeSection);
         const sponsorsWrap = getHomeSponsorsInnerWrapper(homeSection);
-        [sponsorsWrap, introOuter, feedWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
+        const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
+        [sponsorsWrap, introOuter, feedWrap, speakersWrap, regWrap, regDivider, programmeWrap].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
-        void prefetchHomeProgrammeSliderData();
+        const programmeReady = prefetchHomeProgrammeSliderData().then(function () {
+            return hydrateHomeProgrammeSlider(homeSection);
+        });
 
         const newsFeedPromise = loadNewsFeed();
         const speakersPromise = speakersWrap
@@ -3757,16 +3769,12 @@ async function showFeedContent() {
         }
 
         try {
-            revealHomeStageBands(homeSection, { skipIntro: true });
+            // Keep bands hidden until content is ready — do not reveal empty shells under the loader.
             setupHomeHeroIntrosliderPosterGap(8);
 
             const introReady = introWrap
                 ? prepareHomeIntrosliderBeforeReveal(introWrap)
                 : Promise.resolve();
-
-            void prefetchHomeProgrammeSliderData().then(function () {
-                void hydrateHomeProgrammeSlider(homeSection);
-            });
 
             const posterReady = Promise.race([
                 waitForHomePosterPictureReady(pictureEl),
@@ -3776,11 +3784,22 @@ async function showFeedContent() {
             ]);
 
             await posterReady;
+            // Do not mountFeedSkeleton here — it wipes the feed if loadNewsFeed already painted.
+            wireSliderIndicators();
+
+            await runHomeDeferredHydration(homeSection, {
+                introReady: introReady,
+                introOuter: introOuter,
+                newsFeedPromise: newsFeedPromise,
+                speakersPromise: speakersPromise,
+                programmeReady: programmeReady,
+                speakersWrap: speakersWrap,
+                regWrap: regWrap,
+                sponsorsWrap: sponsorsWrap,
+                registrationManifestoPromise: registrationManifestoPromise
+            });
 
             setHomePageLoading(false);
-            mountHomeFeedSkeleton();
-
-            wireSliderIndicators();
             setupHomeViewNavbarScroll();
 
             if (typeof requestIdleCallback === 'function') {
@@ -3792,17 +3811,6 @@ async function showFeedContent() {
                     initPosterSnow();
                 });
             }
-
-            runHomeDeferredHydration(homeSection, {
-                introReady: introReady,
-                introOuter: introOuter,
-                newsFeedPromise: newsFeedPromise,
-                speakersPromise: speakersPromise,
-                speakersWrap: speakersWrap,
-                regWrap: regWrap,
-                sponsorsWrap: sponsorsWrap,
-                registrationManifestoPromise: registrationManifestoPromise
-            });
         } catch (homePaintErr) {
             console.error('showFeedContent home paint', homePaintErr);
             revealStuckHomeStageBands(homeSection);
@@ -8196,8 +8204,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     /* Safety: never leave scroll locked if showFeedContent returned early. */
     setHomePageLoading(false);
 
-    // Warm the Past talks dataset after first paint/interaction.
-    scheduleBackgroundPastTalksWarmup();
+    // Do not warm Past talks in the background — it competes with home scrolling.
     
     // Monitor featured content title for line breaks
     monitorFeaturedTitleBreak();

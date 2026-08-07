@@ -25,7 +25,7 @@
             .navbar { padding: 0 !important; height: var(--mobile-tab-bar-height) !important; min-height: var(--mobile-tab-bar-height) !important; max-height: var(--mobile-tab-bar-height) !important; }
             .hamburger { display: flex !important; }
         }
-        .nav-container { max-width: 1725px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-container { max-width: 1400px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { display: flex; align-items: center; }
         .nav-logo .logo { height: 64.8px; width: auto; max-width: 324px; object-fit: contain; filter: brightness(0) invert(1); }
         .nav-menu { display: flex; list-style: none; gap: 1.5rem; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
@@ -65,7 +65,7 @@
         body.home-view .navbar { background: transparent !important; box-shadow: none !important; }
         .everything { margin: 0; padding: 0; }
         /* Reserve hero poster slot while fixed poster + scroll-over layout loads */
-        body.home-view:not(.past-talks-open) .home-section { padding-top: calc(1168px - 330px) !important; }
+        body.home-view:not(.past-talks-open) .home-section { padding-top: calc(948px - 330px) !important; }
         body.home-view:not(.past-talks-open) .home-section > picture {
             position: fixed;
             top: 0;
@@ -74,17 +74,17 @@
             margin-left: auto;
             margin-right: auto;
             width: 100%;
-            max-width: 1725px;
-            height: 1168px;
+            max-width: 1400px;
+            height: 948px;
             overflow: hidden;
             z-index: 0;
         }
         @media (min-width: 769px) {
             body.home-view:not(.past-talks-open) .home-section {
-                padding-top: calc(min(1168px, 67.7083333333vw) - min(330px, 19.1304347826vw)) !important;
+                padding-top: calc(min(948px, 67.7083333333vw) - max(0px, min(330px, 19.1304347826vw) - 200px)) !important;
             }
             body.home-view:not(.past-talks-open) .home-section > picture {
-                height: min(1168px, 67.7083333333vw);
+                height: min(948px, 67.7083333333vw);
             }
         }
         body.past-talks-open .home-section { padding-top: 0 !important; }
@@ -128,14 +128,14 @@
                 object-position: top center;
             }
         }
-        .container { max-width: 1725px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
     </style>
     <script>
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260628-narrow-poster-fit" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260628-narrow-poster-fit">
+    <link rel="preload" href="styles.css?v=20260807-introslider-first-m8" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260807-introslider-first-m8">
     <!-- LCP: preload hero poster (WebP) -->
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
@@ -594,6 +594,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260625-mouse-drag-scroll-sliders" defer></script>
+    <script src="script.js?v=20260807-column-1400" defer></script>
 </body>
 </html>
