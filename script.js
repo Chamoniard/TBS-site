@@ -77,13 +77,7 @@ const navMenu = document.querySelector('#site-nav-menu') || document.querySelect
 const newsletterForm = document.querySelector('.newsletter-form');
 
 /** Sync active state for all `.nav-link[data-view="…"]` (e.g. header tabs). */
-let lastActiveNavView = null;
 function setActiveNavView(view) {
-    if (lastActiveNavView === view) {
-        const stillActive = document.querySelector('.nav-link.active[data-view="' + view + '"]');
-        if (stillActive) return;
-    }
-    lastActiveNavView = view;
     document.querySelectorAll('.nav-link').forEach((link) => link.classList.remove('active'));
     document.querySelectorAll('.nav-link[data-view="' + view + '"]').forEach((link) => {
         link.classList.add('active');
@@ -675,43 +669,23 @@ function prefetchFeedThumbnailsForRecords(records, limit) {
     });
 }
 
-/** Mobile Safari can skip imgs injected while a band is hidden — force eager load + reload. */
+/** Mobile Safari can skip lazy/decoded imgs injected before the feed band is visible — force a reload. */
 function ensureFeedCardImagesLoad(root) {
     const scope = root && root.querySelectorAll ? root : document;
     const imgs = scope.querySelectorAll
-        ? scope.querySelectorAll('.feed-section .news-card-thumbnail, .news-grid .news-card-thumbnail')
+        ? scope.querySelectorAll('.feed-section .news-card-thumbnail')
         : [];
     imgs.forEach(function (img) {
         if (!(img instanceof HTMLImageElement)) return;
         img.loading = 'eager';
         img.decoding = 'async';
         img.referrerPolicy = 'no-referrer';
-        img.setAttribute('fetchpriority', 'high');
         if (img.complete && img.naturalWidth > 0) return;
         const src = img.getAttribute('src') || img.src;
         if (!src) return;
         img.src = '';
         img.src = src;
     });
-}
-
-/** Decode Latest thumbnails before the pink loader unlocks. */
-async function waitForFeedCardThumbnails(root, timeoutMs) {
-    if (!root) return;
-    ensureFeedCardImagesLoad(root);
-    const imgs = root.querySelectorAll('.news-card-thumbnail');
-    if (!imgs.length) return;
-    try {
-        await withTimeout(
-            Promise.all(Array.from(imgs).map(function (im) {
-                return waitForHomeImageDecode(im);
-            })),
-            typeof timeoutMs === 'number' ? timeoutMs : 5000,
-            'Latest feed thumbnails'
-        );
-    } catch (_e) {
-        /* continue — do not block unlock forever */
-    }
 }
 
 let homeProgrammeSliderPrefetchPromise = null;
@@ -3602,47 +3576,38 @@ function mountHomeSectionIntoMain(main) {
     return main.querySelector(':scope > .home-section');
 }
 
-/** Finish home bands behind the pink loader, then unlock scrolling. */
+/** Feed / event / speakers / intro — after pink loader hides. */
 function runHomeDeferredHydration(homeSection, ctx) {
-    if (!homeSection || !ctx) return Promise.resolve();
+    if (!homeSection || !ctx) return;
 
     const introReady = ctx.introReady || Promise.resolve();
     const introOuter = ctx.introOuter;
     const newsFeedPromise = ctx.newsFeedPromise || Promise.resolve();
     const speakersPromise = ctx.speakersPromise || Promise.resolve();
-    const programmeReady = ctx.programmeReady || Promise.resolve();
     const speakersWrap = ctx.speakersWrap;
     const regWrap = ctx.regWrap;
     const sponsorsWrap = ctx.sponsorsWrap;
     const registrationManifestoPromise = ctx.registrationManifestoPromise;
 
-    const revealHomeBands = async function () {
-        if (introOuter) {
-            introOuter.classList.remove('home-stage-hidden');
+    void introReady
+        .then(function () {
+            if (introOuter) introOuter.classList.remove('home-stage-hidden');
             syncHomeIntrosliderLayout();
             fitHomeMaintitleHeadingFontSize();
-        }
+        })
+        .catch(function (err) {
+            console.warn('introslider deferred hydrate', err);
+            if (introOuter) introOuter.classList.remove('home-stage-hidden');
+            fitHomeMaintitleHeadingFontSize();
+        });
+
+    const revealDeferredHomeBands = function () {
         revealStuckHomeStageBands(homeSection);
-        if (speakersWrap) {
-            finalizeHomeSpeakersSection(speakersWrap);
-            await waitForImagesInElementTree(speakersWrap, 3000);
-        }
-        const feedRoot = homeSection.querySelector('.feed-section-inner-wrapper');
-        if (feedRoot) {
-            await waitForFeedCardThumbnails(feedRoot, 5000);
-        }
+        if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
         wireSliderIndicators();
     };
 
-    // Registration copy can finish quietly after unlock — do not start Past talks warmup here.
-    runHomePageBackgroundHydration(homeSection, {
-        speakersWrap: speakersWrap,
-        regWrap: regWrap,
-        sponsorsWrap: sponsorsWrap,
-        promises: [registrationManifestoPromise]
-    });
-
-    return Promise.all([
+    void Promise.all([
         Promise.race([
             newsFeedPromise,
             new Promise(function (resolve) {
@@ -3654,27 +3619,20 @@ function runHomeDeferredHydration(homeSection, ctx) {
             new Promise(function (resolve) {
                 setTimeout(resolve, HOME_LOAD_SPEAKERS_MAX_MS);
             })
-        ]),
-        Promise.race([
-            introReady,
-            new Promise(function (resolve) {
-                setTimeout(resolve, 4000);
-            })
-        ]),
-        Promise.race([
-            programmeReady,
-            new Promise(function (resolve) {
-                setTimeout(resolve, 8000);
-            })
         ])
     ])
-        .then(function () {
-            return revealHomeBands();
-        })
+        .then(revealDeferredHomeBands)
         .catch(function (err) {
             console.error('home deferred hydrate', err);
-            return revealHomeBands();
+            revealDeferredHomeBands();
         });
+
+    runHomePageBackgroundHydration(homeSection, {
+        speakersWrap: speakersWrap,
+        regWrap: regWrap,
+        sponsorsWrap: sponsorsWrap,
+        promises: [registrationManifestoPromise]
+    });
 }
 
 // Show the feed content (different from blog posts)
@@ -3702,13 +3660,10 @@ async function showFeedContent() {
         mountHomeProgrammeSliderShell(homeSection);
         positionHomeSponsorsAfterIntroslider(homeSection);
         const sponsorsWrap = getHomeSponsorsInnerWrapper(homeSection);
-        const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
-        [sponsorsWrap, introOuter, feedWrap, speakersWrap, regWrap, regDivider, programmeWrap].forEach((el) => {
+        [sponsorsWrap, introOuter, feedWrap, speakersWrap, regWrap, regDivider].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
-        const programmeReady = prefetchHomeProgrammeSliderData().then(function () {
-            return hydrateHomeProgrammeSlider(homeSection);
-        });
+        void prefetchHomeProgrammeSliderData();
 
         const newsFeedPromise = loadNewsFeed();
         const speakersPromise = speakersWrap
@@ -3802,12 +3757,16 @@ async function showFeedContent() {
         }
 
         try {
-            // Keep bands hidden until content is ready — do not reveal empty shells under the loader.
+            revealHomeStageBands(homeSection, { skipIntro: true });
             setupHomeHeroIntrosliderPosterGap(8);
 
             const introReady = introWrap
                 ? prepareHomeIntrosliderBeforeReveal(introWrap)
                 : Promise.resolve();
+
+            void prefetchHomeProgrammeSliderData().then(function () {
+                void hydrateHomeProgrammeSlider(homeSection);
+            });
 
             const posterReady = Promise.race([
                 waitForHomePosterPictureReady(pictureEl),
@@ -3817,22 +3776,11 @@ async function showFeedContent() {
             ]);
 
             await posterReady;
-            // Do not mountFeedSkeleton here — it wipes the feed if loadNewsFeed already painted.
-            wireSliderIndicators();
-
-            await runHomeDeferredHydration(homeSection, {
-                introReady: introReady,
-                introOuter: introOuter,
-                newsFeedPromise: newsFeedPromise,
-                speakersPromise: speakersPromise,
-                programmeReady: programmeReady,
-                speakersWrap: speakersWrap,
-                regWrap: regWrap,
-                sponsorsWrap: sponsorsWrap,
-                registrationManifestoPromise: registrationManifestoPromise
-            });
 
             setHomePageLoading(false);
+            mountHomeFeedSkeleton();
+
+            wireSliderIndicators();
             setupHomeViewNavbarScroll();
 
             if (typeof requestIdleCallback === 'function') {
@@ -3844,6 +3792,17 @@ async function showFeedContent() {
                     initPosterSnow();
                 });
             }
+
+            runHomeDeferredHydration(homeSection, {
+                introReady: introReady,
+                introOuter: introOuter,
+                newsFeedPromise: newsFeedPromise,
+                speakersPromise: speakersPromise,
+                speakersWrap: speakersWrap,
+                regWrap: regWrap,
+                sponsorsWrap: sponsorsWrap,
+                registrationManifestoPromise: registrationManifestoPromise
+            });
         } catch (homePaintErr) {
             console.error('showFeedContent home paint', homePaintErr);
             revealStuckHomeStageBands(homeSection);
@@ -4015,11 +3974,9 @@ async function loadNewsFeed() {
     } finally {
         const feedSection = document.querySelector('body.home-view .home-section > .feed-section');
         if (feedSection) feedSection.classList.remove('home-stage-hidden');
-        const feedContent = document.querySelector('.feed-section-inner-wrapper');
-        if (feedContent) {
-            ensureFeedCardImagesLoad(feedContent);
-            await waitForFeedCardThumbnails(feedContent, 8000);
-        }
+        requestAnimationFrame(function () {
+            ensureFeedCardImagesLoad(document);
+        });
     }
 }
 
@@ -4187,7 +4144,9 @@ async function appendNewsCardsToGrid(newsGrid, recordsSlice) {
     const cardPromises = recordsSlice.map((record) => createNewsCard(record));
     const newsCards = (await Promise.all(cardPromises)).filter(Boolean);
     newsCards.forEach((card) => newsGrid.appendChild(card));
-    ensureFeedCardImagesLoad(newsGrid);
+    requestAnimationFrame(function () {
+        ensureFeedCardImagesLoad(newsGrid);
+    });
 }
 
 function attachHomeFeedLoadMore(feedContent, newsGrid, validRecords) {
@@ -5733,7 +5692,7 @@ function appendHomeSpeakerCard(track, speaker, expandableLongBio, stripeIndex) {
     const img = document.createElement('img');
     img.src = 'images/testimage.png';
     img.alt = '';
-    img.loading = 'eager';
+    img.loading = 'lazy';
     img.decoding = 'async';
     imageWrap.appendChild(img);
 
@@ -6187,6 +6146,7 @@ async function displayNewsGrid(records) {
     newsGrid.className = 'news-grid';
     
     const initialSlice = validRecords.slice(0, HOME_FEED_INITIAL_COUNT);
+    await appendNewsCardsToGrid(newsGrid, initialSlice);
     if (!validRecords.length) {
         newsGrid.innerHTML =
             '<p class="empty-feed-message">No published items to show yet.</p>';
@@ -6198,24 +6158,23 @@ async function displayNewsGrid(records) {
     if (homeSection && !homeSection.querySelector(':scope > .programme-section')) {
         mountHomeProgrammeSliderShell(homeSection);
     }
-    void hydrateHomeProgrammeSlider(homeSection);
+    if (!document.body.classList.contains('loading')) {
+        void hydrateHomeProgrammeSlider(homeSection);
+    }
     const feedTitle = document.createElement('h2');
     feedTitle.className = 'section-titles';
     feedTitle.id = 'home-feed-latest-heading';
     feedTitle.textContent = 'Latest';
     feedContent.appendChild(feedTitle);
     feedContent.appendChild(newsGrid);
-    if (validRecords.length) {
-        await appendNewsCardsToGrid(newsGrid, initialSlice);
-    }
     attachHomeFeedLoadMore(feedContent, newsGrid, validRecords);
 
-    // Feed must not stay display:none or thumbnails never load — pink overlay still covers it.
     const feedSection = document.querySelector('body.home-view .home-section > .feed-section');
     if (feedSection) feedSection.classList.remove('home-stage-hidden');
 
-    ensureFeedCardImagesLoad(feedContent);
-    await waitForFeedCardThumbnails(feedContent, 8000);
+    requestAnimationFrame(function () {
+        ensureFeedCardImagesLoad(feedContent);
+    });
 
     wireSliderIndicators();
 }
@@ -6817,7 +6776,7 @@ async function createNewsCard(record) {
         // Regular news card layout
         const imageContainer = imageUrl ? `
             <div class="news-card-image">
-                <img src="${homeEscapeHtml(imageUrl)}" alt="${homeEscapeHtml(title)}" class="news-card-thumbnail" loading="eager" decoding="async" fetchpriority="high" referrerpolicy="no-referrer">
+                <img src="${homeEscapeHtml(imageUrl)}" alt="${homeEscapeHtml(title)}" class="news-card-thumbnail" loading="eager" decoding="async" referrerpolicy="no-referrer">
                 </div>
         ` : '';
         
@@ -7474,21 +7433,9 @@ function teardownHomeViewNavbarScroll() {
         window.removeEventListener('resize', homeNavbarResizeHandler);
         homeNavbarResizeHandler = null;
     }
-    if (homeScrollIdleTimer) {
-        clearTimeout(homeScrollIdleTimer);
-        homeScrollIdleTimer = null;
-    }
-    if (homeScrollSyncRaf) {
-        cancelAnimationFrame(homeScrollSyncRaf);
-        homeScrollSyncRaf = null;
-    }
-    homeIsScrolling = false;
-    document.body.classList.remove('home-is-scrolling');
     teardownHomeHeroIntrosliderPosterGapSync();
     clearHomeMaintitleHeadingFontSize();
     resetMobileBottomNavbarGlassInline();
-    lastHomeHeroNavGlass = null;
-    lastMobileBottomNavGlass = null;
     if (!document.body.classList.contains('home-view')) {
         resetNavHeaderToCssDefaults();
     }
@@ -7505,20 +7452,16 @@ const INTROSLIDER_NAV_GLASS = {
 /**
  * @param {HTMLElement} navbar
  * @param {number} strength 0–1 (0 = clear glass layer)
- * @param {{ noShadow?: boolean, borderEdge?: 'all' | 'top', noBlur?: boolean }} [options]
+ * @param {{ noShadow?: boolean, borderEdge?: 'all' | 'top' }} [options]
  */
 function applyNavbarIntrosliderGlassInline(navbar, strength, options) {
     if (!navbar) return;
     const t = Math.max(0, Math.min(1, strength));
     const noShadow = Boolean(options && options.noShadow);
-    // Live backdrop-filter over scrolling page content blanks bands (Safari/Chrome compositor).
-    const scrollingHome = document.body.classList.contains('home-is-scrolling');
     const skipBlur =
-        Boolean(options && options.noBlur) ||
-        scrollingHome ||
-        (typeof window.matchMedia === 'function' &&
-            (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-                window.matchMedia('(prefers-reduced-transparency: reduce)').matches));
+        typeof window.matchMedia === 'function' &&
+        (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            window.matchMedia('(prefers-reduced-transparency: reduce)').matches);
     if (t <= 0.001) {
         navbar.style.setProperty('background', 'transparent', 'important');
         navbar.style.setProperty('background-color', 'transparent', 'important');
@@ -7529,11 +7472,7 @@ function applyNavbarIntrosliderGlassInline(navbar, strength, options) {
         navbar.style.setProperty('border-top', 'none', 'important');
         return;
     }
-    // Without blur, nudge alpha slightly so the bar still reads solid — keep mild (not a flat slab).
-    const baseA = skipBlur
-        ? Math.min(0.72, INTROSLIDER_NAV_GLASS.bgAlpha + 0.1)
-        : INTROSLIDER_NAV_GLASS.bgAlpha;
-    const a = baseA * t;
+    const a = INTROSLIDER_NAV_GLASS.bgAlpha * t;
     const blurPx = INTROSLIDER_NAV_GLASS.blurPx * t;
     navbar.style.setProperty('background', `rgba(0, 49, 83, ${a})`, 'important');
     navbar.style.setProperty('background-color', `rgba(0, 49, 83, ${a})`, 'important');
@@ -7586,14 +7525,9 @@ function resetNavHeaderToCssDefaults() {
 
 const HOME_NAV_FADE_MS = '0.45s';
 
-/** Last applied desktop/top glass strength (skip redundant backdrop-filter writes). */
-let lastHomeHeroNavGlass = null;
-/** Last applied mobile bottom glass strength. */
-let lastMobileBottomNavGlass = null;
-
 /**
  * @param {number} opacity 0 = transparent over poster, 1 = introslider-matched frosted glass
- * @param {{ instant?: boolean, force?: boolean }} [options]
+ * @param {{ instant?: boolean }} [options] scroll-driven updates use instant so blur snaps on/off
  */
 function applyHomeHeroNavbarOpacity(opacity, options) {
     const navbar =
@@ -7601,15 +7535,9 @@ function applyHomeHeroNavbarOpacity(opacity, options) {
     const header = document.querySelector('.header');
     if (!navbar) return;
     const o = Math.max(0, Math.min(1, opacity));
-    const key = o <= 0.001 ? 0 : o >= 0.999 ? 1 : Math.round(o * 20) / 20;
-    if (!options || options.force !== true) {
-        if (lastHomeHeroNavGlass === key) return;
-    }
-    lastHomeHeroNavGlass = key;
     const instant = Boolean(options && options.instant);
     const fade = instant ? '0s' : HOME_NAV_FADE_MS;
-    // Do not transition backdrop-filter — that flickers; only fade background/shadow.
-    const navTransition = `background-color ${fade} ease, box-shadow ${fade} ease, border-color ${fade} ease`;
+    const navTransition = `background-color ${fade} ease, box-shadow ${fade} ease, backdrop-filter ${fade} ease, -webkit-backdrop-filter ${fade} ease, border-color ${fade} ease`;
     const headerTransition = `background-color ${fade} ease, box-shadow ${fade} ease`;
 
     if (o <= 0.001) {
@@ -7649,10 +7577,9 @@ function applyHomeHeroNavbarAppearance(transparent) {
     applyHomeHeroNavbarOpacity(transparent ? 0 : 1);
 }
 
-/** Home hero: frosted nav after leaving the top (hysteresis avoids 1px threshold chatter). */
-const HOME_NAV_SCROLL_GLASS_ON_PX = 16;
-const HOME_NAV_SCROLL_GLASS_OFF_PX = 4;
-/** Scroll distance (px) over which mobile bottom glass nav fades in. */
+/** Home hero: full frosted nav as soon as the page scrolls (no ramp, no transition on blur). */
+const HOME_NAV_SCROLL_INSTANT_THRESHOLD_PX = 2;
+/** Scroll distance (px) over which mobile bottom / desktop glass nav fades in. */
 const HOME_NAV_SCROLL_FADE_PX = 100;
 
 function getHomeScrollNavGlassOpacity(scrollY) {
@@ -7663,20 +7590,15 @@ function getHomeScrollNavGlassOpacity(scrollY) {
 /**
  * Mobile bottom tab bar: frosted background fades in with scroll (tabs stay visible).
  * @param {number} opacity 0–1
- * @param {{ instant?: boolean, force?: boolean }} [options]
+ * @param {{ instant?: boolean }} [options]
  */
 function applyMobileBottomNavbarOpacity(opacity, options) {
     const bottomNav = document.querySelector('.navbar--mobile-bottom');
     if (!bottomNav) return;
     const o = Math.max(0, Math.min(1, opacity));
-    const key = o <= 0.001 ? 0 : o >= 0.999 ? 1 : Math.round(o * 20) / 20;
-    if (!options || options.force !== true) {
-        if (lastMobileBottomNavGlass === key) return;
-    }
-    lastMobileBottomNavGlass = key;
     const instant = Boolean(options && options.instant);
     const fade = instant ? '0s' : HOME_NAV_FADE_MS;
-    const navTransition = `background-color ${fade} ease, box-shadow ${fade} ease, border-color ${fade} ease`;
+    const navTransition = `background-color ${fade} ease, box-shadow ${fade} ease, backdrop-filter ${fade} ease, -webkit-backdrop-filter ${fade} ease, border-color ${fade} ease`;
     bottomNav.style.setProperty('transition', navTransition, 'important');
     applyNavbarIntrosliderGlassInline(bottomNav, o, { borderEdge: 'top' });
     bottomNav.classList.toggle('transparent', o < 0.08);
@@ -7873,8 +7795,12 @@ function syncHomeNavSectionFromScroll() {
 
 function syncHomeViewNavbarFromScroll() {
     if (!document.body.classList.contains('home-view')) return;
-    /* Mobile: transparent top bar; bottom bar glass is scroll-driven. Layout is applied once in setup. */
+    if (!isMobileBottomNavbarLayout()) {
+        clearMobileBottomNavbarInlineStyles();
+    }
+    /* Mobile: transparent top bar; bottom bar glass is scroll-driven in script.js on home. */
     if (isMobileBottomNavbarLayout()) {
+        applyMobileBottomNavbarLayout();
         if (document.body.classList.contains('past-talks-open')) {
             applyHomeHeroNavbarOpacity(1, { instant: true });
             applyMobileBottomNavbarOpacity(1, { instant: true });
@@ -7901,13 +7827,7 @@ function syncHomeViewNavbarFromScroll() {
         return;
     }
     const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-    // Hysteresis: turn glass on after scrolling down, off only near the very top.
-    let opacity;
-    if (lastHomeHeroNavGlass === 1) {
-        opacity = scrollY <= HOME_NAV_SCROLL_GLASS_OFF_PX ? 0 : 1;
-    } else {
-        opacity = scrollY >= HOME_NAV_SCROLL_GLASS_ON_PX ? 1 : 0;
-    }
+    const opacity = scrollY > HOME_NAV_SCROLL_INSTANT_THRESHOLD_PX ? 1 : 0;
     applyHomeHeroNavbarOpacity(opacity, { instant: true });
 }
 
@@ -8000,60 +7920,20 @@ function fitHomeMaintitleHeadingFontSize() {
     }
 }
 
-/** True while the user is actively scrolling the home page (blur off until idle). */
-let homeIsScrolling = false;
-let homeScrollIdleTimer = null;
-let homeScrollSyncRaf = null;
-
-function setHomeScrollingState(isScrolling) {
-    const next = !!isScrolling;
-    if (homeIsScrolling === next) return;
-    homeIsScrolling = next;
-    document.body.classList.toggle('home-is-scrolling', next);
-    // Force glass re-apply so blur toggles (skip-redundant keys alone would keep blur on).
-    lastHomeHeroNavGlass = null;
-    lastMobileBottomNavGlass = null;
-    syncHomeViewNavbarFromScroll();
-}
-
-function markHomePageScrolling() {
-    if (!document.body.classList.contains('home-view')) return;
-    if (document.body.classList.contains('past-talks-open')) return;
-    setHomeScrollingState(true);
-    if (homeScrollIdleTimer) clearTimeout(homeScrollIdleTimer);
-    homeScrollIdleTimer = setTimeout(function () {
-        homeScrollIdleTimer = null;
-        setHomeScrollingState(false);
-    }, 150);
-}
-
 function setupHomeViewNavbarScroll() {
     teardownHomeViewNavbarScroll();
     if (!document.body.classList.contains('home-view')) return;
-    homeNavbarScrollHandler = function () {
-        markHomePageScrolling();
-        if (homeScrollSyncRaf) return;
-        homeScrollSyncRaf = requestAnimationFrame(function () {
-            homeScrollSyncRaf = null;
-            syncHomeViewNavbarFromScroll();
-            syncHomeNavSectionFromScroll();
-        });
+    homeNavbarScrollHandler = function() {
+        syncHomeViewNavbarFromScroll();
+        syncHomeNavSectionFromScroll();
     };
-    homeNavbarResizeHandler = function () {
+    homeNavbarResizeHandler = function() {
         syncHomeViewNavbarFromScroll();
         syncHomeNavSectionFromScroll();
         fitHomeMaintitleHeadingFontSize();
     };
     window.addEventListener('scroll', homeNavbarScrollHandler, { passive: true });
     window.addEventListener('resize', homeNavbarResizeHandler, { passive: true });
-    // Horizontal carousels do not fire window scroll — still pause nav blur / snow while they move.
-    document
-        .querySelectorAll(
-            '.home-section .introslider, .home-section .programme-slider, .home-section .speakerslider-track'
-        )
-        .forEach(function (el) {
-            el.addEventListener('scroll', markHomePageScrolling, { passive: true });
-        });
     applyMobileBottomNavbarLayout();
     syncHomeViewNavbarFromScroll();
     syncHomeNavSectionFromScroll();
@@ -8292,7 +8172,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Bind header nav in parallel with home paint (nav exists in home.html before feed inject).
     const navigationReady = setupNavigationListeners();
 
-    let homeInitOk = false;
     try {
         await Promise.race([
             Promise.all([navigationReady, showFeedContent()]),
@@ -8306,13 +8185,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }, 30000);
             }),
         ]);
-        homeInitOk = true;
     } catch (err) {
         console.error('showFeedContent failed or timed out:', err);
     } finally {
-        if (!homeInitOk) {
-            revealStuckHomeStageBands(document.querySelector('.everything .home-section'));
-        }
+        revealStuckHomeStageBands(document.querySelector('.everything .home-section'));
         scrollHomeToTop({ instant: true });
         setHomePageLoading(false);
     }
@@ -8320,7 +8196,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     /* Safety: never leave scroll locked if showFeedContent returned early. */
     setHomePageLoading(false);
 
-    // Do not warm Past talks in the background — that fights smooth home scrolling.
+    // Warm the Past talks dataset after first paint/interaction.
+    scheduleBackgroundPastTalksWarmup();
     
     // Monitor featured content title for line breaks
     monitorFeaturedTitleBreak();
