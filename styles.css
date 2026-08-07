@@ -3293,11 +3293,6 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
     padding-bottom: 0 !important;
 }
 
-body.home-view .home-section .introslider-inner-wrapper > .introslider > .introslider-clickable,
-body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable {
-    padding-top: 24px !important;
-}
-
 /* Introslider left edge breathing space (requested) */
 .introslider > *:first-child {
     margin-left: 16px;
@@ -3444,14 +3439,10 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
     }
 }
 
-/* Introslider cards: 8px top inset; clickable slides use 24px */
+/* Introslider cards: 8px top inset (desktop clickable slides use 24px below) */
 .home-section .introslider > * {
     padding-top: 8px;
     padding-bottom: 0;
-}
-
-.home-section .introslider > .introslider-clickable {
-    padding-top: 24px;
 }
 
 /* Same bottom black gradient on home introslider panels only (not flyer page slider) */
@@ -5024,7 +5015,10 @@ body.home-view .home-section > .home-social-row-container {
         padding-bottom: 0 !important;
     }
 
-    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable {
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable,
+    body.home-view .home-section .introslider-inner-wrapper > .introslider > .introslider-clickable,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable,
+    .home-section .introslider > .introslider-clickable {
         padding-top: 24px !important;
     }
 
@@ -5111,10 +5105,6 @@ body.home-view .home-section > .home-social-row-container {
     min-height: 0;
     padding: 0;
     justify-content: flex-start;
-}
-
-.home-section .introslider > .introslider-clickable {
-    padding-top: 24px;
 }
 
 .home-section > .introslider-inner-wrapper > .introslider > .location:first-child {
