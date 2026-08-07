@@ -3168,7 +3168,7 @@ body.horizontal-slider-dragging * {
         height: var(--horizontal-slider-scrollbar-height);
         box-sizing: border-box;
         padding: 0;
-        margin: 22px auto 0;
+        margin: 32px auto 0;
         opacity: 1;
         pointer-events: auto;
     }
@@ -3291,6 +3291,11 @@ body.home-view .home-section .introslider-inner-wrapper > .introslider > * {
 body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > * {
     padding-top: 8px !important;
     padding-bottom: 0 !important;
+}
+
+body.home-view .home-section .introslider-inner-wrapper > .introslider > .introslider-clickable,
+body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable {
+    padding-top: 24px !important;
 }
 
 /* Introslider left edge breathing space (requested) */
@@ -3439,10 +3444,14 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
     }
 }
 
-/* Introslider cards: 8px top inset; no extra bottom inset */
+/* Introslider cards: 8px top inset; clickable slides use 24px */
 .home-section .introslider > * {
     padding-top: 8px;
     padding-bottom: 0;
+}
+
+.home-section .introslider > .introslider-clickable {
+    padding-top: 24px;
 }
 
 /* Same bottom black gradient on home introslider panels only (not flyer page slider) */
@@ -5015,6 +5024,10 @@ body.home-view .home-section > .home-social-row-container {
         padding-bottom: 0 !important;
     }
 
+    body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable {
+        padding-top: 24px !important;
+    }
+
     .flyer-section .introslider > * {
         border: 1px solid #D1D5DB !important;
         box-sizing: border-box !important;
@@ -5098,6 +5111,10 @@ body.home-view .home-section > .home-social-row-container {
     min-height: 0;
     padding: 0;
     justify-content: flex-start;
+}
+
+.home-section .introslider > .introslider-clickable {
+    padding-top: 24px;
 }
 
 .home-section > .introslider-inner-wrapper > .introslider > .location:first-child {
