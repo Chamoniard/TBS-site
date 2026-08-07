@@ -36,6 +36,10 @@
             --backend-button-yellow: #FECB00;
             --backend-button-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.06);
             --backend-square-btn-size: 35px;
+            /* Guest/speaker list heading + viewer/overwatch top bars */
+            --backend-panel-header-height: 50px;
+            --backend-panel-header-pad-y: 6px;
+            --backend-panel-header-pad-x: var(--backend-table-cell-pad-x);
             /* Rounded rectangles (labels, multi-icon controls, table cells) */
             --backend-square-btn-radius: 5px;
             /* Single-icon / single-character circular controls (equal width × height) */
@@ -1255,6 +1259,31 @@
             margin: 0;
         }
 
+        #speaker-editor .edit-speaker-top .edit-speaker-top-trailing {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #speaker-editor .edit-speaker-top .speaker-editor-toolbar {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 0;
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
         #guest-editor .guests-bottom-row {
             display: flex;
             flex-direction: row;
@@ -1575,60 +1604,86 @@
         }
 
         #speaker-editor .speaker-editor-bottom .speaker-workflow-nav {
-            display: inline-grid;
-            grid-auto-flow: column;
-            grid-template-columns: repeat(4, minmax(6.25rem, 1fr));
-            align-items: flex-start;
-            align-self: flex-start;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            align-self: stretch;
             gap: 4px;
             flex: 0 0 auto;
-            width: max-content;
+            width: 100%;
+            max-width: 100%;
             margin: 0;
-            padding: 8px 16px 0 0;
+            padding: 8px 16px 0;
             box-sizing: border-box;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            background: #ffffff;
         }
 
-        #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        body.backend-page #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link {
+            display: inline-block;
             margin: 0;
-            width: 100%;
+            width: auto;
             min-width: 0;
             padding: 0.25rem 0.625rem;
-            border-top: 1px solid #cbd5e1;
-            border-left: 1px solid #cbd5e1;
-            border-right: 1px solid #cbd5e1;
-            border-bottom: none;
-            border-radius: 5px 5px 0 0;
-            background: #fbcfe8;
+            border: none;
+            border-radius: 0;
+            background: transparent;
             box-shadow: none;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
             font-weight: 400;
             line-height: 1.3;
-            color: #9ca3af;
+            color: #3d4852;
             text-decoration: none;
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
+            filter: none;
+            transform: none;
+            opacity: 1;
         }
 
-        #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link:hover:not(:disabled) {
-            filter: brightness(0.98);
+        body.backend-page #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link:hover:not(:disabled) {
+            filter: none;
+            color: #3d4852;
         }
 
-        #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link:disabled {
-            background: #ffffff;
-            color: #003153;
-            font-weight: 500;
+        body.backend-page #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link:disabled {
+            background: transparent;
+            color: #3d4852;
+            font-weight: 400;
             cursor: default;
             filter: none;
             opacity: 1;
-            position: relative;
-            z-index: 2;
-            transform: translateY(1px);
+            position: static;
+            z-index: auto;
+            transform: none;
+        }
+
+        /* Active pane link: black + underline. */
+        body.backend-page #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link.is-active,
+        body.backend-page #speaker-editor .speaker-editor-bottom .speaker-workflow-nav-link.is-active:disabled {
+            color: #000000;
+            background: transparent;
+            border: none;
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 0.2em;
+        }
+
+        /* No speaker selected: muted like inactive aspect tabs. */
+        body.backend-page #speaker-editor .speaker-editor.is-empty .speaker-editor-bottom .speaker-workflow-nav-link,
+        body.backend-page #speaker-editor .speaker-editor.is-empty .speaker-editor-bottom .speaker-workflow-nav-link:disabled,
+        body.backend-page #speaker-editor .speaker-editor.is-empty .speaker-editor-bottom .speaker-workflow-nav-link.is-active,
+        body.backend-page #speaker-editor .speaker-editor.is-empty .speaker-editor-bottom .speaker-workflow-nav-link.is-active:disabled {
+            color: #9ca3af;
+            font-weight: 400;
+            text-decoration: none;
         }
 
         #guest-editor .guest-editor-log .log {
@@ -1719,7 +1774,6 @@
             box-sizing: border-box;
         }
 
-        #speaker-editor #speaker-editor-actions .speaker-workflow-title,
         #guest-editor #guest-editor-actions .guest-workflow-title {
             width: 100%;
             text-align: center;
@@ -2158,7 +2212,7 @@
             overflow-y: auto;
         }
 
-        /* Speakers tab: viewer is editor only (toolbar lives in .speaker-editor-bottom-panes). */
+        /* Speakers tab: viewer is editor only (toolbar lives in .edit-speaker-top). */
         #speaker-editor .speaker-viewer {
             position: relative;
             display: flex;
@@ -2422,10 +2476,16 @@
         }
 
         #guest-editor .guest-overwatch-title {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
             flex: 0 0 auto;
             margin: 0;
-            padding: 16px var(--backend-table-cell-pad-x) 12px;
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
             box-sizing: border-box;
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
             font-family: 'Inter', sans-serif;
             font-size: 1.2rem;
             font-weight: 700;
@@ -4709,14 +4769,24 @@
 
         #speaker-editor .edit-speaker-top {
             background-color: #ffffff;
-            padding: 8px 0;
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
             margin: 0;
             border-radius: calc(var(--guest-editor-shell-r) - var(--guest-editor-bw))
                 calc(var(--guest-editor-shell-r) - var(--guest-editor-bw)) 0 0;
             align-items: center;
             gap: 0;
-            justify-content: flex-start;
+            justify-content: space-between;
             color: #000000;
+            border-bottom: 1px solid #cbd5e1;
+            box-sizing: border-box;
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+        }
+
+        #speaker-editor .edit-speaker-top .edit-speaker-name-heading {
+            flex: 1 1 auto;
+            min-width: 0;
         }
 
         #guest-editor .edit-guest-top,
@@ -4753,6 +4823,40 @@
             padding-right: 0;
             border-bottom: 1px solid #cbd5e1;
             box-sizing: border-box;
+        }
+
+        /* Guests + Speakers + Content + Programme: shared 50px header bar + matching padding. */
+        #guest-editor .guests-list > .edit-guest-top.guests-list-heading,
+        #guest-editor .guest-viewer > .guest-editor > .edit-guest-top,
+        #guest-editor .guest-overwatch-title,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
+        #speaker-editor .edit-speaker-top,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading {
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+            box-sizing: border-box;
+        }
+
+        #guest-editor .guests-list-heading .edit-guest-top-trailing,
+        #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top .edit-guest-top-trailing,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+            padding-right: 0;
+        }
+
+        #guest-editor .guests-list-heading .guests-actions,
+        #speaker-editor .speakers-list-top .speakers-actions,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .speakers-actions,
+        #content-editor .content-list-top .content-actions {
+            height: 100%;
+            min-height: 0;
+            max-height: 100%;
         }
 
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
@@ -4860,6 +4964,10 @@
             gap: 0.5rem;
             padding: 0 var(--backend-table-cell-pad-x);
             box-sizing: border-box;
+        }
+
+        #speaker-editor .edit-speaker-top .edit-speaker-name-heading {
+            padding: 0;
         }
 
 
@@ -4971,19 +5079,6 @@
             justify-content: flex-start;
         }
 
-        #speaker-editor .speaker-editor-bottom-panes > .speaker-editor-toolbar {
-            flex: 0 0 auto;
-            width: 100%;
-            min-height: 0;
-            padding: 0 0 12px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
         #speaker-editor .speaker-editor-toolbar-trailing {
             justify-self: start;
         }
@@ -5053,8 +5148,9 @@
             text-align: center;
         }
 
-        /* Guest Save / Delete: round icon buttons (yellow save, red trash). */
-        #guest-editor .guest-editor-toolbar-trailing #save-guest-button {
+        /* Guest / Speaker Save / Delete: round icon buttons (yellow save, red trash). */
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button,
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -5070,11 +5166,13 @@
             line-height: 0;
         }
 
-        #guest-editor .guest-editor-toolbar-trailing #save-guest-button:hover:not(:disabled) {
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button:hover:not(:disabled),
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
-        #guest-editor .guest-editor-toolbar-trailing #save-guest-button svg {
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button svg,
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button svg {
             flex-shrink: 0;
             display: block;
         }
@@ -5090,7 +5188,8 @@
             line-height: 1;
         }
 
-        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn {
+        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn,
+        #speaker-editor .speaker-editor-toolbar-trailing #add-speaker-delete-btn {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -5108,13 +5207,15 @@
             line-height: 0;
         }
 
-        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn:hover:not(:disabled) {
+        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn:hover:not(:disabled),
+        #speaker-editor .speaker-editor-toolbar-trailing #add-speaker-delete-btn:hover:not(:disabled) {
             background: #F71941 !important;
             color: #ffffff !important;
             filter: none;
         }
 
-        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn:disabled {
+        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn:disabled,
+        #speaker-editor .speaker-editor-toolbar-trailing #add-speaker-delete-btn:disabled {
             background: #F71941 !important;
             color: #ffffff !important;
             opacity: 0.45;
@@ -5122,7 +5223,9 @@
         }
 
         #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn svg,
-        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn svg path {
+        #guest-editor .guest-editor-toolbar-trailing #add-guest-delete-btn svg path,
+        #speaker-editor .speaker-editor-toolbar-trailing #add-speaker-delete-btn svg,
+        #speaker-editor .speaker-editor-toolbar-trailing #add-speaker-delete-btn svg path {
             fill: #ffffff !important;
             color: #ffffff;
             flex-shrink: 0;
@@ -6505,6 +6608,7 @@
             display: block;
             width: 100%;
             min-height: 8rem;
+            height: auto;
             margin: 0;
             border: none;
             border-radius: 0;
@@ -6517,6 +6621,17 @@
             line-height: 1.5;
             overflow-y: hidden;
             overflow-x: hidden;
+            resize: none;
+        }
+
+        /* Locked (readonly): keep full text readable and uncropped. */
+        #speaker-editor textarea#add-speaker-long-bio[readonly],
+        #speaker-editor textarea#add-speaker-long-bio:disabled {
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+            color: #0f172a;
+            cursor: default;
+            overflow-y: hidden;
             resize: none;
         }
 
@@ -7821,7 +7936,7 @@
             gap: 0.5rem;
             flex: 1 1 auto;
             min-width: 0;
-            padding: 0 var(--backend-table-cell-pad-x) 0 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
@@ -8597,11 +8712,33 @@
                                     <span class="edit-speaker-name-first" id="edit-speaker-name-first" aria-live="polite"></span>
                                     <span class="edit-speaker-name-last" id="edit-speaker-name-last" aria-live="polite"></span>
                                 </div>
+                                <div class="edit-speaker-top-trailing">
+                                    <div class="speaker-editor-toolbar" role="toolbar" aria-label="Speaker editor tools">
+                                        <div class="speaker-editor-toolbar-trailing">
+                                            <button type="button" class="add-speaker-button guest-editor-padlock-btn" id="speaker-editor-padlock-btn" aria-label="Lock speaker" title="Lock" disabled aria-disabled="true">
+                                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                                    <path
+                                                        fill="currentColor"
+                                                        d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <button type="button" class="texteditor-save-btn" id="save-speaker-button" disabled aria-disabled="true" title="Save speaker" aria-label="Save speaker">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                                    <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                                </svg>
+                                            </button>
+                                            <button type="button" class="add-speaker-delete-btn" id="add-speaker-delete-btn" disabled aria-disabled="true" title="Delete speaker" aria-label="Delete speaker">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="speaker-editor-bottom is-showing-management">
                             <div class="speaker-workflow-nav" role="toolbar" aria-label="Speaker editor sections">
-                                <button type="button" class="speaker-workflow-nav-link" id="display-speaker-actions" aria-label="Speaker management actions" title="Speaker management" disabled aria-disabled="true">
-                                    <span class="display-editor-actions-text">Actions</span>
+                                <button type="button" class="speaker-workflow-nav-link" id="display-speaker-actions" aria-label="Speaker workflow" title="Speaker workflow" disabled aria-disabled="true">
+                                    <span class="display-editor-actions-text">Workflow</span>
                                 </button>
                                 <button
                                     type="button"
@@ -8638,23 +8775,6 @@
                                 </button>
                             </div>
                             <div class="speaker-editor-bottom-panes">
-                            <div class="speaker-editor-toolbar" role="toolbar" aria-label="Speaker editor tools">
-                                <div class="speaker-editor-toolbar-trailing">
-                                    <button type="button" class="add-speaker-button guest-editor-padlock-btn" id="speaker-editor-padlock-btn" aria-label="Lock speaker" title="Lock" disabled aria-disabled="true">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path
-                                                fill="currentColor"
-                                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
-                                            />
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="texteditor-save-btn" id="save-speaker-button" disabled aria-disabled="true">Save</button>
-                                    <button type="button" class="add-speaker-delete-btn" id="add-speaker-delete-btn" disabled aria-disabled="true" title="Delete speaker" aria-label="Delete speaker">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                        <span>Delete</span>
-                                    </button>
-                                </div>
-                            </div>
                             <div class="speaker-editor-bio" id="speaker-editor-bio">
                             <div class="speaker-name-row">
                                 <div class="add-speaker-form-field">
@@ -8669,6 +8789,18 @@
                             <div class="add-speaker-form-field">
                                 <label for="add-speaker-email">E-mail</label>
                                 <input type="email" id="add-speaker-email" name="email" autocomplete="email" spellcheck="false">
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-topic1">Topic 1</label>
+                                <input type="text" id="add-speaker-topic1" name="topic1" spellcheck="true" autocomplete="off">
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-topic2">Topic 2</label>
+                                <input type="text" id="add-speaker-topic2" name="topic2" spellcheck="true" autocomplete="off">
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-topic3">Topic 3</label>
+                                <input type="text" id="add-speaker-topic3" name="topic3" spellcheck="true" autocomplete="off">
                             </div>
                             <div class="add-speaker-form-field add-speaker-short-bio-field">
                                 <label for="add-speaker-short-bio">Short bio</label>
@@ -8693,7 +8825,6 @@
                             </div>
                             <div class="speaker-editor-actions" id="speaker-editor-actions" hidden aria-hidden="true">
                                 <div class="speaker-workflow-block">
-                                <h3 class="speaker-workflow-title management-style">Workflow</h3>
                                 <div id="speaker-workflow-actions" class="speaker-workflow-actions">
                                     <div class="speaker-workflow-invite-lodging-row" id="speaker-workflow-invite-lodging-row">
                                     <button type="button" class="speaker-send-formal-invite-btn" id="speaker-send-formal-invite-btn" hidden aria-hidden="true">
@@ -8753,7 +8884,6 @@
                                 <div class="speaker-activity-log" id="speaker-activity-log">
                                     <div class="speaker-activity-log-body">
                                         <div class="management-log-header">
-                                            <h3 class="speaker-activity-log-title management-style">Speaker log</h3>
                                             <button
                                                 type="button"
                                                 class="speaker-add-log-btn"
@@ -10096,6 +10226,9 @@
                 firstName: s.firstName != null ? String(s.firstName) : '',
                 lastName: s.lastName != null ? String(s.lastName) : '',
                 email: s.email != null ? String(s.email) : '',
+                topic1: s.topic1 != null ? String(s.topic1) : '',
+                topic2: s.topic2 != null ? String(s.topic2) : '',
+                topic3: s.topic3 != null ? String(s.topic3) : '',
                 shortBio: s.shortBio != null ? String(s.shortBio) : '',
                 Bio_long: s.longBio != null ? String(s.longBio) : '',
                 lodging: normalizeSpeakerLodging(s.lodging),
@@ -10515,11 +10648,17 @@
             var fnEl = document.getElementById('add-speaker-first-name');
             var lnEl = document.getElementById('add-speaker-last-name');
             var emEl = document.getElementById('add-speaker-email');
+            var t1El = document.getElementById('add-speaker-topic1');
+            var t2El = document.getElementById('add-speaker-topic2');
+            var t3El = document.getElementById('add-speaker-topic3');
             var sbEl = document.getElementById('add-speaker-short-bio');
             var lbEl = document.getElementById('add-speaker-long-bio');
             s.firstName = fnEl ? String(fnEl.value || '') : '';
             s.lastName = lnEl ? String(lnEl.value || '') : '';
             s.email = emEl ? String(emEl.value || '') : '';
+            s.topic1 = t1El ? String(t1El.value || '') : '';
+            s.topic2 = t2El ? String(t2El.value || '') : '';
+            s.topic3 = t3El ? String(t3El.value || '') : '';
             s.shortBio = sbEl ? String(sbEl.value || '') : '';
             s.longBio = lbEl ? String(lbEl.value || '') : '';
             speakerRosterSortInPlace();
@@ -12579,12 +12718,18 @@
             var fnEl = document.getElementById('add-speaker-first-name');
             var lnEl = document.getElementById('add-speaker-last-name');
             var emEl = document.getElementById('add-speaker-email');
+            var t1El = document.getElementById('add-speaker-topic1');
+            var t2El = document.getElementById('add-speaker-topic2');
+            var t3El = document.getElementById('add-speaker-topic3');
             var sbEl = document.getElementById('add-speaker-short-bio');
             var lbEl = document.getElementById('add-speaker-long-bio');
             return {
                 firstName: fnEl ? String(fnEl.value || '') : '',
                 lastName: lnEl ? String(lnEl.value || '') : '',
                 email: emEl ? String(emEl.value || '') : '',
+                topic1: t1El ? String(t1El.value || '') : '',
+                topic2: t2El ? String(t2El.value || '') : '',
+                topic3: t3El ? String(t3El.value || '') : '',
                 shortBio: sbEl ? String(sbEl.value || '') : '',
                 longBio: lbEl ? String(lbEl.value || '') : ''
             };
@@ -12601,6 +12746,9 @@
                 current.firstName !== speakerBioFormBaseline.firstName ||
                 current.lastName !== speakerBioFormBaseline.lastName ||
                 current.email !== speakerBioFormBaseline.email ||
+                current.topic1 !== speakerBioFormBaseline.topic1 ||
+                current.topic2 !== speakerBioFormBaseline.topic2 ||
+                current.topic3 !== speakerBioFormBaseline.topic3 ||
                 current.shortBio !== speakerBioFormBaseline.shortBio ||
                 current.longBio !== speakerBioFormBaseline.longBio
             );
@@ -12702,12 +12850,8 @@
             try {
                 var db = getFirestore();
                 await tbsGuestItemRef(db, id).set(guestPayloadFromRecord(rec), { merge: true });
-                captureGuestBioFormBaseline();
-                syncGuestEditabilityFromPadlock();
-                syncGuestPadlockButtonUi();
-                refreshGuestWorkflowButtonsForPadlock();
-                updateSaveGuestToolbarButtonState();
-                updateAddGuestDeleteButtonState();
+                clearGuestRosterItemSelection();
+                clearGuestEditorForm();
                 if (typeof showStatus === 'function') {
                     showStatus('success', 'Guest saved to Firebase.');
                 }
@@ -12948,6 +13092,9 @@
                 firstName: '',
                 lastName: '',
                 email: '',
+                topic1: '',
+                topic2: '',
+                topic3: '',
                 shortBio: '',
                 longBio: '',
                 event: String(current_event || '').trim(),
@@ -12970,11 +13117,17 @@
             var fnEl = document.getElementById('add-speaker-first-name');
             var lnEl = document.getElementById('add-speaker-last-name');
             var emEl = document.getElementById('add-speaker-email');
+            var t1El = document.getElementById('add-speaker-topic1');
+            var t2El = document.getElementById('add-speaker-topic2');
+            var t3El = document.getElementById('add-speaker-topic3');
             var sbEl = document.getElementById('add-speaker-short-bio');
             var lbEl = document.getElementById('add-speaker-long-bio');
             rec.firstName = fnEl ? String(fnEl.value || '') : '';
             rec.lastName = lnEl ? String(lnEl.value || '') : '';
             rec.email = emEl ? String(emEl.value || '') : '';
+            rec.topic1 = t1El ? String(t1El.value || '') : '';
+            rec.topic2 = t2El ? String(t2El.value || '') : '';
+            rec.topic3 = t3El ? String(t3El.value || '') : '';
             rec.shortBio = sbEl ? String(sbEl.value || '') : '';
             rec.longBio = lbEl ? String(lbEl.value || '') : '';
         }
@@ -13031,7 +13184,6 @@
             if (speakerDraftFormActive) ensureSpeakerDraftRecordReadyForAutosave();
             var existingId = String(speakerFormEditingDocId || '').trim();
             if (!existingId) return;
-            var addSpeakerForm = document.getElementById('speaker-editor-panel');
             try {
                 if (existingId === '_init') {
                     if (typeof showStatus === 'function') showStatus('error', 'Cannot edit this speaker document.');
@@ -13042,14 +13194,13 @@
                 if (!saved) throw new Error('Could not save speaker to Firebase.');
                 speakerDraftFormActive = false;
                 speakerFormEditingDocId = '';
-                clearSpeakerRosterItemSelection();
-                if (addSpeakerForm) {
-                    clearSpeakerEditorFormFields();
-                }
                 speakerBioFormBaseline = null;
+                clearSpeakerRosterItemSelection();
+                clearSpeakerEditorFormFields();
                 updateAddSpeakerSaveButtonState();
                 updateAddSpeakerDeleteButtonState();
                 updateSpeakerNavButtons();
+                setSpeakerEditorEmptyState(true);
             } catch (err) {
                 console.error('Save speaker failed:', err);
                 if (typeof showStatus === 'function') {
@@ -13134,11 +13285,15 @@
         function autosizeAddSpeakerLongBio() {
             var textEl = document.getElementById('add-speaker-long-bio');
             if (!textEl) return;
+            // scrollHeight is unreliable on disabled textareas; measure while enabled.
+            var wasDisabled = !!textEl.disabled;
+            if (wasDisabled) textEl.disabled = false;
             textEl.style.height = 'auto';
             var h = textEl.scrollHeight;
             var minPx = parseFloat(window.getComputedStyle(textEl).minHeight) || 0;
             if (h < minPx) h = minPx;
             textEl.style.height = h + 'px';
+            if (wasDisabled) textEl.disabled = true;
         }
 
         function autosizeContentLongTextareas() {
@@ -13530,6 +13685,9 @@
             var fn = speakerCoalesceStringField(d, ['firstName', 'First Name']);
             var ln = speakerCoalesceStringField(d, ['lastName', 'Last name', 'Last Name']);
             var em = speakerCoalesceStringField(d, ['email', 'Email']);
+            var t1 = speakerCoalesceStringField(d, ['topic1', 'Topic 1', 'Topic1']);
+            var t2 = speakerCoalesceStringField(d, ['topic2', 'Topic 2', 'Topic2']);
+            var t3 = speakerCoalesceStringField(d, ['topic3', 'Topic 3', 'Topic3']);
             var sb = speakerShortBioFromDoc(d);
             var lb = speakerCoalesceLongField(d, ['Bio_long', 'longBio', 'Bio text', 'Long']);
             var ev = speakerCoalesceStringField(d, ['event', 'Event', 'Events']);
@@ -13538,6 +13696,9 @@
                 firstName: fn,
                 lastName: ln,
                 email: em,
+                topic1: t1,
+                topic2: t2,
+                topic3: t3,
                 shortBio: sb,
                 longBio: lb,
                 event: ev,
@@ -14942,24 +15103,28 @@
             bioBtn.setAttribute('aria-hidden', 'false');
             bioBtn.disabled = selectionEmpty || pane === 'bio';
             bioBtn.setAttribute('aria-disabled', selectionEmpty || pane === 'bio' ? 'true' : 'false');
+            bioBtn.classList.toggle('is-active', !selectionEmpty && pane === 'bio');
 
             actions.hidden = false;
             actions.setAttribute('aria-hidden', 'false');
             actions.disabled = selectionEmpty || pane === 'management';
             actions.setAttribute('aria-disabled', selectionEmpty || pane === 'management' ? 'true' : 'false');
+            actions.classList.toggle('is-active', !selectionEmpty && pane === 'management');
 
             filesBtn.hidden = false;
             filesBtn.setAttribute('aria-hidden', 'false');
             filesBtn.disabled = selectionEmpty || pane === 'files';
             filesBtn.setAttribute('aria-disabled', selectionEmpty || pane === 'files' ? 'true' : 'false');
+            filesBtn.classList.toggle('is-active', !selectionEmpty && pane === 'files');
 
             logBtn.hidden = false;
             logBtn.setAttribute('aria-hidden', 'false');
             logBtn.disabled = selectionEmpty || pane === 'log';
             logBtn.setAttribute('aria-disabled', selectionEmpty || pane === 'log' ? 'true' : 'false');
+            logBtn.classList.toggle('is-active', !selectionEmpty && pane === 'log');
 
             if (padlock) {
-                var padlockActive = !selectionEmpty && pane === 'bio';
+                var padlockActive = !selectionEmpty;
                 padlock.disabled = !padlockActive;
                 padlock.setAttribute('aria-disabled', padlockActive ? 'false' : 'true');
             }
@@ -14986,7 +15151,13 @@
             if (!panel) return;
             var canEdit = !panel.classList.contains('is-empty') && speakerPadlockIsOpen;
             panel.querySelectorAll('#speaker-editor-bio input, #speaker-editor-bio textarea').forEach(function (el) {
-                el.disabled = !canEdit;
+                // Long bio stays enabled (readonly when locked) so autosize can show full text.
+                // Disabled textareas often report a clipped scrollHeight and hide overflow.
+                if (el.id === 'add-speaker-long-bio') {
+                    el.disabled = false;
+                } else {
+                    el.disabled = !canEdit;
+                }
                 if (canEdit) {
                     el.removeAttribute('readonly');
                     el.removeAttribute('aria-readonly');
@@ -18246,11 +18417,17 @@
             var fn = document.getElementById('add-speaker-first-name');
             var ln = document.getElementById('add-speaker-last-name');
             var em = document.getElementById('add-speaker-email');
+            var t1 = document.getElementById('add-speaker-topic1');
+            var t2 = document.getElementById('add-speaker-topic2');
+            var t3 = document.getElementById('add-speaker-topic3');
             var sb = document.getElementById('add-speaker-short-bio');
             var lb = document.getElementById('add-speaker-long-bio');
             if (fn) fn.value = s.firstName != null ? String(s.firstName) : '';
             if (ln) ln.value = s.lastName != null ? String(s.lastName) : '';
             if (em) em.value = s.email != null ? String(s.email) : '';
+            if (t1) t1.value = s.topic1 != null ? String(s.topic1) : '';
+            if (t2) t2.value = s.topic2 != null ? String(s.topic2) : '';
+            if (t3) t3.value = s.topic3 != null ? String(s.topic3) : '';
             if (sb) sb.value = s.shortBio != null ? String(s.shortBio) : '';
             if (lb) lb.value = s.longBio != null ? String(s.longBio) : '';
             captureSpeakerBioFormBaseline();
@@ -24938,7 +25115,7 @@
                 updateAddSpeakerSaveButtonState();
                 syncAddSpeakerFormToMemoryIfEditing();
             }
-            ['add-speaker-first-name', 'add-speaker-last-name', 'add-speaker-email', 'add-speaker-short-bio', 'add-speaker-long-bio'].forEach(function(id) {
+            ['add-speaker-first-name', 'add-speaker-last-name', 'add-speaker-email', 'add-speaker-topic1', 'add-speaker-topic2', 'add-speaker-topic3', 'add-speaker-short-bio', 'add-speaker-long-bio'].forEach(function(id) {
                 var el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('input', onAddSpeakerFormInput);
