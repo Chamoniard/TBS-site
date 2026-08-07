@@ -58,14 +58,14 @@ html, body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    background-color: #f0f4f8;
+    background-color: #e2e6eb;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 1.6;
     color: #000000;
-    background-color: #f0f4f8;
+    background-color: #e2e6eb;
     margin: 0;
     padding: 0;
     transition: opacity 0.3s ease;
@@ -5755,9 +5755,24 @@ body.home-view .home-section > .introslider-inner-wrapper.home-hero-introslider 
         max-width: none;
     }
 
-    body.home-view .home-section .feed-section-inner-wrapper .news-card .news-card-text-row,
+    body.home-view .home-section .feed-section-inner-wrapper .news-card .news-card-text-row {
+        display: flex !important;
+    }
+
     body.home-view .home-section .feed-section-inner-wrapper .news-card .news-card-text {
-        display: block !important;
+        display: -webkit-box !important;
+        -webkit-box-orient: vertical !important;
+        -webkit-line-clamp: 5 !important;
+        line-clamp: 5 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    body.home-view .home-section .feed-section-inner-wrapper .news-card-content:has(.post-title.two-lines) .news-card-text-row .news-card-text {
+        -webkit-line-clamp: 1 !important;
+        line-clamp: 1 !important;
+        max-height: 1.6rem !important;
+        text-overflow: ellipsis !important;
     }
 
     body.home-view .home-section .feed-section-inner-wrapper .news-card h3.post-title {
@@ -6121,17 +6136,21 @@ h3.section-titles {
     box-shadow: none;
 }
 
-/* Feed section: thumbnails sized for feed layout (aspect ratio unchanged) */
+/* Feed section: thumbnails +50% then −10% vs prior feed size (aspect ratio unchanged) */
 .feed-section-inner-wrapper .news-card,
 .home-section .feed-section-inner-wrapper .news-card {
-    --news-media-width: calc(288px * 1.2 * 0.9);
-    --news-media-height: calc(192px * 1.2 * 0.9);
+    --news-media-width: calc(288px * 1.2 * 0.9 * 1.5 * 0.9);
+    --news-media-height: calc(192px * 1.2 * 0.9 * 1.5 * 0.9);
 }
 
-/* Airtable Featured: same pink as Fieldcolour “Pink” / .news-card-bg-pink */
+/* Featured newsfeed items: pale yellow highlight */
 .news-card.news-card--featured {
-    background-color: #f9f1dc;
+    background-color: #fef9c3 !important;
     border-radius: 5px;
+}
+
+.news-card.news-card--featured:hover {
+    background-color: #fef08a !important;
 }
 
 /* Dynamic background color classes */
@@ -6565,7 +6584,7 @@ h4 {
     font-weight: 600;
 }
 
-/* Three-line excerpt with ellipsis when clipped (~3 × 1.6 line-height) */
+/* Five-line excerpt with ellipsis when clipped (~5 × 1.6 line-height) */
 .news-card-text {
     color: #000000;
     line-height: 1.6;
@@ -6575,12 +6594,12 @@ h4 {
     padding-bottom: 0;
     margin: 0;
     display: -webkit-box !important;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
     overflow: hidden !important;
-    text-overflow: ellipsis;
-    max-height: 4.8rem !important;
+    text-overflow: ellipsis !important;
+    max-height: 8rem !important;
     word-wrap: break-word !important;
     word-break: break-word !important;
 }
@@ -6590,6 +6609,8 @@ h4 {
     -webkit-line-clamp: 1;
     line-clamp: 1;
     max-height: 1.6rem !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 
@@ -8429,8 +8450,8 @@ h4 {
 }
 
 .home-section .skeleton-card--home-feed.news-card {
-    --news-media-width: 288px;
-    --news-media-height: 192px;
+    --news-media-width: calc(288px * 1.2 * 0.9 * 1.5 * 0.9);
+    --news-media-height: calc(192px * 1.2 * 0.9 * 1.5 * 0.9);
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -8521,8 +8542,8 @@ h4 {
 
 @media (max-width: 768px) {
     .home-section .skeleton-card--home-feed.news-card {
-        --news-media-width: 168px;
-        --news-media-height: 115.2px;
+        --news-media-width: calc(168px * 0.8 * 1.2 * 0.9 * 1.1);
+        --news-media-height: calc(115.2px * 0.8 * 1.2 * 0.9 * 1.1);
     }
 }
 
@@ -8766,7 +8787,7 @@ h4 {
 
 /* Footer - outer band matches page; inner block Prussian (matches site chrome) */
 .footer {
-    background: #f0f4f8 !important;
+    background: #e2e6eb !important;
     color: #003153;
     padding: 0;
     margin: 0 0 50px 0;
@@ -8803,7 +8824,7 @@ h4 {
 /* Equal side columns + invisible third column → logo centered in footer */
 @media (min-width: 769px) {
     .footer {
-        background: #f0f4f8 !important;
+        background: #e2e6eb !important;
         color: #003153;
         margin-bottom: 0;
         padding-bottom: 50px;

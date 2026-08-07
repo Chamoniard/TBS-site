@@ -6635,7 +6635,7 @@ async function createNewsCard(record) {
     const unifiedVideoUrl = record.fields.URL || record.fields['Video URL'] || record.fields.Link || record.fields['YouTube URL'] || record.fields['Video Link'] || record.fields.Youtube;
     const isFeatured = hasFeaturedFieldValue(record);
 
-    // Apply background color from Fieldcolour field if it exists (featured cards use CSS pink instead)
+    // Apply background color from Fieldcolour field if it exists (featured cards use pale yellow CSS instead)
     const fieldColour = record.fields.Fieldcolour;
     if (fieldColour && !isFeatured) {
         // Map color names to CSS color values
