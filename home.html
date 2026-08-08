@@ -263,8 +263,10 @@
             }
         }
 
-        body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
-            max-width: min(70vw, 980px) !important;
+        @media (min-width: 769px) {
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
+                max-width: min(70vw, 980px) !important;
+            }
         }
 
         body.home-view .home-section > .feed-section,
@@ -296,6 +298,13 @@
             padding-left: 16px !important;
             padding-right: 16px !important;
             box-sizing: border-box !important;
+        }
+
+        @media (max-width: 768px) {
+            body.home-view .feed-section-inner-wrapper .news-grid {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
         }
 
         body.home-view .home-section > .programme-section,

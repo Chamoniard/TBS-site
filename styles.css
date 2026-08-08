@@ -1652,7 +1652,7 @@ body.home-view .home-section > .speaker-section {
 
     body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
         width: 100%;
-        max-width: calc(100vw - 16px);
+        max-width: 100%;
     }
 
 
