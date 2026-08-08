@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <title>TBS Zermatt</title>
+    <link rel="icon" href="images/emblem.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/emblem.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://firestore.googleapis.com">
+    <style>
+        /* Critical CSS for above-the-fold content */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #ffffff; margin: 0; padding: 0; }
+        .header { background: #003153; backdrop-filter: none; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); position: fixed; top: 0; width: 100%; z-index: 1000; transition: all 0.3s ease; }
+        .navbar { padding: 16px 0; margin-bottom: 0; }
+        @media (max-width: 768px) {
+            :root { --mobile-tab-bar-height: 56px; --navbar-height: calc(env(safe-area-inset-top, 0px) + var(--mobile-tab-bar-height)); }
+            .navbar { padding: 0 !important; height: var(--mobile-tab-bar-height) !important; min-height: var(--mobile-tab-bar-height) !important; max-height: var(--mobile-tab-bar-height) !important; }
+            .hamburger { display: flex !important; }
+        }
+        .nav-container { max-width: 1400px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; }
+        .nav-logo .logo { height: 64.8px; width: auto; max-width: 324px; object-fit: contain; filter: brightness(0) invert(1); }
+        .nav-menu { display: flex; list-style: none; gap: 1.5rem; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
+        .nav-link { text-decoration: none; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 1rem; transition: color 0.3s ease; white-space: nowrap; letter-spacing: 0.02em; }
+        .nav-link:hover { color: #FFD700; }
+        .nav-link.active { color: #FFD700; font-weight: 500; }
+        @media (max-width: 1019px) {
+            .nav-logo { display: none !important; }
+        }
+        @media (min-width: 769px) {
+            .nav-link { font-size: 1rem; }
+            .header { top: 0 !important; bottom: auto !important; width: 100% !important; height: auto !important; }
+            .navbar { top: 0 !important; bottom: auto !important; padding: 16px 0 !important; height: auto !important; min-height: 0 !important; max-height: none !important; }
+            body.home-view { padding-bottom: 0 !important; }
+        }
+        @media (min-width: 1020px) {
+            .nav-logo { display: flex !important; }
+        }
+        :root { font-size: 20px; --navbar-height: calc(16px + 46.656px + 16px); }
+        @media (max-width: 768px) {
+            :root {
+                font-size: 18px;
+                --mobile-tab-bar-height: 56px;
+                --mobile-top-nav-height: var(--mobile-tab-bar-height);
+                --navbar-height: calc(env(safe-area-inset-top, 0px) + var(--mobile-top-nav-height));
+                --mobile-bottom-nav-height: calc(var(--mobile-tab-bar-height) + env(safe-area-inset-bottom, 0px));
+            }
+            .header { top: 0 !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; height: auto !important; pointer-events: none !important; background: transparent !important; }
+            body.home-view .header:not(.post-view), body.home-view .navbar--mobile-top { background: transparent !important; box-shadow: none !important; }
+            body.home-view { padding-bottom: var(--mobile-bottom-nav-height) !important; }
+        }
+        .hero { background: #f8fafc; color: #333; height: calc(var(--navbar-height) - 2px); min-height: calc(var(--navbar-height) - 2px); text-align: left; position: relative; width: 100%; margin: 0 0 8px 0; }
+        @media (max-width: 768px) { .hero { margin: 0 !important; } }
+        body.home-view .home-section { margin-top: 0 !important; background-color: #003153 !important; }
+        body.home-view .hero { display: none !important; }
+        body.home-view .header:not(.post-view) { background: transparent !important; box-shadow: none !important; }
+        body.home-view .navbar { background: transparent !important; box-shadow: none !important; }
+        .everything { margin: 0; padding: 0; }
+        /* Reserve hero poster slot while fixed poster + scroll-over layout loads */
+        body.home-view:not(.past-talks-open) .home-section { padding-top: calc(948px - 330px) !important; }
+        body.home-view:not(.past-talks-open) .home-section > picture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+            max-width: none;
+            height: 948px;
+            overflow: hidden;
+            z-index: 0;
+        }
+        @media (min-width: 769px) {
+            body.home-view:not(.past-talks-open) .home-section {
+                padding-top: calc(min(1300px, 100vw * 1300 / 1920) - max(0px, min(330px, 19.1304347826vw) - 200px)) !important;
+            }
+            body.home-view:not(.past-talks-open) .home-section > picture {
+                height: min(1300px, calc(100vw * 1300 / 1920));
+            }
+        }
+        body.past-talks-open .home-section { padding-top: 0 !important; }
+        body.past-talks-open .home-section > picture {
+            position: relative !important;
+            height: var(--navbar-height);
+            min-height: var(--navbar-height);
+            background-color: #003153;
+        }
+        body.home-view .home-section > picture .home-poster-wide {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top left;
+            display: block;
+        }
+        @media (min-width: 769px) and (max-width: 1150px) {
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
+                top: 119px !important;
+            }
+            body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+                height: min(7.2rem, 12.5217391304vw) !important;
+            }
+        }
+        @media (max-width: 768px) {
+            .mobile-poster-logo-subtitle {
+                display: none !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section {
+                padding-top: max(calc(217.2727272727vw - 330px), 100dvh, 100vh) !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture {
+                height: 217.2727272727vw !important;
+                max-width: 100vw;
+            }
+
+            body.home-view .home-section > picture .home-poster-wide {
+                object-fit: contain;
+                object-position: top center;
+            }
+        }
+        .container { max-width: none; margin: 0 auto; padding: 0 20px; }
+    </style>
+    <script>
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+    </script>
+    <link rel="preload" href="styles.css?v=20260808-carousel-450" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260808-carousel-450">
+    <style>
+        /* Home layout: after styles.css so full-width / 1400px column rules win */
+        body.home-view .everything,
+        body.home-view .home-section,
+        body.home-view .viewer-section,
+        body.home-view.past-talks-open .home-section > picture {
+            max-width: none !important;
+            width: 100% !important;
+        }
+
+        @media (min-width: 769px) {
+            body.home-view .navbar:not(.navbar--mobile-bottom) {
+                --_home-nav-w: var(--_home-nav-avail);
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
+        }
+
+        body.home-view .nav-container {
+            width: 1400px !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        body.home-view .footer-content {
+            width: 1400px !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        body.home-view .footer {
+            background: #003153 !important;
+            background-color: #003153 !important;
+            color: #ffffff !important;
+        }
+
+        body.home-view .footer::before {
+            max-width: 1400px !important;
+            width: 100% !important;
+        }
+
+        body.home-view:not(.past-talks-open) .home-section > picture {
+            max-width: none !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100% !important;
+        }
+
+        body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
+            width: 1400px !important;
+            max-width: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        @media (min-width: 769px) {
+            body.home-view .home-section {
+                --home-poster-layout-height: min(1300px, calc(100vw * 1300 / 1920));
+                --home-poster-visual-height: min(1300px, calc(100vw * 1300 / 1920));
+                /* Logo + titles Y on poster image (fraction of poster height; aspect-matched so = image Y) */
+                --home-poster-titles-y: 18%;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture {
+                container-type: inline-size;
+                container-name: home-poster;
+            }
+
+            body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
+                width: 25cqw !important; /* 25% of poster width */
+                height: auto !important;
+                max-width: none !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
+                top: var(--home-poster-titles-y) !important;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                align-items: baseline !important;
+                justify-content: flex-start !important;
+                text-align: left !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .maintitle-heading {
+                flex: 0 0 100% !important;
+                width: 100% !important;
+                text-align: left !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .tbs27-card-subtitle {
+                display: block !important;
+                width: auto !important;
+                max-width: none !important;
+                flex: 0 0 auto !important;
+                white-space: nowrap !important;
+                text-align: left !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                font-family: 'Montserrat', sans-serif !important;
+                font-size: 1.7rem !important;
+                font-weight: 600 !important;
+                line-height: 1.2 !important;
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+                text-shadow:
+                    0 1px 2px rgba(0, 0, 0, 0.16),
+                    0 1px 4px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .tbs27-card-subtitle:first-of-type::after {
+                content: ', ';
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
+                max-width: min(70vw, 980px) !important;
+            }
+        }
+
+        body.home-view .home-section > .feed-section,
+        body.home-view .feed-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+        }
+
+        body.home-view .home-section .feed-section-inner-wrapper,
+        body.home-view .feed-section-inner-wrapper {
+            width: 1400px !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        body.home-view .feed-section-inner-wrapper > h2.section-titles,
+        body.home-view .feed-section-inner-wrapper .news-grid,
+        body.home-view #home-feed-latest-heading {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+            box-sizing: border-box !important;
+        }
+
+        @media (max-width: 768px) {
+            body.home-view .feed-section-inner-wrapper .news-grid {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+        }
+
+        body.home-view .home-section > .programme-section,
+        body.home-view .programme-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        body.home-view .home-section > .speaker-section,
+        body.home-view .speaker-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        body.home-view .home-section .registration-section-inner-wrapper,
+        body.home-view .registration-section-inner-wrapper {
+            width: 1400px !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        body.home-view .home-section > .registration-section,
+        body.home-view .registration-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        body.home-view .past-talks-section,
+        body.home-view .past-talks-section .past-talks-wrapper {
+            border-radius: 0 !important;
+        }
+
+        body.home-view .past-talks-section {
+            width: 1400px !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-sizing: border-box !important;
+        }
+    </style>
+    <!-- LCP: preload hero poster (WebP) -->
+    <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
+    <!-- Mobile: tab row + Register; after main CSS for cascade -->
+    <style>
+        .nav-past-mobile,
+        .nav-register-mobile-top,
+        .nav-register-mobile-bar,
+        .navbar--mobile-bottom {
+            display: none !important;
+        }
+        @media (max-width: 768px) {
+            .header {
+                top: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                pointer-events: none !important;
+                background: transparent !important;
+            }
+            .navbar--mobile-top {
+                top: env(safe-area-inset-top, 0px) !important;
+                bottom: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                pointer-events: auto !important;
+            }
+            .navbar--mobile-bottom {
+                display: block !important;
+                top: auto !important;
+                bottom: env(safe-area-inset-bottom, 0px) !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                pointer-events: auto !important;
+                background: var(--introslider-nav-glass-bg) !important;
+                background-color: var(--introslider-nav-glass-bg) !important;
+                backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                border: none !important;
+                border-top: 1px solid var(--introslider-nav-glass-border) !important;
+                box-shadow: var(--introslider-nav-glass-shadow) !important;
+            }
+            body.home-view .navbar--mobile-bottom {
+                background: var(--introslider-nav-glass-bg) !important;
+                background-color: var(--introslider-nav-glass-bg) !important;
+                backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
+                border-top: 1px solid var(--introslider-nav-glass-border) !important;
+                box-shadow: var(--introslider-nav-glass-shadow) !important;
+            }
+            body.home-view .header:not(.post-view),
+            body.home-view .navbar--mobile-top {
+                background: transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+            }
+            .nav-logo {
+                display: none !important;
+            }
+            .nav-container--mobile-top {
+                justify-content: space-between !important;
+                align-items: center !important;
+                width: 100% !important;
+                max-width: none !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 8px !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
+                background: transparent !important;
+            }
+            .hamburger {
+                display: flex !important;
+                flex-shrink: 0 !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .hamburger .bar {
+                background-color: #FFD700 !important;
+                filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32)) !important;
+            }
+            body.nav-menu-open .hamburger .bar {
+                filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.28)) drop-shadow(0 1px 3px rgba(255, 255, 255, 0.22)) !important;
+            }
+            .nav-register-mobile-bar {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                margin-left: auto !important;
+            }
+            .nav-register-mobile-top {
+                display: none !important;
+            }
+            .navbar--mobile-top .nav-past-mobile {
+                display: none !important;
+            }
+            .navbar--mobile-top .nav-menu {
+                display: none !important;
+            }
+            .nav-container--mobile-bottom {
+                justify-content: center !important;
+                align-items: center !important;
+                width: 100% !important;
+                max-width: none !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                padding: 0 8px !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
+            }
+            .nav-menu--bottom-tabs {
+                display: flex !important;
+                flex: 1 1 0 !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 100% !important;
+                height: var(--mobile-tab-bar-height) !important;
+                min-height: var(--mobile-tab-bar-height) !important;
+                max-height: var(--mobile-tab-bar-height) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                gap: 8px !important;
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+            .nav-menu--bottom-tabs > .nav-item {
+                flex: 0 0 auto !important;
+                height: var(--mobile-tab-bar-height) !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .nav-menu--bottom-tabs .mobile-top-tab-link {
+                font-size: 1.25rem !important;
+                font-weight: 500 !important;
+                color: #ffffff !important;
+                padding: 0 0.15rem !important;
+                line-height: 1.2 !important;
+                text-align: center !important;
+            }
+            .nav-menu--bottom-tabs .mobile-top-tab-link.active {
+                color: #FFD700 !important;
+            }
+            body.nav-menu-open .nav-register-mobile-bar,
+            body.nav-menu-open .navbar--mobile-bottom {
+                display: none !important;
+            }
+            body.nav-menu-open .hamburger .bar {
+                background-color: #003153 !important;
+            }
+            .navbar--mobile-top .nav-menu.active {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                position: fixed !important;
+                inset: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                min-height: 100dvh !important;
+                max-height: none !important;
+                margin: 0 !important;
+                padding: calc(env(safe-area-inset-top, 0px) + var(--mobile-tab-bar-height) + 12px) 8px calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+                gap: 4px !important;
+                background: #ffd700 !important;
+                background-color: #ffd700 !important;
+                box-shadow: none !important;
+                z-index: 10040 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-item:not(.nav-item-hidden):not(.nav-past-mobile) {
+                display: flex !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .navbar--mobile-top .nav-menu:not(.active) > .nav-menu-logo-item {
+                display: none !important;
+            }
+            .navbar--mobile-top .nav-menu.active > .nav-menu-logo-item {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding-bottom: 8px !important;
+                margin-bottom: 4px !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-menu-logo-btn {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 8px !important;
+                border: none !important;
+                background: transparent !important;
+                cursor: pointer !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-menu-logo-img {
+                display: block !important;
+                max-width: min(72vw, 260px) !important;
+                max-height: 52px !important;
+                width: auto !important;
+                height: auto !important;
+                object-fit: contain !important;
+                filter: none !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-past-desktop {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-item-register-desktop {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-link,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link {
+                font-family: 'Montserrat', sans-serif !important;
+                font-size: 1.25rem !important;
+                font-weight: 500 !important;
+                color: #003153 !important;
+                width: 100% !important;
+                padding: 12px 8px !important;
+                margin: 0 !important;
+                line-height: 1.2 !important;
+                text-align: center !important;
+                -webkit-tap-highlight-color: transparent !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-link:hover,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link:hover,
+            .navbar--mobile-top .nav-menu.active .nav-link.active,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link.active {
+                color: #003153 !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-link.active,
+            .navbar--mobile-top .nav-menu.active .mobile-top-tab-link.active {
+                font-weight: 600 !important;
+            }
+            .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill {
+                background: transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                font-size: 1rem !important;
+                margin: 0 !important;
+                padding: 12px 4px !important;
+            }
+            .home-section .feed-section-inner-wrapper h3.post-title,
+            .feed-section-inner-wrapper h3.post-title {
+                font-size: 1.1rem !important;
+                font-weight: 500 !important;
+                line-height: 1.25 !important;
+                max-height: calc(2 * 1.1rem * 1.25) !important;
+                -webkit-line-clamp: 2 !important;
+                line-clamp: 2 !important;
+            }
+        }
+    </style>
+    <!-- Inter 4 (body) + Montserrat (headers/titles): preload + non-blocking -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" as="style">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:wght@300;400;500;600;700;800&display=swap">
+    </noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap">
+    </noscript>
+    <!-- Footer social icons — non-blocking -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
+    </noscript>
+</head>
+<body class="home-view loading">
+    <div id="home-loading-screen" class="home-loading-screen" aria-live="polite" aria-busy="true" aria-label="Loading page">
+        <img src="images/logo.png" alt="TBS Zermatt" class="home-loading-screen-logo" width="324" height="65" loading="eager" decoding="async">
+    </div>
+    <header class="header">
+        <nav class="navbar navbar--mobile-top">
+            <div class="nav-container nav-container--mobile-top">
+                <button type="button" class="hamburger" id="site-nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <div class="nav-logo" role="button" tabindex="0" aria-label="Home">
+                    <img src="images/logo.png" alt="TBS Zermatt" class="logo" loading="eager" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <h2 style="display: none;">TBS Zermatt Blog</h2>
+                </div>
+                <ul class="nav-menu" id="site-nav-menu">
+                    <li class="nav-item nav-menu-logo-item">
+                        <button type="button" class="nav-menu-logo-btn" aria-label="TBS Zermatt home">
+                            <img src="images/logo.png" alt="" class="nav-menu-logo-img" width="291" height="58" loading="eager" decoding="async">
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
+                    </li>
+                    <li class="nav-item nav-past-desktop">
+                        <span class="nav-link" data-view="past-talks" style="cursor: pointer;">Past talks</span>
+                    </li>
+                    <li class="nav-item nav-past-mobile">
+                        <span class="nav-link mobile-top-tab-link" data-view="past-talks" style="cursor: pointer;">Talks</span>
+                    </li>
+                    <li class="nav-item nav-item-register-desktop">
+                        <span class="nav-link nav-register-pill" data-view="register" style="cursor: pointer;">Register</span>
+                    </li>
+                    <li class="nav-item nav-item-hidden">
+                        <a href="login.html" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item nav-item-hidden">
+                        <a href="login.html" class="nav-link user-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; font-size: 1.38rem; color: #003153; border-radius: 50%; transition: all 0.3s ease; background-color: #FFD700; border: 2px solid #FFD700; text-shadow: none; filter: none;">👤</a>
+                    </li>
+                </ul>
+                <div class="nav-register-mobile-bar">
+                    <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
+                </div>
+            </div>
+        </nav>
+        <nav class="navbar navbar--mobile-bottom" aria-label="Section navigation">
+            <div class="nav-container nav-container--mobile-bottom">
+                <ul class="nav-menu nav-menu--bottom-tabs">
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link active" data-view="feed" style="cursor: pointer;">Home</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="flyer" style="cursor: pointer;">Programme</span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link mobile-top-tab-link" data-view="speakers" style="cursor: pointer;">Speakers</span>
+                    </li>
+                    <li class="nav-item nav-past-mobile">
+                        <span class="nav-link mobile-top-tab-link" data-view="past-talks" style="cursor: pointer;">Talks</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="everything">
+        <section class="home-section">
+            <picture>
+                <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
+                <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
+                <img src="images/wideposter.webp" alt="" class="home-poster-wide" width="1920" height="1300" loading="eager" decoding="async" fetchpriority="high">
+                <canvas class="poster-snow-canvas" aria-hidden="true"></canvas>
+                <div class="poster-top-divider">
+                    <picture class="event-section-divider-picture">
+                        <source media="(max-width: 768px)" srcset="images/narrowdivider.png">
+                        <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async" aria-hidden="true">
+                    </picture>
+                </div>
+                <div class="poster-maintitles">
+                    <h1 class="section-titles maintitle-heading tbs27-card-maintitle" id="home-event-welcome-heading">
+                        <span class="poster-maintitle-text">TBS27</span>
+                        <img src="images/27logo.png" alt="TBS27" class="poster-maintitle-logo" width="1000" height="347" loading="eager" decoding="async">
+                    </h1>
+                    <h2 class="section-titles tbs27-card-subtitle">9-12 February, 2027</h2>
+                    <h2 class="section-titles tbs27-card-subtitle">Hotel Alex, Zermatt</h2>
+                </div>
+            </picture>
+            <div class="feed-section">
+                <div class="feed-section-inner-wrapper">
+                </div>
+            </div>
+        </section>
+        <section class="past-talks-section is-collapsed" hidden aria-hidden="true"></section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section footer-section-stack">
+                <div class="footer-section-row">
+                    <h3 class="post-title">Social</h3>
+                    <div class="hero-social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section-row footer-section-contact">
+                    <h3 class="post-title">Contact</h3>
+                    <p><a class="footer-contact-email" href="mailto:info@tbs-zermatt.org">info@tbs-zermatt.org</a></p>
+                </div>
+            </div>
+            <div class="footer-section footer-logo-section">
+                <div class="footer-logo-container">
+                    <img src="images/emblem.png" alt="TBS Zermatt" class="footer-logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="footer-logo-fallback" style="display: none;">
+                        <h3 class="section-titles footer-logo-fallback-title">TBS ZERMATT</h3>
+                        <p style="color: #94a3b8; margin: 0.5rem 0 0 0; font-size: 0.9rem;">THE SICKEST PATIENTS. THE FIRST HOURS.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section footer-section-balance" aria-hidden="true"></div>
+        </div>
+    </footer>
+
+    <!-- Canonical programme day blocks: home slider (script.js) and backend editor fetch from here -->
+    <div id="programme-index-source" hidden aria-hidden="true">
+        <div class="programme-tuesday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Tuesday will appear here.</p></div>
+        </div>
+        <div class="programme-wednesday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Wednesday will appear here.</p></div>
+        </div>
+        <div class="programme-thursday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Thursday will appear here.</p></div>
+        </div>
+        <div class="programme-friday">
+            <div class="programme-day-content programmestyle"><p>Programme details for Friday will appear here.</p></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="script.js?v=20260808-home-from-sandbox" defer></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" class="index-is-checking">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <title>TBS Zermatt</title>
+    <link rel="icon" href="images/emblem.png" type="image/png">
+    <script>
+        (function () {
+            try {
+                var raw = localStorage.getItem('tbs:index:standby');
+                var parts = raw ? String(raw).split('|') : [];
+                var cachedAt = Number(parts[1] || 0);
+                if (parts[0] === 'no' && cachedAt && Date.now() - cachedAt < 300000) {
+                    window.location.replace('home.html');
+                }
+            } catch (e) {
+                /* ignore */
+            }
+        })();
+    </script>
+    <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+    <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background: #003153;
+            position: relative;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .index-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 100dvh;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .index-is-checking .index-content {
+            visibility: hidden;
+        }
+
+        .index-poster {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .poster-bg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top left;
+        }
+
+        .index-brand {
+            position: absolute;
+            top: clamp(7rem, 20vw, 267px);
+            left: clamp(1rem, 3vw, 24px);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            z-index: 2;
+            pointer-events: none;
+            user-select: none;
+            width: max-content;
+            max-width: none;
+        }
+
+        .index-logo {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .index-standby-title {
+            margin: 0;
+            padding-left: 5px;
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: clamp(1.35rem, 4vw, 2rem);
+            font-weight: 500;
+            line-height: 1.1;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .index-standby-title * {
+            color: inherit;
+            white-space: nowrap;
+        }
+
+        .index-standby-title:not(.is-ready) {
+            visibility: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .index-brand {
+                top: 10vh;
+                bottom: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                align-items: center;
+                text-align: center;
+                width: max-content;
+                max-width: none;
+            }
+
+            .index-logo {
+                width: min(88vw, 420px);
+            }
+
+            .index-standby-title {
+                padding-left: 0;
+                font-size: clamp(1rem, 3.6vw, 1.75rem);
+            }
+        }
+    </style>
+</head>
+<body aria-label="Poster background page">
+    <div class="index-content">
+        <picture class="index-poster">
+            <source media="(max-width: 768px)" srcset="images/narrowposter.webp" type="image/webp">
+            <source media="(min-width: 769px)" srcset="images/wideposter.webp" type="image/webp">
+            <img src="images/wideposter.webp" alt="" class="poster-bg" width="1920" height="1300" decoding="async" fetchpriority="high" aria-hidden="true">
+        </picture>
+        <div class="index-brand">
+            <img src="images/logo.png" alt="TBS Zermatt" class="index-logo" width="640" height="128" decoding="async">
+            <p class="index-standby-title" id="index-standby-title" aria-live="polite"></p>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="index.js?v=20260628-fast-home-redirect" defer></script>
+</body>
+</html>
