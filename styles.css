@@ -201,7 +201,7 @@ body.loading:not(.home-view)::after {
     /* Register / Apply / More / Less — shared fixed width (sized for “Register”; 75% scale) */
     --tbs-action-btn-width: 4.78125rem;
     /* Programme + speaker carousel cards (home + backend Snippets preview) */
-    --home-carousel-slide-width: 600px;
+    --home-carousel-slide-width: 450px;
     --home-carousel-minimal-aspect-ratio: 1080 / 1920;
 }
 
@@ -1258,7 +1258,7 @@ body.home-view .hero {
 /* Feed Section */
 .home-section {
     /* Programme day strip + speakers slider: same slide width (see speakerslider-track / programme-slider) */
-    --home-carousel-slide-width: 600px;
+    --home-carousel-slide-width: 450px;
     /* Home programme + speaker carousel cards: 1080×1920 portrait */
     --home-carousel-minimal-aspect-ratio: 1080 / 1920;
     padding-bottom: 0;
@@ -2563,7 +2563,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 .home-section .speakerslider-track {
     /* Same width token as `.home-section .programme-slider` (--home-carousel-slide-width) */
-    --introslider-column-width: var(--home-carousel-slide-width, 600px);
+    --introslider-column-width: var(--home-carousel-slide-width, 450px);
     display: flex;
     flex-wrap: nowrap;
     align-items: flex-start;
@@ -4065,7 +4065,7 @@ body.home-view .home-section > .home-social-row-container {
 /* TBS27 introslider track: same width behavior as carousel inside .home-section */
 .flyer-section .introslider {
     --introslider-card-width-scale: 0.978285; /* prior scale × 1.1 (+10%) */
-    --introslider-column-width: calc(var(--home-carousel-slide-width, 600px) * var(--introslider-card-width-scale));
+    --introslider-column-width: calc(var(--home-carousel-slide-width, 450px) * var(--introslider-card-width-scale));
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -4082,7 +4082,7 @@ body.home-view .home-section > .home-social-row-container {
     box-sizing: border-box;
     background-color: transparent;
     background-image: none;
-    --introslider-column-width: var(--home-carousel-slide-width, 600px);
+    --introslider-column-width: var(--home-carousel-slide-width, 450px);
     align-items: flex-start;
     gap: 0 !important;
     border: none;
@@ -4200,10 +4200,10 @@ body.home-view .home-section > .home-social-row-container {
     border-radius: 5px 0 0 5px !important;
     box-sizing: border-box;
     box-shadow: none;
-    flex: 0 0 var(--home-carousel-slide-width, 600px) !important;
-    width: var(--home-carousel-slide-width, 600px) !important;
-    min-width: var(--home-carousel-slide-width, 600px) !important;
-    max-width: var(--home-carousel-slide-width, 600px) !important;
+    flex: 0 0 var(--home-carousel-slide-width, 450px) !important;
+    width: var(--home-carousel-slide-width, 450px) !important;
+    min-width: var(--home-carousel-slide-width, 450px) !important;
+    max-width: var(--home-carousel-slide-width, 450px) !important;
     aspect-ratio: var(--home-carousel-minimal-aspect-ratio, 1080 / 1920);
     height: auto !important;
     align-self: flex-start !important;

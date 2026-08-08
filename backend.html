@@ -9,7 +9,7 @@
     <title>Backend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=20260605-introslider-hover-lift-fix">
+    <link rel="stylesheet" href="styles.css?v=20260808-carousel-450">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* After styles.css so this wins: 1rem = 16px on backend (overrides :root 18px site-wide). */
@@ -7502,7 +7502,7 @@
         }
 
         #texteditor .texteditor-render-html .texteditor-speaker-info-preview {
-            --home-carousel-slide-width: 600px;
+            /* Card width from styles.css --home-carousel-slide-width (same as home) */
             display: inline-flex;
             align-items: flex-start;
             width: fit-content;
@@ -8221,9 +8221,8 @@
             margin-left: 16px;
             margin-right: 16px;
             box-sizing: border-box;
-            --home-carousel-slide-width: 600px;
-            --introslider-column-width: var(--home-carousel-slide-width, 600px);
-            --home-carousel-minimal-aspect-ratio: 1080 / 1920;
+            /* Width/aspect inherit styles.css :root --home-carousel-* (same as home) */
+            --introslider-column-width: var(--home-carousel-slide-width);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
         }
 
