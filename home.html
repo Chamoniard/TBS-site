@@ -245,13 +245,21 @@
                 text-align: left !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
-                /* Scale with logo: logo is 25cqw wide; keep prior 1.5rem / 10.8rem height ratio */
-                font-size: calc(25cqw * 347 / 1000 * 1.5 / 10.8) !important;
+                font-family: 'Montserrat', sans-serif !important;
+                font-size: 1.7rem !important;
+                font-weight: 700 !important;
                 line-height: 1.2 !important;
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+                text-shadow:
+                    0 1px 2px rgba(0, 0, 0, 0.16),
+                    0 1px 4px rgba(0, 0, 0, 0.1) !important;
             }
 
             body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .tbs27-card-subtitle:first-of-type::after {
                 content: ', ';
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
             }
         }
 
