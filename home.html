@@ -17,7 +17,7 @@
     <style>
         /* Critical CSS for above-the-fold content */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #e2e6eb; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #ffffff; margin: 0; padding: 0; }
         .header { background: #003153; backdrop-filter: none; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); position: fixed; top: 0; width: 100%; z-index: 1000; transition: all 0.3s ease; }
         .navbar { padding: 16px 0; margin-bottom: 0; }
         @media (max-width: 768px) {
@@ -134,13 +134,12 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260807-featured-pale-yellow" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260807-featured-pale-yellow">
+    <link rel="preload" href="styles.css?v=20260808-canvas-white" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260808-canvas-white">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
         body.home-view .home-section,
-        body.home-view .past-talks-section,
         body.home-view .viewer-section,
         body.home-view.past-talks-open .home-section > picture {
             max-width: none !important;
@@ -322,6 +321,23 @@
             padding-right: 0 !important;
             border: none !important;
             border-radius: 0 !important;
+        }
+
+        body.home-view .past-talks-section,
+        body.home-view .past-talks-section .past-talks-wrapper {
+            border-radius: 0 !important;
+        }
+
+        body.home-view .past-talks-section {
+            width: 1400px !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-sizing: border-box !important;
         }
     </style>
     <!-- LCP: preload hero poster (WebP) -->

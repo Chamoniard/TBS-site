@@ -58,14 +58,14 @@ html, body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    background-color: #e2e6eb;
+    background-color: #ffffff;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 1.6;
     color: #000000;
-    background-color: #e2e6eb;
+    background-color: #ffffff;
     margin: 0;
     padding: 0;
     transition: opacity 0.3s ease;
@@ -8028,6 +8028,8 @@ h4 {
     flex: 0 0 auto;
     width: 6rem;
     min-width: 6rem;
+    background: var(--tbs-loading-pink, #fce7f3);
+    background-color: var(--tbs-loading-pink, #fce7f3);
 }
 .past-talks-search-input {
     width: 100%;
@@ -8037,7 +8039,8 @@ h4 {
     border-radius: 5px;
     font-family: inherit;
     color: #1e293b;
-    background: #fc70d7;
+    background: var(--tbs-loading-pink, #fce7f3);
+    background-color: var(--tbs-loading-pink, #fce7f3);
     transition: border-color 0.2s ease;
     box-sizing: border-box;
 }
@@ -8140,10 +8143,10 @@ h4 {
     border-color: #003153;
 }
 
-/* Blog Grid */
+/* Blog Grid — auto-fit cards, never more than 4 per row (3×16px gaps) */
 .blog-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(max(350px, calc((100% - 48px) / 4)), 1fr));
     row-gap: 24px;
     column-gap: 16px;
     margin-bottom: 16px;
@@ -8787,7 +8790,7 @@ h4 {
 
 /* Footer - outer band matches page; inner block Prussian (matches site chrome) */
 .footer {
-    background: #e2e6eb !important;
+    background: #ffffff !important;
     color: #003153;
     padding: 0;
     margin: 0 0 50px 0;
@@ -8824,7 +8827,7 @@ h4 {
 /* Equal side columns + invisible third column → logo centered in footer */
 @media (min-width: 769px) {
     .footer {
-        background: #e2e6eb !important;
+        background: #ffffff !important;
         color: #003153;
         margin-bottom: 0;
         padding-bottom: 50px;
