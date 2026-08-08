@@ -74,17 +74,17 @@
             margin-left: auto;
             margin-right: auto;
             width: 100%;
-            max-width: none;
+            max-width: 1400px;
             height: 948px;
             overflow: hidden;
             z-index: 0;
         }
         @media (min-width: 769px) {
             body.home-view:not(.past-talks-open) .home-section {
-                padding-top: calc(min(1300px, 100vw * 1300 / 1920) - max(0px, min(330px, 19.1304347826vw) - 200px)) !important;
+                padding-top: calc(min(948px, 67.7083333333vw) - max(0px, min(330px, 19.1304347826vw) - 200px)) !important;
             }
             body.home-view:not(.past-talks-open) .home-section > picture {
-                height: min(1300px, calc(100vw * 1300 / 1920));
+                height: min(948px, 67.7083333333vw);
             }
         }
         body.past-talks-open .home-section { padding-top: 0 !important; }
@@ -128,7 +128,7 @@
                 object-position: top center;
             }
         }
-        .container { max-width: none; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
     </style>
     <script>
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -136,193 +136,6 @@
     </script>
     <link rel="preload" href="styles.css?v=20260807-featured-pale-yellow" as="style">
     <link rel="stylesheet" href="styles.css?v=20260807-featured-pale-yellow">
-    <style>
-        /* Home layout: after styles.css so full-width / 1400px column rules win */
-        body.home-view .everything,
-        body.home-view .home-section,
-        body.home-view .past-talks-section,
-        body.home-view .viewer-section,
-        body.home-view.past-talks-open .home-section > picture {
-            max-width: none !important;
-            width: 100% !important;
-        }
-
-        @media (min-width: 769px) {
-            body.home-view .navbar:not(.navbar--mobile-bottom) {
-                --_home-nav-w: var(--_home-nav-avail);
-                left: 0 !important;
-                right: 0 !important;
-                width: 100% !important;
-                max-width: none !important;
-            }
-        }
-
-        body.home-view .nav-container {
-            width: 1400px !important;
-            max-width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            box-sizing: border-box !important;
-        }
-
-        body.home-view .footer-content {
-            width: 1400px !important;
-            max-width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            box-sizing: border-box !important;
-        }
-
-        body.home-view .footer {
-            background: #003153 !important;
-            background-color: #003153 !important;
-            color: #ffffff !important;
-        }
-
-        body.home-view .footer::before {
-            max-width: 1400px !important;
-            width: 100% !important;
-        }
-
-        body.home-view:not(.past-talks-open) .home-section > picture {
-            max-width: none !important;
-            left: 0 !important;
-            right: 0 !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            width: 100% !important;
-        }
-
-        body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
-            width: 1400px !important;
-            max-width: 100% !important;
-            left: 0 !important;
-            right: 0 !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            box-sizing: border-box !important;
-        }
-
-        @media (min-width: 769px) {
-            body.home-view .home-section {
-                --home-poster-layout-height: min(1300px, calc(100vw * 1300 / 1920));
-                --home-poster-visual-height: min(1300px, calc(100vw * 1300 / 1920));
-                /* Logo + titles Y on poster image (fraction of poster height; aspect-matched so = image Y) */
-                --home-poster-titles-y: 18%;
-            }
-
-            body.home-view:not(.past-talks-open) .home-section > picture {
-                container-type: inline-size;
-                container-name: home-poster;
-            }
-
-            body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
-                width: 25cqw !important; /* 25% of poster width */
-                height: auto !important;
-                max-width: none !important;
-            }
-
-            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
-                top: var(--home-poster-titles-y) !important;
-                flex-direction: row !important;
-                flex-wrap: wrap !important;
-                align-items: baseline !important;
-                justify-content: flex-start !important;
-                text-align: left !important;
-            }
-
-            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .maintitle-heading {
-                flex: 0 0 100% !important;
-                width: 100% !important;
-                text-align: left !important;
-            }
-
-            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .tbs27-card-subtitle {
-                display: block !important;
-                width: auto !important;
-                max-width: none !important;
-                flex: 0 0 auto !important;
-                white-space: nowrap !important;
-                text-align: left !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                /* Scale with logo: logo is 25cqw wide; keep prior 1.5rem / 10.8rem height ratio */
-                font-size: calc(25cqw * 347 / 1000 * 1.5 / 10.8) !important;
-                line-height: 1.2 !important;
-            }
-
-            body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles .tbs27-card-subtitle:first-of-type::after {
-                content: ', ';
-            }
-        }
-
-        body.home-view:not(.past-talks-open) .home-section > picture .poster-top-divider {
-            max-width: min(70vw, 980px) !important;
-        }
-
-        body.home-view .home-section > .feed-section,
-        body.home-view .feed-section {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            border: none !important;
-            border-radius: 0 !important;
-            background: #ffffff !important;
-            background-color: #ffffff !important;
-        }
-
-        body.home-view .home-section .feed-section-inner-wrapper,
-        body.home-view .feed-section-inner-wrapper {
-            width: 1400px !important;
-            max-width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            border: none !important;
-            border-radius: 0 !important;
-            box-sizing: border-box !important;
-        }
-
-        body.home-view .feed-section-inner-wrapper > h2.section-titles,
-        body.home-view .feed-section-inner-wrapper .news-grid {
-            padding-left: 16px !important;
-            padding-right: 16px !important;
-            box-sizing: border-box !important;
-        }
-
-        body.home-view .home-section > .programme-section,
-        body.home-view .programme-section {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            border: none !important;
-            border-radius: 0 !important;
-        }
-
-        body.home-view .home-section > .speaker-section,
-        body.home-view .speaker-section {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            border: none !important;
-            border-radius: 0 !important;
-        }
-
-        body.home-view .home-section .registration-section-inner-wrapper,
-        body.home-view .registration-section-inner-wrapper {
-            width: 1400px !important;
-            max-width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            box-sizing: border-box !important;
-        }
-
-        body.home-view .home-section > .registration-section,
-        body.home-view .registration-section {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            border: none !important;
-            border-radius: 0 !important;
-        }
-    </style>
     <!-- LCP: preload hero poster (WebP) -->
     <link rel="preload" as="image" href="images/narrowposter.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
     <link rel="preload" as="image" href="images/wideposter.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
@@ -781,6 +594,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260808-home-from-sandbox" defer></script>
+    <script src="script.js?v=20260807-intro-card-h" defer></script>
 </body>
 </html>

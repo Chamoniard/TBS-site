@@ -4257,7 +4257,7 @@ const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome'
 const HOME_PASSWORD_PROTECT_VALUE = 'VilleTrollkarl';
 const HOME_PASSWORD_SESSION_STORAGE_KEY = 'tbs-home-password-ok';
 /** Placeholder slides when Settings hide speakers/programme roster (after optional info card). */
-const HOME_CAROUSEL_TBA_CARD_COUNT = 2;
+const HOME_CAROUSEL_TBA_CARD_COUNT = 4;
 
 /** @returns {boolean} true when speaker roster cards should show (default Yes). */
 function normalizeHomeDisplaySpeakersSetting(value) {

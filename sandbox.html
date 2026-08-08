@@ -6,7 +6,7 @@
     <meta name="robots" content="index, follow">
     <meta name="googlebot" content="index, follow">
     <meta name="bingbot" content="index, follow">
-    <title>TBS Zermatt</title>
+    <title>TBS Zermatt — Sandbox</title>
     <link rel="icon" href="images/emblem.png" type="image/png">
     <link rel="apple-touch-icon" href="images/emblem.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -137,12 +137,12 @@
     <link rel="preload" href="styles.css?v=20260807-featured-pale-yellow" as="style">
     <link rel="stylesheet" href="styles.css?v=20260807-featured-pale-yellow">
     <style>
-        /* Home layout: after styles.css so full-width / 1400px column rules win */
+        /* Sandbox only: after styles.css so full-width wins over the 1400px column */
         body.home-view .everything,
         body.home-view .home-section,
         body.home-view .past-talks-section,
         body.home-view .viewer-section,
-        body.home-view.past-talks-open .home-section > picture {
+        body.home-view.sandbox-view.past-talks-open .home-section > picture {
             max-width: none !important;
             width: 100% !important;
         }
@@ -208,12 +208,12 @@
                 --home-poster-layout-height: min(1300px, calc(100vw * 1300 / 1920));
                 --home-poster-visual-height: min(1300px, calc(100vw * 1300 / 1920));
                 /* Logo + titles Y on poster image (fraction of poster height; aspect-matched so = image Y) */
-                --home-poster-titles-y: 18%;
+                --sandbox-poster-titles-y: 18%;
             }
 
             body.home-view:not(.past-talks-open) .home-section > picture {
                 container-type: inline-size;
-                container-name: home-poster;
+                container-name: sandbox-poster;
             }
 
             body.home-view .home-section > picture .poster-maintitles .poster-maintitle-logo {
@@ -223,7 +223,7 @@
             }
 
             body.home-view:not(.past-talks-open) .home-section > picture .poster-maintitles {
-                top: var(--home-poster-titles-y) !important;
+                top: var(--sandbox-poster-titles-y) !important;
                 flex-direction: row !important;
                 flex-wrap: wrap !important;
                 align-items: baseline !important;
@@ -629,7 +629,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
     </noscript>
 </head>
-<body class="home-view loading">
+<body class="home-view sandbox-view loading">
     <div id="home-loading-screen" class="home-loading-screen" aria-live="polite" aria-busy="true" aria-label="Loading page">
         <img src="images/logo.png" alt="TBS Zermatt" class="home-loading-screen-logo" width="324" height="65" loading="eager" decoding="async">
     </div>
