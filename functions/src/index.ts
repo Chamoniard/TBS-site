@@ -32,7 +32,9 @@ const gmailSendClientIdParam = defineSecret("GMAIL_SEND_CLIENT_ID");
 const gmailSendClientSecretParam = defineSecret("GMAIL_SEND_CLIENT_SECRET");
 const gmailSendRefreshTokenParam = defineSecret("GMAIL_SEND_REFRESH_TOKEN");
 const gmailSendFromParam = defineSecret("GMAIL_SEND_FROM");
-const gmailSpeakerSendClientIdParam = defineSecret("GMAIL_SPEAKER_SEND_CLIENT_ID");
+const gmailSpeakerSendClientIdParam = defineSecret(
+  "GMAIL_SPEAKER_SEND_CLIENT_ID",
+);
 const gmailSpeakerSendClientSecretParam = defineSecret(
   "GMAIL_SPEAKER_SEND_CLIENT_SECRET",
 );
@@ -183,7 +185,8 @@ async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
 }
 
 /**
- * Load speaker invitation HTML + optional subject from tbs/Snippets.Speakerinvitation.
+ * Load speaker invitation HTML + optional subject from
+ * tbs/Snippets.Speakerinvitation.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<{html: string, subject: string}>} Template fields.
  */
@@ -1434,8 +1437,9 @@ export const sendGuestInviteHttp = onRequest({
 });
 
 /**
- * Speaker workflow: send formal invitation HTML from tbs/Snippets.Speakerinvitation
- * as info@… using server-side Gmail OAuth (GMAIL_SPEAKER_SEND_* secrets).
+ * Speaker workflow: send formal invitation HTML from
+ * tbs/Snippets.Speakerinvitation as info@… using server-side Gmail OAuth
+ * (GMAIL_SPEAKER_SEND_* secrets).
  * Sets Status/inviteStatus to Invited + Speaker log line.
  * Expects JSON: { speakerId }.
  * Guest invite path (sendGuestInviteHttp) is unchanged.

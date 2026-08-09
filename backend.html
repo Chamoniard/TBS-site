@@ -10368,9 +10368,6 @@
             var confirmedDate = s.confirmedDate != null ? String(s.confirmedDate).trim() : '';
             payload.confirmedDate = confirmedDate;
             payload['Confirmed date'] = confirmedDate;
-            var invitedDate = s.invitedDate != null ? String(s.invitedDate).trim() : '';
-            payload.invitedDate = invitedDate;
-            payload['Invited date'] = invitedDate;
             var ev = String(s && s.event != null ? s.event : '').trim();
             if (ev) payload.event = ev;
             if (Array.isArray(s.speakerLog) && s.speakerLog.length) {
@@ -10423,20 +10420,6 @@
             for (var i = log.length - 1; i >= 0; i--) {
                 var m = String(log[i] != null ? log[i] : '').match(
                     /^(\d{2})(\d{2})(\d{2}):\s*Speaker confirmed/i
-                );
-                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
-            }
-            return '';
-        }
-
-        function speakerInvitedDateLabelFromRecord(s) {
-            if (!s) return '';
-            var stored = s.invitedDate != null ? String(s.invitedDate).trim() : '';
-            if (stored) return stored;
-            var log = Array.isArray(s.speakerLog) ? s.speakerLog : [];
-            for (var i = log.length - 1; i >= 0; i--) {
-                var m = String(log[i] != null ? log[i] : '').match(
-                    /^(\d{2})(\d{2})(\d{2}):\s*Formal invite sent/i
                 );
                 if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
             }
@@ -13265,7 +13248,6 @@
                 event: String(current_event || '').trim(),
                 inviteStatus: 'Preliminary',
                 confirmedDate: '',
-                invitedDate: '',
                 lodging: 'No',
                 bioStatus: 'No',
                 bioPublish: 'No',
@@ -13890,11 +13872,6 @@
                     'Confirmed Date',
                     'Status date',
                     'Status Date'
-                ]),
-                invitedDate: speakerCoalesceStringField(d, [
-                    'invitedDate',
-                    'Invited date',
-                    'Invited Date'
                 ]),
                 titlesStatus: normalizeSpeakerTitlesStatus(
                     speakerCoalesceStringField(d, ['titlesStatus', 'Title', 'Titles received?']) || 'No'
@@ -17384,6 +17361,7 @@
             // Lodging / later steps unlock only after Status is Invited.
             var canRequestLodging = Boolean(s && workflowPastInvite && lodgingSt === 'No');
             var runRequestLodging = canRequestLodging && padlockOpen;
+            var showInviteCheck = formalInviteSent;
             if (confirmSpeakerBtn) {
                 confirmSpeakerBtn.hidden = !showConfirmSpeaker;
                 confirmSpeakerBtn.setAttribute('aria-hidden', showConfirmSpeaker ? 'false' : 'true');
@@ -17412,24 +17390,19 @@
                 inviteBtn.setAttribute('aria-hidden', 'false');
                 inviteBtn.disabled = !runSendFormalInvite;
                 inviteBtn.setAttribute('aria-disabled', runSendFormalInvite ? 'false' : 'true');
-                // After send: gray inactive (not green is-done) with "Invited <date>".
                 setSpeakerWorkflowStepState(inviteBtn, {
                     active: canSendFormalInvite,
-                    done: false
+                    done: formalInviteSent
                 });
                 var inviteLabel = inviteBtn.querySelector('.speaker-send-formal-invite-label');
                 if (inviteLabel) {
-                    if (formalInviteSent) {
-                        var invitedDateLabel = speakerInvitedDateLabelFromRecord(s) || '—';
-                        inviteLabel.textContent = 'Invited ' + invitedDateLabel;
-                    } else {
-                        inviteLabel.textContent = 'Send formal invite';
-                    }
+                    inviteLabel.textContent =
+                        formalInviteSent ? 'Formal invite sent' : 'Send formal invite';
                 }
             }
             if (inviteCheck) {
-                inviteCheck.hidden = true;
-                inviteCheck.setAttribute('aria-hidden', 'true');
+                inviteCheck.hidden = !showInviteCheck;
+                inviteCheck.setAttribute('aria-hidden', showInviteCheck ? 'false' : 'true');
             }
             var showConfirmLodgingCheck = Boolean(s && workflowPastInvite && lodgingSt === 'Own lodging');
             if (confirmLodgingCheck) {
@@ -21269,10 +21242,9 @@
         }
 
         /**
-         * Send formal speaker invitation via Cloud Function `sendSpeakerInviteHttp`
-         * (server Gmail as GMAIL_SPEAKER_SEND_FROM / info@…).
-         * Body from tbs/Snippets `Speakerinvitation` with {{Event}} / {{Name}}.
-         * On success sets Status=Invited + log line in Firestore.
+         * Send formal speaker invitation e-mail (Gmail API). Body from tbs/Snippets `Speakerinvitation`.
+         * Replaces `{{Event}}` with `current_event` and `{{Name}}` with the speaker `firstName`.
+         * Requires Status `Confirmed`. On success appends a Formal invite sent log line.
          */
         async function sendSpeakerFormalInvitationEmail() {
             var btn = document.getElementById('speaker-send-formal-invite-btn');
@@ -21281,7 +21253,6 @@
                 if (typeof showStatus === 'function') showStatus('error', 'Select a speaker first.');
                 return;
             }
-            if (!speakerPadlockIsOpen) return;
             var s = findSpeakerInMemory(id);
             if (!s) {
                 if (typeof showStatus === 'function') showStatus('error', 'Speaker not found.');
@@ -21293,79 +21264,86 @@
                 }
                 return;
             }
-            // Keep Firestore `email` in sync so the Cloud Function sends to tbs/Speakers email.
-            readSpeakerFormIntoRecord(s);
+            if (speakerFormalInviteWasSent(s)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'Formal invite was already sent for this speaker.');
+                }
+                return;
+            }
             var toRaw = s.email != null ? String(s.email).trim() : '';
+            var emailEl = document.getElementById('add-speaker-email');
+            if (!toRaw && emailEl) toRaw = String(emailEl.value || '').trim();
             if (!toRaw || /[\r\n]/.test(toRaw) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toRaw)) {
                 if (typeof showStatus === 'function') {
                     showStatus('error', 'This speaker has no valid E-mail address.');
                 }
                 return;
             }
-            markSpeakerDocDirty(id);
-            var flushed = await flushSpeakersToFirebase({ silent: true });
-            if (!flushed) {
-                if (typeof showStatus === 'function') {
-                    showStatus('error', 'Could not save speaker email before sending.');
-                }
-                return;
-            }
-            if (btn) {
-                btn.disabled = true;
-                btn.setAttribute('aria-disabled', 'true');
-            }
-            if (typeof showStatus === 'function') {
-                showStatus('loading', 'Sending formal invite...');
-            }
+            if (!(await ensureGmailAccessForSending())) return;
+            if (btn) btn.disabled = true;
             try {
-                var fnUrl =
-                    'https://us-central1-' +
-                    String(firebaseConfig.projectId || '').trim() +
-                    '.cloudfunctions.net/sendSpeakerInviteHttp';
-                var res = await fetch(fnUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ speakerId: id }),
-                });
-                var payload = {};
-                try {
-                    payload = await res.json();
-                } catch (parseErr) {
-                    payload = {};
-                }
-                if (!res.ok) {
-                    var errMsg =
-                        payload && payload.error
-                            ? String(payload.error)
-                            : 'Function call failed (' + res.status + ')';
-                    throw new Error(errMsg);
+                var template = await fetchSpeakerInvitationFromFirestore();
+                var html = String(template.html || '').trim();
+                if (!html) {
+                    if (typeof showStatus === 'function') {
+                        showStatus('error', 'Formal speaker invitation template is empty in tbs/Snippets.');
+                    }
+                    return;
                 }
                 var firstName = String(s.firstName || '').trim();
-                var sentOkMsg =
-                    payload && payload.message
-                        ? String(payload.message)
-                        : firstName
-                          ? 'Formal invite sent to ' + firstName
-                          : 'Formal invite sent.';
+                var eventLabel = String(current_event || '').trim();
+                var subject = String(template.subject || '').trim();
+                if (!subject) {
+                    subject = eventLabel ? eventLabel + ' - Speaker invitation' : 'Speaker invitation';
+                }
+                subject = applySpeakerInvitationTemplateTokens(subject, eventLabel, firstName).replace(/[\r\n]/g, ' ');
+                html = applySpeakerInvitationTemplateTokens(html, eventLabel, firstName);
+                var rfc822 = [
+                    'To: ' + toRaw,
+                    'Subject: ' + subject,
+                    'MIME-Version: 1.0',
+                    'Content-Type: text/html; charset=UTF-8',
+                    '',
+                    html
+                ].join('\r\n');
+                var raw = gmailRfc822ToBase64Url(rfc822);
+                await gmailApiRequest('messages/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ raw: raw })
+                });
+                var sentOkMsg = firstName ? 'Formal invite sent to ' + firstName : 'Formal invite sent.';
+                var prevStatus = s.inviteStatus;
+                var prevSpeakerLog = Array.isArray(s.speakerLog) ? s.speakerLog.slice() : [];
+                if (!Array.isArray(s.speakerLog)) s.speakerLog = [];
+                s.speakerLog.push(speakerLogFormalInviteSentLine());
                 s.inviteStatus = 'Invited';
-                if (payload && payload.invitedDate) {
-                    s.invitedDate = String(payload.invitedDate);
-                } else {
-                    s.invitedDate = guestPaidDateYyyyMmDd();
-                }
-                if (payload && payload.logLine) {
-                    s.speakerLog = (Array.isArray(s.speakerLog) ? s.speakerLog.slice() : []).concat([
-                        String(payload.logLine),
-                    ]);
-                } else {
-                    if (!Array.isArray(s.speakerLog)) s.speakerLog = [];
-                    s.speakerLog.push(speakerLogFormalInviteSentLine());
-                }
+                markSpeakerDocDirty(id);
                 renderSpeakerRoster();
                 syncSpeakerManagementLogPanel();
                 syncSpeakerWorkflowActionsPanel();
-                if (typeof showStatus === 'function') {
-                    showStatus('success', sentOkMsg);
+                try {
+                    var saved = await flushSpeakersToFirebase({ silent: true });
+                    if (!saved) throw new Error('Failed to update Status.');
+                    if (typeof showStatus === 'function') {
+                        showStatus('success', sentOkMsg);
+                    }
+                } catch (fsErr) {
+                    console.error('sendSpeakerFormalInvitationEmail Firestore Status:', fsErr);
+                    s.inviteStatus = prevStatus;
+                    s.speakerLog = prevSpeakerLog.slice();
+                    markSpeakerDocDirty(id);
+                    renderSpeakerRoster();
+                    syncSpeakerManagementLogPanel();
+                    syncSpeakerWorkflowActionsPanel();
+                    if (typeof showStatus === 'function') {
+                        showStatus(
+                            'error',
+                            (firstName ? 'Invite was sent to ' + firstName + ', but ' : 'Invite was sent, but ') +
+                                'Firestore could not be updated (Status): ' +
+                                (fsErr && fsErr.message ? fsErr.message : 'Firestore error')
+                        );
+                    }
                 }
             } catch (err) {
                 console.error('sendSpeakerFormalInvitationEmail:', err);
@@ -24436,12 +24414,7 @@
                     ev.preventDefault();
                     ev.stopPropagation();
                     if (speakerSendFormalInviteBtn.disabled || !speakerPadlockIsOpen) return;
-                    sendSpeakerFormalInvitationEmail().catch(function(err) {
-                        console.error('speaker-send-formal-invite:', err);
-                        if (typeof showStatus === 'function') {
-                            showStatus('error', err && err.message ? err.message : 'Failed to send formal invite.');
-                        }
-                    });
+                    // Placeholder: pulses when Status is Confirmed and padlock is open; send action wired later.
                 });
             }
             function speakerWorkflowCanSetLodgingFromNo() {
