@@ -2938,6 +2938,8 @@
         body.backend-page #guest-editor #guest-editor-actions #invitedisno[hidden],
         body.backend-page #guest-editor #guest-editor-actions #invoicedisno[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-speaker-btn[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-confirm-speaker-arrow[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-check[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-lodging-check[hidden],
@@ -4652,7 +4654,7 @@
         }
 
         body.backend-page button.speaker-roster-tag--lodging-no,
-        body.backend-page button.speaker-roster-tag--invite-no,
+        body.backend-page button.speaker-roster-tag--invite-preliminary,
         body.backend-page button.speaker-roster-tag--bio-no,
         body.backend-page button.speaker-roster-tag--brief-no,
         body.backend-page button.speaker-roster-tag--titles-no,
@@ -4672,16 +4674,21 @@
         body.backend-page button.speaker-roster-tag--programmed-yes,
         body.backend-page button.speaker-roster-tag--travel-yes,
         body.backend-page button.speaker-roster-tag--refunded-yes,
-        body.backend-page button.speaker-roster-tag--invite-confirmed,
         body.backend-page button.speaker-roster-tag--invite-invited,
         body.backend-page button.speaker-roster-tag--cme-sent {
             background: var(--backend-roster-status-yes-bg);
             color: var(--backend-roster-status-yes-color);
         }
 
+        body.backend-page button.speaker-roster-tag--invite-cancel {
+            background: var(--backend-roster-pill-black);
+            color: #ffffff;
+        }
+
         body.backend-page button.speaker-roster-tag--lodging-requested,
         body.backend-page button.speaker-roster-tag--bio-received,
         body.backend-page button.speaker-roster-tag--brief-first,
+        body.backend-page button.speaker-roster-tag--invite-confirmed,
         body.backend-page button.speaker-roster-tag--cme-ready {
             background: var(--backend-roster-status-ready-bg);
             color: var(--backend-roster-status-ready-color);
@@ -5775,6 +5782,7 @@
             animation: none;
         }
 
+        /* Formal invite / confirm: pulse only when padlock is open. */
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-send-formal-invite-btn.is-active,
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-send-formal-invite-btn.is-active[aria-disabled='false'],
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-request-lodging-btn.is-active,
@@ -5784,6 +5792,14 @@
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn.is-active,
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn.is-active[aria-disabled='false'] {
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
+        }
+
+        body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-send-formal-invite-btn.is-active,
+        body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-request-lodging-btn.is-active,
+        body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-own-lodging-btn.is-active,
+        body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn.is-active {
+            cursor: not-allowed;
+            animation: none;
         }
 
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-send-formal-invite-btn.is-active:hover:not(:disabled):not([aria-disabled='true']),
@@ -5852,7 +5868,12 @@
             font-size: 1.25rem;
         }
 
-        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-actions-row > .speaker-request-lodging-btn,
+        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-actions-row > .speaker-request-lodging-btn {
+            width: 250px;
+            max-width: 100%;
+            flex: 0 0 250px;
+        }
+
         #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-confirm-bio-row > .speaker-workflow-phase-btn,
         #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-program-publish-row > .speaker-workflow-phase-btn {
             width: 140px;
@@ -7182,6 +7203,35 @@
         #texteditor .texteditor-pane-heading #texteditor-save-btn.texteditor-save-btn--saved:disabled {
             opacity: 1;
             cursor: default;
+        }
+
+        #texteditor .texteditor-pane-heading #texteditor-sync-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            border-radius: var(--backend-icon-btn-radius);
+            box-sizing: border-box;
+        }
+
+        #texteditor .texteditor-pane-heading #texteditor-sync-btn svg {
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #texteditor .texteditor-pane-heading #texteditor-sync-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        #texteditor .texteditor-pane-heading #texteditor-sync-btn.is-syncing > svg {
+            animation: sync-guest-payments-spin 0.85s linear infinite;
+            will-change: transform;
         }
 
         .texteditor-main {
@@ -8697,6 +8747,11 @@
                                         <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
                                     </svg>
                                 </button>
+                                <button type="button" class="add-speaker-button texteditor-sync-btn" id="texteditor-sync-btn" disabled aria-disabled="true" title="Sync from Firebase" aria-label="Sync from Firebase">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -8884,6 +8939,10 @@
                             <div class="speaker-editor-actions" id="speaker-editor-actions" hidden aria-hidden="true">
                                 <div class="speaker-workflow-block">
                                 <div id="speaker-workflow-actions" class="speaker-workflow-actions">
+                                    <button type="button" class="speaker-workflow-phase-btn" id="speaker-confirm-speaker-btn" disabled aria-disabled="true" hidden aria-hidden="true">
+                                        <span class="speaker-confirm-speaker-label">Confirm speaker</span>
+                                    </button>
+                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-confirm-speaker-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
                                     <div class="speaker-workflow-invite-lodging-row" id="speaker-workflow-invite-lodging-row">
                                     <button type="button" class="speaker-send-formal-invite-btn" id="speaker-send-formal-invite-btn" hidden aria-hidden="true">
                                         <span class="speaker-send-formal-invite-label">Send formal invite</span>
@@ -10008,7 +10067,7 @@
         var SPEAKER_BIO_STATUS_VALUES = ['No', 'Received', 'Uploaded'];
         var SPEAKER_BRIEF_VALUES = ['No', 'First brief', 'Final brief'];
         var SPEAKER_PRESENTED_VALUES = ['No', 'Yes'];
-        var SPEAKER_INVITE_STATUS_VALUES = ['None', 'Invited'];
+        var SPEAKER_INVITE_STATUS_VALUES = ['Preliminary', 'Confirmed', 'Invited', 'Cancel'];
         var SPEAKER_TITLES_VALUES = ['No', 'Yes'];
         var SPEAKER_TRAVEL_VALUES = ['No', 'Yes'];
         var SPEAKER_CME_VALUES = ['No', 'Ready', 'Sent'];
@@ -10122,14 +10181,14 @@
 
         function normalizeSpeakerInviteStatus(v) {
             var s = v != null ? String(v).trim() : '';
-            if (!s) return 'No';
+            if (!s) return 'Preliminary';
             var low = s.toLowerCase();
-            if (low === 'none') return 'None';
-            if (low === 'no' || low === 'n') return 'No';
-            if (low === 'invited') return 'Invited';
+            if (low === 'none' || low === 'no' || low === 'n' || low === 'preliminary') return 'Preliminary';
             if (low === 'confirmed' || low === 'accepted') return 'Confirmed';
+            if (low === 'invited') return 'Invited';
+            if (low === 'cancel' || low === 'cancelled' || low === 'canceled') return 'Cancel';
             if (SPEAKER_INVITE_STATUS_VALUES.indexOf(s) >= 0) return s;
-            return s;
+            return 'Preliminary';
         }
 
         function normalizeSpeakerTitlesStatus(v) {
@@ -10204,9 +10263,10 @@
 
         function speakerRosterInviteTagClass(inviteStatus) {
             var I = normalizeSpeakerInviteStatus(inviteStatus);
-            if (I === 'None' || I === 'No') return 'speaker-roster-tag--invite-no';
+            if (I === 'Cancel') return 'speaker-roster-tag--invite-cancel';
             if (I === 'Invited') return 'speaker-roster-tag--invite-invited';
-            return 'speaker-roster-tag--invite-confirmed';
+            if (I === 'Confirmed') return 'speaker-roster-tag--invite-confirmed';
+            return 'speaker-roster-tag--invite-preliminary';
         }
 
         function speakerRosterTitlesTagClass(titlesStatus) {
@@ -10305,6 +10365,9 @@
                 refunded: normalizedExpenses,
                 Expenses: normalizedExpenses
             };
+            var confirmedDate = s.confirmedDate != null ? String(s.confirmedDate).trim() : '';
+            payload.confirmedDate = confirmedDate;
+            payload['Confirmed date'] = confirmedDate;
             var ev = String(s && s.event != null ? s.event : '').trim();
             if (ev) payload.event = ev;
             if (Array.isArray(s.speakerLog) && s.speakerLog.length) {
@@ -10335,6 +10398,32 @@
 
         function speakerLogFormalInviteSentLine() {
             return guestLogYyMmDdPrefix() + ': Formal invite sent';
+        }
+
+        function speakerLogConfirmedLine() {
+            return guestLogYyMmDdPrefix() + ': Speaker confirmed';
+        }
+
+        function speakerFormalInviteWasSent(s) {
+            var log = Array.isArray(s && s.speakerLog) ? s.speakerLog : [];
+            for (var i = 0; i < log.length; i++) {
+                if (/Formal invite sent/i.test(String(log[i] != null ? log[i] : ''))) return true;
+            }
+            return false;
+        }
+
+        function speakerConfirmedDateLabelFromRecord(s) {
+            if (!s) return '';
+            var stored = s.confirmedDate != null ? String(s.confirmedDate).trim() : '';
+            if (stored) return stored;
+            var log = Array.isArray(s.speakerLog) ? s.speakerLog : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var m = String(log[i] != null ? log[i] : '').match(
+                    /^(\d{2})(\d{2})(\d{2}):\s*Speaker confirmed/i
+                );
+                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
+            }
+            return '';
         }
 
         function speakerLogOwnLodgingLine() {
@@ -13157,7 +13246,8 @@
                 shortBio: '',
                 longBio: '',
                 event: String(current_event || '').trim(),
-                inviteStatus: 'None',
+                inviteStatus: 'Preliminary',
+                confirmedDate: '',
                 lodging: 'No',
                 bioStatus: 'No',
                 bioPublish: 'No',
@@ -13776,6 +13866,13 @@
                 inviteStatus: normalizeSpeakerInviteStatus(
                     speakerCoalesceStringField(d, ['inviteStatus', 'Invite status', 'Status']) || 'No'
                 ),
+                confirmedDate: speakerCoalesceStringField(d, [
+                    'confirmedDate',
+                    'Confirmed date',
+                    'Confirmed Date',
+                    'Status date',
+                    'Status Date'
+                ]),
                 titlesStatus: normalizeSpeakerTitlesStatus(
                     speakerCoalesceStringField(d, ['titlesStatus', 'Title', 'Titles received?']) || 'No'
                 ),
@@ -17110,6 +17207,8 @@
 
         function syncSpeakerWorkflowActionsPanel() {
             var wrap = document.getElementById('speaker-workflow-actions');
+            var confirmSpeakerBtn = document.getElementById('speaker-confirm-speaker-btn');
+            var confirmSpeakerArrow = document.getElementById('speaker-workflow-confirm-speaker-arrow');
             var inviteBtn = document.getElementById('speaker-send-formal-invite-btn');
             var inviteCheck = document.getElementById('speaker-send-formal-invite-check');
             var confirmLodgingCheck = document.getElementById('speaker-confirm-lodging-check');
@@ -17155,9 +17254,24 @@
                     plusEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
                 });
             }
+            function resetConfirmSpeakerBtn() {
+                if (!confirmSpeakerBtn) return;
+                confirmSpeakerBtn.hidden = true;
+                confirmSpeakerBtn.setAttribute('aria-hidden', 'true');
+                confirmSpeakerBtn.disabled = true;
+                confirmSpeakerBtn.setAttribute('aria-disabled', 'true');
+                setSpeakerWorkflowStepState(confirmSpeakerBtn, { active: false, done: false });
+                var confirmLabelReset = confirmSpeakerBtn.querySelector('.speaker-confirm-speaker-label');
+                if (confirmLabelReset) confirmLabelReset.textContent = 'Confirm speaker';
+            }
             if (!wrap) return;
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') {
+                resetConfirmSpeakerBtn();
+                if (confirmSpeakerArrow) {
+                    confirmSpeakerArrow.hidden = true;
+                    confirmSpeakerArrow.setAttribute('aria-hidden', 'true');
+                }
                 if (inviteBtn) {
                     inviteBtn.hidden = true;
                     inviteBtn.setAttribute('aria-hidden', 'true');
@@ -17235,31 +17349,62 @@
             var inviteStatus = normalizeSpeakerInviteStatus(s && s.inviteStatus);
             var lodgingSt = normalizeSpeakerLodging(s && s.lodging);
             var bioSt = normalizeSpeakerBioStatus(s && s.bioStatus);
-            var canSendFormalInvite = inviteStatus === 'None';
-            var canRequestLodging = Boolean(
-                s && inviteStatus === 'Invited' && lodgingSt === 'No'
-            );
-            var showInviteCheck = inviteStatus === 'Invited';
+            var formalInviteSent = inviteStatus === 'Invited';
+            var canConfirmSpeaker = inviteStatus === 'Preliminary';
+            var speakerPastConfirm = inviteStatus === 'Confirmed' || inviteStatus === 'Invited';
+            var workflowPastInvite = inviteStatus === 'Invited';
+            var showConfirmSpeaker = canConfirmSpeaker || speakerPastConfirm;
+            var canSendFormalInvite = inviteStatus === 'Confirmed';
+            var padlockOpen = !!speakerPadlockIsOpen;
+            var runConfirmSpeaker = canConfirmSpeaker && padlockOpen;
+            var runSendFormalInvite = canSendFormalInvite && padlockOpen;
+            // Lodging / later steps unlock only after Status is Invited.
+            var canRequestLodging = Boolean(s && workflowPastInvite && lodgingSt === 'No');
+            var runRequestLodging = canRequestLodging && padlockOpen;
+            var showInviteCheck = formalInviteSent;
+            if (confirmSpeakerBtn) {
+                confirmSpeakerBtn.hidden = !showConfirmSpeaker;
+                confirmSpeakerBtn.setAttribute('aria-hidden', showConfirmSpeaker ? 'false' : 'true');
+                confirmSpeakerBtn.disabled = !runConfirmSpeaker;
+                confirmSpeakerBtn.setAttribute('aria-disabled', runConfirmSpeaker ? 'false' : 'true');
+                setSpeakerWorkflowStepState(confirmSpeakerBtn, {
+                    active: canConfirmSpeaker,
+                    done: speakerPastConfirm
+                });
+                var confirmLabel = confirmSpeakerBtn.querySelector('.speaker-confirm-speaker-label');
+                if (confirmLabel) {
+                    if (speakerPastConfirm) {
+                        var confirmedDateLabel = speakerConfirmedDateLabelFromRecord(s) || '—';
+                        confirmLabel.textContent = 'Confirmed ' + confirmedDateLabel;
+                    } else {
+                        confirmLabel.textContent = 'Confirm speaker';
+                    }
+                }
+            }
+            if (confirmSpeakerArrow) {
+                confirmSpeakerArrow.hidden = !showConfirmSpeaker;
+                confirmSpeakerArrow.setAttribute('aria-hidden', showConfirmSpeaker ? 'false' : 'true');
+            }
             if (inviteBtn) {
                 inviteBtn.hidden = false;
                 inviteBtn.setAttribute('aria-hidden', 'false');
-                inviteBtn.disabled = !canSendFormalInvite;
-                inviteBtn.setAttribute('aria-disabled', canSendFormalInvite ? 'false' : 'true');
+                inviteBtn.disabled = !runSendFormalInvite;
+                inviteBtn.setAttribute('aria-disabled', runSendFormalInvite ? 'false' : 'true');
                 setSpeakerWorkflowStepState(inviteBtn, {
                     active: canSendFormalInvite,
-                    done: inviteStatus === 'Invited'
+                    done: formalInviteSent
                 });
                 var inviteLabel = inviteBtn.querySelector('.speaker-send-formal-invite-label');
                 if (inviteLabel) {
                     inviteLabel.textContent =
-                        inviteStatus === 'Invited' ? 'Formal invite sent' : 'Send formal invite';
+                        formalInviteSent ? 'Formal invite sent' : 'Send formal invite';
                 }
             }
             if (inviteCheck) {
                 inviteCheck.hidden = !showInviteCheck;
                 inviteCheck.setAttribute('aria-hidden', showInviteCheck ? 'false' : 'true');
             }
-            var showConfirmLodgingCheck = Boolean(s && lodgingSt === 'Own lodging');
+            var showConfirmLodgingCheck = Boolean(s && workflowPastInvite && lodgingSt === 'Own lodging');
             if (confirmLodgingCheck) {
                 confirmLodgingCheck.hidden = !showConfirmLodgingCheck;
                 confirmLodgingCheck.setAttribute('aria-hidden', showConfirmLodgingCheck ? 'false' : 'true');
@@ -17271,30 +17416,36 @@
             if (lodgingBtn) {
                 lodgingBtn.hidden = false;
                 lodgingBtn.setAttribute('aria-hidden', 'false');
-                lodgingBtn.disabled = !canRequestLodging;
-                lodgingBtn.setAttribute('aria-disabled', canRequestLodging ? 'false' : 'true');
+                lodgingBtn.disabled = !runRequestLodging;
+                lodgingBtn.setAttribute('aria-disabled', runRequestLodging ? 'false' : 'true');
                 setSpeakerWorkflowStepState(lodgingBtn, {
                     active: canRequestLodging,
-                    done: lodgingSt === 'Requested'
+                    done: workflowPastInvite && lodgingSt === 'Requested'
                 });
                 var requestLodgingLabel = lodgingBtn.querySelector('.speaker-request-lodging-label');
                 if (requestLodgingLabel) {
                     requestLodgingLabel.textContent =
-                        lodgingSt === 'Requested' ? 'Lodging requested' : 'Request lodging';
+                        workflowPastInvite && lodgingSt === 'Requested'
+                            ? 'Lodging requested'
+                            : 'Request lodging';
                 }
             }
             if (ownLodgingBtn) {
                 ownLodgingBtn.hidden = false;
                 ownLodgingBtn.setAttribute('aria-hidden', 'false');
-                ownLodgingBtn.disabled = !canRequestLodging;
-                ownLodgingBtn.setAttribute('aria-disabled', canRequestLodging ? 'false' : 'true');
+                ownLodgingBtn.disabled = !runRequestLodging;
+                ownLodgingBtn.setAttribute('aria-disabled', runRequestLodging ? 'false' : 'true');
                 setSpeakerWorkflowStepState(ownLodgingBtn, {
                     active: canRequestLodging,
-                    done: lodgingSt === 'Own lodging'
+                    done: workflowPastInvite && lodgingSt === 'Own lodging'
                 });
             }
-            var showLodgingOwnChoiceIndicators = Boolean(s && lodgingSt === 'Own lodging');
-            var showRequestLodgingRequested = Boolean(s && lodgingSt === 'Requested');
+            var showLodgingOwnChoiceIndicators = Boolean(
+                s && workflowPastInvite && lodgingSt === 'Own lodging'
+            );
+            var showRequestLodgingRequested = Boolean(
+                s && workflowPastInvite && lodgingSt === 'Requested'
+            );
             if (requestLodgingCheck) {
                 requestLodgingCheck.hidden = !showRequestLodgingRequested;
                 requestLodgingCheck.setAttribute('aria-hidden', showRequestLodgingRequested ? 'false' : 'true');
@@ -17307,7 +17458,9 @@
                 ownLodgingCheck.hidden = !showLodgingOwnChoiceIndicators;
                 ownLodgingCheck.setAttribute('aria-hidden', showLodgingOwnChoiceIndicators ? 'false' : 'true');
             }
-            var showOwnLodgingCrossForRequested = Boolean(s && lodgingSt === 'Requested');
+            var showOwnLodgingCrossForRequested = Boolean(
+                s && workflowPastInvite && lodgingSt === 'Requested'
+            );
             if (ownLodgingCross) {
                 ownLodgingCross.hidden = !showOwnLodgingCrossForRequested;
                 ownLodgingCross.setAttribute('aria-hidden', showOwnLodgingCrossForRequested ? 'false' : 'true');
@@ -17321,38 +17474,39 @@
                 inviteLodgingPlus.setAttribute('aria-hidden', 'false');
             }
 
-            function showWorkflowPhaseButton(btn, enabled, done) {
+            function showWorkflowPhaseButton(btn, statusEnabled, done) {
                 if (!btn) return;
+                var canRun = !!statusEnabled && padlockOpen;
                 btn.hidden = false;
                 btn.setAttribute('aria-hidden', 'false');
-                btn.disabled = !enabled;
-                btn.setAttribute('aria-disabled', enabled ? 'false' : 'true');
-                setSpeakerWorkflowStepState(btn, { active: !!enabled, done: !!done });
+                btn.disabled = !canRun;
+                btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
+                setSpeakerWorkflowStepState(btn, { active: !!statusEnabled, done: !!done });
             }
 
             showWorkflowPhaseButton(
                 document.getElementById('speaker-confirm-lodging-btn'),
-                lodgingSt === 'Requested',
-                lodgingSt === 'Own lodging'
+                workflowPastInvite && lodgingSt === 'Requested',
+                workflowPastInvite && lodgingSt === 'Own lodging'
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-bio-received-btn'),
-                inviteStatus === 'Invited' && bioSt === 'No',
-                bioSt === 'Received'
+                workflowPastInvite && bioSt === 'No',
+                workflowPastInvite && bioSt === 'Received'
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-program-speaker-btn'),
-                inviteStatus === 'Invited',
+                workflowPastInvite,
                 false
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-publish-speaker-btn'),
-                bioSt === 'Received',
+                workflowPastInvite && bioSt === 'Received',
                 false
             );
             showWorkflowPhaseButton(document.getElementById('speaker-send-brief-btn'), false, false);
             if (bioReceivedCheck) {
-                var showBioReceivedCheck = Boolean(s && bioSt === 'Received');
+                var showBioReceivedCheck = Boolean(s && workflowPastInvite && bioSt === 'Received');
                 bioReceivedCheck.hidden = !showBioReceivedCheck;
                 bioReceivedCheck.setAttribute('aria-hidden', showBioReceivedCheck ? 'false' : 'true');
             }
@@ -18285,6 +18439,7 @@
             if (!rec) return;
             var next = normalizeSpeakerInviteStatus(value);
             var prev = rec.inviteStatus;
+            var prevConfirmedDate = rec.confirmedDate != null ? String(rec.confirmedDate) : '';
             if (normalizeSpeakerInviteStatus(prev) === next) {
                 clearSpeakerStatusUiState();
                 clearSpeakerLodgingUiState();
@@ -18293,6 +18448,13 @@
                 return;
             }
             rec.inviteStatus = next;
+            if (next === 'Confirmed') {
+                if (!(rec.confirmedDate != null && String(rec.confirmedDate).trim())) {
+                    rec.confirmedDate = guestPaidDateYyyyMmDd();
+                }
+            } else if (next === 'Preliminary') {
+                rec.confirmedDate = '';
+            }
             clearSpeakerStatusUiState();
             clearSpeakerLodgingUiState();
             clearSpeakerBioUiState();
@@ -18310,11 +18472,58 @@
             } catch (err) {
                 console.error('setSpeakerRosterStatusField:', err);
                 rec.inviteStatus = prev;
+                rec.confirmedDate = prevConfirmedDate;
                 markSpeakerDocDirty(id);
                 renderSpeakerRoster();
                 syncSpeakerWorkflowActionsPanel();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Status.');
+                }
+            }
+        }
+
+        async function confirmSpeakerFromWorkflow() {
+            if (!speakerPadlockIsOpen) return;
+            var id = String(speakerFormEditingDocId || '').trim();
+            if (!id || id === '_init') {
+                if (typeof showStatus === 'function') showStatus('error', 'Select a speaker first.');
+                return;
+            }
+            var rec = findSpeakerInMemory(id);
+            if (!rec) {
+                if (typeof showStatus === 'function') showStatus('error', 'Speaker not found.');
+                return;
+            }
+            if (normalizeSpeakerInviteStatus(rec.inviteStatus) !== 'Preliminary') return;
+            var prevStatus = rec.inviteStatus;
+            var prevConfirmedDate = rec.confirmedDate != null ? String(rec.confirmedDate) : '';
+            var prevSpeakerLog = Array.isArray(rec.speakerLog) ? rec.speakerLog.slice() : [];
+            rec.inviteStatus = 'Confirmed';
+            rec.confirmedDate = guestPaidDateYyyyMmDd();
+            if (!Array.isArray(rec.speakerLog)) rec.speakerLog = [];
+            rec.speakerLog.push(speakerLogConfirmedLine());
+            markSpeakerDocDirty(id);
+            renderSpeakerRoster();
+            syncSpeakerWorkflowActionsPanel();
+            syncSpeakerManagementLogPanel();
+            var name = speakerRosterDisplayName(rec);
+            try {
+                var saved = await flushSpeakersToFirebase({ silent: true });
+                if (!saved) throw new Error('Failed to update Status.');
+                if (typeof showStatus === 'function') {
+                    showStatus('success', name + ': Confirmed');
+                }
+            } catch (err) {
+                console.error('confirmSpeakerFromWorkflow:', err);
+                rec.inviteStatus = prevStatus;
+                rec.confirmedDate = prevConfirmedDate;
+                rec.speakerLog = prevSpeakerLog.slice();
+                markSpeakerDocDirty(id);
+                renderSpeakerRoster();
+                syncSpeakerWorkflowActionsPanel();
+                syncSpeakerManagementLogPanel();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to confirm speaker.');
                 }
             }
         }
@@ -18730,11 +18939,6 @@
                     raw = d.locationinfo != null ? d.locationinfo : '';
                 }
                 var html = raw != null ? String(raw) : '';
-                try {
-                    localStorage.setItem(key, html);
-                } catch (lsErr) {
-                    console.warn('Home snippet localStorage:', lsErr);
-                }
                 document.querySelectorAll('#texteditor-selectors .texteditor-day-btn').forEach(function(b) {
                     b.classList.remove('is-active');
                     b.setAttribute('aria-pressed', 'false');
@@ -18746,7 +18950,7 @@
                 });
                 var taPre = document.getElementById('texteditor-code');
                 if (taPre) delete taPre.dataset.programmeAlias;
-                updateTexteditorCodeEditor('', key, texteditorPresetLabelForSnippetKey(key) || spec.metaLabel);
+                updateTexteditorCodeEditor(html, key, texteditorPresetLabelForSnippetKey(key) || spec.metaLabel, { forceHtml: true });
                 if (typeof showStatus === 'function') {
                     showStatus('success', spec.loadOk);
                 }
@@ -19101,6 +19305,7 @@
                 }
             }
             updateTexteditorSaveButtonState();
+            updateTexteditorSyncButtonState();
         }
 
         function flushTexteditorStorageNow() {
@@ -19317,16 +19522,19 @@
             return '';
         }
 
-        function updateTexteditorCodeEditor(html, storageKey, presetName) {
+        function updateTexteditorCodeEditor(html, storageKey, presetName, opts) {
+            opts = opts || {};
             var ta = document.getElementById('texteditor-code');
             if (!ta) return;
             texteditorProgrammeFirebaseSavedUi = false;
-            flushTexteditorStorageNow();
+            if (!opts.forceHtml) {
+                flushTexteditorStorageNow();
+            }
             var nextKey = storageKey || '';
             var isEventProgrammeKey = nextKey.indexOf(':event:') !== -1 && nextKey.indexOf(':programme:') !== -1;
             /* Event programme HTML is authoritative from Firestore; do not override with localStorage on load/switch. */
             var effectiveHtml = html;
-            if (nextKey && !isEventProgrammeKey) {
+            if (!opts.forceHtml && nextKey && !isEventProgrammeKey) {
                 try {
                     var stored = localStorage.getItem(nextKey);
                     if (stored !== null) {
@@ -19357,6 +19565,118 @@
             texteditorPadlockIsOpen = false;
             syncTexteditorPadlockButtonUi();
             syncTexteditorEditabilityFromPadlock();
+            updateTexteditorSyncButtonState();
+        }
+
+        function updateTexteditorSyncButtonState() {
+            var ta = document.getElementById('texteditor-code');
+            var btn = document.getElementById('texteditor-sync-btn');
+            if (!btn) return;
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var canSync = Boolean(key) && !btn.classList.contains('is-syncing');
+            btn.disabled = !canSync;
+            btn.setAttribute('aria-disabled', canSync ? 'false' : 'true');
+            if (!key) {
+                btn.setAttribute('title', 'Select a pre-set to sync');
+                btn.setAttribute('aria-label', 'Select a pre-set to sync');
+            } else {
+                btn.setAttribute('title', 'Sync from Firebase');
+                btn.setAttribute('aria-label', 'Sync from Firebase');
+            }
+        }
+
+        async function syncTexteditorSourceFromFirebase() {
+            var ta = document.getElementById('texteditor-code');
+            var btn = document.getElementById('texteditor-sync-btn');
+            if (!ta || !btn) return;
+            var key = String(ta.dataset.storageKey || '').trim();
+            if (!key || btn.disabled || btn.classList.contains('is-syncing')) return;
+
+            btn.classList.add('is-syncing');
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+
+            try {
+                var html = '';
+                var label = texteditorPresetLabelForSnippetKey(key) || '';
+                var spec = homeSnippetFirestoreSpecForKey(key);
+                if (spec) {
+                    if (spec.target === 'event' && !selectedevent) {
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', 'Select an event first.');
+                        }
+                        return;
+                    }
+                    var db = getFirestore();
+                    var snap = spec.target === 'tbs-snippets'
+                        ? await db.collection('tbs').doc('Snippets').get()
+                        : await db.collection('events').doc(selectedevent).get();
+                    var d = snap.exists ? (snap.data() || {}) : {};
+                    var raw = d[spec.field];
+                    if ((raw == null || String(raw).trim() === '') && spec.field === FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD) {
+                        raw = d.locationinfo != null ? d.locationinfo : '';
+                    }
+                    html = raw != null ? String(raw) : '';
+                    label = texteditorPresetLabelForSnippetKey(key) || spec.metaLabel;
+                    delete ta.dataset.programmeAlias;
+                    updateTexteditorCodeEditor(html, key, label, { forceHtml: true });
+                    if (typeof showStatus === 'function') {
+                        showStatus('success', spec.loadOk || 'Synced from Firebase into Source.');
+                    }
+                    return;
+                }
+
+                var ep = parseEventProgrammeKey(key);
+                if (ep) {
+                    if (!selectedevent || ep.eventId !== selectedevent) {
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', 'Select the matching event before syncing this programme day.');
+                        }
+                        return;
+                    }
+                    var alias = ta.dataset.programmeAlias || '';
+                    if (alias === 'programme-intro') {
+                        var dbIntro = getFirestore();
+                        var introSnap = await dbIntro.collection('tbs').doc('Snippets').get();
+                        var introData = introSnap.exists ? (introSnap.data() || {}) : {};
+                        var rawIntro = introData[FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD];
+                        html = rawIntro != null ? String(rawIntro) : '';
+                        label = 'Programme infoslide';
+                    } else {
+                        var dbDay = getFirestore();
+                        var daySnap = await tbsProgrammeDayDocRef(dbDay, ep.dateStr).get();
+                        var dayData = daySnap.exists ? (daySnap.data() || {}) : {};
+                        html = dayData.html != null ? String(dayData.html) : '';
+                        if (programmeState) {
+                            programmeState.htmlDateByDay[ep.dateStr] = html;
+                            if (dayData.name != null && String(dayData.name).trim() !== '') {
+                                programmeState.nameDateByDay[ep.dateStr] = String(dayData.name);
+                            }
+                        }
+                        label = (programmeState && programmeState.nameDateByDay && programmeState.nameDateByDay[ep.dateStr]) || ep.dateStr;
+                    }
+                    updateTexteditorCodeEditor(html, key, label, { forceHtml: true });
+                    if (alias === 'programme-intro') ta.dataset.programmeAlias = 'programme-intro';
+                    else delete ta.dataset.programmeAlias;
+                    if (typeof showStatus === 'function') {
+                        showStatus('success', 'Synced programme HTML from Firebase into Source.');
+                    }
+                    return;
+                }
+
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'This pre-set has no Firebase field to sync.');
+                }
+            } catch (err) {
+                console.error('syncTexteditorSourceFromFirebase:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to sync from Firebase.');
+                }
+            } finally {
+                btn.classList.remove('is-syncing');
+                updateTexteditorSyncButtonState();
+                updateTexteditorSaveButtonState();
+            }
         }
 
         function initTexteditorCodeInputPersistence() {
@@ -20924,7 +21244,7 @@
         /**
          * Send formal speaker invitation e-mail (Gmail API). Body from tbs/Snippets `Speakerinvitation`.
          * Replaces `{{Event}}` with `current_event` and `{{Name}}` with the speaker `firstName`.
-         * On success sets Status to `Invited`.
+         * Requires Status `Confirmed`. On success appends a Formal invite sent log line.
          */
         async function sendSpeakerFormalInvitationEmail() {
             var btn = document.getElementById('speaker-send-formal-invite-btn');
@@ -20938,9 +21258,15 @@
                 if (typeof showStatus === 'function') showStatus('error', 'Speaker not found.');
                 return;
             }
-            if (normalizeSpeakerInviteStatus(s.inviteStatus) !== 'None') {
+            if (normalizeSpeakerInviteStatus(s.inviteStatus) !== 'Confirmed') {
                 if (typeof showStatus === 'function') {
-                    showStatus('error', 'Formal invite is only available when Status is None.');
+                    showStatus('error', 'Formal invite is only available when Status is Confirmed.');
+                }
+                return;
+            }
+            if (speakerFormalInviteWasSent(s)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'Formal invite was already sent for this speaker.');
                 }
                 return;
             }
@@ -20995,6 +21321,7 @@
                 markSpeakerDocDirty(id);
                 renderSpeakerRoster();
                 syncSpeakerManagementLogPanel();
+                syncSpeakerWorkflowActionsPanel();
                 try {
                     var saved = await flushSpeakersToFirebase({ silent: true });
                     if (!saved) throw new Error('Failed to update Status.');
@@ -21008,6 +21335,7 @@
                     markSpeakerDocDirty(id);
                     renderSpeakerRoster();
                     syncSpeakerManagementLogPanel();
+                    syncSpeakerWorkflowActionsPanel();
                     if (typeof showStatus === 'function') {
                         showStatus(
                             'error',
@@ -23719,6 +24047,7 @@
                     speakerPadlockIsOpen = !speakerPadlockIsOpen;
                     syncSpeakerPadlockButtonUi();
                     syncSpeakerEditabilityFromPadlock();
+                    syncSpeakerWorkflowActionsPanel();
                 });
                 syncSpeakerPadlockButtonUi();
             }
@@ -24070,25 +24399,34 @@
                     });
                 });
             }
+            var speakerConfirmSpeakerBtn = document.getElementById('speaker-confirm-speaker-btn');
+            if (speakerConfirmSpeakerBtn) {
+                speakerConfirmSpeakerBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (speakerConfirmSpeakerBtn.disabled || !speakerPadlockIsOpen) return;
+                    void confirmSpeakerFromWorkflow();
+                });
+            }
             var speakerSendFormalInviteBtn = document.getElementById('speaker-send-formal-invite-btn');
             if (speakerSendFormalInviteBtn) {
                 speakerSendFormalInviteBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
-                    sendSpeakerFormalInvitationEmail().catch(function(err) {
-                        console.error('speaker-send-formal-invite:', err);
-                        if (typeof showStatus === 'function') {
-                            showStatus('error', err && err.message ? err.message : 'Failed to send formal invite.');
-                        }
-                    });
+                    ev.stopPropagation();
+                    if (speakerSendFormalInviteBtn.disabled || !speakerPadlockIsOpen) return;
+                    // Placeholder: pulses when Status is Confirmed and padlock is open; send action wired later.
                 });
             }
             function speakerWorkflowCanSetLodgingFromNo() {
                 var sid = String(speakerFormEditingDocId || '').trim();
                 if (!sid || sid === '_init') return false;
+                if (!speakerPadlockIsOpen) return false;
                 var sp = findSpeakerInMemory(sid);
                 var inviteStatus = normalizeSpeakerInviteStatus(sp && sp.inviteStatus);
                 return Boolean(
-                    sp && inviteStatus === 'Invited' && normalizeSpeakerLodging(sp.lodging) === 'No'
+                    sp &&
+                        inviteStatus === 'Invited' &&
+                        normalizeSpeakerLodging(sp.lodging) === 'No'
                 );
             }
             var speakerRequestLodgingBtn = document.getElementById('speaker-request-lodging-btn');
@@ -25456,7 +25794,19 @@
                     }
                 });
             }
+            var texteditorSyncBtn = document.getElementById('texteditor-sync-btn');
+            if (texteditorSyncBtn) {
+                texteditorSyncBtn.addEventListener('click', function(ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    if (texteditorSyncBtn.disabled) return;
+                    syncTexteditorSourceFromFirebase().catch(function(err) {
+                        console.error('texteditor-sync-btn:', err);
+                    });
+                });
+            }
             updateTexteditorSaveButtonState();
+            updateTexteditorSyncButtonState();
             var texteditorRenderHtmlEl = document.getElementById('texteditor-render-html');
             if (texteditorRenderHtmlEl) {
                 texteditorRenderHtmlEl.addEventListener('click', function(e) {
