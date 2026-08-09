@@ -32,6 +32,14 @@ const gmailSendClientIdParam = defineSecret("GMAIL_SEND_CLIENT_ID");
 const gmailSendClientSecretParam = defineSecret("GMAIL_SEND_CLIENT_SECRET");
 const gmailSendRefreshTokenParam = defineSecret("GMAIL_SEND_REFRESH_TOKEN");
 const gmailSendFromParam = defineSecret("GMAIL_SEND_FROM");
+const gmailSpeakerSendClientIdParam = defineSecret("GMAIL_SPEAKER_SEND_CLIENT_ID");
+const gmailSpeakerSendClientSecretParam = defineSecret(
+  "GMAIL_SPEAKER_SEND_CLIENT_SECRET",
+);
+const gmailSpeakerSendRefreshTokenParam = defineSecret(
+  "GMAIL_SPEAKER_SEND_REFRESH_TOKEN",
+);
+const gmailSpeakerSendFromParam = defineSecret("GMAIL_SPEAKER_SEND_FROM");
 const stripeInvoiceTemplateId = "inrtem_1U0L26J1nXZVJIUSnNARAePJ";
 const stripeInvoicePriceId = "price_1TnIigJ1nXZVJIUS4KTefGCf";
 
@@ -175,6 +183,112 @@ async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
 }
 
 /**
+ * Load speaker invitation HTML + optional subject from tbs/Snippets.Speakerinvitation.
+ * @param {Firestore} db Firestore instance.
+ * @return {Promise<{html: string, subject: string}>} Template fields.
+ */
+async function loadSpeakerInvitationFromSnippets(
+  db: Firestore,
+): Promise<{html: string; subject: string}> {
+  const snap = await db.collection("tbs").doc("Snippets").get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  const raw = data.Speakerinvitation;
+  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
+    const obj = raw as Record<string, unknown>;
+    let html = "";
+    if (obj.html != null) html = String(obj.html);
+    else if (obj.body != null) html = String(obj.body);
+    else if (obj.HTML != null) html = String(obj.HTML);
+    const subject = obj.subject != null ?
+      String(obj.subject) :
+      obj.Subject != null ? String(obj.Subject) : "";
+    return {html, subject};
+  }
+  return {html: raw != null ? String(raw) : "", subject: ""};
+}
+
+/**
+ * Pick speaker email from Firestore item fields.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {string} Email or empty.
+ */
+function pickSpeakerEmail(data: Record<string, unknown>): string {
+  // Primary: tbs/Speakers/{id}/item `email` field (same as Speakers roster).
+  const primary = String(data.email || "").trim();
+  if (primary.includes("@")) return primary;
+  const candidates = [
+    data.Email,
+    data["E-mail"],
+    data["E mail"],
+  ];
+  for (const value of candidates) {
+    const email = String(value || "").trim();
+    if (email.includes("@")) return email;
+  }
+  return "";
+}
+
+/**
+ * Pick speaker first name for template tokens.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {string} First name or empty.
+ */
+function pickSpeakerFirstName(data: Record<string, unknown>): string {
+  const candidates = [
+    data.firstName,
+    data.FirstName,
+    data["First name"],
+    data["First Name"],
+    data.Name,
+    data.name,
+  ];
+  for (const value of candidates) {
+    const v = String(value || "").trim();
+    if (v) return v.split(/\s+/)[0] || v;
+  }
+  return "";
+}
+
+/**
+ * Normalize speaker Status / inviteStatus for workflow gates.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {string} Preliminary | Confirmed | Invited | Cancel | other.
+ */
+function normalizeSpeakerStatus(data: Record<string, unknown>): string {
+  const raw = String(
+    data.Status ?? data.inviteStatus ?? data["Invite status"] ?? "",
+  ).trim();
+  if (!raw) return "Preliminary";
+  const low = raw.toLowerCase();
+  if (low === "none" || low === "no" || low === "n" || low === "preliminary") {
+    return "Preliminary";
+  }
+  if (low === "confirmed" || low === "accepted") return "Confirmed";
+  if (low === "invited") return "Invited";
+  if (low === "cancel" || low === "cancelled" || low === "canceled") {
+    return "Cancel";
+  }
+  return raw;
+}
+
+/**
+ * Formal speaker invite only when Status is Confirmed.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {boolean} Whether invite may be sent.
+ */
+function speakerFormalInviteAllowed(data: Record<string, unknown>): boolean {
+  return normalizeSpeakerStatus(data) === "Confirmed";
+}
+
+/**
+ * Speaker log line for formal invite sent.
+ * @return {string} e.g. `260809: Formal invite sent`
+ */
+function speakerLogFormalInviteSentLine(): string {
+  return guestLogPrefixYyMmDd() + ": Formal invite sent";
+}
+
+/**
  * Refresh a Gmail OAuth access token using the stored refresh token.
  * @return {Promise<string>} Access token.
  */
@@ -206,6 +320,47 @@ async function refreshGmailSendAccessToken(): Promise<string> {
   const accessToken = String(json.access_token || "").trim();
   if (!accessToken) {
     throw new Error("Gmail token refresh returned no access_token.");
+  }
+  return accessToken;
+}
+
+/**
+ * Refresh Gmail access token for the speaker invite mailbox (info@…).
+ * Uses GMAIL_SPEAKER_SEND_* secrets only — guest secrets are untouched.
+ * @return {Promise<string>} Access token.
+ */
+async function refreshGmailSpeakerSendAccessToken(): Promise<string> {
+  const clientId = String(gmailSpeakerSendClientIdParam.value() || "").trim();
+  const clientSecret = String(
+    gmailSpeakerSendClientSecretParam.value() || "",
+  ).trim();
+  const refreshToken = String(
+    gmailSpeakerSendRefreshTokenParam.value() || "",
+  ).trim();
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error("Missing speaker Gmail send OAuth secrets.");
+  }
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    refresh_token: refreshToken,
+    grant_type: "refresh_token",
+  });
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body: body.toString(),
+  });
+  const json = await res.json() as Record<string, unknown>;
+  if (!res.ok) {
+    const errMsg = String(
+      json.error_description || json.error || res.statusText,
+    );
+    throw new Error("Speaker Gmail token refresh failed: " + errMsg);
+  }
+  const accessToken = String(json.access_token || "").trim();
+  if (!accessToken) {
+    throw new Error("Speaker Gmail token refresh returned no access_token.");
   }
   return accessToken;
 }
@@ -1274,6 +1429,149 @@ export const sendGuestInviteHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Failed to send invitation.",
+    });
+  }
+});
+
+/**
+ * Speaker workflow: send formal invitation HTML from tbs/Snippets.Speakerinvitation
+ * as info@… using server-side Gmail OAuth (GMAIL_SPEAKER_SEND_* secrets).
+ * Sets Status/inviteStatus to Invited + Speaker log line.
+ * Expects JSON: { speakerId }.
+ * Guest invite path (sendGuestInviteHttp) is unchanged.
+ */
+export const sendSpeakerInviteHttp = onRequest({
+  secrets: [
+    gmailSpeakerSendClientIdParam,
+    gmailSpeakerSendClientSecretParam,
+    gmailSpeakerSendRefreshTokenParam,
+    gmailSpeakerSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const speakerId = String(body.speakerId || "").trim();
+  if (!speakerId) {
+    res.status(400).json({error: "Missing speakerId."});
+    return;
+  }
+
+  const fromAddress = String(gmailSpeakerSendFromParam.value() || "").trim();
+  if (!fromAddress || !fromAddress.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SPEAKER_SEND_FROM secret.",
+    });
+    return;
+  }
+
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Speakers")
+    .collection(speakerId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Speaker item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    if (!speakerFormalInviteAllowed(data)) {
+      res.status(400).json({
+        error: "Formal invite is only available when Status is Confirmed.",
+      });
+      return;
+    }
+
+    const email = pickSpeakerEmail(data);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({
+        error: "Speaker has no valid email in tbs/Speakers email field.",
+      });
+      return;
+    }
+
+    const template = await loadSpeakerInvitationFromSnippets(db);
+    const htmlTemplate = String(template.html || "").trim();
+    if (!htmlTemplate) {
+      res.status(500).json({
+        error: "Speaker invitation template is empty in tbs/Snippets.",
+      });
+      return;
+    }
+
+    const firstName = pickSpeakerFirstName(data);
+    const eventLabel = await loadCurrentEventLabel(db);
+    const subject = (eventLabel ?
+      eventLabel + " - Speaker invitation" :
+      "Speaker invitation").replace(/[\r\n]/g, " ");
+    const html = htmlTemplate
+      .split("{{Event}}")
+      .join(escapeHtml(eventLabel))
+      .split("{{Name}}")
+      .join(escapeHtml(firstName));
+
+    const accessToken = await refreshGmailSpeakerSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    const inviteLogLine = speakerLogFormalInviteSentLine();
+    const invitedDate = formatGuestInvoicedDateDisplay(new Date());
+    await itemRef.set({
+      "Status": "Invited",
+      "inviteStatus": "Invited",
+      "invitedDate": invitedDate,
+      "Invited date": invitedDate,
+      "Speaker log": FieldValue.arrayUnion(inviteLogLine),
+    }, {merge: true});
+
+    logger.info("sendSpeakerInviteHttp ok", {
+      speakerId,
+      to: email,
+      from: fromAddress,
+      invitedDate,
+    });
+
+    res.status(200).json({
+      ok: true,
+      speakerId,
+      to: email,
+      from: fromAddress,
+      invitedDate,
+      logLine: inviteLogLine,
+      message: firstName ?
+        "Formal invite sent to " + firstName :
+        "Formal invite sent.",
+    });
+  } catch (err) {
+    logger.error("sendSpeakerInviteHttp failed", {speakerId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send speaker invitation.",
     });
   }
 });
