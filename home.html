@@ -246,8 +246,9 @@
                 margin-left: 0 !important;
                 margin-right: 0 !important;
                 font-family: 'Montserrat', sans-serif !important;
-                font-size: 1.7rem !important;
-                font-weight: 600 !important;
+                /* Desktop: ~1.7rem when wide; shrinks toward 1rem as viewport narrows. */
+                font-size: clamp(1rem, calc(1rem + (100vw - 769px) * 0.01775), 1.7rem) !important;
+                font-weight: 500 !important;
                 line-height: 1.2 !important;
                 color: #ffffff !important;
                 -webkit-text-fill-color: #ffffff !important;
