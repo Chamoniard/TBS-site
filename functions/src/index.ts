@@ -173,6 +173,99 @@ async function loadCurrentEventLabel(db: Firestore): Promise<string> {
 }
 
 /**
+ * Read tbs/Settings (full document) for Current event + Eventdates.
+ * @param {Firestore} db Firestore instance.
+ * @return {Promise<Record<string, unknown>>} Settings fields.
+ */
+async function loadTbsSettingsData(
+  db: Firestore,
+): Promise<Record<string, unknown>> {
+  const snap = await db.collection("tbs").doc("Settings").get();
+  return (snap.exists ? snap.data() : null) || {};
+}
+
+/**
+ * Current event label from Settings data.
+ * @param {Record<string, unknown>} data Settings fields.
+ * @return {string} Current event or empty.
+ */
+function currentEventFromSettingsData(
+  data: Record<string, unknown>,
+): string {
+  const keys = [
+    "Current event",
+    "currentEvent",
+    "Current Event",
+    "CURRENT EVENT",
+  ];
+  for (const key of keys) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const v = String(data[key] || "").trim();
+      if (v) return v;
+    }
+  }
+  return "";
+}
+
+/**
+ * From Eventdates, pick the string that contains Current event, then
+ * return only the part after the first comma (trimmed).
+ * @param {Record<string, unknown>} data Settings fields.
+ * @param {string} currentEvent Current event label.
+ * @return {string} Dates portion or empty.
+ */
+function eventDatesAfterCommaForCurrentEvent(
+  data: Record<string, unknown>,
+  currentEvent: string,
+): string {
+  const current = String(currentEvent || "").trim();
+  if (!current) return "";
+  const raw =
+    data.Eventdates ??
+    data["Event dates"] ??
+    data.EventDates ??
+    data.eventdates;
+  const list: string[] = [];
+  if (Array.isArray(raw)) {
+    for (let i = 0; i < raw.length; i++) {
+      const s = String(raw[i] != null ? raw[i] : "").trim();
+      if (s) list.push(s);
+    }
+  } else if (raw && typeof raw === "object") {
+    const vals = Object.values(raw as Record<string, unknown>);
+    for (let i = 0; i < vals.length; i++) {
+      const s = String(vals[i] != null ? vals[i] : "").trim();
+      if (s) list.push(s);
+    }
+  } else if (raw != null && String(raw).trim()) {
+    list.push(String(raw).trim());
+  }
+  let chosen = "";
+  // Prefer exact / prefix match on Current event, then substring.
+  for (let i = 0; i < list.length; i++) {
+    const s = list[i];
+    if (s === current || s.indexOf(current + ",") === 0 ||
+      s.indexOf(current + " ,") === 0) {
+      chosen = s;
+      break;
+    }
+  }
+  if (!chosen) {
+    for (let i = 0; i < list.length; i++) {
+      const s = list[i];
+      if (s.indexOf(current) >= 0) {
+        chosen = s;
+        break;
+      }
+    }
+  }
+  if (!chosen) return "";
+  const comma = chosen.indexOf(",");
+  if (comma < 0) return "";
+  return chosen.slice(comma + 1).trim();
+}
+
+/**
  * Load guest invitation HTML from tbs/Snippets.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<string>} HTML template string.
@@ -1524,7 +1617,12 @@ export const sendSpeakerInviteHttp = onRequest({
     }
 
     const firstName = pickSpeakerFirstName(data);
-    const eventLabel = await loadCurrentEventLabel(db);
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
     const subject = (eventLabel ?
       eventLabel + " - Speaker invitation" :
       "Speaker invitation").replace(/[\r\n]/g, " ");
@@ -1532,7 +1630,9 @@ export const sendSpeakerInviteHttp = onRequest({
       .split("{{Event}}")
       .join(escapeHtml(eventLabel))
       .split("{{Name}}")
-      .join(escapeHtml(firstName));
+      .join(escapeHtml(firstName))
+      .split("{{Eventdates}}")
+      .join(escapeHtml(eventDatesLabel));
 
     const accessToken = await refreshGmailSpeakerSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {

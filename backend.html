@@ -47,6 +47,7 @@
             /* Gold toolbar label buttons (Save, Publish, guest Bio/Actions, etc.) */
             --backend-gold-toolbar-btn-font: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
             --backend-gold-toolbar-btn-width: 108px;
+            --backend-workflow-btn-width: 230px;
             --backend-page-width: 2000px;
             --backend-table-cell-pad-x: 8px;
             --backend-roster-row-pad-y: 0.175rem;
@@ -1428,7 +1429,7 @@
 
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn {
             display: block;
-            width: 250px;
+            width: var(--backend-workflow-btn-width);
             max-width: 100%;
             min-width: 0;
             min-height: 35px;
@@ -5675,13 +5676,12 @@
             pointer-events: none;
         }
 
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn {
             display: block;
             position: relative;
-            width: 250px;
+            width: var(--backend-workflow-btn-width);
             max-width: 100%;
             min-width: 0;
             min-height: 35px;
@@ -5706,7 +5706,70 @@
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn,
+        /* Speaker Send invite — layout only (colors are Status-driven below). */
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn {
+            display: block;
+            position: relative;
+            width: var(--backend-workflow-btn-width);
+            max-width: 100%;
+            min-width: 0;
+            min-height: 35px;
+            height: auto;
+            margin: 0;
+            padding: 8px 12px;
+            padding-right: 2rem;
+            box-sizing: border-box;
+            border-radius: var(--backend-square-btn-radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        /* Status ≠ Invited and ≠ Confirmed → gray inactive */
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn:not(.is-active):not(.is-done),
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn:not(.is-active):not(.is-done):disabled,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn:not(.is-active):not(.is-done)[aria-disabled='true'],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn:not(.is-active):not(.is-done)[aria-disabled='false'] {
+            background: #f1f5f9 !important;
+            border: 1px solid #c5cdd4 !important;
+            color: #94a3b8 !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        /* Status = Confirmed → transparent active */
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active:disabled,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active[aria-disabled='true'],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active[aria-disabled='false'] {
+            background: transparent !important;
+            border: 1px solid var(--backend-roster-status-yes-bg) !important;
+            color: #0f172a !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            cursor: pointer;
+        }
+
+        /* Status = Invited → green inactive (only rule that matters for done) */
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done:disabled,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done[aria-disabled],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done[aria-disabled='true'],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done[aria-disabled='false'] {
+            background: var(--backend-roster-status-yes-bg) !important;
+            border: 1px solid var(--backend-roster-status-yes-bg) !important;
+            color: var(--backend-roster-status-yes-color) !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            cursor: not-allowed;
+            animation: none !important;
+        }
+
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-lodging-btn,
@@ -5714,11 +5777,9 @@
             padding-right: 2rem;
         }
 
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn:disabled:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn:disabled:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn:disabled:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn:disabled:not(.is-active):not(.is-done),
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn[aria-disabled='true']:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn[aria-disabled='true']:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn[aria-disabled='true']:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn[aria-disabled='true']:not(.is-active):not(.is-done) {
@@ -5741,9 +5802,6 @@
             filter: none;
         }
 
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done:disabled,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done[aria-disabled='true'],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done:disabled,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done[aria-disabled='true'],
@@ -5759,10 +5817,6 @@
             animation: none;
         }
 
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active:disabled,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active[aria-disabled='true'],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-active[aria-disabled='false'],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-active,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-active:disabled,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-active[aria-disabled='true'],
@@ -5794,7 +5848,11 @@
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
-        body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-send-formal-invite-btn.is-active,
+        body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-send-formal-invite-btn.is-active {
+            cursor: pointer;
+            animation: none;
+        }
+
         body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-request-lodging-btn.is-active,
         body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-own-lodging-btn.is-active,
         body.backend-page #speaker-editor:not(.speaker-padlock-unlocked) #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn.is-active {
@@ -5802,7 +5860,13 @@
             animation: none;
         }
 
-        body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-send-formal-invite-btn.is-active:hover:not(:disabled):not([aria-disabled='true']),
+        body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-send-formal-invite-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
+            animation: none;
+            border-color: var(--backend-roster-status-yes-bg);
+            background: transparent;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-request-lodging-btn.is-active:hover:not(:disabled):not([aria-disabled='true']),
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-own-lodging-btn.is-active:hover:not(:disabled):not([aria-disabled='true']),
         body.backend-page #speaker-editor.speaker-padlock-unlocked #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
@@ -5868,16 +5932,12 @@
             font-size: 1.25rem;
         }
 
-        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-actions-row > .speaker-request-lodging-btn {
-            width: 250px;
-            max-width: 100%;
-            flex: 0 0 250px;
-        }
-
+        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-actions-row > .speaker-request-lodging-btn,
         #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-confirm-bio-row > .speaker-workflow-phase-btn,
         #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-program-publish-row > .speaker-workflow-phase-btn {
-            width: 140px;
+            width: var(--backend-workflow-btn-width);
             max-width: 100%;
+            flex: 0 0 var(--backend-workflow-btn-width);
         }
 
         #speaker-editor .edit-speaker-name-first,
@@ -8685,7 +8745,7 @@
                                 data-snippet-key="tbsBackend:texteditor:preset:formal-speaker-invitation"
                                 id="texteditor-preset-formal-speaker-invitation-btn"
                                 aria-pressed="false"
-                            >Formal speaker invitation</button>
+                            >Speaker invitation</button>
                             <button
                                 type="button"
                                 class="texteditor-day-btn texteditor-snippet-btn"
@@ -13882,7 +13942,7 @@
                     speakerCoalesceStringField(d, ['Presented', 'Presented?', 'presented']) || 'No'
                 ),
                 inviteStatus: normalizeSpeakerInviteStatus(
-                    speakerCoalesceStringField(d, ['inviteStatus', 'Invite status', 'Status']) || 'No'
+                    speakerCoalesceStringField(d, ['Status', 'inviteStatus', 'Invite status']) || 'No'
                 ),
                 confirmedDate: speakerCoalesceStringField(d, [
                     'confirmedDate',
@@ -15202,6 +15262,29 @@
                 padlock.classList.remove('is-angry-shake');
                 padlock._angryShakeTimer = null;
             }, 450);
+        }
+
+        function shakeSpeakerPadlockAngrily() {
+            var padlock = document.getElementById('speaker-editor-padlock-btn');
+            if (!padlock || padlock.disabled) return;
+            padlock.classList.remove('is-angry-shake');
+            void padlock.offsetWidth;
+            padlock.classList.add('is-angry-shake');
+            if (padlock._angryShakeTimer) {
+                clearTimeout(padlock._angryShakeTimer);
+            }
+            padlock._angryShakeTimer = setTimeout(function () {
+                padlock.classList.remove('is-angry-shake');
+                padlock._angryShakeTimer = null;
+            }, 450);
+        }
+
+        /** Returns true if the speaker workflow action may run; if locked but active, shakes padlock. */
+        function speakerWorkflowActionAllowedOrShake(btn) {
+            if (!btn || !btn.classList.contains('is-active')) return false;
+            if (speakerPadlockIsOpen) return true;
+            shakeSpeakerPadlockAngrily();
+            return false;
         }
 
         /** Returns true if the workflow action may run; if locked but active, shakes padlock. */
@@ -17410,16 +17493,15 @@
             if (inviteBtn) {
                 inviteBtn.hidden = false;
                 inviteBtn.setAttribute('aria-hidden', 'false');
-                inviteBtn.disabled = !runSendFormalInvite;
-                inviteBtn.setAttribute('aria-disabled', runSendFormalInvite ? 'false' : 'true');
-                // After send: gray inactive (not green is-done) with "Invited <date>".
-                setSpeakerWorkflowStepState(inviteBtn, {
-                    active: canSendFormalInvite,
-                    done: false
-                });
+                var statusIsInvited = inviteStatus === 'Invited';
+                var statusIsConfirmed = inviteStatus === 'Confirmed';
+                inviteBtn.disabled = !statusIsConfirmed;
+                inviteBtn.setAttribute('aria-disabled', statusIsConfirmed && padlockOpen ? 'false' : 'true');
+                inviteBtn.classList.toggle('is-active', statusIsConfirmed);
+                inviteBtn.classList.toggle('is-done', statusIsInvited);
                 var inviteLabel = inviteBtn.querySelector('.speaker-send-formal-invite-label');
                 if (inviteLabel) {
-                    if (formalInviteSent) {
+                    if (statusIsInvited) {
                         var invitedDateLabel = speakerInvitedDateLabelFromRecord(s) || '—';
                         inviteLabel.textContent = 'Invited ' + invitedDateLabel;
                     } else {
@@ -17511,6 +17593,9 @@
                 setSpeakerWorkflowStepState(btn, { active: !!statusEnabled, done: !!done });
             }
 
+            // Bio received / Program speaker stay gray inactive while Lodging is No.
+            var lodgingPastNo = lodgingSt !== 'No';
+
             showWorkflowPhaseButton(
                 document.getElementById('speaker-confirm-lodging-btn'),
                 workflowPastInvite && lodgingSt === 'Requested',
@@ -17518,12 +17603,12 @@
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-bio-received-btn'),
-                workflowPastInvite && bioSt === 'No',
-                workflowPastInvite && bioSt === 'Received'
+                workflowPastInvite && lodgingPastNo && bioSt === 'No',
+                workflowPastInvite && lodgingPastNo && bioSt === 'Received'
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-program-speaker-btn'),
-                workflowPastInvite,
+                workflowPastInvite && lodgingPastNo,
                 false
             );
             showWorkflowPhaseButton(
@@ -17533,7 +17618,9 @@
             );
             showWorkflowPhaseButton(document.getElementById('speaker-send-brief-btn'), false, false);
             if (bioReceivedCheck) {
-                var showBioReceivedCheck = Boolean(s && workflowPastInvite && bioSt === 'Received');
+                var showBioReceivedCheck = Boolean(
+                    s && workflowPastInvite && lodgingPastNo && bioSt === 'Received'
+                );
                 bioReceivedCheck.hidden = !showBioReceivedCheck;
                 bioReceivedCheck.setAttribute('aria-hidden', showBioReceivedCheck ? 'false' : 'true');
             }
@@ -18916,10 +19003,10 @@
             if (key === TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD,
-                    metaLabel: 'Speaker email templates — Formal speaker invitation',
-                    loadOk: 'Formal speaker invitation loaded from Firestore (tbs/Snippets.Speakerinvitation) into the editor.',
-                    saveOk: 'Formal speaker invitation saved to Firestore (tbs/Snippets.Speakerinvitation).',
-                    saveErr: 'Failed to save Formal speaker invitation to Firestore.',
+                    metaLabel: 'Speaker email templates — Speaker invitation',
+                    loadOk: 'Speaker invitation loaded from Firestore (tbs/Snippets.Speakerinvitation) into the editor.',
+                    saveOk: 'Speaker invitation saved to Firestore (tbs/Snippets.Speakerinvitation).',
+                    saveErr: 'Failed to save Speaker invitation to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -19092,14 +19179,17 @@
             return { html: raw != null ? String(raw) : '', subject: '' };
         }
 
-        function applySpeakerInvitationTemplateTokens(text, eventLabel, firstName) {
+        function applySpeakerInvitationTemplateTokens(text, eventLabel, firstName, eventDatesLabel) {
             var eventEscaped = escapeHtml(String(eventLabel || '').trim());
             var nameEscaped = escapeHtml(String(firstName || '').trim());
+            var datesEscaped = escapeHtml(String(eventDatesLabel || '').trim());
             return String(text || '')
                 .split('{{Event}}')
                 .join(eventEscaped)
                 .split('{{Name}}')
-                .join(nameEscaped);
+                .join(nameEscaped)
+                .split('{{Eventdates}}')
+                .join(datesEscaped);
         }
 
         /** HTML body and optional subject from tbs/Snippets field `Speakerinvitation`. */
@@ -21271,7 +21361,7 @@
         /**
          * Send formal speaker invitation via Cloud Function `sendSpeakerInviteHttp`
          * (server Gmail as GMAIL_SPEAKER_SEND_FROM / info@…).
-         * Body from tbs/Snippets `Speakerinvitation` with {{Event}} / {{Name}}.
+         * Body from tbs/Snippets `Speakerinvitation` with {{Event}} / {{Name}} / {{Eventdates}}.
          * On success sets Status=Invited + log line in Firestore.
          */
         async function sendSpeakerFormalInvitationEmail() {
@@ -24435,7 +24525,7 @@
                 speakerSendFormalInviteBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
-                    if (speakerSendFormalInviteBtn.disabled || !speakerPadlockIsOpen) return;
+                    if (!speakerWorkflowActionAllowedOrShake(speakerSendFormalInviteBtn)) return;
                     sendSpeakerFormalInvitationEmail().catch(function(err) {
                         console.error('speaker-send-formal-invite:', err);
                         if (typeof showStatus === 'function') {
@@ -24492,6 +24582,7 @@
                     if (
                         !sp ||
                         normalizeSpeakerInviteStatus(sp.inviteStatus) !== 'Invited' ||
+                        normalizeSpeakerLodging(sp.lodging) === 'No' ||
                         normalizeSpeakerBioStatus(sp.bioStatus) !== 'No'
                     ) {
                         return;
