@@ -6,6 +6,8 @@
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <title>Backend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2508,6 +2510,7 @@
         #guest-editor .guest-overwatch-body .guests-invited,
         #guest-editor .guest-overwatch-body .guests-invoiced,
         #guest-editor .guest-overwatch-body .guests-direct-transfer,
+        #guest-editor .guest-overwatch-body .guests-cancelled,
         #guest-editor .guest-overwatch-body .guests-paid {
             display: flex;
             flex-direction: column;
@@ -2542,7 +2545,9 @@
         }
 
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invoiced,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer {
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer,
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-paid,
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-cancelled {
             flex: 0 0 8rem;
             width: 8rem;
             min-width: 8rem;
@@ -2573,10 +2578,17 @@
             color: #003153;
         }
 
+        #guest-editor .guest-overwatch-body .guests-cancelled {
+            background: var(--backend-roster-pill-black);
+            border-color: var(--backend-roster-pill-black);
+            color: #ffffff;
+        }
+
         #guest-editor .guest-overwatch-body .guests-registered-label,
         #guest-editor .guest-overwatch-body .guests-invited-label,
         #guest-editor .guest-overwatch-body .guests-invoiced-label,
         #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
+        #guest-editor .guest-overwatch-body .guests-cancelled-label,
         #guest-editor .guest-overwatch-body .guests-paid-label {
             margin: 0 0 0.35rem;
             font-size: 0.875rem;
@@ -2593,6 +2605,7 @@
         #guest-editor .guest-overwatch-body .guests-invited-count,
         #guest-editor .guest-overwatch-body .guests-invoiced-count,
         #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
+        #guest-editor .guest-overwatch-body .guests-cancelled-count,
         #guest-editor .guest-overwatch-body .guests-paid-count {
             margin: 0;
             font-size: 1.75rem;
@@ -6231,7 +6244,6 @@
 
         #guest-editor .guests-invited-dropdown,
         #guest-editor .guests-read-dropdown,
-        #guest-editor .guests-invoiced-dropdown,
         #guest-editor .guests-paid-dropdown {
             position: absolute;
             left: 0;
@@ -6248,10 +6260,37 @@
             box-sizing: border-box;
         }
 
+        #guest-editor .guests-invoiced-dropdown,
+        body.backend-page > ul.guests-invoiced-dropdown {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 3px);
+            z-index: 20001;
+            min-width: 9rem;
+            margin: 0;
+            padding: 0.35rem;
+            list-style: none;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+            box-sizing: border-box;
+        }
+
+        body.backend-page > ul.guests-invoiced-dropdown {
+            position: fixed;
+        }
+
+        #guest-editor .guests-invoiced-dropdown[hidden],
+        body.backend-page > ul.guests-invoiced-dropdown[hidden] {
+            display: none !important;
+        }
+
         #guest-editor .guests-invited-dropdown > li,
         #guest-editor .guests-read-dropdown > li,
         #guest-editor .guests-invoiced-dropdown > li,
-        #guest-editor .guests-paid-dropdown > li {
+        #guest-editor .guests-paid-dropdown > li,
+        body.backend-page > ul.guests-invoiced-dropdown > li {
             margin: 0;
             padding: 0;
         }
@@ -6259,7 +6298,8 @@
         #guest-editor .guests-invited-dropdown .guests-invited-option,
         #guest-editor .guests-read-dropdown .guests-read-option,
         #guest-editor .guests-invoiced-dropdown .guests-invoiced-option,
-        #guest-editor .guests-paid-dropdown .guests-paid-option {
+        #guest-editor .guests-paid-dropdown .guests-paid-option,
+        body.backend-page > ul.guests-invoiced-dropdown .guests-invoiced-option {
             display: block;
             width: 100%;
             margin: 0;
@@ -6279,11 +6319,26 @@
             -webkit-appearance: none;
         }
 
+        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option.content-badge,
+        body.backend-page > ul.guests-invoiced-dropdown .guests-invoiced-option.content-badge {
+            width: var(--backend-roster-pill-width);
+            min-width: var(--backend-roster-pill-width);
+            max-width: var(--backend-roster-pill-width);
+            margin: 0.18rem auto;
+            justify-content: center;
+            text-align: center;
+            box-shadow: none;
+        }
+
         #guest-editor .guests-invited-dropdown .guests-invited-option:hover,
         #guest-editor .guests-read-dropdown .guests-read-option:hover,
-        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option:hover,
         #guest-editor .guests-paid-dropdown .guests-paid-option:hover {
             background: #f1f5f9;
+        }
+
+        #guest-editor .guests-invoiced-dropdown .guests-invoiced-option.content-badge:hover,
+        body.backend-page > ul.guests-invoiced-dropdown .guests-invoiced-option.content-badge:hover {
+            filter: brightness(0.92);
         }
 
         #speaker-editor .speakers-status-wrap,
@@ -6361,9 +6416,27 @@
             box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
-        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-cancelled {
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-cancelled,
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-invoiced-cancel,
+        body.backend-page > ul.guests-invoiced-dropdown .content-badge--guest-invoiced-cancel {
             background: var(--backend-roster-pill-black);
             color: #ffffff;
+        }
+
+        body.backend-page > ul.guests-invoiced-dropdown .content-badge--guest-status-yes {
+            background: var(--backend-roster-status-yes-bg);
+            color: #ffffff;
+        }
+
+        body.backend-page > ul.guests-invoiced-dropdown .content-badge--guest-status-no {
+            background: var(--backend-roster-status-no-bg);
+            color: #ffffff;
+        }
+
+        body.backend-page button.guests-invoiced-option {
+            box-shadow: none;
+            font-weight: 400;
+            font-size: 0.9rem;
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-read-denied {
@@ -9453,9 +9526,16 @@
                                         </div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
-                                    <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
-                                        <div class="guests-paid-label">Paid:</div>
-                                        <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
+                                    <div class="guest-overwatch-split-row" role="group" aria-label="Paid and cancelled">
+                                        <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
+                                            <div class="guests-paid-label">Paid:</div>
+                                            <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
+                                        </div>
+                                        <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                        <div class="guests-cancelled" id="guests-cancelled" data-name="guests.cancelled" aria-label="Cancelled paid guests">
+                                            <div class="guests-cancelled-label">Cancelled:</div>
+                                            <div class="guests-cancelled-count" id="guests-cancelled-count" aria-live="polite">0</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -10058,7 +10138,7 @@
         /** Read column: same two-step interaction as Invited. */
         var guestsReadArmedDocId = '';
         var guestsReadDropdownOpenDocId = '';
-        /** Invoiced column: Yes / No / Direct; same two-step interaction as Read. */
+        /** Invoiced column: Yes / No / Direct / Cancel; same two-step interaction as Read. */
         var guestsInvoicedArmedDocId = '';
         var guestsInvoicedDropdownOpenDocId = '';
         /** Paid column: Yes / No / Cancelled; same two-step interaction. */
@@ -13223,6 +13303,19 @@
             return n;
         }
 
+        /** Paid=Cancelled for Current event. */
+        function countGuestsCancelledForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestPaidFieldIsCancelled(g.paid)) n++;
+            }
+            return n;
+        }
+
         function updateGuestsOverwatchRegisteredCount() {
             var registeredEl = document.getElementById('guests-registered-count');
             if (registeredEl) registeredEl.textContent = String(countGuestsRegisteredForCurrentEvent());
@@ -13232,6 +13325,8 @@
             if (invoicedEl) invoicedEl.textContent = String(countGuestsInvoicedForCurrentEvent());
             var directEl = document.getElementById('guests-direct-transfer-count');
             if (directEl) directEl.textContent = String(countGuestsDirectForCurrentEvent());
+            var cancelledEl = document.getElementById('guests-cancelled-count');
+            if (cancelledEl) cancelledEl.textContent = String(countGuestsCancelledForCurrentEvent());
             var paidEl = document.getElementById('guests-paid-count');
             if (paidEl) paidEl.textContent = String(countGuestsPaidForCurrentEvent());
         }
@@ -15592,7 +15687,7 @@
 
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
-        var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct'];
+        var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
         var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Cancelled'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -15849,6 +15944,9 @@
                 return ' content-badge--guest-status-yes';
             }
             if (low === 'no' || low === 'n' || low === 'false') return ' content-badge--guest-status-no';
+            if (low === 'cancel' || low === 'cancelled' || low === 'canceled') {
+                return ' content-badge--guest-invoiced-cancel';
+            }
             return ' content-badge--guest-status-neutral';
         }
 
@@ -15876,7 +15974,9 @@
             for (var ii = 0; ii < GUEST_INVOICED_MENU_VALUES.length; ii++) {
                 var v = GUEST_INVOICED_MENU_VALUES[ii];
                 opts.push(
-                    '<li role="none"><button type="button" class="guests-invoiced-option" role="menuitem" data-invoiced-value="' +
+                    '<li role="none"><button type="button" class="guests-invoiced-option content-badge' +
+                    guestInvoicedBadgeModifierClass(v) +
+                    '" role="menuitem" data-invoiced-value="' +
                     escapeHtml(v) +
                     '">' +
                     escapeHtml(v) +
@@ -15899,15 +15999,70 @@
             );
         }
 
+        function unplaceGuestsInvoicedDropdown(dropdown) {
+            if (!dropdown) return;
+            dropdown.hidden = true;
+            dropdown.style.position = '';
+            dropdown.style.left = '';
+            dropdown.style.right = '';
+            dropdown.style.top = '';
+            dropdown.style.bottom = '';
+            dropdown.style.zIndex = '';
+            dropdown.style.minWidth = '';
+            dropdown.style.margin = '';
+            var home = dropdown._rosterHome;
+            if (home && home.parent && dropdown.parentNode !== home.parent) {
+                if (home.next && home.next.parentNode === home.parent) {
+                    home.parent.insertBefore(dropdown, home.next);
+                } else {
+                    home.parent.appendChild(dropdown);
+                }
+            }
+        }
+
+        function placeGuestsInvoicedDropdown(anchorBtn, dropdown) {
+            if (!anchorBtn || !dropdown) return;
+            if (!dropdown._rosterHome) {
+                dropdown._rosterHome = { parent: dropdown.parentNode, next: dropdown.nextSibling };
+            }
+            document.body.appendChild(dropdown);
+            var r = anchorBtn.getBoundingClientRect();
+            dropdown.style.position = 'fixed';
+            dropdown.style.zIndex = '20001';
+            dropdown.style.left = Math.round(r.left) + 'px';
+            dropdown.style.right = 'auto';
+            dropdown.style.bottom = 'auto';
+            dropdown.style.minWidth = Math.max(144, Math.round(r.width)) + 'px';
+            dropdown.style.top = Math.round(r.bottom + 4) + 'px';
+            dropdown.hidden = false;
+            var dr = dropdown.getBoundingClientRect();
+            if (dr.bottom > window.innerHeight - 8) {
+                dropdown.style.top = Math.max(8, Math.round(r.top - dr.height - 4)) + 'px';
+            }
+            dr = dropdown.getBoundingClientRect();
+            if (dr.right > window.innerWidth - 8) {
+                dropdown.style.left = Math.max(8, Math.round(window.innerWidth - dr.width - 8)) + 'px';
+            }
+        }
+
+        function findGuestsInvoicedDropdown(wrap) {
+            return (wrap && wrap.querySelector('.guests-invoiced-dropdown')) ||
+                document.querySelector('body > ul.guests-invoiced-dropdown');
+        }
+
+        function hideAllGuestsInvoicedDropdowns() {
+            document.querySelectorAll('.guests-invoiced-dropdown').forEach(function(el) {
+                unplaceGuestsInvoicedDropdown(el);
+            });
+        }
+
         function clearGuestsInvoicedUiState() {
             guestsInvoicedArmedDocId = '';
             guestsInvoicedDropdownOpenDocId = '';
             document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn.is-armed').forEach(function(b) {
                 b.classList.remove('is-armed');
             });
-            document.querySelectorAll('#guest-editor .guests-invoiced-dropdown').forEach(function(el) {
-                el.hidden = true;
-            });
+            hideAllGuestsInvoicedDropdowns();
             document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn').forEach(function(b) {
                 b.setAttribute('aria-expanded', 'false');
             });
@@ -16046,6 +16201,7 @@
             rec.invoiced = value;
             guestsInvoicedArmedDocId = '';
             guestsInvoicedDropdownOpenDocId = '';
+            hideAllGuestsInvoicedDropdowns();
             clearGuestsReadUiState();
             clearGuestsInvitedUiState();
             clearGuestsPaidUiState();
@@ -16628,6 +16784,12 @@
             return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'direct';
         }
 
+        /** Invoiced is Cancel / Cancelled (case-insensitive). */
+        function guestInvoicedFieldIsCancel(invoicedVal) {
+            var t = String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase();
+            return t === 'cancel' || t === 'cancelled' || t === 'canceled';
+        }
+
         /** Paid is the literal “No” (case-insensitive). */
         function guestPaidFieldIsNo(paidVal) {
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'no';
@@ -16636,6 +16798,12 @@
         /** Paid is the literal “Yes” (case-insensitive). */
         function guestPaidFieldIsYes(paidVal) {
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'yes';
+        }
+
+        /** Paid is Cancelled / Canceled (case-insensitive). */
+        function guestPaidFieldIsCancelled(paidVal) {
+            var t = String(paidVal != null ? paidVal : '').trim().toLowerCase();
+            return t === 'cancelled' || t === 'canceled';
         }
 
         /** Invited is the literal “Yes” (case-insensitive). */
@@ -25175,21 +25343,19 @@
                         var invRow2 = invoicedBtn.closest('.guests-roster-row');
                         var invId2 = invRow2 && invRow2.getAttribute('data-guests-id');
                         var invWrap = invoicedBtn.closest('.guests-invoiced-wrap');
-                        var invDropdown = invWrap && invWrap.querySelector('.guests-invoiced-dropdown');
+                        var invDropdown = findGuestsInvoicedDropdown(invWrap);
                         if (invId2 && invDropdown) {
                             if (guestsInvoicedArmedDocId === invId2) {
                                 if (!invDropdown.hidden) {
-                                    invDropdown.hidden = true;
+                                    unplaceGuestsInvoicedDropdown(invDropdown);
                                     invoicedBtn.setAttribute('aria-expanded', 'false');
                                     guestsInvoicedDropdownOpenDocId = '';
                                 } else {
-                                    document.querySelectorAll('#guest-editor .guests-invoiced-dropdown').forEach(function(el) {
-                                        el.hidden = true;
-                                    });
+                                    hideAllGuestsInvoicedDropdowns();
                                     document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn').forEach(function(b) {
                                         b.setAttribute('aria-expanded', 'false');
                                     });
-                                    invDropdown.hidden = false;
+                                    placeGuestsInvoicedDropdown(invoicedBtn, invDropdown);
                                     invoicedBtn.setAttribute('aria-expanded', 'true');
                                     guestsInvoicedDropdownOpenDocId = invId2;
                                 }
@@ -25197,9 +25363,7 @@
                                 document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn.is-armed').forEach(function(b) {
                                     b.classList.remove('is-armed');
                                 });
-                                document.querySelectorAll('#guest-editor .guests-invoiced-dropdown').forEach(function(el) {
-                                    el.hidden = true;
-                                });
+                                hideAllGuestsInvoicedDropdowns();
                                 document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn').forEach(function(b) {
                                     b.setAttribute('aria-expanded', 'false');
                                 });
@@ -25276,6 +25440,18 @@
                 });
             }
             document.addEventListener('click', function(ev) {
+                var invoicedOptDoc = ev.target.closest('.guests-invoiced-option');
+                if (invoicedOptDoc) {
+                    var invValDoc = invoicedOptDoc.getAttribute('data-invoiced-value');
+                    var invIdDoc = guestsInvoicedDropdownOpenDocId;
+                    if (!invIdDoc) {
+                        var invRowDoc = invoicedOptDoc.closest('.guests-roster-row');
+                        invIdDoc = invRowDoc && invRowDoc.getAttribute('data-guests-id');
+                    }
+                    if (invIdDoc && invValDoc) void setGuestInvoicedField(invIdDoc, invValDoc);
+                    return;
+                }
+                if (ev.target.closest('.guests-invoiced-dropdown')) return;
                 if (ev.target.closest('.guests-invited-wrap')) return;
                 if (ev.target.closest('.guests-read-wrap')) return;
                 if (ev.target.closest('.guests-invoiced-wrap')) return;
