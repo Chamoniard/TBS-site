@@ -18,6 +18,7 @@
     }
   ],
   "hosting": {
+    "site": "tbs-app-e2062",
     "public": "_site",
     "ignore": [
       "firebase.json",

@@ -2782,6 +2782,9 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 .home-section .programme-section .programme-slider.home-carousel--minimal,
 .home-programme-section .programme-slider.home-carousel--minimal {
     align-items: flex-start;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
 }
 
 .home-section .programme-section .programme-slider.home-carousel--minimal > *,
@@ -4038,7 +4041,7 @@ body.home-view .home-section > .home-social-row-container {
     flex-direction: column;
     gap: 4px;
     overflow: visible;
-    background-color: #003153 !important;
+    background-color: #ffffff !important;
     padding: 0 8px;
     margin: 0;
     border-radius: 0 !important;
@@ -4052,7 +4055,10 @@ body.home-view .home-section > .home-social-row-container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    background-color: #ffffff !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
     overflow: visible;
     position: relative;
     padding-top: 16px;
@@ -4087,7 +4093,7 @@ body.home-view .home-section > .home-social-row-container {
     gap: 0 !important;
     border: none;
     border-radius: 0;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    box-shadow: none;
     padding-left: 0;
     padding-right: 0;
 }
@@ -5933,13 +5939,16 @@ h3.section-titles {
     padding-left: 0 !important;
 }
 
-/* Home: same link pink as outer programme band */
+/* Home: same white as Latest `.feed-section` */
 .home-section > .programme-section {
-    background-color: #003153 !important;
+    background-color: #ffffff !important;
 }
 
 .home-section > .programme-section .programmeslider-innerwrapper {
-    background-color: #ffffff !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     padding-left: 0;
@@ -6688,7 +6697,7 @@ h4 {
         padding-right: 0 !important;
         padding-top: 0;
         padding-bottom: 0;
-        background-color: transparent !important;
+        background-color: #ffffff !important;
     }
 
     .home-section > .speaker-section {
@@ -7425,7 +7434,7 @@ h4 {
     .home-programme-section .programme-slider {
         border: none;
         border-radius: 0;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+        box-shadow: none;
         box-sizing: border-box;
     }
 
