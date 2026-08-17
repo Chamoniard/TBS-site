@@ -208,7 +208,7 @@ function currentEventFromSettingsData(
 }
 
 /**
- * From Eventdates, pick the string that contains Current event, then
+ * From Eventdates, pick the string that starts with Current event, then
  * return only the part after the first comma (trimmed).
  * @param {Record<string, unknown>} data Settings fields.
  * @param {string} currentEvent Current event label.
@@ -241,22 +241,16 @@ function eventDatesAfterCommaForCurrentEvent(
     list.push(String(raw).trim());
   }
   let chosen = "";
-  // Prefer exact / prefix match on Current event, then substring.
   for (let i = 0; i < list.length; i++) {
     const s = list[i];
-    if (s === current || s.indexOf(current + ",") === 0 ||
-      s.indexOf(current + " ,") === 0) {
+    if (
+      s === current ||
+      s.indexOf(current + ",") === 0 ||
+      s.indexOf(current + " ,") === 0 ||
+      s.indexOf(current) === 0
+    ) {
       chosen = s;
       break;
-    }
-  }
-  if (!chosen) {
-    for (let i = 0; i < list.length; i++) {
-      const s = list[i];
-      if (s.indexOf(current) >= 0) {
-        chosen = s;
-        break;
-      }
     }
   }
   if (!chosen) return "";
@@ -304,6 +298,30 @@ async function loadSpeakerInvitationFromSnippets(
 }
 
 /**
+ * Load request-lodging HTML from tbs/Snippets.Requestlodging.
+ * @param {Firestore} db Firestore instance.
+ * @return {Promise<string>} HTML template string.
+ */
+async function loadRequestLodgingHtmlFromSnippets(
+  db: Firestore,
+): Promise<string> {
+  const snap = await db.collection("tbs").doc("Snippets").get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  const raw =
+    data.Requestlodging ??
+    data["Request lodging"] ??
+    data.RequestLodging;
+  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
+    const obj = raw as Record<string, unknown>;
+    if (obj.html != null) return String(obj.html);
+    if (obj.body != null) return String(obj.body);
+    if (obj.HTML != null) return String(obj.HTML);
+    return "";
+  }
+  return raw != null ? String(raw) : "";
+}
+
+/**
  * Pick speaker email from Firestore item fields.
  * @param {Record<string, unknown>} data Speaker item data.
  * @return {string} Email or empty.
@@ -346,6 +364,27 @@ function pickSpeakerFirstName(data: Record<string, unknown>): string {
 }
 
 /**
+ * Pick speaker last name for template tokens.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {string} Last name or empty.
+ */
+function pickSpeakerLastName(data: Record<string, unknown>): string {
+  const candidates = [
+    data.lastName,
+    data.LastName,
+    data["Last name"],
+    data["Last Name"],
+    data.Surname,
+    data.surname,
+  ];
+  for (const value of candidates) {
+    const v = String(value || "").trim();
+    if (v) return v;
+  }
+  return "";
+}
+
+/**
  * Normalize speaker Status / inviteStatus for workflow gates.
  * @param {Record<string, unknown>} data Speaker item data.
  * @return {string} Preliminary | Confirmed | Invited | Cancel | other.
@@ -377,11 +416,47 @@ function speakerFormalInviteAllowed(data: Record<string, unknown>): boolean {
 }
 
 /**
+ * Normalize speaker Lodging field.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {string} Lodging value.
+ */
+function normalizeSpeakerLodging(data: Record<string, unknown>): string {
+  const raw = String(data.lodging ?? data.Lodging ?? "").trim();
+  if (!raw) return "No";
+  const low = raw.toLowerCase();
+  if (low === "no" || low === "n" || low === "none") return "No";
+  if (low === "requested") return "Requested";
+  if (low === "own lodging" || low === "own") return "Own lodging";
+  if (low === "confirmed") return "Confirmed";
+  return raw;
+}
+
+/**
+ * Request lodging email only when Status is Invited and Lodging is No.
+ * @param {Record<string, unknown>} data Speaker item data.
+ * @return {boolean} Whether lodging request may be sent.
+ */
+function speakerRequestLodgingAllowed(data: Record<string, unknown>): boolean {
+  return (
+    normalizeSpeakerStatus(data) === "Invited" &&
+    normalizeSpeakerLodging(data) === "No"
+  );
+}
+
+/**
  * Speaker log line for formal invite sent.
  * @return {string} e.g. `260809: Formal invite sent`
  */
 function speakerLogFormalInviteSentLine(): string {
   return guestLogPrefixYyMmDd() + ": Formal invite sent";
+}
+
+/**
+ * Speaker log line for lodging request emailed.
+ * @return {string} e.g. `260816: Lodging requested`
+ */
+function speakerLogLodgingRequestedLine(): string {
+  return guestLogPrefixYyMmDd() + ": Lodging requested";
 }
 
 /**
@@ -482,24 +557,40 @@ function gmailRfc822ToBase64Url(rfc822: string): string {
  */
 async function sendGmailHtmlMessage(
   accessToken: string,
-  opts: {from: string; to: string; subject: string; html: string},
+  opts: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    cc?: string;
+  },
 ): Promise<void> {
   const from = String(opts.from || "").trim();
   const to = String(opts.to || "").trim();
+  const cc = String(opts.cc || "").trim();
   const subject = String(opts.subject || "").replace(/[\r\n]/g, " ").trim();
   const html = String(opts.html || "");
   if (!from || !to || !subject) {
     throw new Error("Missing From, To, or Subject for invite e-mail.");
   }
-  const rfc822 = [
+  const headers = [
     "From: " + from,
     "To: " + to,
+  ];
+  if (cc) {
+    if (/[\r\n]/.test(cc) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cc)) {
+      throw new Error("Invalid Cc address for e-mail.");
+    }
+    headers.push("Cc: " + cc);
+  }
+  headers.push(
     "Subject: " + subject,
     "MIME-Version: 1.0",
     "Content-Type: text/html; charset=UTF-8",
     "",
     html,
-  ].join("\r\n");
+  );
+  const rfc822 = headers.join("\r\n");
   const raw = gmailRfc822ToBase64Url(rfc822);
   const res = await fetch(
     "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
@@ -1676,6 +1767,174 @@ export const sendSpeakerInviteHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Failed to send speaker invitation.",
+    });
+  }
+});
+
+/**
+ * Speaker workflow: send Request lodging HTML from
+ * tbs/Snippets.Requestlodging as info@… to hotel AlX with speaker in Cc.
+ * Subject: "{Current event} - Lodging request".
+ * On success sets Lodging to Requested + Speaker log line.
+ * Expects JSON: { speakerId }.
+ */
+export const sendSpeakerRequestLodgingHttp = onRequest({
+  secrets: [
+    gmailSpeakerSendClientIdParam,
+    gmailSpeakerSendClientSecretParam,
+    gmailSpeakerSendRefreshTokenParam,
+    gmailSpeakerSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const speakerId = String(body.speakerId || "").trim();
+  if (!speakerId) {
+    res.status(400).json({error: "Missing speakerId."});
+    return;
+  }
+
+  const fromAddress = String(gmailSpeakerSendFromParam.value() || "").trim();
+  if (!fromAddress || !fromAddress.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SPEAKER_SEND_FROM secret.",
+    });
+    return;
+  }
+
+  const toAddress = "info@hotelalxzermatt.com";
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Speakers")
+    .collection(speakerId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Speaker item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    if (!speakerRequestLodgingAllowed(data)) {
+      res.status(400).json({
+        error:
+          "Request lodging is only available when Status is Invited " +
+          "and Lodging is No.",
+      });
+      return;
+    }
+
+    const speakerEmail = pickSpeakerEmail(data);
+    if (
+      !speakerEmail ||
+      /[\r\n]/.test(speakerEmail) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(speakerEmail)
+    ) {
+      res.status(400).json({
+        error: "Speaker has no valid email in tbs/Speakers email field.",
+      });
+      return;
+    }
+
+    const htmlTemplate = String(
+      await loadRequestLodgingHtmlFromSnippets(db) || "",
+    ).trim();
+    if (!htmlTemplate) {
+      res.status(500).json({
+        error: "Request lodging template is empty in tbs/Snippets.",
+      });
+      return;
+    }
+
+    const firstName = pickSpeakerFirstName(data);
+    const lastName = pickSpeakerLastName(data);
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
+    const subject = (eventLabel ?
+      eventLabel + " - Lodging request" :
+      "Lodging request").replace(/[\r\n]/g, " ");
+    const html = htmlTemplate
+      .split("{{Event}}")
+      .join(escapeHtml(eventLabel))
+      .split("{{Name}}")
+      .join(escapeHtml(firstName))
+      .split("{{firstname}}")
+      .join(escapeHtml(firstName))
+      .split("{{Firstname}}")
+      .join(escapeHtml(firstName))
+      .split("{{FirstName}}")
+      .join(escapeHtml(firstName))
+      .split("{{lastname}}")
+      .join(escapeHtml(lastName))
+      .split("{{Lastname}}")
+      .join(escapeHtml(lastName))
+      .split("{{LastName}}")
+      .join(escapeHtml(lastName))
+      .split("{{Eventdate}}")
+      .join(escapeHtml(eventDatesLabel))
+      .split("{{Eventdates}}")
+      .join(escapeHtml(eventDatesLabel));
+
+    const accessToken = await refreshGmailSpeakerSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: toAddress,
+      cc: speakerEmail,
+      subject,
+      html,
+    });
+
+    const lodgingLogLine = speakerLogLodgingRequestedLine();
+    await itemRef.set({
+      "lodging": "Requested",
+      "Lodging": "Requested",
+      "Speaker log": FieldValue.arrayUnion(lodgingLogLine),
+    }, {merge: true});
+
+    logger.info("sendSpeakerRequestLodgingHttp ok", {
+      speakerId,
+      to: toAddress,
+      cc: speakerEmail,
+      from: fromAddress,
+    });
+
+    res.status(200).json({
+      ok: true,
+      speakerId,
+      to: toAddress,
+      cc: speakerEmail,
+      from: fromAddress,
+      lodging: "Requested",
+      logLine: lodgingLogLine,
+      message: firstName ?
+        "Lodging requested for " + firstName :
+        "Lodging requested.",
+    });
+  } catch (err) {
+    logger.error("sendSpeakerRequestLodgingHttp failed", {speakerId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send lodging request.",
     });
   }
 });

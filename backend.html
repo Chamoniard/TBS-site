@@ -2955,19 +2955,17 @@
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-speaker-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-confirm-speaker-arrow[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-check[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-lodging-check[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-received-check[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions-arrow[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions .speaker-workflow-actions-plus[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-lodging-arrows-row[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-lodging-arrow[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-bio-requested-arrow[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-confirm-bio-arrows-row[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-confirm-lodging-arrow[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-bio-received-arrow[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-invite-lodging-row[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-invite-lodging-plus[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-check[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-cross[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-check[hidden],
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-cross[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-lodging-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-program-speaker-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-received-btn[hidden],
@@ -5660,8 +5658,7 @@
         }
 
         #speaker-editor #speaker-editor-actions .speaker-workflow-confirm-bio-row,
-        #speaker-editor #speaker-editor-actions .speaker-workflow-program-publish-row,
-        #speaker-editor #speaker-editor-actions .speaker-workflow-lodging-actions-row {
+        #speaker-editor #speaker-editor-actions .speaker-workflow-program-publish-row {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -5673,23 +5670,74 @@
             box-sizing: border-box;
         }
 
-        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-sep,
-        #speaker-editor #speaker-editor-actions .speaker-workflow-actions-plus {
+        #speaker-editor #speaker-editor-actions .speaker-workflow-lodging-actions-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 8px;
+            width: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #speaker-editor #speaker-editor-actions .speaker-workflow-lodging-request-col,
+        #speaker-editor #speaker-editor-actions .speaker-workflow-lodging-bio-col {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 6px;
+            flex: 0 0 var(--backend-workflow-btn-width);
+            width: var(--backend-workflow-btn-width);
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #speaker-editor #speaker-editor-actions .speaker-workflow-lodging-arrows-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #speaker-editor #speaker-editor-actions .speaker-workflow-lodging-arrows-row > .speaker-workflow-actions-arrow {
+            flex: 0 0 var(--backend-workflow-btn-width);
+            width: var(--backend-workflow-btn-width);
+            max-width: 100%;
+        }
+
+        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-sep {
             display: flex;
             align-items: center;
             justify-content: center;
             flex: 0 0 auto;
             min-width: 0.75rem;
+            min-height: 0;
             margin: 0;
             color: #338a17;
-            font-size: 1.25rem;
+            font-size: 0.75rem;
             font-weight: 700;
+            letter-spacing: 0.06em;
             line-height: 1;
+            text-transform: uppercase;
             user-select: none;
             pointer-events: none;
         }
 
+        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-sep[hidden] {
+            display: none !important;
+        }
+
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn {
             display: block;
@@ -5730,7 +5778,6 @@
             height: auto;
             margin: 0;
             padding: 8px 12px;
-            padding-right: 2rem;
             box-sizing: border-box;
             border-radius: var(--backend-square-btn-radius);
             font-family: 'Inter', sans-serif;
@@ -5783,17 +5830,12 @@
             animation: none !important;
         }
 
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-lodging-btn,
-        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-received-btn {
-            padding-right: 2rem;
-        }
-
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn:disabled:not(.is-active):not(.is-done),
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn:disabled:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn:disabled:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn:disabled:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn[aria-disabled='true']:not(.is-active):not(.is-done),
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn[aria-disabled='true']:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn[aria-disabled='true']:not(.is-active):not(.is-done),
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-phase-btn[aria-disabled='true']:not(.is-active):not(.is-done) {
             background: #f1f5f9;
@@ -5818,6 +5860,9 @@
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done:disabled,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done[aria-disabled='true'],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn.is-done,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn.is-done:disabled,
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-bio-requested-btn.is-done[aria-disabled='true'],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn.is-done,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn.is-done:disabled,
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn.is-done[aria-disabled='true'],
@@ -5889,43 +5934,6 @@
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
         }
 
-        #speaker-editor #speaker-editor-actions .speaker-own-lodging-check,
-        #speaker-editor #speaker-editor-actions .speaker-request-lodging-check,
-        #speaker-editor #speaker-editor-actions .speaker-confirm-lodging-check,
-        #speaker-editor #speaker-editor-actions .speaker-bio-received-check,
-        #speaker-editor #speaker-editor-actions .speaker-send-formal-invite-check {
-            position: absolute;
-            top: 50%;
-            right: 12px;
-            transform: translateY(-50%);
-            color: #22c55e;
-            font-size: 1rem;
-            font-weight: 700;
-            line-height: 1;
-            pointer-events: none;
-        }
-
-        #speaker-editor #speaker-editor-actions .speaker-request-lodging-cross,
-        #speaker-editor #speaker-editor-actions .speaker-own-lodging-cross {
-            position: absolute;
-            top: 50%;
-            right: 12px;
-            transform: translateY(-50%);
-            color: #F71941;
-            font-size: 1.1rem;
-            font-weight: 700;
-            line-height: 1;
-            pointer-events: none;
-        }
-
-        #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn.is-done .speaker-send-formal-invite-check,
-        #speaker-editor #speaker-editor-actions #speaker-request-lodging-btn.is-done .speaker-request-lodging-check,
-        #speaker-editor #speaker-editor-actions #speaker-own-lodging-btn.is-done .speaker-own-lodging-check,
-        #speaker-editor #speaker-editor-actions #speaker-confirm-lodging-btn.is-done .speaker-confirm-lodging-check,
-        #speaker-editor #speaker-editor-actions #speaker-bio-received-btn.is-done .speaker-bio-received-check {
-            color: #ffffff;
-        }
-
         #speaker-editor #speaker-editor-actions .speaker-workflow-actions-arrow {
             display: flex;
             align-items: center;
@@ -5941,11 +5949,14 @@
             pointer-events: none;
         }
 
-        #speaker-editor #speaker-editor-actions .speaker-workflow-actions-arrow.speaker-workflow-actions-plus {
-            font-size: 1.25rem;
+        /* Lodging columns: width only — do not use flex-basis on column axis (that becomes height). */
+        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-request-col > .speaker-request-lodging-btn,
+        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-bio-col > .speaker-bio-requested-btn {
+            width: var(--backend-workflow-btn-width);
+            max-width: 100%;
+            flex: 0 0 auto;
         }
 
-        #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-lodging-actions-row > .speaker-request-lodging-btn,
         #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-confirm-bio-row > .speaker-workflow-phase-btn,
         #speaker-editor #speaker-editor-actions #speaker-workflow-actions .speaker-workflow-program-publish-row > .speaker-workflow-phase-btn {
             width: var(--backend-workflow-btn-width);
@@ -9079,40 +9090,45 @@
                                     <div class="speaker-workflow-invite-lodging-row" id="speaker-workflow-invite-lodging-row">
                                     <button type="button" class="speaker-send-formal-invite-btn" id="speaker-send-formal-invite-btn" hidden aria-hidden="true">
                                         <span class="speaker-send-formal-invite-label">Send formal invite</span>
-                                        <span class="speaker-send-formal-invite-check" id="speaker-send-formal-invite-check" hidden aria-hidden="true">✓</span>
                                     </button>
                                     <div class="speaker-workflow-actions-arrow" id="speaker-workflow-invite-lodging-plus" hidden aria-hidden="true" aria-label="Next step">⬇</div>
                                     <div class="speaker-workflow-lodging-actions-row" id="speaker-workflow-lodging-actions-row">
+                                    <div class="speaker-workflow-lodging-request-col" id="speaker-workflow-lodging-request-col">
                                     <button type="button" class="speaker-request-lodging-btn" id="speaker-request-lodging-btn" hidden aria-hidden="true">
                                         <span class="speaker-request-lodging-label">Request lodging</span>
-                                        <span class="speaker-request-lodging-check" id="speaker-request-lodging-check" hidden aria-hidden="true">✓</span>
-                                        <span class="speaker-request-lodging-cross" id="speaker-request-lodging-cross" hidden aria-hidden="true">✕</span>
                                     </button>
-                                    <span class="speaker-workflow-lodging-sep" aria-hidden="true">/</span>
+                                    <span class="speaker-workflow-lodging-sep" id="speaker-workflow-lodging-sep" hidden aria-hidden="true">OR</span>
                                     <button type="button" class="speaker-request-lodging-btn" id="speaker-own-lodging-btn" hidden aria-hidden="true">
                                         <span class="speaker-own-lodging-label">Own lodging</span>
-                                        <span class="speaker-own-lodging-check" id="speaker-own-lodging-check" hidden aria-hidden="true">✓</span>
-                                        <span class="speaker-own-lodging-cross" id="speaker-own-lodging-cross" hidden aria-hidden="true">✕</span>
+                                    </button>
+                                    </div>
+                                    <div class="speaker-workflow-lodging-bio-col" id="speaker-workflow-lodging-bio-col">
+                                    <button type="button" class="speaker-bio-requested-btn" id="speaker-bio-requested-btn" hidden aria-hidden="true" disabled aria-disabled="true">
+                                        <span class="speaker-bio-requested-label">Bio requested</span>
                                     </button>
                                     </div>
                                     </div>
-                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-actions-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
+                                    </div>
+                                    <div class="speaker-workflow-lodging-arrows-row" id="speaker-workflow-lodging-arrows-row" hidden aria-hidden="true">
+                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-lodging-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
+                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-bio-requested-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
+                                    </div>
                                     <div class="speaker-workflow-confirm-bio-row" id="speaker-workflow-confirm-bio-row">
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-confirm-lodging-btn" disabled aria-disabled="true" hidden aria-hidden="true">
                                         <span class="speaker-confirm-lodging-label">Confirm lodging</span>
-                                        <span class="speaker-confirm-lodging-check" id="speaker-confirm-lodging-check" hidden aria-hidden="true">✓</span>
                                     </button>
-                                    <div class="speaker-workflow-actions-plus speaker-workflow-actions-plus--phase speaker-workflow-actions-plus--confirm-bio" id="speaker-workflow-confirm-bio-plus" hidden aria-hidden="true" aria-label="Then">+</div>
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-bio-received-btn" disabled aria-disabled="true" hidden aria-hidden="true">
                                         <span class="speaker-bio-received-label">Bio received</span>
-                                        <span class="speaker-bio-received-check" id="speaker-bio-received-check" hidden aria-hidden="true">✓</span>
                                     </button>
+                                    </div>
+                                    <div class="speaker-workflow-lodging-arrows-row" id="speaker-workflow-confirm-bio-arrows-row" hidden aria-hidden="true">
+                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-confirm-lodging-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
+                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-bio-received-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
                                     </div>
                                     <div class="speaker-workflow-program-publish-row" id="speaker-workflow-program-publish-row">
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-program-speaker-btn" disabled aria-disabled="true" hidden aria-hidden="true">
                                         Program speaker
                                     </button>
-                                    <div class="speaker-workflow-actions-arrow speaker-workflow-actions-plus speaker-workflow-actions-plus--phase" id="speaker-workflow-program-publish-plus" hidden aria-hidden="true" aria-label="Then">+</div>
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-publish-speaker-btn" disabled aria-disabled="true" hidden aria-hidden="true">
                                         Publish bio
                                     </button>
@@ -10585,6 +10601,10 @@
 
         function speakerLogOwnLodgingLine() {
             return guestLogYyMmDdPrefix() + ': Speaker has own lodging';
+        }
+
+        function speakerLogLodgingRequestedLine() {
+            return guestLogYyMmDdPrefix() + ': Lodging requested';
         }
 
         function speakerLogBioReceivedLine() {
@@ -17484,16 +17504,16 @@
             var confirmSpeakerBtn = document.getElementById('speaker-confirm-speaker-btn');
             var confirmSpeakerArrow = document.getElementById('speaker-workflow-confirm-speaker-arrow');
             var inviteBtn = document.getElementById('speaker-send-formal-invite-btn');
-            var inviteCheck = document.getElementById('speaker-send-formal-invite-check');
-            var confirmLodgingCheck = document.getElementById('speaker-confirm-lodging-check');
-            var bioReceivedCheck = document.getElementById('speaker-bio-received-check');
-            var requestLodgingCheck = document.getElementById('speaker-request-lodging-check');
-            var requestLodgingCross = document.getElementById('speaker-request-lodging-cross');
-            var ownLodgingCheck = document.getElementById('speaker-own-lodging-check');
-            var ownLodgingCross = document.getElementById('speaker-own-lodging-cross');
-            var workflowArrow = document.getElementById('speaker-workflow-actions-arrow');
+            var lodgingArrowsRow = document.getElementById('speaker-workflow-lodging-arrows-row');
+            var lodgingArrow = document.getElementById('speaker-workflow-lodging-arrow');
+            var bioRequestedArrow = document.getElementById('speaker-workflow-bio-requested-arrow');
+            var confirmBioArrowsRow = document.getElementById('speaker-workflow-confirm-bio-arrows-row');
+            var confirmLodgingArrow = document.getElementById('speaker-workflow-confirm-lodging-arrow');
+            var bioReceivedArrow = document.getElementById('speaker-workflow-bio-received-arrow');
             var lodgingBtn = document.getElementById('speaker-request-lodging-btn');
+            var bioRequestedBtn = document.getElementById('speaker-bio-requested-btn');
             var ownLodgingBtn = document.getElementById('speaker-own-lodging-btn');
+            var lodgingSep = document.getElementById('speaker-workflow-lodging-sep');
             var inviteLodgingRow = document.getElementById('speaker-workflow-invite-lodging-row');
             var inviteLodgingPlus = document.getElementById('speaker-workflow-invite-lodging-plus');
             var sendBriefArrow = document.getElementById('speaker-workflow-actions-arrow-send-brief');
@@ -17522,12 +17542,6 @@
                 btn.classList.toggle('is-active', active);
                 btn.classList.toggle('is-done', done && !active);
             }
-            function setSpeakerWorkflowPlusConnectorsVisible(visible) {
-                wrap.querySelectorAll('.speaker-workflow-actions-plus--phase').forEach(function(plusEl) {
-                    plusEl.hidden = !visible;
-                    plusEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
-                });
-            }
             function resetConfirmSpeakerBtn() {
                 if (!confirmSpeakerBtn) return;
                 confirmSpeakerBtn.hidden = true;
@@ -17555,37 +17569,29 @@
                     var inviteLabelReset = inviteBtn.querySelector('.speaker-send-formal-invite-label');
                     if (inviteLabelReset) inviteLabelReset.textContent = 'Send formal invite';
                 }
-                if (inviteCheck) {
-                    inviteCheck.hidden = true;
-                    inviteCheck.setAttribute('aria-hidden', 'true');
+                if (lodgingArrowsRow) {
+                    lodgingArrowsRow.hidden = true;
+                    lodgingArrowsRow.setAttribute('aria-hidden', 'true');
                 }
-                if (confirmLodgingCheck) {
-                    confirmLodgingCheck.hidden = true;
-                    confirmLodgingCheck.setAttribute('aria-hidden', 'true');
+                if (lodgingArrow) {
+                    lodgingArrow.hidden = true;
+                    lodgingArrow.setAttribute('aria-hidden', 'true');
                 }
-                if (bioReceivedCheck) {
-                    bioReceivedCheck.hidden = true;
-                    bioReceivedCheck.setAttribute('aria-hidden', 'true');
+                if (bioRequestedArrow) {
+                    bioRequestedArrow.hidden = true;
+                    bioRequestedArrow.setAttribute('aria-hidden', 'true');
                 }
-                if (requestLodgingCheck) {
-                    requestLodgingCheck.hidden = true;
-                    requestLodgingCheck.setAttribute('aria-hidden', 'true');
+                if (confirmBioArrowsRow) {
+                    confirmBioArrowsRow.hidden = true;
+                    confirmBioArrowsRow.setAttribute('aria-hidden', 'true');
                 }
-                if (requestLodgingCross) {
-                    requestLodgingCross.hidden = true;
-                    requestLodgingCross.setAttribute('aria-hidden', 'true');
+                if (confirmLodgingArrow) {
+                    confirmLodgingArrow.hidden = true;
+                    confirmLodgingArrow.setAttribute('aria-hidden', 'true');
                 }
-                if (ownLodgingCheck) {
-                    ownLodgingCheck.hidden = true;
-                    ownLodgingCheck.setAttribute('aria-hidden', 'true');
-                }
-                if (ownLodgingCross) {
-                    ownLodgingCross.hidden = true;
-                    ownLodgingCross.setAttribute('aria-hidden', 'true');
-                }
-                if (workflowArrow) {
-                    workflowArrow.hidden = true;
-                    workflowArrow.setAttribute('aria-hidden', 'true');
+                if (bioReceivedArrow) {
+                    bioReceivedArrow.hidden = true;
+                    bioReceivedArrow.setAttribute('aria-hidden', 'true');
                 }
                 if (lodgingBtn) {
                     lodgingBtn.hidden = true;
@@ -17596,12 +17602,23 @@
                     var requestLodgingLabelReset = lodgingBtn.querySelector('.speaker-request-lodging-label');
                     if (requestLodgingLabelReset) requestLodgingLabelReset.textContent = 'Request lodging';
                 }
+                if (bioRequestedBtn) {
+                    bioRequestedBtn.hidden = true;
+                    bioRequestedBtn.setAttribute('aria-hidden', 'true');
+                    bioRequestedBtn.disabled = true;
+                    bioRequestedBtn.setAttribute('aria-disabled', 'true');
+                    setSpeakerWorkflowStepState(bioRequestedBtn, { active: false, done: false });
+                }
                 if (ownLodgingBtn) {
                     ownLodgingBtn.hidden = true;
                     ownLodgingBtn.setAttribute('aria-hidden', 'true');
                     ownLodgingBtn.disabled = true;
                     ownLodgingBtn.setAttribute('aria-disabled', 'true');
                     setSpeakerWorkflowStepState(ownLodgingBtn, { active: false, done: false });
+                }
+                if (lodgingSep) {
+                    lodgingSep.hidden = true;
+                    lodgingSep.setAttribute('aria-hidden', 'true');
                 }
                 if (inviteLodgingRow) {
                     inviteLodgingRow.hidden = true;
@@ -17616,7 +17633,6 @@
                     sendBriefArrow.hidden = true;
                     sendBriefArrow.setAttribute('aria-hidden', 'true');
                 }
-                setSpeakerWorkflowPlusConnectorsVisible(false);
                 return;
             }
             var s = findSpeakerInMemory(id);
@@ -17677,18 +17693,29 @@
                     }
                 }
             }
-            if (inviteCheck) {
-                inviteCheck.hidden = true;
-                inviteCheck.setAttribute('aria-hidden', 'true');
+            if (lodgingArrowsRow) {
+                lodgingArrowsRow.hidden = false;
+                lodgingArrowsRow.setAttribute('aria-hidden', 'false');
             }
-            var showConfirmLodgingCheck = Boolean(s && workflowPastInvite && lodgingSt === 'Own lodging');
-            if (confirmLodgingCheck) {
-                confirmLodgingCheck.hidden = !showConfirmLodgingCheck;
-                confirmLodgingCheck.setAttribute('aria-hidden', showConfirmLodgingCheck ? 'false' : 'true');
+            if (lodgingArrow) {
+                lodgingArrow.hidden = false;
+                lodgingArrow.setAttribute('aria-hidden', 'false');
             }
-            if (workflowArrow) {
-                workflowArrow.hidden = false;
-                workflowArrow.setAttribute('aria-hidden', 'false');
+            if (bioRequestedArrow) {
+                bioRequestedArrow.hidden = false;
+                bioRequestedArrow.setAttribute('aria-hidden', 'false');
+            }
+            if (confirmBioArrowsRow) {
+                confirmBioArrowsRow.hidden = false;
+                confirmBioArrowsRow.setAttribute('aria-hidden', 'false');
+            }
+            if (confirmLodgingArrow) {
+                confirmLodgingArrow.hidden = false;
+                confirmLodgingArrow.setAttribute('aria-hidden', 'false');
+            }
+            if (bioReceivedArrow) {
+                bioReceivedArrow.hidden = false;
+                bioReceivedArrow.setAttribute('aria-hidden', 'false');
             }
             if (lodgingBtn) {
                 lodgingBtn.hidden = false;
@@ -17707,9 +17734,25 @@
                             : 'Request lodging';
                 }
             }
+            if (bioRequestedBtn) {
+                // Speakers use Status Invited (guest-style “Invited = Yes”).
+                var bioRequestedDone = inviteStatus === 'Invited';
+                bioRequestedBtn.hidden = false;
+                bioRequestedBtn.setAttribute('aria-hidden', 'false');
+                bioRequestedBtn.disabled = true;
+                bioRequestedBtn.setAttribute('aria-disabled', 'true');
+                setSpeakerWorkflowStepState(bioRequestedBtn, {
+                    active: false,
+                    done: bioRequestedDone
+                });
+            }
             if (ownLodgingBtn) {
-                ownLodgingBtn.hidden = false;
-                ownLodgingBtn.setAttribute('aria-hidden', 'false');
+                // When Lodging is Requested, hide Own lodging (and OR) entirely.
+                var showOwnLodgingChoice = Boolean(
+                    s && workflowPastInvite && lodgingSt !== 'Requested'
+                );
+                ownLodgingBtn.hidden = !showOwnLodgingChoice;
+                ownLodgingBtn.setAttribute('aria-hidden', showOwnLodgingChoice ? 'false' : 'true');
                 ownLodgingBtn.disabled = !runRequestLodging;
                 ownLodgingBtn.setAttribute('aria-disabled', runRequestLodging ? 'false' : 'true');
                 setSpeakerWorkflowStepState(ownLodgingBtn, {
@@ -17717,30 +17760,12 @@
                     done: workflowPastInvite && lodgingSt === 'Own lodging'
                 });
             }
-            var showLodgingOwnChoiceIndicators = Boolean(
-                s && workflowPastInvite && lodgingSt === 'Own lodging'
-            );
-            var showRequestLodgingRequested = Boolean(
-                s && workflowPastInvite && lodgingSt === 'Requested'
-            );
-            if (requestLodgingCheck) {
-                requestLodgingCheck.hidden = !showRequestLodgingRequested;
-                requestLodgingCheck.setAttribute('aria-hidden', showRequestLodgingRequested ? 'false' : 'true');
-            }
-            if (requestLodgingCross) {
-                requestLodgingCross.hidden = !showLodgingOwnChoiceIndicators;
-                requestLodgingCross.setAttribute('aria-hidden', showLodgingOwnChoiceIndicators ? 'false' : 'true');
-            }
-            if (ownLodgingCheck) {
-                ownLodgingCheck.hidden = !showLodgingOwnChoiceIndicators;
-                ownLodgingCheck.setAttribute('aria-hidden', showLodgingOwnChoiceIndicators ? 'false' : 'true');
-            }
-            var showOwnLodgingCrossForRequested = Boolean(
-                s && workflowPastInvite && lodgingSt === 'Requested'
-            );
-            if (ownLodgingCross) {
-                ownLodgingCross.hidden = !showOwnLodgingCrossForRequested;
-                ownLodgingCross.setAttribute('aria-hidden', showOwnLodgingCrossForRequested ? 'false' : 'true');
+            if (lodgingSep) {
+                var showLodgingOr = Boolean(
+                    s && workflowPastInvite && lodgingSt !== 'Requested'
+                );
+                lodgingSep.hidden = !showLodgingOr;
+                lodgingSep.setAttribute('aria-hidden', showLodgingOr ? 'false' : 'true');
             }
             if (inviteLodgingRow) {
                 inviteLodgingRow.hidden = false;
@@ -17785,18 +17810,10 @@
                 false
             );
             showWorkflowPhaseButton(document.getElementById('speaker-send-brief-btn'), false, false);
-            if (bioReceivedCheck) {
-                var showBioReceivedCheck = Boolean(
-                    s && workflowPastInvite && lodgingPastNo && bioSt === 'Received'
-                );
-                bioReceivedCheck.hidden = !showBioReceivedCheck;
-                bioReceivedCheck.setAttribute('aria-hidden', showBioReceivedCheck ? 'false' : 'true');
-            }
             if (sendBriefArrow) {
                 sendBriefArrow.hidden = false;
                 sendBriefArrow.setAttribute('aria-hidden', 'false');
             }
-            setSpeakerWorkflowPlusConnectorsVisible(true);
         }
 
         /** `#speaker-editor-actions`: activity log list from in-memory `speakerLog` / Firestore **Speaker log**. */
@@ -21635,6 +21652,115 @@
             }
         }
 
+        /**
+         * Request lodging via Cloud Function `sendSpeakerRequestLodgingHttp`
+         * (From info@… → registration@…, Cc speaker).
+         * Body from tbs/Snippets `Requestlodging`.
+         * On success sets Lodging=Requested + log line.
+         */
+        async function sendSpeakerRequestLodgingEmail() {
+            var btn = document.getElementById('speaker-request-lodging-btn');
+            var id = String(speakerFormEditingDocId || '').trim();
+            if (!id || id === '_init') {
+                if (typeof showStatus === 'function') showStatus('error', 'Select a speaker first.');
+                return;
+            }
+            if (!speakerPadlockIsOpen) return;
+            var s = findSpeakerInMemory(id);
+            if (!s) {
+                if (typeof showStatus === 'function') showStatus('error', 'Speaker not found.');
+                return;
+            }
+            if (normalizeSpeakerInviteStatus(s.inviteStatus) !== 'Invited') {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'Request lodging is only available when Status is Invited.');
+                }
+                return;
+            }
+            if (normalizeSpeakerLodging(s.lodging) !== 'No') {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'Request lodging is only available when Lodging is No.');
+                }
+                return;
+            }
+            readSpeakerFormIntoRecord(s);
+            var toRaw = s.email != null ? String(s.email).trim() : '';
+            if (!toRaw || /[\r\n]/.test(toRaw) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toRaw)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'This speaker has no valid E-mail address (needed for Cc).');
+                }
+                return;
+            }
+            markSpeakerDocDirty(id);
+            var flushed = await flushSpeakersToFirebase({ silent: true });
+            if (!flushed) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'Could not save speaker email before sending.');
+                }
+                return;
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending lodging request...');
+            }
+            try {
+                var fnUrl =
+                    'https://us-central1-' +
+                    String(firebaseConfig.projectId || '').trim() +
+                    '.cloudfunctions.net/sendSpeakerRequestLodgingHttp';
+                var res = await fetch(fnUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ speakerId: id }),
+                });
+                var payload = {};
+                try {
+                    payload = await res.json();
+                } catch (parseErr) {
+                    payload = {};
+                }
+                if (!res.ok) {
+                    var errMsg =
+                        payload && payload.error
+                            ? String(payload.error)
+                            : 'Function call failed (' + res.status + ')';
+                    throw new Error(errMsg);
+                }
+                s.lodging = 'Requested';
+                if (payload && payload.logLine) {
+                    s.speakerLog = (Array.isArray(s.speakerLog) ? s.speakerLog.slice() : []).concat([
+                        String(payload.logLine),
+                    ]);
+                } else {
+                    if (!Array.isArray(s.speakerLog)) s.speakerLog = [];
+                    s.speakerLog.push(speakerLogLodgingRequestedLine());
+                }
+                renderSpeakerRoster();
+                syncSpeakerManagementLogPanel();
+                syncSpeakerWorkflowActionsPanel();
+                var sentOkMsg =
+                    payload && payload.message
+                        ? String(payload.message)
+                        : 'Lodging requested.';
+                if (typeof showStatus === 'function') {
+                    showStatus('success', sentOkMsg);
+                }
+            } catch (err) {
+                console.error('sendSpeakerRequestLodgingEmail:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to request lodging.'
+                    );
+                }
+            } finally {
+                syncSpeakerWorkflowActionsPanel();
+            }
+        }
+
         async function connectGmailClient(options) {
             var authEl = document.getElementById('emailer-auth-status');
             var opts = options || {};
@@ -24721,9 +24847,15 @@
                     ev.stopPropagation();
                     if (speakerRequestLodgingBtn.disabled) return;
                     if (!speakerWorkflowCanSetLodgingFromNo()) return;
-                    var docId = String(speakerFormEditingDocId || '').trim();
-                    if (!docId) return;
-                    void setSpeakerRosterLodgingField(docId, 'Requested');
+                    sendSpeakerRequestLodgingEmail().catch(function(err) {
+                        console.error('speaker-request-lodging:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to request lodging.'
+                            );
+                        }
+                    });
                 });
             }
             var speakerOwnLodgingBtn = document.getElementById('speaker-own-lodging-btn');
