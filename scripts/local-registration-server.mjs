@@ -129,8 +129,13 @@ async function handleSubmitRegistration(body) {
         throw new Error('Please indicate whether you have attended TBS in the past.');
     }
 
+    const requestedEvent = String(body.event || '').trim();
+    const event = requestedEvent || 'TBS27';
+    if (event !== 'TBS27' && event !== 'TBS Alaska') {
+        throw new Error('Invalid event.');
+    }
+
     const db = initFirebase();
-    const event = 'TBS27';
     const applicationDate = formatApplicationDate(new Date());
     const parentRef = db.collection('tbs').doc('Guests');
     const baseGuestId = buildRegistrationGuestId(event, firstName, lastName);
@@ -227,7 +232,7 @@ const server = http.createServer(async (req, res) => {
                         'Set GOOGLE_APPLICATION_CREDENTIALS in .env to a service-account JSON file, ' +
                         'or run: gcloud auth application-default login — then restart npm run start:8082';
                 }
-                const code = /required|match|Select|indicate|valid email/i.test(msg) ? 400 : 500;
+                const code = /required|match|Select|indicate|valid email|Invalid event/i.test(msg) ? 400 : 500;
                 console.error('[submitRegistration]', err);
                 res.writeHead(code, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: msg }));

@@ -1815,7 +1815,7 @@ export const sendSpeakerRequestLodgingHttp = onRequest({
     return;
   }
 
-  const toAddress = "info@hotelalxzermatt.com";
+  const toAddress = "reservation@hotelalexzermatt.com";
   const db = getFirestore();
   const itemRef = db
     .collection("tbs")
@@ -2110,6 +2110,25 @@ function registrationSlugPart(input: unknown): string {
   return t.slice(0, 80);
 }
 
+const REGISTRATION_DEFAULT_EVENT = "TBS27";
+const REGISTRATION_ALLOWED_EVENTS = new Set([
+  "TBS27",
+  "TBS Alaska",
+]);
+
+/**
+ * Resolves guest Event from the request body.
+ * Missing/empty defaults to TBS27 (home form). Unknown values are rejected.
+ * @param {unknown} input Raw event from JSON body.
+ * @return {string|null} Allowed event label, or null if invalid.
+ */
+function resolveRegistrationEvent(input: unknown): string | null {
+  const t = String(input ?? "").trim();
+  if (!t) return REGISTRATION_DEFAULT_EVENT;
+  if (REGISTRATION_ALLOWED_EVENTS.has(t)) return t;
+  return null;
+}
+
 /**
  * Builds base guest document id: event + first + last (no separators).
  * @param {string} event Current event label.
@@ -2221,8 +2240,13 @@ export const submitRegistrationHttp = onRequest({
       return;
     }
 
+    const event = resolveRegistrationEvent(body.event);
+    if (!event) {
+      res.status(400).json({error: "Invalid event."});
+      return;
+    }
+
     const db = getFirestore();
-    const event = "TBS27";
     const submittedAt = new Date();
     const applicationDate = formatApplicationDate(submittedAt);
 

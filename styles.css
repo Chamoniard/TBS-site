@@ -12009,3 +12009,101 @@ body.home-view .home-section .programmestyle h3.home-carousel-tba-title {
     font-weight: 600 !important;
 }
 
+/* TBS Alaska guest registration (embeddable; no home chrome) */
+html.alaska-guest-register,
+body.alaska-guest-register {
+    background-color: #FFD007;
+    color: #1a1a1a;
+    min-height: 100%;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body.alaska-guest-register {
+    margin: 0;
+    padding: 0;
+}
+
+body.alaska-guest-register .alaska-guest-register-main {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body.alaska-guest-register .registration-section {
+    padding: 0 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+body.alaska-guest-register .registration-section,
+body.alaska-guest-register .registration-section-inner-wrapper {
+    background-color: #FFD007;
+    color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-section-inner-wrapper {
+    padding: 24px 16px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+body.alaska-guest-register .registration-form .registration-field label,
+body.alaska-guest-register .registration-form .registration-fieldset legend,
+body.alaska-guest-register .registration-form .registration-checkbox-group label,
+body.alaska-guest-register .registration-form .registration-smallprint,
+body.alaska-guest-register .registration-form p {
+    color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-form .registration-field input,
+body.alaska-guest-register .registration-form .registration-field textarea,
+body.alaska-guest-register .registration-form .registration-field select {
+    color: #1a1a1a;
+    background-color: #ffffff;
+}
+
+body.alaska-guest-register .registration-form .registration-field input:focus,
+body.alaska-guest-register .registration-form .registration-field textarea:focus,
+body.alaska-guest-register .registration-form .registration-field select:focus {
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.18);
+}
+
+body.alaska-guest-register .registration-checkbox-group input[type="radio"] {
+    border-color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-checkbox-group input[type="radio"]::before {
+    background-color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-speciality-box {
+    border-color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-speciality-box::after {
+    color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-fieldset[aria-label="Base medical speciality"],
+body.alaska-guest-register .registration-fieldset[aria-label="Level of training"],
+body.alaska-guest-register .registration-fieldset[aria-label="Clinical context"] {
+    border-color: #1a1a1a;
+}
+
+body.alaska-guest-register .registration-submit-btn {
+    background-color: #1a1a1a;
+    color: #FFD007;
+}
+
+body.alaska-guest-register .registration-submit-btn:hover:not(:disabled),
+body.alaska-guest-register .registration-submit-btn:focus-visible:not(:disabled) {
+    background-color: #003153;
+    color: #FFD007;
+}
+

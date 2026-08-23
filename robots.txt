@@ -8,6 +8,8 @@ Disallow: /
 Disallow: /index.html
 Disallow: /login.html
 Disallow: /backend.html
+Disallow: /alaska-guest-register.html
+Disallow: /alaska-guest-register.js
 Disallow: /data/
 Disallow: /auth.js
 Disallow: /auth-common.js
