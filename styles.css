@@ -2567,6 +2567,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     display: flex;
     flex-wrap: nowrap;
     align-items: flex-start;
+    justify-content: center;
+    justify-content: safe center;
     gap: 0;
     overflow-x: auto;
     overflow-y: hidden;
@@ -2721,6 +2723,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 .home-section .speakerslider-track > .speaker-card:only-child,
 .home-section .speakerslider-track > .speaker-placeholder:only-child {
     border-radius: 5px;
+    margin-left: 16px !important;
     margin-right: 16px !important;
 }
 
@@ -4090,6 +4093,8 @@ body.home-view .home-section > .home-social-row-container {
     background-image: none;
     --introslider-column-width: var(--home-carousel-slide-width, 450px);
     align-items: flex-start;
+    justify-content: center;
+    justify-content: safe center;
     gap: 0 !important;
     border: none;
     border-radius: 0;
