@@ -12231,6 +12231,43 @@
             return firebase.firestore.Timestamp.fromDate(new Date(y, mo, d, h, mi, 0, 0));
         }
 
+        var PROGRAMME_SLOT_DEFAULT_DURATION_MS = 30 * 60 * 1000;
+
+        function getNextProgrammeSlotTimesForSession(dateStr, sessionId) {
+            var slots = getProgrammeSlotsForSessionSorted(dateStr, sessionId);
+            var latestEndMs = null;
+            var durationMs = PROGRAMME_SLOT_DEFAULT_DURATION_MS;
+            for (var i = 0; i < slots.length; i++) {
+                var startDate = programmeSlotTimestampToDate(slots[i].starttime);
+                var endDate = programmeSlotTimestampToDate(slots[i].endtime);
+                var startMs = startDate ? startDate.getTime() : 0;
+                var endMs = endDate ? endDate.getTime() : 0;
+                var slotEndMs = Math.max(startMs, endMs);
+                if (slotEndMs > 0 && (latestEndMs == null || slotEndMs > latestEndMs)) {
+                    latestEndMs = slotEndMs;
+                    if (startMs > 0 && endMs > startMs) {
+                        durationMs = endMs - startMs;
+                    }
+                }
+            }
+            if (latestEndMs == null) {
+                return {
+                    starttime: programmeDayTimestamp(dateStr, 9, 0),
+                    endtime: programmeDayTimestamp(dateStr, 9, 30)
+                };
+            }
+            var start = new Date(latestEndMs);
+            var end = new Date(latestEndMs + durationMs);
+            var dayEnd = programmeSlotTimestampToDate(programmeDayTimestamp(dateStr, 23, 59));
+            if (dayEnd && end.getTime() > dayEnd.getTime()) {
+                end = dayEnd;
+            }
+            return {
+                starttime: programmeDayTimestamp(dateStr, start.getHours(), start.getMinutes()),
+                endtime: programmeDayTimestamp(dateStr, end.getHours(), end.getMinutes())
+            };
+        }
+
         function generateProgrammeSessionDocId() {
             var suffix = '';
             if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -12387,6 +12424,32 @@
                 var diff = programmeSlotTimestampMillis(a.starttime) - programmeSlotTimestampMillis(b.starttime);
                 return diff !== 0 ? diff : String(a.id).localeCompare(String(b.id));
             });
+        }
+
+        function appendProgrammeSlotToSessionState(dateStr, sessionId, slot) {
+            if (!slot || !slot.id) return;
+            var sessions = programmeState.sessionsByDay && programmeState.sessionsByDay[dateStr];
+            if (!sessions) return;
+            var session = null;
+            for (var i = 0; i < sessions.length; i++) {
+                if (sessions[i].id === sessionId) {
+                    session = sessions[i];
+                    break;
+                }
+            }
+            if (!session) return;
+            session.slots = session.slots || [];
+            session.slots.push(slot);
+            sortProgrammeSlotsInState(dateStr, sessionId);
+            var persisted = getPersistedProgrammeSession(dateStr, sessionId);
+            if (persisted) {
+                persisted.slots = persisted.slots || [];
+                persisted.slots.push(cloneProgrammeSlotForPersistedSnapshot(slot));
+                persisted.slots.sort(function(a, b) {
+                    var diff = programmeSlotTimestampMillis(a.starttime) - programmeSlotTimestampMillis(b.starttime);
+                    return diff !== 0 ? diff : String(a.id).localeCompare(String(b.id));
+                });
+            }
         }
 
         function syncProgrammeSlotInState(dateStr, sessionId, slotId, patch) {
@@ -22982,18 +23045,33 @@
                 btn.disabled = true;
             }
             try {
+                flushProgrammeSlotDomEditsToLocal({
+                    dateStr: dateStr,
+                    sessionId: sessionId,
+                    skipRefresh: true
+                });
+                var nextTimes = getNextProgrammeSlotTimesForSession(dateStr, sessionId);
                 var db = getFirestore();
                 var slotsRef = tbsProgrammeSessionSlotsCollection(db, dateStr, sessionId);
                 var slotRef = slotsRef.doc();
-                await slotRef.set({
-                    starttime: programmeDayTimestamp(dateStr, 9, 0),
-                    endtime: programmeDayTimestamp(dateStr, 9, 30),
+                var newSlot = {
+                    id: slotRef.id,
+                    starttime: nextTimes.starttime,
+                    endtime: nextTimes.endtime,
                     name: 'TBA',
-                    session: sessionId,
                     speaker: '',
                     note: ''
+                };
+                await slotRef.set({
+                    starttime: newSlot.starttime,
+                    endtime: newSlot.endtime,
+                    name: newSlot.name,
+                    session: sessionId,
+                    speaker: newSlot.speaker,
+                    note: newSlot.note
                 });
-                await refreshProgrammeDaySessionsFromFirestore(dateStr);
+                appendProgrammeSlotToSessionState(dateStr, sessionId, newSlot);
+                recomputeProgrammeEditDirtyFlags();
                 var savedSessionId = sessionId;
                 var newSlotId = slotRef.id;
                 refreshProgrammeEditorDays();
