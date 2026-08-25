@@ -247,11 +247,12 @@
         .event-creator-bar #status-container.backend-status-ticker,
         .eventnavigation #status-container.backend-status-ticker {
             display: block;
-            flex: 0 0 100px;
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
-            height: 2rem;
+            flex: 0 0 400px;
+            width: 400px;
+            min-width: 400px;
+            max-width: 400px;
+            min-height: 2rem;
+            height: auto;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -265,19 +266,24 @@
         .backend-status-ticker-viewport {
             display: block;
             width: 100%;
-            height: 100%;
+            max-width: 100%;
+            height: auto;
+            min-height: 2rem;
             overflow: hidden;
             position: relative;
+            box-sizing: border-box;
         }
 
         .backend-status-ticker-track {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            height: 100%;
-            width: max-content;
-            white-space: nowrap;
-            will-change: transform;
-            animation: backend-status-marquee linear infinite;
+            width: 100%;
+            max-width: 100%;
+            min-height: 2rem;
+            height: auto;
+            white-space: normal;
+            transform: none;
+            animation: none;
         }
 
         .backend-status-ticker-track.is-static {
@@ -286,16 +292,22 @@
         }
 
         .backend-status-ticker-segment {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            height: 100%;
-            padding: 0 0.5rem;
+            width: 100%;
+            max-width: 100%;
+            min-height: 2rem;
+            height: auto;
+            padding: 0.2rem 0.5rem;
             font-size: 0.7rem;
             font-weight: 400;
             font-family: 'Inter', sans-serif;
             line-height: 1.2;
             color: rgba(255, 255, 255, 0.92);
-            white-space: nowrap;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            box-sizing: border-box;
         }
 
         .backend-status-ticker-segment.is-success {
@@ -310,16 +322,6 @@
         .backend-status-ticker-segment.is-info {
             color: rgba(255, 255, 255, 0.92);
         }
-
-        @keyframes backend-status-marquee {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(-50%);
-            }
-        }
-
 
         .eventnavigation .aspects {
             display: flex;
@@ -24132,29 +24134,6 @@
             return hh + ':' + mm + ': ' + (message != null ? String(message) : '');
         }
 
-        function describeBackendStartupLoadedSummary() {
-            var guestCount = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
-            var speakerCount = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory.length : 0;
-            var programmeDayCount = programmeState && Array.isArray(programmeState.dayDates) ? programmeState.dayDates.length : 0;
-            var eventLabel = String(selectedevent || current_event || '').trim() || 'selected event';
-            return (
-                eventLabel +
-                ': ' +
-                guestCount +
-                ' guest' +
-                (guestCount === 1 ? '' : 's') +
-                ', ' +
-                speakerCount +
-                ' speaker' +
-                (speakerCount === 1 ? '' : 's') +
-                ', ' +
-                programmeDayCount +
-                ' programme day' +
-                (programmeDayCount === 1 ? '' : 's') +
-                ' (content loads when you open the Content tab)'
-            );
-        }
-
         var backendStatusTickerLines = [];
         var BACKEND_STATUS_TICKER_MAX = 24;
 
@@ -24162,27 +24141,18 @@
             var track = document.getElementById('status-ticker-track');
             var container = document.getElementById('status-container');
             if (!track || !container) return;
-            var joined = backendStatusTickerLines.length
-                ? backendStatusTickerLines.join('   ·   ')
+            var last = backendStatusTickerLines.length
+                ? backendStatusTickerLines[backendStatusTickerLines.length - 1]
                 : 'Ready';
             var latestType = '';
             if (backendStatusTickerLines.length) {
-                var last = backendStatusTickerLines[backendStatusTickerLines.length - 1] || '';
-                if (last.indexOf('[error]') === 0) latestType = 'error';
-                else if (last.indexOf('[…]') === 0) latestType = 'loading';
-                else if (last.indexOf('[ok]') === 0) latestType = 'success';
+                var lastLine = last || '';
+                if (lastLine.indexOf('[error]') === 0) latestType = 'error';
+                else if (lastLine.indexOf('[…]') === 0) latestType = 'loading';
+                else if (lastLine.indexOf('[ok]') === 0) latestType = 'success';
                 else latestType = 'info';
             }
-            var safe = typeof escapeHtml === 'function' ? escapeHtml(joined) : joined;
-            var segmentWidthProbe = document.createElement('span');
-            segmentWidthProbe.className = 'backend-status-ticker-segment';
-            segmentWidthProbe.textContent = joined;
-            segmentWidthProbe.style.visibility = 'hidden';
-            segmentWidthProbe.style.position = 'absolute';
-            track.appendChild(segmentWidthProbe);
-            var probedWidth = segmentWidthProbe.scrollWidth;
-            track.removeChild(segmentWidthProbe);
-            var boxWidth = container.clientWidth || 100;
+            var safe = typeof escapeHtml === 'function' ? escapeHtml(last) : last;
             var typeClass =
                 latestType === 'error'
                     ? ' is-error'
@@ -24191,35 +24161,15 @@
                       : latestType === 'loading'
                         ? ' is-loading'
                         : ' is-info';
-            if (probedWidth <= boxWidth + 4) {
-                track.classList.add('is-static');
-                track.style.animationDuration = '';
-                track.innerHTML =
-                    '<span class="backend-status-ticker-segment' +
-                    typeClass +
-                    '" id="status">' +
-                    safe +
-                    '</span>';
-                container.setAttribute('title', joined);
-                return;
-            }
-            track.classList.remove('is-static');
+            track.classList.add('is-static');
+            track.style.animationDuration = '';
             track.innerHTML =
                 '<span class="backend-status-ticker-segment' +
                 typeClass +
                 '" id="status">' +
                 safe +
-                '</span>' +
-                '<span class="backend-status-ticker-segment' +
-                typeClass +
-                '" aria-hidden="true">' +
-                safe +
                 '</span>';
-            track.style.animationDuration = '0s';
-            void track.offsetWidth;
-            var seconds = Math.max(8, Math.round(probedWidth / 28));
-            track.style.animationDuration = seconds + 's';
-            container.setAttribute('title', joined);
+            container.setAttribute('title', last);
         }
 
         function showStatus(type, message) {
@@ -26443,56 +26393,20 @@
 
             setBackendPageLoading(true);
             try {
-            showStatus('loading', 'Loading backend settings from Firestore…');
             await syncSelectedAndCurrentEventFromSettings();
             updateBackendEditorVisibility();
             updateEditSpeakerNameHeading();
             updateAddSpeakerSaveButtonState();
             updateContentSaveButtonState();
-            var startupEventLabel = String(selectedevent || current_event || '').trim() || 'the selected event';
             var startupLoaded = { guests: false, programme: false, speakers: false };
             function updateBackendStartupLoadStatus(errorMessage) {
                 if (errorMessage) {
                     showStatus('error', errorMessage);
-                    return;
                 }
-                var done = [];
-                var pending = [];
-                if (startupLoaded.guests) {
-                    var guestCount = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory.length : 0;
-                    done.push(guestCount + ' guest' + (guestCount === 1 ? '' : 's'));
-                } else {
-                    pending.push('guests');
-                }
-                if (startupLoaded.programme) {
-                    var programmeDayCount =
-                        programmeState && Array.isArray(programmeState.dayDates) ? programmeState.dayDates.length : 0;
-                    done.push(programmeDayCount + ' programme day' + (programmeDayCount === 1 ? '' : 's'));
-                } else {
-                    pending.push('programme');
-                }
-                if (startupLoaded.speakers) {
-                    var speakerCount = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory.length : 0;
-                    done.push(speakerCount + ' speaker' + (speakerCount === 1 ? '' : 's'));
-                } else {
-                    pending.push('speakers');
-                }
-                var message = '';
-                if (done.length) {
-                    message += 'Loaded ' + done.join(', ') + '.';
-                }
-                if (pending.length) {
-                    message += ' Loading ' + pending.join(', ') + ' for ' + startupEventLabel + '…';
-                } else {
-                    message += ' Finishing startup…';
-                }
-                showStatus('loading', message.trim());
             }
             function markStartupLoaded(key) {
                 startupLoaded[key] = true;
-                updateBackendStartupLoadStatus();
             }
-            updateBackendStartupLoadStatus();
             backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({})
                 .then(function () {
                     markStartupLoaded('guests');
@@ -26523,7 +26437,10 @@
                     }),
                 backendGuestsPreloadPromise
             ]);
-            showStatus('success', 'Backend ready. Loaded ' + describeBackendStartupLoadedSummary() + '.');
+            backendStatusTickerLines = [
+                'Loaded ' + (String(current_event || selectedevent || '').trim() || 'event')
+            ];
+            refreshBackendStatusTicker();
             } catch (startupErr) {
                 console.error('Backend startup failed:', startupErr);
             } finally {
