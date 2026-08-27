@@ -2510,6 +2510,7 @@
 
         #guest-editor .guest-overwatch-body .guests-registered,
         #guest-editor .guest-overwatch-body .guests-invited,
+        #guest-editor .guest-overwatch-body .guests-reserves,
         #guest-editor .guest-overwatch-body .guests-invoiced,
         #guest-editor .guest-overwatch-body .guests-direct-transfer,
         #guest-editor .guest-overwatch-body .guests-not-invoiced,
@@ -2549,6 +2550,7 @@
         }
 
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invited,
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-reserves,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-decided,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invoiced,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer,
@@ -2579,7 +2581,8 @@
             user-select: none;
         }
 
-        #guest-editor .guest-overwatch-body .guests-direct-transfer {
+        #guest-editor .guest-overwatch-body .guests-direct-transfer,
+        #guest-editor .guest-overwatch-body .guests-reserves {
             background: var(--backend-button-yellow);
             border-color: var(--backend-button-yellow);
             color: #003153;
@@ -2600,6 +2603,7 @@
 
         #guest-editor .guest-overwatch-body .guests-registered-label,
         #guest-editor .guest-overwatch-body .guests-invited-label,
+        #guest-editor .guest-overwatch-body .guests-reserves-label,
         #guest-editor .guest-overwatch-body .guests-invoiced-label,
         #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
         #guest-editor .guest-overwatch-body .guests-not-invoiced-label,
@@ -2613,12 +2617,14 @@
             color: #ffffff;
         }
 
-        #guest-editor .guest-overwatch-body .guests-direct-transfer-label {
+        #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
+        #guest-editor .guest-overwatch-body .guests-reserves-label {
             color: #003153;
         }
 
         #guest-editor .guest-overwatch-body .guests-registered-count,
         #guest-editor .guest-overwatch-body .guests-invited-count,
+        #guest-editor .guest-overwatch-body .guests-reserves-count,
         #guest-editor .guest-overwatch-body .guests-invoiced-count,
         #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
         #guest-editor .guest-overwatch-body .guests-not-invoiced-count,
@@ -2633,7 +2639,8 @@
             font-variant-numeric: tabular-nums;
         }
 
-        #guest-editor .guest-overwatch-body .guests-direct-transfer-count {
+        #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
+        #guest-editor .guest-overwatch-body .guests-reserves-count {
             color: #003153;
         }
 
@@ -9543,10 +9550,15 @@
                                         <div class="guests-registered-count" id="guests-registered-count" aria-live="polite">0</div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
-                                    <div class="guest-overwatch-split-row" role="group" aria-label="Invited and not decided">
+                                    <div class="guest-overwatch-split-row" role="group" aria-label="Invited, reserves, and not decided">
                                         <div class="guests-invited" id="guests-invited" data-name="guests.invited" aria-label="Invited guests">
                                             <div class="guests-invited-label">Invited:</div>
                                             <div class="guests-invited-count" id="guests-invited-count" aria-live="polite">0</div>
+                                        </div>
+                                        <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                        <div class="guests-reserves" id="guests-reserves" data-name="guests.reserves" aria-label="Reserve guests">
+                                            <div class="guests-reserves-label">Reserves:</div>
+                                            <div class="guests-reserves-count" id="guests-reserves-count" aria-live="polite">0</div>
                                         </div>
                                         <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
                                         <div class="guests-not-decided" id="guests-not-decided" data-name="guests.not-decided" aria-label="Guests not decided">
@@ -13377,6 +13389,19 @@
             return n;
         }
 
+        /** Invited=Reserve for Current event. */
+        function countGuestsReservesForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestInvitedFieldIsReserve(g.invited)) n++;
+            }
+            return n;
+        }
+
         /** Invited=No for Current event. */
         function countGuestsNotDecidedForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
@@ -13460,6 +13485,8 @@
             if (registeredEl) registeredEl.textContent = String(countGuestsRegisteredForCurrentEvent());
             var invitedEl = document.getElementById('guests-invited-count');
             if (invitedEl) invitedEl.textContent = String(countGuestsInvitedForCurrentEvent());
+            var reservesEl = document.getElementById('guests-reserves-count');
+            if (reservesEl) reservesEl.textContent = String(countGuestsReservesForCurrentEvent());
             var notDecidedEl = document.getElementById('guests-not-decided-count');
             if (notDecidedEl) notDecidedEl.textContent = String(countGuestsNotDecidedForCurrentEvent());
             var invoicedEl = document.getElementById('guests-invoiced-count');
@@ -16957,6 +16984,11 @@
         /** Invited is the literal “No” (case-insensitive). */
         function guestInvitedFieldIsNo(invitedVal) {
             return String(invitedVal != null ? invitedVal : '').trim().toLowerCase() === 'no';
+        }
+
+        /** Invited is the literal “Reserve” (case-insensitive). */
+        function guestInvitedFieldIsReserve(invitedVal) {
+            return String(invitedVal != null ? invitedVal : '').trim().toLowerCase() === 'reserve';
         }
 
         /** `#invoicedisno`: **Invoiced** is No and **Invited** is Yes. */
