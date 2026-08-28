@@ -8469,7 +8469,7 @@
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
-            align-items: flex-start;
+            align-items: stretch;
             gap: 0;
             overflow-x: auto;
             overflow-y: hidden;
@@ -8480,6 +8480,29 @@
             /* Width/aspect inherit styles.css :root --home-carousel-* (same as home) */
             --introslider-column-width: var(--home-carousel-slide-width);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+        }
+
+        /* Fill the editor row and keep vertical scroll on the day card, including while editing. */
+        #programme-editor .programme-grid-row > .programme-editor-day.programme-day-slide {
+            aspect-ratio: auto !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+            align-self: stretch !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            overscroll-behavior-y: contain;
+        }
+
+        #programme-editor .programme-editor-day.programme-day-slide .programme-day-content.programmestyle {
+            flex: 1 1 0;
+            min-height: 0;
+            overflow: visible;
+        }
+
+        #programme-editor .programme-day-slot-detail[contenteditable='true'] {
+            overflow: visible;
+            text-overflow: clip;
         }
 
         /* Day card chrome + typography: styles.css `.programme-day-slide` (shared with home programme slider) */
@@ -26628,6 +26651,19 @@
                         e.stopPropagation();
                     }
                 });
+                programmeEditorEl.addEventListener('wheel', function(e) {
+                    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX || 0)) return;
+                    var dayEl = e.target.closest && e.target.closest('.programme-editor-day');
+                    if (!dayEl || !programmeEditorEl.contains(dayEl)) return;
+                    var maxScroll = dayEl.scrollHeight - dayEl.clientHeight;
+                    if (maxScroll <= 1) return;
+                    var next = dayEl.scrollTop + e.deltaY;
+                    if (next < 0) next = 0;
+                    if (next > maxScroll) next = maxScroll;
+                    if (next === dayEl.scrollTop) return;
+                    dayEl.scrollTop = next;
+                    e.preventDefault();
+                }, { passive: false, capture: true });
             }
             var programmePadlockBtn = document.getElementById('programme-editor-padlock-btn');
             if (programmePadlockBtn) {
