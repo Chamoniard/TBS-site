@@ -2515,6 +2515,7 @@
         #guest-editor .guest-overwatch-body .guests-direct-transfer,
         #guest-editor .guest-overwatch-body .guests-not-invoiced,
         #guest-editor .guest-overwatch-body .guests-not-decided,
+        #guest-editor .guest-overwatch-body .guests-not-paid,
         #guest-editor .guest-overwatch-body .guests-cancelled,
         #guest-editor .guest-overwatch-body .guests-paid {
             display: flex;
@@ -2556,6 +2557,7 @@
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-invoiced,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-paid,
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-paid,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-cancelled {
             flex: 0 0 8rem;
             width: 8rem;
@@ -2589,7 +2591,8 @@
         }
 
         #guest-editor .guest-overwatch-body .guests-not-invoiced,
-        #guest-editor .guest-overwatch-body .guests-not-decided {
+        #guest-editor .guest-overwatch-body .guests-not-decided,
+        #guest-editor .guest-overwatch-body .guests-not-paid {
             background: var(--backend-roster-status-no-bg);
             border-color: var(--backend-roster-status-no-bg);
             color: var(--backend-roster-status-no-color);
@@ -2608,6 +2611,7 @@
         #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
         #guest-editor .guest-overwatch-body .guests-not-invoiced-label,
         #guest-editor .guest-overwatch-body .guests-not-decided-label,
+        #guest-editor .guest-overwatch-body .guests-not-paid-label,
         #guest-editor .guest-overwatch-body .guests-cancelled-label,
         #guest-editor .guest-overwatch-body .guests-paid-label {
             margin: 0 0 0.35rem;
@@ -2629,6 +2633,7 @@
         #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
         #guest-editor .guest-overwatch-body .guests-not-invoiced-count,
         #guest-editor .guest-overwatch-body .guests-not-decided-count,
+        #guest-editor .guest-overwatch-body .guests-not-paid-count,
         #guest-editor .guest-overwatch-body .guests-cancelled-count,
         #guest-editor .guest-overwatch-body .guests-paid-count {
             margin: 0;
@@ -9584,10 +9589,15 @@
                                         </div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
-                                    <div class="guest-overwatch-split-row" role="group" aria-label="Paid and cancelled">
+                                    <div class="guest-overwatch-split-row" role="group" aria-label="Paid, not paid, and cancelled">
                                         <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
                                             <div class="guests-paid-label">Paid:</div>
                                             <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
+                                        </div>
+                                        <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                        <div class="guests-not-paid" id="guests-not-paid" data-name="guests.not-paid" aria-label="Guests not paid">
+                                            <div class="guests-not-paid-label">Not paid:</div>
+                                            <div class="guests-not-paid-count" id="guests-not-paid-count" aria-live="polite">0</div>
                                         </div>
                                         <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
                                         <div class="guests-cancelled" id="guests-cancelled" data-name="guests.cancelled" aria-label="Cancelled paid guests">
@@ -13467,6 +13477,19 @@
             return n;
         }
 
+        /** Paid=No for Current event. */
+        function countGuestsNotPaidForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestPaidFieldIsNo(g.paid)) n++;
+            }
+            return n;
+        }
+
         /** Paid=Cancelled for Current event. */
         function countGuestsCancelledForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
@@ -13495,10 +13518,12 @@
             if (directEl) directEl.textContent = String(countGuestsDirectForCurrentEvent());
             var notInvoicedEl = document.getElementById('guests-not-invoiced-count');
             if (notInvoicedEl) notInvoicedEl.textContent = String(countGuestsNotInvoicedForCurrentEvent());
-            var cancelledEl = document.getElementById('guests-cancelled-count');
-            if (cancelledEl) cancelledEl.textContent = String(countGuestsCancelledForCurrentEvent());
             var paidEl = document.getElementById('guests-paid-count');
             if (paidEl) paidEl.textContent = String(countGuestsPaidForCurrentEvent());
+            var notPaidEl = document.getElementById('guests-not-paid-count');
+            if (notPaidEl) notPaidEl.textContent = String(countGuestsNotPaidForCurrentEvent());
+            var cancelledEl = document.getElementById('guests-cancelled-count');
+            if (cancelledEl) cancelledEl.textContent = String(countGuestsCancelledForCurrentEvent());
         }
 
         async function openGuestsOverwatch() {
