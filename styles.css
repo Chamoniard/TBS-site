@@ -1690,6 +1690,7 @@ body.home-view .home-section > .speaker-section {
         backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
         -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
+        border-bottom: none !important;
         border-radius: 0 !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;
         box-sizing: border-box !important;
@@ -5010,6 +5011,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border: 1px solid #D1D5DB !important;
+    border-bottom: none !important;
 }
 }
 
@@ -5142,6 +5144,13 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     outline: none;
     transform: translateY(calc(-1 * var(--introslider-hover-lift)));
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24), 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+}
+
+@media (max-width: 768px) {
+    .home-section .introslider > .introslider-clickable:hover,
+    .home-section .introslider > .introslider-clickable:focus-visible {
+        border-bottom: none !important;
+    }
 }
 
 @media (min-width: 769px) {
@@ -7077,7 +7086,7 @@ h4 {
     }
 
     .home-section > .sponsors-section {
-        padding-top: 10px;
+        padding-top: 24px;
     }
 
     .home-section > .sponsors-section .sponsors-section-inner-wrapper {
@@ -7099,74 +7108,18 @@ h4 {
         row-gap: var(--sponsor-logo-gap);
     }
 
-    .home-section > .sponsors-section .sponsor-logo-slot {
-        flex: 0 1 calc((100% - var(--sponsor-logo-gap)) / 2);
-        max-width: calc((100% - var(--sponsor-logo-gap)) / 2);
+    .home-section > .sponsors-section .sponsor-logo-slot,
+    .home-section > .sponsors-section .sponsor-logo-slot--solo {
+        flex: 0 1 calc((100% - (2 * var(--sponsor-logo-gap))) / 3 * 1.2);
+        max-width: calc((100% - (2 * var(--sponsor-logo-gap))) / 3 * 1.2);
         min-width: 0;
         order: 0;
-    }
-
-    .home-section > .sponsors-section .sponsor-logo-slot--solo {
-        flex: 0 1 100%;
-        max-width: 100%;
-        order: 99;
     }
 
     .home-section > .sponsors-section .sponsor-logo-slot .sponsors-logo-image {
         max-width: 100%;
         width: auto;
         height: auto;
-    }
-
-    /* Mobile: sponsor logos auto-scroll in one row at fixed speed (see script.js). */
-    .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee {
-        --sponsor-logo-gap: clamp(16px, 4vw, 32px);
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        overflow: hidden;
-    }
-
-    .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee .sponsor-logos-marquee-viewport {
-        width: 100%;
-        overflow: hidden;
-    }
-
-    .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee .sponsor-logos-marquee-track {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: center;
-        width: max-content;
-        column-gap: var(--sponsor-logo-gap);
-        animation: sponsor-logos-marquee var(--sponsor-marquee-duration, 40s) linear infinite;
-        will-change: transform;
-    }
-
-    .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee .sponsor-logo-slot,
-    .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee .sponsor-logo-slot--solo {
-        flex: 0 0 auto;
-        max-width: none;
-        order: 0;
-    }
-
-    .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee .sponsor-logo-slot .sponsors-logo-image {
-        max-width: none;
-    }
-
-    @keyframes sponsor-logos-marquee {
-        from {
-            transform: translate3d(0, 0, 0);
-        }
-        to {
-            transform: translate3d(-50%, 0, 0);
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .home-section > .sponsors-section .sponsor-logos.sponsor-logos--marquee .sponsor-logos-marquee-track {
-            animation: none;
-            transform: none;
-        }
     }
 
     .home-section > .event-section {
@@ -11575,6 +11528,18 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
     box-sizing: border-box !important;
 }
 
+@media (max-width: 768px) {
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .location,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .pasttalks,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .register,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about-programme,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about-speakers,
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .tbsonsocial {
+        border-bottom: none !important;
+    }
+}
+
 @media (min-width: 769px) {
     body.home-view .home-section > .introslider-section.home-hero-introslider-outer > .introslider-inner-wrapper.home-hero-introslider,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider {
@@ -11927,6 +11892,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         margin-left: 0 !important;
         margin-right: 0 !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
+        border-bottom: none !important;
         border-radius: 0 !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;
         box-sizing: border-box !important;
@@ -11941,6 +11907,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
         border: 1px solid var(--tbs-pink) !important;
+        border-bottom: none !important;
         outline: none !important;
         transform: translateY(calc(-1 * var(--introslider-hover-lift)));
         box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;

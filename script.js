@@ -2177,7 +2177,7 @@ ${HOME_SPONSOR_LOGO_SLOTS_HTML}
 /** Max rendered logo height (px); row logic still scales down responsively as space shrinks. */
 function homeSponsorLogosMaxHeightPx() {
     const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
-    return isMobile ? 100 : 50;
+    return isMobile ? 120 : 50;
 }
 
 function sponsorLogosRowGapPx(rowEl) {
@@ -2190,32 +2190,18 @@ function sponsorLogosRowGapPx(rowEl) {
     return Number.isFinite(x) ? x : 0;
 }
 
-/** Mobile wrap layout: pairs of slots, optional full-width `--solo` row (e.g. Heine) last. */
+/** Mobile wrap layout: three logos on the first row, remaining on the second. */
 function sponsorLogoMobileRowGroups(row) {
     const slots = Array.from(row.querySelectorAll(':scope > .sponsor-logo-slot'));
-    const regular = slots.filter((s) => !s.classList.contains('sponsor-logo-slot--solo'));
-    const solo = slots.filter((s) => s.classList.contains('sponsor-logo-slot--solo'));
-    const orderedSlots = regular.concat(solo);
+    const images = [];
+    for (let i = 0; i < slots.length; i++) {
+        const img = slots[i].querySelector('img.sponsors-logo-image');
+        if (img) images.push(img);
+    }
+    const perRow = 3;
     const groups = [];
-    for (let i = 0; i < orderedSlots.length; i++) {
-        const slot = orderedSlots[i];
-        const img = slot.querySelector('img.sponsors-logo-image');
-        if (!img) continue;
-        if (slot.classList.contains('sponsor-logo-slot--solo')) {
-            groups.push([img]);
-            continue;
-        }
-        const nextSlot = orderedSlots[i + 1];
-        const nextImg =
-            nextSlot && !nextSlot.classList.contains('sponsor-logo-slot--solo')
-                ? nextSlot.querySelector('img.sponsors-logo-image')
-                : null;
-        if (nextImg) {
-            groups.push([img, nextImg]);
-            i += 1;
-        } else {
-            groups.push([img]);
-        }
+    for (let i = 0; i < images.length; i += perRow) {
+        groups.push(images.slice(i, i + perRow));
     }
     return groups;
 }
@@ -2413,6 +2399,7 @@ function layoutSponsorLogosRowElement(row) {
             if (hRow == null) return;
             hUsed = Math.min(hUsed, hRow);
         }
+        hUsed = Math.min(maxH, hUsed * 1.2);
         applySponsorLogoUniformHeight(images, hUsed, true);
         return;
     }
@@ -2468,7 +2455,7 @@ function wireHomeSponsorLogosRowLayout(sponsorsRootEl) {
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(function () {
             raf = 0;
-            ensureHomeSponsorLogosMobileMarquee(row);
+            teardownHomeSponsorLogosMobileMarquee(row);
             layoutHomeSponsorLogosRowApply(sponsorsRootEl);
         });
     }
