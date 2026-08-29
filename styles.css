@@ -2939,6 +2939,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: pre-wrap;
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
 .home-section .speaker-card .speaker-card-bio-main {
@@ -2946,6 +2948,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: pre-wrap;
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
 /* Same scale as `.programmestyle h3` on programme day cards; colour is black on the white speaker slide. */
@@ -2971,8 +2975,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     overflow: visible;
     display: flow-root;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 0.875rem;
-    line-height: 1.45;
+    font-size: 0.9rem;
+    line-height: 1.6;
     color: rgba(30, 41, 59, 0.92);
     text-align: left;
     white-space: normal;
@@ -2999,9 +3003,17 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin: 0 0 0.5rem 0;
 }
 
+.home-section .speakerslider .speaker-card-bio h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: normal;
+    margin: 0 0 0.5rem 0;
+}
+
 .home-section .speakerslider .speaker-card-bio p {
     margin: 0 0 1rem 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1.6;
     white-space: normal;
 }
@@ -3023,7 +3035,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 @media (min-width: 769px) {
     .home-section .speaker-card-bio {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
 }
 
@@ -4141,15 +4153,19 @@ body.home-view .home-section > .home-social-row-container {
  * Home programme (displayed): no inner scroll. Every slide — including
  * `.programme-info` — shares one size (CSS vars set in script.js).
  */
-body.home-view .home-section .programme-slider:not(.home-carousel--minimal),
-body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) {
+body.home-view .home-section .programme-slider,
+body.home-view .home-programme-section .programme-slider,
+body.home-view .home-section .speakerslider-track {
     align-items: stretch;
 }
 
-body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
-body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > *,
-body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > .programme-info,
-body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > .programme-info {
+body.home-view .home-section .programme-slider > *,
+body.home-view .home-programme-section .programme-slider > *,
+body.home-view .home-section .programme-slider > .programme-info,
+body.home-view .home-programme-section .programme-slider > .programme-info,
+body.home-view .home-section .speakerslider-track > .speaker-card,
+body.home-view .home-section .speakerslider-track > .speaker-placeholder,
+body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
     flex: 0 0 var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
     width: var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
     min-width: var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
@@ -4160,6 +4176,11 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     max-height: var(--home-programme-fit-height, none) !important;
     align-self: stretch !important;
     overflow: hidden !important;
+}
+
+body.home-view .home-section .speakerslider-track > .speaker-card > .speaker-card-inner-wrapper {
+    overflow: hidden;
+    max-height: none;
 }
 
 body.home-view .home-section .programme-slider:not(.home-carousel--minimal) .programme-day-content,
@@ -4334,13 +4355,13 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     overflow: visible;
     display: flex;
     flex-direction: column;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 /* Home programme slider + backend day cards: base copy size (h4/p also set explicitly below) */
 .programme-slider .programme-day-slide .programme-day-content,
 .programme-slider .programme-day-slide .programmestyle {
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 /* Minimal slides: internal scroll (1080×1920 ratio set on home carousel cards above) */
@@ -4384,7 +4405,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
 .programme-friday .programmestyle p,
 .texteditor-render-html .programmestyle p {
     margin: 0 0 1rem 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .programme-wednesday .programme-day-content p,
@@ -4524,7 +4545,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
 .programme-thursday .programmestyle h4,
 .programme-friday .programmestyle h4,
 .texteditor-render-html .programmestyle h4 {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #FFD700;
 }
 
@@ -4592,7 +4613,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     padding: 0.2rem 0.45rem;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .programme-slider > .programme-day-slide .programme-day-slot-time,
@@ -4631,6 +4652,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
 .programme-slider > .programme-day-slide .programme-day-session,
 #programme-editor .programme-day-session {
     margin: 0;
+    font-size: 0.9rem;
 }
 
 /* Location slide: white background (same A3 as .introslider > *) */
@@ -7463,10 +7485,13 @@ h4 {
         border-bottom: none !important;
     }
 
-    body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
-    body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > *,
-    body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > .programme-info,
-    body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > .programme-info {
+    body.home-view .home-section .programme-slider > *,
+    body.home-view .home-programme-section .programme-slider > *,
+    body.home-view .home-section .programme-slider > .programme-info,
+    body.home-view .home-programme-section .programme-slider > .programme-info,
+    body.home-view .home-section .speakerslider-track > .speaker-card,
+    body.home-view .home-section .speakerslider-track > .speaker-placeholder,
+    body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
         flex: 0 0 100% !important;
         width: var(--home-programme-fit-width, 100%) !important;
         min-width: var(--home-programme-fit-width, 100%) !important;

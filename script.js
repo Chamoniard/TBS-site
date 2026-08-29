@@ -5814,6 +5814,8 @@ function setHomeSpeakerCardsExpandedForSection(section, expanded) {
     });
     section._homeSpeakersExpanded = !!expanded;
     syncHomeSpeakerLongBioUniformHeight(section, !!expanded);
+    const homeSection = section.closest('.home-section');
+    if (homeSection) fitHomeProgrammeCardsToContent(homeSection);
 }
 
 function wireHomeSpeakerCardBioExpandOnce() {
@@ -5928,6 +5930,8 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
         delete speakersWrapperEl.dataset.speakersScrollbarWired;
         wireSpeakersSliderScrollbar();
         finalizeHomeSpeakersSection(speakersWrapperEl);
+        const homeSection = speakersWrapperEl.closest('.home-section');
+        if (homeSection) fitHomeProgrammeCardsToContent(homeSection);
     }
 }
 
@@ -6067,75 +6071,101 @@ function clearHomeProgrammeCardFitStyles(card) {
     });
 }
 
-function clearHomeProgrammeSliderFitVars(slider) {
-    if (!slider) return;
-    slider.style.removeProperty('--home-programme-fit-width');
-    slider.style.removeProperty('--home-programme-fit-height');
+function clearHomeProgrammeSliderFitVars(el) {
+    if (!el) return;
+    el.style.removeProperty('--home-programme-fit-width');
+    el.style.removeProperty('--home-programme-fit-height');
 }
 
-function setHomeProgrammeSliderFitVars(slider, widthPx, heightPx) {
-    if (!slider) return;
-    slider.style.setProperty('--home-programme-fit-width', widthPx);
-    slider.style.setProperty('--home-programme-fit-height', heightPx);
+function setHomeProgrammeSliderFitVars(el, widthPx, heightPx) {
+    if (!el) return;
+    el.style.setProperty('--home-programme-fit-width', widthPx);
+    el.style.setProperty('--home-programme-fit-height', heightPx);
+}
+
+function homeCarouselFitCardChildren(container) {
+    if (!container) return [];
+    return Array.from(container.children).filter(function (el) {
+        return el.nodeType === 1;
+    });
+}
+
+function prepareHomeCarouselCardForMeasure(card, baseWidth) {
+    card.style.setProperty('aspect-ratio', 'auto', 'important');
+    card.style.setProperty('height', 'auto', 'important');
+    card.style.setProperty('min-height', '0', 'important');
+    card.style.setProperty('max-height', 'none', 'important');
+    card.style.setProperty('max-width', 'none', 'important');
+    card.style.setProperty('overflow', 'visible', 'important');
+    card.style.setProperty('width', baseWidth + 'px', 'important');
+    card.style.setProperty('flex', '0 0 ' + baseWidth + 'px', 'important');
+    const inner = card.querySelector(':scope > .speaker-card-inner-wrapper');
+    if (inner) {
+        inner.style.setProperty('overflow', 'visible', 'important');
+        inner.style.setProperty('max-height', 'none', 'important');
+    }
+}
+
+function restoreHomeCarouselCardAfterMeasure(card) {
+    clearHomeProgrammeCardFitStyles(card);
+    const inner = card.querySelector(':scope > .speaker-card-inner-wrapper');
+    if (inner) {
+        inner.style.removeProperty('overflow');
+        inner.style.removeProperty('max-height');
+    }
 }
 
 /**
- * Home programme cards: one shared size, no inner scroll.
- * Desktop: if any card is taller than 1080×1920, grow every card’s width and
- * height together so the portrait ratio is kept.
- * Mobile: width stays 100%; every card uses the tallest card’s height.
+ * Programme + speaker carousel cards share one size (incl. programme-info
+ * and speaker-info). Desktop grows width+height together at 1080×1920;
+ * mobile keeps full width and uses the tallest card’s height.
  */
 function fitHomeProgrammeCardsToContent(root) {
-    const scope = root && root.querySelectorAll
-        ? root
-        : document;
-    const sliders = scope.querySelectorAll
-        ? scope.querySelectorAll(
-            '.home-section .programme-slider:not(.home-carousel--minimal), .home-programme-section .programme-slider:not(.home-carousel--minimal)'
-        )
-        : [];
+    const homeSection =
+        root && root.classList && root.classList.contains('home-section')
+            ? root
+            : ((root && root.querySelector ? root.querySelector('.home-section') : null) ||
+                document.querySelector('.home-section'));
+    if (!homeSection) return;
+
+    const programmeSlider = homeSection.querySelector(
+        ':scope > .programme-section .programme-slider'
+    );
+    const speakerTrack = homeSection.querySelector('.speakerslider-track');
+    const cards = homeCarouselFitCardChildren(programmeSlider).concat(
+        homeCarouselFitCardChildren(speakerTrack)
+    );
+
+    [homeSection, programmeSlider, speakerTrack].forEach(clearHomeProgrammeSliderFitVars);
+    cards.forEach(restoreHomeCarouselCardAfterMeasure);
+    if (!cards.length) return;
+
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    sliders.forEach(function (slider) {
-        const cards = Array.from(slider.children).filter(function (el) {
-            return el.nodeType === 1;
-        });
-        cards.forEach(clearHomeProgrammeCardFitStyles);
-        clearHomeProgrammeSliderFitVars(slider);
-        if (!cards.length) return;
+    const baseWidth = cards[0].getBoundingClientRect().width;
+    if (!(baseWidth > 0)) return;
+    const ratioHeight = baseWidth * (1920 / 1080);
 
-        const baseWidth = cards[0].getBoundingClientRect().width;
-        if (!(baseWidth > 0)) return;
-        const ratioHeight = baseWidth * (1920 / 1080);
+    cards.forEach(function (card) {
+        prepareHomeCarouselCardForMeasure(card, baseWidth);
+    });
 
-        cards.forEach(function (card) {
-            card.style.setProperty('aspect-ratio', 'auto', 'important');
-            card.style.setProperty('height', 'auto', 'important');
-            card.style.setProperty('min-height', '0', 'important');
-            card.style.setProperty('max-height', 'none', 'important');
-            card.style.setProperty('max-width', 'none', 'important');
-            card.style.setProperty('overflow', 'visible', 'important');
-            card.style.setProperty('width', baseWidth + 'px', 'important');
-            card.style.setProperty('flex', '0 0 ' + baseWidth + 'px', 'important');
-        });
+    let maxContentHeight = 0;
+    cards.forEach(function (card) {
+        maxContentHeight = Math.max(maxContentHeight, card.scrollHeight);
+    });
+    cards.forEach(restoreHomeCarouselCardAfterMeasure);
 
-        let maxContentHeight = 0;
-        cards.forEach(function (card) {
-            maxContentHeight = Math.max(maxContentHeight, card.scrollHeight);
-        });
-        cards.forEach(clearHomeProgrammeCardFitStyles);
+    const sharedHeight = Math.max(ratioHeight, maxContentHeight);
+    const widthValue = isMobile
+        ? '100%'
+        : (maxContentHeight <= ratioHeight + 1
+            ? baseWidth
+            : baseWidth * (sharedHeight / ratioHeight)) + 'px';
+    const heightValue =
+        (isMobile ? sharedHeight : parseFloat(widthValue) * (1920 / 1080)) + 'px';
 
-        const sharedHeight = Math.max(ratioHeight, maxContentHeight);
-        if (isMobile) {
-            setHomeProgrammeSliderFitVars(slider, '100%', sharedHeight + 'px');
-            return;
-        }
-
-        const newWidth =
-            maxContentHeight <= ratioHeight + 1
-                ? baseWidth
-                : baseWidth * (sharedHeight / ratioHeight);
-        const newHeight = newWidth * (1920 / 1080);
-        setHomeProgrammeSliderFitVars(slider, newWidth + 'px', newHeight + 'px');
+    [homeSection, programmeSlider, speakerTrack].forEach(function (el) {
+        setHomeProgrammeSliderFitVars(el, widthValue, heightValue);
     });
 }
 
