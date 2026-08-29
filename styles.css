@@ -7169,11 +7169,6 @@ h4 {
         }
     }
 
-    /* Sponsors band hidden on mobile until re-enabled */
-    body.home-view .home-section > .sponsors-section {
-        display: none !important;
-    }
-
     .home-section > .event-section {
         padding-left: 0 !important;
         padding-right: 0 !important;
