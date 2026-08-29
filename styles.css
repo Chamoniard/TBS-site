@@ -2687,8 +2687,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     z-index: 0;
     background-image: url('images/speakerinfo.png');
     background-repeat: no-repeat;
-    background-position: top center;
-    background-size: 100% auto;
+    background-position: right center;
+    background-size: cover;
     pointer-events: none;
 }
 
@@ -4285,8 +4285,8 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     z-index: 0;
     background-image: url('images/programmeinfo.png');
     background-repeat: no-repeat;
-    background-position: top center;
-    background-size: 100% auto;
+    background-position: right center;
+    background-size: cover;
     pointer-events: none;
 }
 
