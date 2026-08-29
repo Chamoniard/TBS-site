@@ -1690,6 +1690,8 @@ body.home-view .home-section > .speaker-section {
         backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
         -webkit-backdrop-filter: blur(var(--introslider-nav-glass-blur)) !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
+        border-left: none !important;
+        border-right: none !important;
         border-bottom: none !important;
         border-radius: 0 !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;
@@ -5011,6 +5013,8 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border: 1px solid #D1D5DB !important;
+    border-left: none !important;
+    border-right: none !important;
     border-bottom: none !important;
 }
 }
@@ -5149,6 +5153,8 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
 @media (max-width: 768px) {
     .home-section .introslider > .introslider-clickable:hover,
     .home-section .introslider > .introslider-clickable:focus-visible {
+        border-left: none !important;
+        border-right: none !important;
         border-bottom: none !important;
     }
 }
@@ -11536,6 +11542,8 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about-programme,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .about-speakers,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .tbsonsocial {
+        border-left: none !important;
+        border-right: none !important;
         border-bottom: none !important;
     }
 }
@@ -11892,6 +11900,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         margin-left: 0 !important;
         margin-right: 0 !important;
         border: 1px solid var(--introslider-nav-glass-border) !important;
+        border-left: none !important;
+        border-right: none !important;
         border-bottom: none !important;
         border-radius: 0 !important;
         box-shadow: var(--introslider-nav-glass-shadow) !important;
@@ -11907,6 +11917,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:hover,
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable:focus-visible {
         border: 1px solid var(--tbs-pink) !important;
+        border-left: none !important;
+        border-right: none !important;
         border-bottom: none !important;
         outline: none !important;
         transform: translateY(calc(-1 * var(--introslider-hover-lift)));
