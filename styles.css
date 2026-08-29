@@ -4138,27 +4138,27 @@ body.home-view .home-section > .home-social-row-container {
 }
 
 /*
- * Home programme (displayed): no inner scroll. Cards stay at least 1080×1920
- * and grow with copy so every line stays visible.
+ * Home programme (displayed): no inner scroll. Every slide — including
+ * `.programme-info` — shares one size (CSS vars set in script.js).
  */
+body.home-view .home-section .programme-slider:not(.home-carousel--minimal),
+body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) {
+    align-items: stretch;
+}
+
 body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
-body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > * {
-    aspect-ratio: auto !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: hidden !important;
-}
-
-@media (min-width: 769px) {
-    body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
-    body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > * {
-        min-height: calc(var(--home-carousel-slide-width, 450px) * 1920 / 1080) !important;
-    }
-}
-
+body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > *,
 body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > .programme-info,
 body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > .programme-info {
+    flex: 0 0 var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
+    width: var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
+    min-width: var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
+    max-width: var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
+    aspect-ratio: auto !important;
+    height: var(--home-programme-fit-height, auto) !important;
+    min-height: var(--home-programme-fit-height, calc(var(--home-carousel-slide-width, 450px) * 1920 / 1080)) !important;
+    max-height: var(--home-programme-fit-height, none) !important;
+    align-self: stretch !important;
     overflow: hidden !important;
 }
 
@@ -7467,12 +7467,16 @@ h4 {
     body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > *,
     body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > .programme-info,
     body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > .programme-info {
+        flex: 0 0 100% !important;
+        width: var(--home-programme-fit-width, 100%) !important;
+        min-width: var(--home-programme-fit-width, 100%) !important;
+        max-width: var(--home-programme-fit-width, 100%) !important;
         aspect-ratio: auto !important;
-        height: auto !important;
-        min-height: calc(100vw * 1920 / 1080) !important;
-        max-height: none !important;
-        overflow-x: hidden !important;
-        overflow-y: hidden !important;
+        height: var(--home-programme-fit-height, auto) !important;
+        min-height: var(--home-programme-fit-height, calc(100vw * 1920 / 1080)) !important;
+        max-height: var(--home-programme-fit-height, none) !important;
+        align-self: stretch !important;
+        overflow: hidden !important;
     }
 
     .home-section .speakerslider-track > .speaker-card:not(:first-child),

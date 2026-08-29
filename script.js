@@ -6053,11 +6053,13 @@ function clearHomeProgrammeCardFitStyles(card) {
         'width',
         'min-width',
         'max-width',
+        'flex',
         'flex-basis',
         'flex-grow',
         'flex-shrink',
         'height',
         'min-height',
+        'max-height',
         'aspect-ratio',
         'overflow'
     ].forEach(function (prop) {
@@ -6065,10 +6067,23 @@ function clearHomeProgrammeCardFitStyles(card) {
     });
 }
 
+function clearHomeProgrammeSliderFitVars(slider) {
+    if (!slider) return;
+    slider.style.removeProperty('--home-programme-fit-width');
+    slider.style.removeProperty('--home-programme-fit-height');
+}
+
+function setHomeProgrammeSliderFitVars(slider, widthPx, heightPx) {
+    if (!slider) return;
+    slider.style.setProperty('--home-programme-fit-width', widthPx);
+    slider.style.setProperty('--home-programme-fit-height', heightPx);
+}
+
 /**
- * Home programme cards: no inner scroll. If copy is taller than the 1080×1920
- * box, grow width and height together so the portrait ratio is kept.
- * On mobile, width is already 100% so CSS grows height only.
+ * Home programme cards: one shared size, no inner scroll.
+ * Desktop: if any card is taller than 1080×1920, grow every card’s width and
+ * height together so the portrait ratio is kept.
+ * Mobile: width stays 100%; every card uses the tallest card’s height.
  */
 function fitHomeProgrammeCardsToContent(root) {
     const scope = root && root.querySelectorAll
@@ -6085,37 +6100,42 @@ function fitHomeProgrammeCardsToContent(root) {
             return el.nodeType === 1;
         });
         cards.forEach(clearHomeProgrammeCardFitStyles);
-        if (isMobile || !cards.length) return;
+        clearHomeProgrammeSliderFitVars(slider);
+        if (!cards.length) return;
 
         const baseWidth = cards[0].getBoundingClientRect().width;
         if (!(baseWidth > 0)) return;
         const ratioHeight = baseWidth * (1920 / 1080);
+
         cards.forEach(function (card) {
             card.style.setProperty('aspect-ratio', 'auto', 'important');
             card.style.setProperty('height', 'auto', 'important');
             card.style.setProperty('min-height', '0', 'important');
+            card.style.setProperty('max-height', 'none', 'important');
+            card.style.setProperty('max-width', 'none', 'important');
             card.style.setProperty('overflow', 'visible', 'important');
             card.style.setProperty('width', baseWidth + 'px', 'important');
+            card.style.setProperty('flex', '0 0 ' + baseWidth + 'px', 'important');
         });
 
-        const contentHeights = cards.map(function (card) {
-            return card.scrollHeight;
+        let maxContentHeight = 0;
+        cards.forEach(function (card) {
+            maxContentHeight = Math.max(maxContentHeight, card.scrollHeight);
         });
         cards.forEach(clearHomeProgrammeCardFitStyles);
 
-        cards.forEach(function (card, index) {
-            const contentHeight = contentHeights[index];
-            if (!(contentHeight > ratioHeight + 1)) return;
-            const newWidth = baseWidth * (contentHeight / ratioHeight);
-            card.style.setProperty('flex-basis', newWidth + 'px', 'important');
-            card.style.setProperty('width', newWidth + 'px', 'important');
-            card.style.setProperty('min-width', newWidth + 'px', 'important');
-            card.style.setProperty('max-width', 'none', 'important');
-            card.style.setProperty('aspect-ratio', '1080 / 1920', 'important');
-            card.style.setProperty('height', 'auto', 'important');
-            card.style.setProperty('min-height', '0', 'important');
-            card.style.setProperty('overflow', 'hidden', 'important');
-        });
+        const sharedHeight = Math.max(ratioHeight, maxContentHeight);
+        if (isMobile) {
+            setHomeProgrammeSliderFitVars(slider, '100%', sharedHeight + 'px');
+            return;
+        }
+
+        const newWidth =
+            maxContentHeight <= ratioHeight + 1
+                ? baseWidth
+                : baseWidth * (sharedHeight / ratioHeight);
+        const newHeight = newWidth * (1920 / 1080);
+        setHomeProgrammeSliderFitVars(slider, newWidth + 'px', newHeight + 'px');
     });
 }
 
