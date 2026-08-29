@@ -172,7 +172,8 @@ async function loadCurrentEventLabel(db: Firestore): Promise<string> {
 }
 
 /**
- * Read tbs/Settings/Zermatt/Zermatt (full document) for Current event + Eventdates.
+ * Read tbs/Settings/Zermatt/Zermatt (full document)
+ * for Current event + Eventdates.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<Record<string, unknown>>} Settings fields.
  */
