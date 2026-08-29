@@ -4137,6 +4137,41 @@ body.home-view .home-section > .home-social-row-container {
     box-sizing: border-box !important;
 }
 
+/*
+ * Home programme (displayed): no inner scroll. Cards stay at least 1080×1920
+ * and grow with copy so every line stays visible.
+ */
+body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
+body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > * {
+    aspect-ratio: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+}
+
+@media (min-width: 769px) {
+    body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
+    body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > * {
+        min-height: calc(var(--home-carousel-slide-width, 450px) * 1920 / 1080) !important;
+    }
+}
+
+body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > .programme-info,
+body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > .programme-info {
+    overflow: hidden !important;
+}
+
+body.home-view .home-section .programme-slider:not(.home-carousel--minimal) .programme-day-content,
+body.home-view .home-section .programme-slider:not(.home-carousel--minimal) .programme-day-slide .programme-day-content,
+body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) .programme-day-content,
+body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) .programme-day-slide .programme-day-content {
+    flex: 1 0 auto;
+    min-height: min-content;
+    max-height: none;
+    overflow: visible;
+}
+
 .home-section .programme-slider > *:last-child,
 .home-programme-section .programme-slider > *:last-child,
 .home-section .programme-slider > *:only-child,
@@ -7410,7 +7445,7 @@ h4 {
         margin-right: 0 !important;
     }
 
-    /* Programme carousel: full-width 1080×1920 portrait slides; no top/bottom borders */
+    /* Programme carousel: full-width portrait slides; grow with copy, no inner scroll */
     body.home-view .home-section .programme-slider > *,
     body.home-view .home-programme-section .programme-slider > *,
     body.home-view .home-section .programme-slider > .programme-info,
@@ -7426,6 +7461,18 @@ h4 {
         max-height: none !important;
         border-top: none !important;
         border-bottom: none !important;
+    }
+
+    body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > *,
+    body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > *,
+    body.home-view .home-section .programme-slider:not(.home-carousel--minimal) > .programme-info,
+    body.home-view .home-programme-section .programme-slider:not(.home-carousel--minimal) > .programme-info {
+        aspect-ratio: auto !important;
+        height: auto !important;
+        min-height: calc(100vw * 1920 / 1080) !important;
+        max-height: none !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
     }
 
     .home-section .speakerslider-track > .speaker-card:not(:first-child),

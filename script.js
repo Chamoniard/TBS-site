@@ -6047,6 +6047,91 @@ function mountHomeProgrammeSliderShell(homeSection) {
     insertHomeProgrammeSection(programmeSection, homeSection);
 }
 
+function clearHomeProgrammeCardFitStyles(card) {
+    if (!card || card.nodeType !== 1) return;
+    [
+        'width',
+        'min-width',
+        'max-width',
+        'flex-basis',
+        'flex-grow',
+        'flex-shrink',
+        'height',
+        'min-height',
+        'aspect-ratio',
+        'overflow'
+    ].forEach(function (prop) {
+        card.style.removeProperty(prop);
+    });
+}
+
+/**
+ * Home programme cards: no inner scroll. If copy is taller than the 1080×1920
+ * box, grow width and height together so the portrait ratio is kept.
+ * On mobile, width is already 100% so CSS grows height only.
+ */
+function fitHomeProgrammeCardsToContent(root) {
+    const scope = root && root.querySelectorAll
+        ? root
+        : document;
+    const sliders = scope.querySelectorAll
+        ? scope.querySelectorAll(
+            '.home-section .programme-slider:not(.home-carousel--minimal), .home-programme-section .programme-slider:not(.home-carousel--minimal)'
+        )
+        : [];
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    sliders.forEach(function (slider) {
+        const cards = Array.from(slider.children).filter(function (el) {
+            return el.nodeType === 1;
+        });
+        cards.forEach(clearHomeProgrammeCardFitStyles);
+        if (isMobile || !cards.length) return;
+
+        const baseWidth = cards[0].getBoundingClientRect().width;
+        if (!(baseWidth > 0)) return;
+        const ratioHeight = baseWidth * (1920 / 1080);
+        cards.forEach(function (card) {
+            card.style.setProperty('aspect-ratio', 'auto', 'important');
+            card.style.setProperty('height', 'auto', 'important');
+            card.style.setProperty('min-height', '0', 'important');
+            card.style.setProperty('overflow', 'visible', 'important');
+            card.style.setProperty('width', baseWidth + 'px', 'important');
+        });
+
+        const contentHeights = cards.map(function (card) {
+            return card.scrollHeight;
+        });
+        cards.forEach(clearHomeProgrammeCardFitStyles);
+
+        cards.forEach(function (card, index) {
+            const contentHeight = contentHeights[index];
+            if (!(contentHeight > ratioHeight + 1)) return;
+            const newWidth = baseWidth * (contentHeight / ratioHeight);
+            card.style.setProperty('flex-basis', newWidth + 'px', 'important');
+            card.style.setProperty('width', newWidth + 'px', 'important');
+            card.style.setProperty('min-width', newWidth + 'px', 'important');
+            card.style.setProperty('max-width', 'none', 'important');
+            card.style.setProperty('aspect-ratio', '1080 / 1920', 'important');
+            card.style.setProperty('height', 'auto', 'important');
+            card.style.setProperty('min-height', '0', 'important');
+            card.style.setProperty('overflow', 'hidden', 'important');
+        });
+    });
+}
+
+let homeProgrammeCardFitResizeTimer = 0;
+function scheduleFitHomeProgrammeCardsToContent() {
+    window.clearTimeout(homeProgrammeCardFitResizeTimer);
+    homeProgrammeCardFitResizeTimer = window.setTimeout(function () {
+        fitHomeProgrammeCardsToContent(document);
+    }, 80);
+}
+
+if (typeof window !== 'undefined' && !window.__tbsHomeProgrammeCardFitBound) {
+    window.__tbsHomeProgrammeCardFitBound = true;
+    window.addEventListener('resize', scheduleFitHomeProgrammeCardsToContent, { passive: true });
+}
+
 async function hydrateHomeProgrammeSlider(homeSection) {
     if (!homeSection) return;
     try {
@@ -6063,6 +6148,12 @@ async function hydrateHomeProgrammeSlider(homeSection) {
         freshSection.classList.remove('home-stage-hidden');
         finalizeHomeSpeakersSection(homeSection.querySelector(':scope > .speaker-section'));
         wireSliderIndicators();
+        fitHomeProgrammeCardsToContent(homeSection);
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(function () {
+                fitHomeProgrammeCardsToContent(homeSection);
+            });
+        }
     } catch (e) {
         console.error('hydrateHomeProgrammeSlider', e);
         const programmeSection = homeSection.querySelector(':scope > .programme-section');
