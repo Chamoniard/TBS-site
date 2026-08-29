@@ -98,9 +98,19 @@ function bindViewLinks(view, onClick) {
 }
 
 const HOME_HISTORY_APP_KEY = 'tbs-home-sections';
+const HOME_SITE_EVENT_DEFAULT = 'TBS27';
 
 function homeHistoryState(view, extra) {
-    return Object.assign({ app: HOME_HISTORY_APP_KEY, view: view || 'home' }, extra || {});
+    const current = typeof window !== 'undefined' && window.history ? window.history.state : null;
+    const fromExtra = extra && extra['site-event'];
+    const fromCurrent = isHomeHistoryState(current) ? current['site-event'] : '';
+    const siteEvent = fromExtra || fromCurrent || HOME_SITE_EVENT_DEFAULT;
+    const merged = Object.assign(
+        { app: HOME_HISTORY_APP_KEY, view: view || 'home' },
+        extra || {}
+    );
+    merged['site-event'] = siteEvent;
+    return merged;
 }
 
 function isHomeHistoryState(state) {
