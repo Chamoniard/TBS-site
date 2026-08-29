@@ -150,13 +150,12 @@ function escapeHtml(text: string): string {
 }
 
 /**
- * Read Current event from tbs/Settings.
+ * Read Current event from tbs/Settings/Zermatt/Zermatt.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<string>} Current event label or empty string.
  */
 async function loadCurrentEventLabel(db: Firestore): Promise<string> {
-  const snap = await db.collection("tbs").doc("Settings").get();
-  const data = (snap.exists ? snap.data() : null) || {};
+  const data = await loadTbsSettingsData(db);
   const keys = [
     "Current event",
     "currentEvent",
@@ -173,15 +172,23 @@ async function loadCurrentEventLabel(db: Firestore): Promise<string> {
 }
 
 /**
- * Read tbs/Settings (full document) for Current event + Eventdates.
+ * Read tbs/Settings/Zermatt/Zermatt (full document) for Current event + Eventdates.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<Record<string, unknown>>} Settings fields.
  */
 async function loadTbsSettingsData(
   db: Firestore,
 ): Promise<Record<string, unknown>> {
-  const snap = await db.collection("tbs").doc("Settings").get();
-  return (snap.exists ? snap.data() : null) || {};
+  const destSnap = await db
+    .collection("tbs")
+    .doc("Settings")
+    .collection("Zermatt")
+    .doc("Zermatt")
+    .get();
+  const parentSnap = await db.collection("tbs").doc("Settings").get();
+  const dest = (destSnap.exists ? destSnap.data() : null) || {};
+  const parent = (parentSnap.exists ? parentSnap.data() : null) || {};
+  return {...parent, ...dest};
 }
 
 /**

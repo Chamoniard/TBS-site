@@ -22,13 +22,13 @@ const firestoreHomeCache = {
     registrationManifesto: { value: '', fetchedAt: 0, promise: null },
     /** First programme-band card: `tbs/Snippets` field `Programmeinfo`. */
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
-    /** `tbs/Settings` field `displayspeakers` (`Yes` / `No`). */
+    /** `tbs/Settings/Zermatt/Zermatt` field `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
-    /** `tbs/Settings` field `displayprogramme` (`Yes` / `No`). */
+    /** `tbs/Settings/Zermatt/Zermatt` field `displayprogramme` (`Yes` / `No`). */
     siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null },
-    /** `tbs/Settings` field `passwordprotecthome` (`Yes` / `No`). */
+    /** `tbs/Settings/Zermatt/Zermatt` field `passwordprotecthome` (`Yes` / `No`). */
     siteSettingsPasswordProtectHome: { value: false, fetchedAt: 0, promise: null },
-    /** `tbs/Settings` field `registrationopen` (boolean). */
+    /** `tbs/Settings/Zermatt/Zermatt` field `registrationopen` (boolean). */
     siteSettingsRegistrationOpen: { value: true, fetchedAt: 0, promise: null }
 };
 
@@ -4253,6 +4253,18 @@ const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
 const FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
 const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
+
+function tbsSettingsDocRef(db) {
+    return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
+}
+
+async function fetchTbsSettingsFields(db) {
+    const destSnap = await tbsSettingsDocRef(db).get();
+    const parentSnap = await db.collection('tbs').doc('Settings').get();
+    const dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
+    const parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
+    return Object.assign({}, parent, dest);
+}
 /** Site password when `passwordprotecthome` is `Yes` (client-side gate only). */
 const HOME_PASSWORD_PROTECT_VALUE = 'VilleTrollkarl';
 const HOME_PASSWORD_SESSION_STORAGE_KEY = 'tbs-home-password-ok';
@@ -4453,12 +4465,12 @@ async function fetchHomeSiteSettingsFromFirestore() {
     const promise = (async function () {
         try {
             const db = getFirestore();
-            const snap = await withTimeout(
-                db.collection('tbs').doc('Settings').get(),
+            const snapData = await withTimeout(
+                fetchTbsSettingsFields(db),
                 10000,
-                'Firestore tbs/Settings'
+                'Firestore tbs/Settings/Zermatt/Zermatt'
             );
-            const data = snap && snap.exists ? snap.data() || {} : {};
+            const data = snapData || {};
             return {
                 displaySpeakers: normalizeHomeDisplaySpeakersSetting(
                     data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD]
@@ -5072,7 +5084,7 @@ async function resolveHomeProgrammeInfoSlideHtml() {
     return normalizeProgrammeInfoSlideHtml(infoHtmlRaw);
 }
 
-/** Placeholder programme slide when `tbs/Settings.displayprogramme` is `No`. */
+/** Placeholder programme slide when `tbs/Settings/Zermatt/Zermatt.displayprogramme` is `No`. */
 function buildHomeProgrammeTbaSlideHtml() {
     return (
         '<div class="programme-tba programme-friday" role="status" aria-label="Programme to be announced">' +
@@ -5622,7 +5634,7 @@ function appendHomeSpeakerinfoCard(track, html) {
     track.appendChild(article);
 }
 
-/** Placeholder speaker slide when `tbs/Settings.displayspeakers` is `No`. */
+/** Placeholder speaker slide when `tbs/Settings/Zermatt/Zermatt.displayspeakers` is `No`. */
 function appendHomeSpeakerTbaCard(track, stripeIndex) {
     const article = document.createElement('article');
     article.className = 'speaker-card speaker-card--tba ' + homeSpeakerStripeClass(stripeIndex != null ? stripeIndex : 0);
