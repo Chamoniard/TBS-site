@@ -101,19 +101,12 @@ async function fetchStandbyModeEnabledFromFirestore() {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
-        const destSnap = await withFirestoreTimeout(
+        const snap = await withFirestoreTimeout(
             db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt').get(),
             'Firestore tbs/Settings/Zermatt/Zermatt (index standby)',
             INDEX_SETTINGS_TIMEOUT_MS
         );
-        const parentSnap = await withFirestoreTimeout(
-            db.collection('tbs').doc('Settings').get(),
-            'Firestore tbs/Settings (index standby fallback)',
-            INDEX_SETTINGS_TIMEOUT_MS
-        );
-        const dest = destSnap.exists ? destSnap.data() || {} : {};
-        const parent = parentSnap.exists ? parentSnap.data() || {} : {};
-        const data = Object.assign({}, parent, dest);
+        const data = snap.exists ? snap.data() || {} : {};
         return normalizeStandbySettingYes(data[FIRESTORE_TBS_SETTINGS_STANDBY_FIELD]);
     } catch (err) {
         console.warn('fetchStandbyModeEnabledFromFirestore:', err);

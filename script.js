@@ -4260,10 +4260,7 @@ function tbsSettingsDocRef(db) {
 
 async function fetchTbsSettingsFields(db) {
     const destSnap = await tbsSettingsDocRef(db).get();
-    const parentSnap = await db.collection('tbs').doc('Settings').get();
-    const dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
-    const parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
-    return Object.assign({}, parent, dest);
+    return destSnap && destSnap.exists ? destSnap.data() || {} : {};
 }
 /** Site password when `passwordprotecthome` is `Yes` (client-side gate only). */
 const HOME_PASSWORD_PROTECT_VALUE = 'VilleTrollkarl';

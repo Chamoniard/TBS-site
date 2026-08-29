@@ -10215,7 +10215,7 @@
         let speakerRosterInMemory = [];
         /** In-memory roster for Guests tab. */
         let guestsRosterInMemory = [];
-        /** From `tbs/Settings/Zermatt/Zermatt` field `Current event` (and aliases); guests roster only includes rows whose `Event` matches. */
+        /** From `tbs/Settings` field `Current event` (and aliases); guests roster only includes rows whose `Event` matches. */
         var current_event = '';
         let guestFormEditingDocId = '';
         /** Guests Overwatch overview panel is open in the guest viewer. */
@@ -11966,7 +11966,7 @@
             return db.collection('events').doc(eventId).collection('programme');
         }
 
-        /** Subcollection under `tbs/Programme` named like `tbs/Settings/Zermatt/Zermatt` → `Current event` (e.g. TBS27). */
+        /** Subcollection under `tbs/Programme` named like `tbs/Settings` → `Current event` (e.g. TBS27). */
         function tbsProgrammeEventKey() {
             if (programmeState && programmeState.programmeCollectionKey) {
                 return String(programmeState.programmeCollectionKey).trim();
@@ -12179,7 +12179,7 @@
         function tbsProgrammeDaysRootDocRef(db, eventKeyOpt) {
             var eventKey = String(eventKeyOpt != null ? eventKeyOpt : tbsProgrammeEventKey() || '').trim();
             if (!eventKey) {
-                throw new Error('Set Current event on tbs/Settings/Zermatt/Zermatt before loading programme days.');
+                throw new Error('Set Current event on tbs/Settings before loading programme days.');
             }
             return db.collection('tbs').doc('Programme').collection(eventKey).doc('days');
         }
@@ -12243,7 +12243,7 @@
         function tbsProgrammeDayCollection(db, isoDate, eventKeyOpt) {
             var eventKey = String(eventKeyOpt != null ? eventKeyOpt : tbsProgrammeEventKey() || '').trim();
             if (!eventKey) {
-                throw new Error('Set Current event on tbs/Settings/Zermatt/Zermatt before loading programme days.');
+                throw new Error('Set Current event on tbs/Settings before loading programme days.');
             }
             return db
                 .collection('tbs')
@@ -14317,19 +14317,47 @@
             return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
         }
 
-        async function fetchTbsSettingsFields(db) {
-            var destSnap = await tbsSettingsDocRef(db).get();
-            var parentSnap = await db.collection('tbs').doc('Settings').get();
-            var dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
-            var parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
+        function tbsSettingsRootDocRef(db) {
+            return db.collection('tbs').doc('Settings');
+        }
+
+        var TBS_SETTINGS_EVENT_FIELD_KEYS = [
+            'Current event',
+            'currentEvent',
+            'Current Event',
+            'CURRENT EVENT',
+            'Allevents',
+            'All events',
+            'allEvents',
+            'AllEvents',
+            'ALL EVENTS',
+            'Eventdates',
+            'Event dates',
+            'EventDates',
+            'eventdates',
+        ];
+
+        function overlayTbsEventSettingsFromParent(dest, parent) {
             var out = {};
-            Object.keys(parent).forEach(function (k) {
-                out[k] = parent[k];
-            });
-            Object.keys(dest).forEach(function (k) {
+            Object.keys(dest || {}).forEach(function (k) {
                 out[k] = dest[k];
             });
+            for (var i = 0; i < TBS_SETTINGS_EVENT_FIELD_KEYS.length; i++) {
+                var k = TBS_SETTINGS_EVENT_FIELD_KEYS[i];
+                if (!parent || !Object.prototype.hasOwnProperty.call(parent, k) || parent[k] == null) {
+                    continue;
+                }
+                out[k] = parent[k];
+            }
             return out;
+        }
+
+        async function fetchTbsSettingsFields(db) {
+            var destSnap = await tbsSettingsDocRef(db).get();
+            var parentSnap = await tbsSettingsRootDocRef(db).get();
+            var dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
+            var parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
+            return overlayTbsEventSettingsFromParent(dest, parent);
         }
 
         function tbsSettingsFirestoreFieldForSettingKey(settingKey) {
@@ -14479,7 +14507,7 @@
             }
         }
 
-        /** Document `tbs/Settings/Zermatt/Zermatt`: field `Current event` (and aliases). */
+        /** Document `tbs/Settings`: field `Current event` (and aliases). */
         function guestCoalesceCurrentEventField(data) {
             if (!data || typeof data !== 'object') return '';
             var keys = ['Current event', 'currentEvent', 'Current Event', 'CURRENT EVENT'];
@@ -14554,14 +14582,14 @@
                     'aria-label',
                     v ? 'Current event: ' + v + '. Choose current event' : 'Choose current event'
                 );
-                btn.setAttribute('title', v ? 'Current event: ' + v : 'Set field “Current event” on tbs/Settings/Zermatt/Zermatt');
+                btn.setAttribute('title', v ? 'Current event: ' + v : 'Set field “Current event” on tbs/Settings');
             }
             updateGuestsListHeadingDisplay();
             syncGuestInvoicedisnoBlock();
             syncGuestWorkflowAppliedButton();
         }
 
-        /** Programme / editor use `selectedevent`; keep it aligned with `tbs/Settings/Zermatt/Zermatt` → `Current event`. */
+        /** Programme / editor use `selectedevent`; keep it aligned with `tbs/Settings` → `Current event`. */
         async function syncSelectedAndCurrentEventFromSettings() {
             try {
                 var db = getFirestore();
@@ -14586,7 +14614,7 @@
         ];
         var currentEventSwitchInFlight = false;
 
-        /** Document `tbs/Settings/Zermatt/Zermatt` field `Allevents` (array or delimited string). */
+        /** Document `tbs/Settings` field `Allevents` (array or delimited string). */
         function coalesceAlleventsField(data) {
             if (!data || typeof data !== 'object') return [];
             for (var ki = 0; ki < FIRESTORE_TBS_SETTINGS_ALLEVENTS_KEYS.length; ki++) {
@@ -14674,7 +14702,7 @@
         }
 
         /**
-         * Write `Current event` on tbs/Settings/Zermatt/Zermatt, then reload Speakers, Guests, and Programme for the new value.
+         * Write `Current event` on tbs/Settings, then reload Speakers, Guests, and Programme for the new value.
          * @param {string} eventName
          */
         async function setCurrentEventAndRefreshRosters(eventName) {
@@ -14692,7 +14720,7 @@
                 var db = getFirestore();
                 var patch = {};
                 patch[FIRESTORE_TBS_SETTINGS_CURRENT_EVENT_FIELD] = next;
-                await tbsSettingsDocRef(db).set(patch, { merge: true });
+                await tbsSettingsRootDocRef(db).set(patch, { merge: true });
                 current_event = next;
                 selectedevent = next;
                 updateBackendCurrentEventDisplay();
@@ -18288,7 +18316,7 @@
             } else if (!guestsRosterInMemory.length) {
                 var curEvEmpty = String(current_event || '').trim();
                 var emptyMsg = !curEvEmpty
-                    ? 'Set field “Current event” on Firestore document tbs/Settings/Zermatt/Zermatt to load guests.'
+                    ? 'Set field “Current event” on Firestore document tbs/Settings to load guests.'
                     : 'No guests listed for this event.';
                 html += '<tr class="guests-roster-row">' +
                     '<td class="guests-roster-empty" colspan="' +
@@ -18657,7 +18685,7 @@
             if (!speakerRosterInMemory.length) {
                 var curEvEmpty = String(current_event || '').trim();
                 var emptyMsg = !curEvEmpty
-                    ? 'Set field “Current event” on Firestore document tbs/Settings/Zermatt/Zermatt to load speakers.'
+                    ? 'Set field “Current event” on Firestore document tbs/Settings to load speakers.'
                     : 'No speakers listed for this event.';
                 html += '<tr class="speaker-roster-row">' +
                     '<td class="speaker-roster-empty" colspan="' +

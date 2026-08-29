@@ -150,7 +150,7 @@ function escapeHtml(text: string): string {
 }
 
 /**
- * Read Current event from tbs/Settings/Zermatt/Zermatt.
+ * Read Current event from tbs/Settings.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<string>} Current event label or empty string.
  */
@@ -172,8 +172,8 @@ async function loadCurrentEventLabel(db: Firestore): Promise<string> {
 }
 
 /**
- * Read tbs/Settings/Zermatt/Zermatt (full document)
- * for Current event + Eventdates.
+ * Read tbs/Settings (event fields) plus Zermatt site settings.
+ * Eventdates / Current event / Allevents live on the parent document.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<Record<string, unknown>>} Settings fields.
  */
@@ -189,7 +189,30 @@ async function loadTbsSettingsData(
   const parentSnap = await db.collection("tbs").doc("Settings").get();
   const dest = (destSnap.exists ? destSnap.data() : null) || {};
   const parent = (parentSnap.exists ? parentSnap.data() : null) || {};
-  return {...parent, ...dest};
+  const out: Record<string, unknown> = {...dest};
+  const eventKeys = [
+    "Current event",
+    "currentEvent",
+    "Current Event",
+    "CURRENT EVENT",
+    "Allevents",
+    "All events",
+    "allEvents",
+    "AllEvents",
+    "ALL EVENTS",
+    "Eventdates",
+    "Event dates",
+    "EventDates",
+    "eventdates",
+  ];
+  for (let i = 0; i < eventKeys.length; i++) {
+    const k = eventKeys[i];
+    if (Object.prototype.hasOwnProperty.call(parent, k) &&
+      parent[k] != null) {
+      out[k] = parent[k];
+    }
+  }
+  return out;
 }
 
 /**
