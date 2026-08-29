@@ -98,7 +98,7 @@ function bindViewLinks(view, onClick) {
 }
 
 const HOME_HISTORY_APP_KEY = 'tbs-home-sections';
-const HOME_SITE_EVENT_DEFAULT = 'TBS27';
+const HOME_SITE_EVENT_DEFAULT = 'Zermatt';
 
 function homeHistoryState(view, extra) {
     const current = typeof window !== 'undefined' && window.history ? window.history.state : null;
