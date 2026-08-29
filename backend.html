@@ -5192,7 +5192,8 @@
 
         /* Guest / Speaker Save / Delete: round icon buttons (yellow save, red trash). */
         #guest-editor .guest-editor-toolbar-trailing #save-guest-button,
-        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button {
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button,
+        #speaker-editor .speaker-editor-toolbar-trailing #speaker-bio-preview {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -5209,12 +5210,14 @@
         }
 
         #guest-editor .guest-editor-toolbar-trailing #save-guest-button:hover:not(:disabled),
-        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button:hover:not(:disabled) {
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button:hover:not(:disabled),
+        #speaker-editor .speaker-editor-toolbar-trailing #speaker-bio-preview:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
         #guest-editor .guest-editor-toolbar-trailing #save-guest-button svg,
-        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button svg {
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button svg,
+        #speaker-editor .speaker-editor-toolbar-trailing #speaker-bio-preview svg {
             flex-shrink: 0;
             display: block;
         }
@@ -5285,6 +5288,7 @@
         #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn:disabled,
         #speaker-editor .speaker-editor-toolbar .guest-editor-padlock-btn:disabled,
         #speaker-editor .speaker-editor-toolbar #save-speaker-button:disabled,
+        #speaker-editor .speaker-editor-toolbar #speaker-bio-preview:disabled,
         #guest-editor .guest-editor-toolbar #save-guest-button:disabled,
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:disabled,
         #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:disabled,
@@ -5309,6 +5313,7 @@
         #guest-editor .guest-editor-toolbar .guest-editor-padlock-btn:disabled:hover,
         #speaker-editor .speaker-editor-toolbar .guest-editor-padlock-btn:disabled:hover,
         #speaker-editor .speaker-editor-toolbar #save-speaker-button:disabled:hover,
+        #speaker-editor .speaker-editor-toolbar #speaker-bio-preview:disabled:hover,
         #guest-editor .guest-editor-toolbar #save-guest-button:disabled:hover,
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:disabled:hover,
         #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:disabled:hover,
@@ -9036,6 +9041,11 @@
                                             <button type="button" class="texteditor-save-btn" id="save-speaker-button" disabled aria-disabled="true" title="Save speaker" aria-label="Save speaker">
                                                 <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                                                     <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                                </svg>
+                                            </button>
+                                            <button type="button" class="add-speaker-button" id="speaker-bio-preview" name="speaker-bio-preview" disabled aria-disabled="true" title="Preview speaker bio" aria-label="Preview speaker bio">
+                                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                                    <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                                                 </svg>
                                             </button>
                                             <button type="button" class="add-speaker-delete-btn" id="add-speaker-delete-btn" disabled aria-disabled="true" title="Delete speaker" aria-label="Delete speaker">
