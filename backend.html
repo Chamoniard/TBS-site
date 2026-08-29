@@ -865,20 +865,73 @@
             overflow: auto;
         }
 
-        .settings-top-row,
         .settings-site {
             flex: 0 0 auto;
         }
 
-        .settings-top-row {
+        #settings-editor .edit-guest-top.guests-list-heading {
+            background-color: #ffffff;
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+            margin: 0;
+            border-radius: 5px 5px 0 0;
+            align-items: center;
+            gap: 0;
+            justify-content: flex-start;
+            color: #000000;
+            border-bottom: 1px solid #cbd5e1;
+            box-sizing: border-box;
             flex: 0 0 auto;
             width: 100%;
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+        }
+
+        #settings-editor .edit-guest-top.guests-list-heading .edit-guest-top-spacer {
+            display: none;
+        }
+
+        #settings-editor .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
             min-width: 0;
-            height: 55px;
-            min-height: 55px;
+            padding-right: 0;
             box-sizing: border-box;
-            border: none;
-            background: transparent;
+        }
+
+        #settings-editor .edit-guest-top.guests-list-heading .selected-guestname-wrap {
+            flex: 0 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        #settings-editor .edit-guest-top.guests-list-heading .selected-guestname {
+            color: #000000;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0.5rem;
+            padding: 8px 0;
+            box-sizing: border-box;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        #settings-editor .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #settings-editor .edit-guest-top.guests-list-heading .edit-guest-name-last {
+            font-size: 1.2rem;
+            display: inline;
+            min-width: 0;
+            word-break: break-word;
+            text-transform: uppercase;
         }
 
         .settings-site {
@@ -889,25 +942,18 @@
             overflow: hidden;
         }
 
-        .settings-site-title {
-            margin: 0;
-            padding: 0.25rem var(--backend-table-cell-pad-x);
-            background: #ffffff;
-            color: #000000;
-            font-weight: 500;
-            font-size: 1.2rem;
-            font-family: 'Inter', sans-serif;
-            border-bottom: none;
-            line-height: 1.25;
-        }
-
         .settings-site-toggles {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch;
             gap: 12px;
-            padding: 12px var(--backend-table-cell-pad-x) 16px;
+            padding: 0 0 16px;
             box-sizing: border-box;
+        }
+
+        .settings-site-toggles > .settings-site-toggle-row {
+            margin-left: var(--backend-table-cell-pad-x);
+            margin-right: var(--backend-table-cell-pad-x);
         }
 
         .settings-site-toggle-row {
@@ -3119,6 +3165,15 @@
         #speaker-editor,
         .speakers-overview,
         .speakers-overview.is-open {
+            --editor-gunmetal-border: #3d4852;
+            background: #e2e8f0;
+            border: none;
+            padding: 16px;
+        }
+
+        #settings-editor,
+        .settings-section,
+        .settings-section.is-open {
             --editor-gunmetal-border: #3d4852;
             background: #e2e8f0;
             border: none;
@@ -10032,10 +10087,18 @@
 
             <section class="settings-section" id="settings-editor" aria-hidden="true" aria-label="Settings" data-name="settings-editor">
                 <div class="settings-body">
-                    <div class="settings-top-row" id="settings-top-row"></div>
                     <div class="settings-site" id="settings-site">
-                        <h3 class="settings-site-title">Site</h3>
                         <div class="settings-site-toggles">
+                            <div class="edit-guest-top guests-list-heading speakers-list-top" id="settings-list-heading">
+                                <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                                <div class="selected-guestname-wrap">
+                                    <div class="selected-guestname" role="group" aria-label="Settings title">
+                                        <span class="edit-guest-name-first">Settings for</span>
+                                        <span class="edit-guest-name-last" id="settings-list-heading-event" aria-live="polite">—</span>
+                                    </div>
+                                </div>
+                                <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                            </div>
                             <div class="settings-site-toggle-row">
                                 <div class="settings-site-toggle-label-wrap">
                                     <span class="settings-site-toggle-label" id="settings-standby-label">Page in stand-by mode?</span>
@@ -14579,6 +14642,8 @@
             if (speakersEventEl) speakersEventEl.textContent = eventLabel;
             var programmeEventEl = document.getElementById('programme-list-heading-event');
             if (programmeEventEl) programmeEventEl.textContent = eventLabel;
+            var settingsEventEl = document.getElementById('settings-list-heading-event');
+            if (settingsEventEl) settingsEventEl.textContent = eventLabel;
         }
 
         function updateBackendCurrentEventDisplay() {
