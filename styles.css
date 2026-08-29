@@ -2672,7 +2672,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     position: relative;
     isolation: isolate;
     overflow: hidden !important;
-    background-color: transparent;
+    background-color: #fede3a;
     background-image: none;
     padding: 24px 50px 24px 16px !important;
     border: 1px solid #D1D5DB;
@@ -2687,8 +2687,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     z-index: 0;
     background-image: url('images/speakerinfo.png');
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    background-position: top center;
+    background-size: 100% auto;
     pointer-events: none;
 }
 
@@ -4257,7 +4257,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     isolation: isolate;
     overflow: hidden !important;
     min-height: 0;
-    background-color: transparent;
+    background-color: #003153;
     background-image: none;
     padding: 24px 50px 24px 16px !important;
     display: flex;
@@ -4285,8 +4285,8 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     z-index: 0;
     background-image: url('images/programmeinfo.png');
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    background-position: top center;
+    background-size: 100% auto;
     pointer-events: none;
 }
 
