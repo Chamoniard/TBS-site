@@ -983,6 +983,10 @@
             line-height: 1.25;
         }
 
+        .settings-site-toggle-row.is-disabled .settings-site-toggle-label {
+            color: #94a3b8;
+        }
+
         .settings-site-toggle {
             display: inline-flex;
             flex-direction: row;
@@ -1016,7 +1020,7 @@
             border-left: 1px solid #003153;
         }
 
-        body.backend-page button.settings-site-toggle-option:hover:not(.is-active) {
+        body.backend-page button.settings-site-toggle-option:hover:not(:disabled):not(.is-active) {
             background: #71C7FE;
         }
 
@@ -1032,11 +1036,24 @@
             color: #ffffff;
         }
 
-        body.backend-page button.settings-site-toggle-option[data-value='yes'].is-active:hover,
-        body.backend-page button.settings-site-toggle-option[data-value='yes'][aria-pressed='true']:hover,
-        body.backend-page button.settings-site-toggle-option[data-value='no'].is-active:hover,
-        body.backend-page button.settings-site-toggle-option[data-value='no'][aria-pressed='true']:hover {
+        body.backend-page button.settings-site-toggle-option[data-value='yes'].is-active:hover:not(:disabled),
+        body.backend-page button.settings-site-toggle-option[data-value='yes'][aria-pressed='true']:hover:not(:disabled),
+        body.backend-page button.settings-site-toggle-option[data-value='no'].is-active:hover:not(:disabled),
+        body.backend-page button.settings-site-toggle-option[data-value='no'][aria-pressed='true']:hover:not(:disabled) {
             filter: brightness(1.08);
+        }
+
+        body.backend-page button.settings-site-toggle-option:disabled,
+        body.backend-page button.settings-site-toggle-option:disabled.is-active,
+        body.backend-page button.settings-site-toggle-option[data-value='yes'].is-active:disabled,
+        body.backend-page button.settings-site-toggle-option[data-value='no'].is-active:disabled,
+        body.backend-page button.settings-site-toggle-option[data-value='yes'][aria-pressed='true']:disabled,
+        body.backend-page button.settings-site-toggle-option[data-value='no'][aria-pressed='true']:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            filter: none;
+            box-shadow: none;
         }
 
         body.backend-page button.settings-site-toggle-option:focus-visible {
@@ -10136,6 +10153,15 @@
                                     <button type="button" class="settings-site-toggle-option is-active" data-setting-key="registrationOpen" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
+                            <div class="settings-site-toggle-row is-disabled" id="settings-waiting-list-row">
+                                <div class="settings-site-toggle-label-wrap">
+                                    <span class="settings-site-toggle-label" id="settings-waiting-list-label">Send guest registrations to waiting list?</span>
+                                </div>
+                                <div class="settings-site-toggle" role="group" aria-labelledby="settings-waiting-list-label">
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="waitingList" data-value="no" aria-pressed="true" disabled aria-disabled="true">No</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="waitingList" data-value="yes" aria-pressed="false" disabled aria-disabled="true">Yes</button>
+                                </div>
+                            </div>
                             <div class="settings-site-toggle-row">
                                 <div class="settings-site-toggle-label-wrap">
                                     <span class="settings-site-toggle-label" id="settings-password-protect-home-label">Password for homepage?</span>
@@ -14382,6 +14408,7 @@
         var FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
         var FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
         var FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
+        var FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
         var FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
         /** Document `tbs/Settings/Zermatt/Zermatt` field `filterguests` (JSON map of guests-table filters). */
         var FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD = 'filterguests';
@@ -14439,6 +14466,7 @@
             if (settingKey === 'displaySpeakers') return FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD;
             if (settingKey === 'displayProgramme') return FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD;
             if (settingKey === 'registrationOpen') return FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD;
+            if (settingKey === 'waitingList') return FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD;
             if (settingKey === 'passwordProtectHome') return FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD;
             return '';
         }
@@ -14486,6 +14514,25 @@
                 });
         }
 
+        function isRegistrationOpenSettingsUi() {
+            var yesBtn = document.querySelector(
+                '#settings-site button.settings-site-toggle-option[data-setting-key="registrationOpen"][data-value="yes"]'
+            );
+            return !!(yesBtn && yesBtn.classList.contains('is-active'));
+        }
+
+        function syncWaitingListToggleEnabledFromUi() {
+            var open = isRegistrationOpenSettingsUi();
+            var row = document.getElementById('settings-waiting-list-row');
+            if (row) row.classList.toggle('is-disabled', !open);
+            document
+                .querySelectorAll('#settings-site button.settings-site-toggle-option[data-setting-key="waitingList"]')
+                .forEach(function (opt) {
+                    opt.disabled = !open;
+                    opt.setAttribute('aria-disabled', open ? 'false' : 'true');
+                });
+        }
+
         async function loadSiteSettingsFromFirestore() {
             var db = getFirestore();
             var data = await fetchTbsSettingsFields(db);
@@ -14511,9 +14558,14 @@
                 )
             );
             setSettingsSiteToggleUi(
+                'waitingList',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD], false)
+            );
+            setSettingsSiteToggleUi(
                 'passwordProtectHome',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD], false)
             );
+            syncWaitingListToggleEnabledFromUi();
         }
 
         async function saveSiteSettingToFirestore(settingKey, yesNoUi) {
@@ -14530,6 +14582,7 @@
         }
 
         async function onSettingsSiteToggleClick(btn) {
+            if (!btn || btn.disabled) return;
             var group = btn.closest('.settings-site-toggle');
             if (!group) return;
             var settingKey = btn.getAttribute('data-setting-key');
@@ -14542,6 +14595,9 @@
                 opt.classList.toggle('is-active', isSelected);
                 opt.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
             });
+            if (settingKey === 'registrationOpen') {
+                syncWaitingListToggleEnabledFromUi();
+            }
             if (wasActive) return;
 
             if (siteSettingsSaveInFlight) return;
@@ -14559,6 +14615,8 @@
                             showStatus('info', 'Programme is no longer displayed on the site.');
                         } else if (settingKey === 'registrationOpen') {
                             showStatus('info', 'Registration is no longer open on the site.');
+                        } else if (settingKey === 'waitingList') {
+                            showStatus('info', 'Guest registrations are no longer sent to the waiting list.');
                         } else if (settingKey === 'passwordProtectHome') {
                             showStatus('info', 'Homepage is no longer password protected.');
                         }
