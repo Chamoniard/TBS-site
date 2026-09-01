@@ -8896,9 +8896,10 @@
                         <div class="texteditor-selectors" id="texteditor-home-selectors" role="group" aria-label="Home page snippets">
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:eventinfo" id="texteditor-home-event-btn" aria-pressed="false">Event</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:locationinfo" id="texteditor-home-location-btn" aria-pressed="false">Location</button>
-                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:registration" id="texteditor-home-registration-btn" aria-pressed="false">Registration</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:programmeinfo" id="texteditor-home-programmeinfo-btn" aria-pressed="false">Programme infoslide</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:speakers" id="texteditor-home-speakers-btn" aria-pressed="false">Speakers infoslide</button>
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:registration" id="texteditor-home-registration-btn" aria-pressed="false">Registration</button>
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:register-to-waiting-list" id="texteditor-home-register-to-waiting-list-btn" aria-pressed="false">Register to waiting list</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:standby" id="texteditor-home-standby-btn" aria-pressed="false">Stand by</button>
                         </div>
                     </div>
@@ -8925,13 +8926,6 @@
                                 id="texteditor-preset-guest-sent-to-reserves-btn"
                                 aria-pressed="false"
                             >Guest sent to reserves</button>
-                            <button
-                                type="button"
-                                class="texteditor-day-btn texteditor-snippet-btn"
-                                data-snippet-key="tbsBackend:texteditor:preset:register-to-waiting-list"
-                                id="texteditor-preset-register-to-waiting-list-btn"
-                                aria-pressed="false"
-                            >Register to waiting list</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -19409,9 +19403,9 @@
         var TBS_TEXTEDITOR_HOME_REGISTRATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:registration';
         var TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:programmeinfo';
         var TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:standby';
+        var TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:register-to-waiting-list';
         var TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-invitation';
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
-        var TBS_TEXTEDITOR_PRESET_REGISTER_TO_WAITING_LIST_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:register-to-waiting-list';
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
@@ -19499,6 +19493,16 @@
                     target: 'tbs-snippets'
                 };
             }
+            if (key === TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
+                    metaLabel: 'Home — Register to waiting list',
+                    loadOk: 'Register to waiting list loaded from Firestore (tbs/Snippets.Sendtoreserves) into the editor.',
+                    saveOk: 'Register to waiting list saved to Firestore (tbs/Snippets.Sendtoreserves).',
+                    saveErr: 'Failed to save Register to waiting list to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
             if (key === TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD,
@@ -19516,16 +19520,6 @@
                     loadOk: 'Guest sent to reserves loaded from Firestore (tbs/Snippets.Guest sent to reserves) into the editor.',
                     saveOk: 'Guest sent to reserves saved to Firestore (tbs/Snippets.Guest sent to reserves).',
                     saveErr: 'Failed to save Guest sent to reserves to Firestore.',
-                    target: 'tbs-snippets'
-                };
-            }
-            if (key === TBS_TEXTEDITOR_PRESET_REGISTER_TO_WAITING_LIST_LS_KEY) {
-                return {
-                    field: FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
-                    metaLabel: 'Guest email templates — Register to waiting list',
-                    loadOk: 'Register to waiting list loaded from Firestore (tbs/Snippets.Sendtoreserves) into the editor.',
-                    saveOk: 'Register to waiting list saved to Firestore (tbs/Snippets.Sendtoreserves).',
-                    saveErr: 'Failed to save Register to waiting list to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
