@@ -11755,7 +11755,7 @@
             return db.collection('events').doc(eventId).collection('items');
         }
 
-        /** Programme day metadata under events (doc ids per ISO date). Day card HTML is `tbs/Programme/{Current event}/days/{ISO}/Programme`; intro is `tbs/Snippets.Programmeinfo`. */
+        /** Programme day metadata under events (doc ids per ISO date). Day card HTML is `tbs/Programme/{Current event}/days/{ISO}/Programme`; intro is `tbs/Pre-sets/Zermatt/Zermatt.Programmeinfo`. */
         function eventProgrammeHtmlCollection(db, eventId) {
             if (!eventId) return null;
             return db.collection('events').doc(eventId).collection('programme');
@@ -14111,6 +14111,10 @@
 
         function tbsSettingsDocRef(db) {
             return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
+        }
+
+        function tbsPresetsZermattDocRef(db) {
+            return db.collection('tbs').doc('Pre-sets').collection('Zermatt').doc('Zermatt');
         }
 
         function tbsSettingsRootDocRef(db) {
@@ -19211,8 +19215,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_EVENTINFO_FIELD,
                     metaLabel: 'Home — Event',
-                    loadOk: 'Event loaded from Firestore (tbs/Snippets.Eventinfo) into the editor.',
-                    saveOk: 'Event saved to Firestore (tbs/Snippets.Eventinfo).',
+                    loadOk: 'Event loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Eventinfo) into the editor.',
+                    saveOk: 'Event saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Eventinfo).',
                     saveErr: 'Failed to save Event to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19221,8 +19225,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD,
                     metaLabel: 'Home — Location',
-                    loadOk: 'Location loaded from Firestore (tbs/Snippets.Locationinfo) into the editor.',
-                    saveOk: 'Location saved to Firestore (tbs/Snippets.Locationinfo).',
+                    loadOk: 'Location loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Locationinfo) into the editor.',
+                    saveOk: 'Location saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Locationinfo).',
                     saveErr: 'Failed to save Location to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19231,8 +19235,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SPEAKERS_FIELD,
                     metaLabel: 'Home — Speakers infoslide',
-                    loadOk: 'Speakers infoslide loaded from Firestore (tbs/Snippets.Speakers) into the editor.',
-                    saveOk: 'Speakers infoslide saved to Firestore (tbs/Snippets.Speakers).',
+                    loadOk: 'Speakers infoslide loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Speakers) into the editor.',
+                    saveOk: 'Speakers infoslide saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Speakers).',
                     saveErr: 'Failed to save Speakers infoslide to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19241,8 +19245,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_REGISTRATION_FIELD,
                     metaLabel: 'Home — Registration',
-                    loadOk: 'Registration loaded from Firestore (tbs/Snippets.Registration) into the editor.',
-                    saveOk: 'Registration saved to Firestore (tbs/Snippets.Registration).',
+                    loadOk: 'Registration loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Registration) into the editor.',
+                    saveOk: 'Registration saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Registration).',
                     saveErr: 'Failed to save Registration to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19251,8 +19255,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD,
                     metaLabel: 'Home — Programme infoslide',
-                    loadOk: 'Programme infoslide loaded from Firestore (tbs/Snippets.Programmeinfo) into the editor.',
-                    saveOk: 'Programme infoslide saved to Firestore (tbs/Snippets.Programmeinfo).',
+                    loadOk: 'Programme infoslide loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Programmeinfo) into the editor.',
+                    saveOk: 'Programme infoslide saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Programmeinfo).',
                     saveErr: 'Failed to save Programme infoslide to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19261,8 +19265,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD,
                     metaLabel: 'Home — Stand by',
-                    loadOk: 'Stand by loaded from Firestore (tbs/Snippets.Stand by) into the editor.',
-                    saveOk: 'Stand by saved to Firestore (tbs/Snippets.Stand by).',
+                    loadOk: 'Stand by loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Stand by) into the editor.',
+                    saveOk: 'Stand by saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Stand by).',
                     saveErr: 'Failed to save Stand by to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19271,8 +19275,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
                     metaLabel: 'Home — Register to waiting list',
-                    loadOk: 'Register to waiting list loaded from Firestore (tbs/Snippets.Sendtoreserves) into the editor.',
-                    saveOk: 'Register to waiting list saved to Firestore (tbs/Snippets.Sendtoreserves).',
+                    loadOk: 'Register to waiting list loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Sendtoreserves) into the editor.',
+                    saveOk: 'Register to waiting list saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Sendtoreserves).',
                     saveErr: 'Failed to save Register to waiting list to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19281,8 +19285,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD,
                     metaLabel: 'Guest email templates — Guest invitation',
-                    loadOk: 'Guest invitation loaded from Firestore (tbs/Snippets.Guest invitation) into the editor.',
-                    saveOk: 'Guest invitation saved to Firestore (tbs/Snippets.Guest invitation).',
+                    loadOk: 'Guest invitation loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest invitation) into the editor.',
+                    saveOk: 'Guest invitation saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest invitation).',
                     saveErr: 'Failed to save Guest invitation to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19291,8 +19295,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD,
                     metaLabel: 'Guest email templates — Guest sent to reserves',
-                    loadOk: 'Guest sent to reserves loaded from Firestore (tbs/Snippets.Guest sent to reserves) into the editor.',
-                    saveOk: 'Guest sent to reserves saved to Firestore (tbs/Snippets.Guest sent to reserves).',
+                    loadOk: 'Guest sent to reserves loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest sent to reserves) into the editor.',
+                    saveOk: 'Guest sent to reserves saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest sent to reserves).',
                     saveErr: 'Failed to save Guest sent to reserves to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19301,8 +19305,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD,
                     metaLabel: 'Speaker email templates — Speaker invitation',
-                    loadOk: 'Speaker invitation loaded from Firestore (tbs/Snippets.Speakerinvitation) into the editor.',
-                    saveOk: 'Speaker invitation saved to Firestore (tbs/Snippets.Speakerinvitation).',
+                    loadOk: 'Speaker invitation loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation) into the editor.',
+                    saveOk: 'Speaker invitation saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation).',
                     saveErr: 'Failed to save Speaker invitation to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19311,8 +19315,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD,
                     metaLabel: 'Speaker email templates — Request lodging',
-                    loadOk: 'Request lodging loaded from Firestore (tbs/Snippets.Requestlodging) into the editor.',
-                    saveOk: 'Request lodging saved to Firestore (tbs/Snippets.Requestlodging).',
+                    loadOk: 'Request lodging loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Requestlodging) into the editor.',
+                    saveOk: 'Request lodging saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Requestlodging).',
                     saveErr: 'Failed to save Request lodging to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19321,8 +19325,8 @@
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD,
                     metaLabel: 'Miscellaneous — Scrapbook',
-                    loadOk: 'Scrapbook loaded from Firestore (tbs/Snippets.Scrapbook) into the editor.',
-                    saveOk: 'Scrapbook saved to Firestore (tbs/Snippets.Scrapbook).',
+                    loadOk: 'Scrapbook loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Scrapbook) into the editor.',
+                    saveOk: 'Scrapbook saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Scrapbook).',
                     saveErr: 'Failed to save Scrapbook to Firestore.',
                     target: 'tbs-snippets'
                 };
@@ -19342,7 +19346,7 @@
             try {
                 var db = getFirestore();
                 var snap = spec.target === 'tbs-snippets'
-                    ? await db.collection('tbs').doc('Snippets').get()
+                    ? await tbsPresetsZermattDocRef(db).get()
                     : await db.collection('events').doc(selectedevent).get();
                 var d = snap.exists ? (snap.data() || {}) : {};
                 var raw = d[spec.field];
@@ -19453,10 +19457,10 @@
             btn.setAttribute('aria-label', label);
         }
 
-        /** HTML body for tbs/Snippets field `Guest invitation` (same as Snippets preset). */
+        /** HTML body for tbs/Pre-sets/Zermatt/Zermatt field `Guest invitation` (same as Snippets preset). */
         async function fetchGuestInvitationHtmlFromFirestore() {
             var db = getFirestore();
-            var snap = await db.collection('tbs').doc('Snippets').get();
+            var snap = await tbsPresetsZermattDocRef(db).get();
             var d = snap.exists ? snap.data() || {} : {};
             var raw = d[FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD];
             return raw != null ? String(raw) : '';
@@ -19489,10 +19493,10 @@
                 .join(datesEscaped);
         }
 
-        /** HTML body and optional subject from tbs/Snippets field `Speakerinvitation`. */
+        /** HTML body and optional subject from tbs/Pre-sets/Zermatt/Zermatt field `Speakerinvitation`. */
         async function fetchSpeakerInvitationFromFirestore() {
             var db = getFirestore();
-            var snap = await db.collection('tbs').doc('Snippets').get();
+            var snap = await tbsPresetsZermattDocRef(db).get();
             var d = snap.exists ? snap.data() || {} : {};
             return speakerInvitationFieldsFromSnippetsData(d);
         }
@@ -19594,7 +19598,7 @@
                 if (!dateStr) return;
                 try {
                     var dbIntro = getFirestore();
-                    var introSnap = await dbIntro.collection('tbs').doc('Snippets').get();
+                    var introSnap = await tbsPresetsZermattDocRef(dbIntro).get();
                     var introData = introSnap.exists ? (introSnap.data() || {}) : {};
                     var rawIntro = introData[FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD];
                     html = rawIntro != null ? String(rawIntro) : '';
@@ -20023,7 +20027,7 @@
                     }
                     var db = getFirestore();
                     var snap = spec.target === 'tbs-snippets'
-                        ? await db.collection('tbs').doc('Snippets').get()
+                        ? await tbsPresetsZermattDocRef(db).get()
                         : await db.collection('events').doc(selectedevent).get();
                     var d = snap.exists ? (snap.data() || {}) : {};
                     var raw = d[spec.field];
@@ -20051,7 +20055,7 @@
                     var alias = ta.dataset.programmeAlias || '';
                     if (alias === 'programme-intro') {
                         var dbIntro = getFirestore();
-                        var introSnap = await dbIntro.collection('tbs').doc('Snippets').get();
+                        var introSnap = await tbsPresetsZermattDocRef(dbIntro).get();
                         var introData = introSnap.exists ? (introSnap.data() || {}) : {};
                         var rawIntro = introData[FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD];
                         html = rawIntro != null ? String(rawIntro) : '';
@@ -21284,7 +21288,7 @@
         /**
          * Send invitation e-mail to the selected guest via Cloud Function
          * `sendGuestInviteHttp` (server Gmail as GMAIL_SEND_FROM).
-         * Body from tbs/Snippets `Guest invitation` (loaded in the function).
+         * Body from tbs/Pre-sets/Zermatt/Zermatt `Guest invitation` (loaded in the function).
          * On success sets Invited=Yes + log line in Firestore.
          */
         async function sendGuestInvitationEmail() {
@@ -21393,7 +21397,7 @@
         /**
          * Send formal speaker invitation via Cloud Function `sendSpeakerInviteHttp`
          * (server Gmail as GMAIL_SPEAKER_SEND_FROM / info@…).
-         * Body from tbs/Snippets `Speakerinvitation` with {{Event}} / {{Name}} / {{Eventdates}}.
+         * Body from tbs/Pre-sets/Zermatt/Zermatt `Speakerinvitation` with {{Event}} / {{Name}} / {{Eventdates}}.
          * On success sets Status=Invited + log line in Firestore.
          */
         async function sendSpeakerFormalInvitationEmail() {
@@ -21502,7 +21506,7 @@
         /**
          * Request lodging via Cloud Function `sendSpeakerRequestLodgingHttp`
          * (From info@… → registration@…, Cc speaker).
-         * Body from tbs/Snippets `Requestlodging`.
+         * Body from tbs/Pre-sets/Zermatt/Zermatt `Requestlodging`.
          * On success sets Lodging=Requested + log line.
          */
         async function sendSpeakerRequestLodgingEmail() {
@@ -25846,7 +25850,7 @@
                             var homePayload = {};
                             homePayload[homeSpec.field] = ta.value;
                             if (homeSpec.target === 'tbs-snippets') {
-                                await db.collection('tbs').doc('Snippets').set(homePayload, { merge: true });
+                                await tbsPresetsZermattDocRef(db).set(homePayload, { merge: true });
                             } else {
                                 await db.collection('events').doc(selectedevent).set(homePayload, { merge: true });
                             }

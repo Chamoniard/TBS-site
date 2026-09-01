@@ -291,12 +291,22 @@ function eventDatesAfterCommaForCurrentEvent(
 }
 
 /**
- * Load guest invitation HTML from tbs/Snippets.
+ * Site pre-set copy used by email templates.
+ * @param {Firestore} db Firestore instance.
+ * @return {DocumentReference} Zermatt pre-set document.
+ */
+function tbsPresetsZermattDocRef(db: Firestore) {
+  return db.collection("tbs").doc("Pre-sets")
+    .collection("Zermatt").doc("Zermatt");
+}
+
+/**
+ * Load guest invitation HTML from tbs/Pre-sets/Zermatt/Zermatt.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<string>} HTML template string.
  */
 async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
-  const snap = await db.collection("tbs").doc("Snippets").get();
+  const snap = await tbsPresetsZermattDocRef(db).get();
   const data = (snap.exists ? snap.data() : null) || {};
   const raw = data["Guest invitation"];
   return raw != null ? String(raw) : "";
@@ -304,14 +314,14 @@ async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
 
 /**
  * Load speaker invitation HTML + optional subject from
- * tbs/Snippets.Speakerinvitation.
+ * tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<{html: string, subject: string}>} Template fields.
  */
 async function loadSpeakerInvitationFromSnippets(
   db: Firestore,
 ): Promise<{html: string; subject: string}> {
-  const snap = await db.collection("tbs").doc("Snippets").get();
+  const snap = await tbsPresetsZermattDocRef(db).get();
   const data = (snap.exists ? snap.data() : null) || {};
   const raw = data.Speakerinvitation;
   if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
@@ -329,14 +339,14 @@ async function loadSpeakerInvitationFromSnippets(
 }
 
 /**
- * Load request-lodging HTML from tbs/Snippets.Requestlodging.
+ * Load request-lodging HTML from tbs/Pre-sets/Zermatt/Zermatt.Requestlodging.
  * @param {Firestore} db Firestore instance.
  * @return {Promise<string>} HTML template string.
  */
 async function loadRequestLodgingHtmlFromSnippets(
   db: Firestore,
 ): Promise<string> {
-  const snap = await db.collection("tbs").doc("Snippets").get();
+  const snap = await tbsPresetsZermattDocRef(db).get();
   const data = (snap.exists ? snap.data() : null) || {};
   const raw =
     data.Requestlodging ??
@@ -1516,7 +1526,8 @@ export const importStripeInvoicesHttp = onRequest({
 });
 
 /**
- * Guest workflow: send invitation HTML from tbs/Snippets as Registration@…
+ * Guest workflow: send invitation HTML from
+ * tbs/Pre-sets/Zermatt/Zermatt as Registration@…
  * using server-side Gmail OAuth (refresh token). Sets Invited=Yes + log line.
  * Expects JSON: { guestId }.
  */
@@ -1591,7 +1602,8 @@ export const sendGuestInviteHttp = onRequest({
     const htmlTemplate = await loadGuestInvitationHtml(db);
     if (!String(htmlTemplate).trim()) {
       res.status(500).json({
-        error: "Guest invitation template is empty in tbs/Snippets.",
+        error: "Guest invitation template is empty in " +
+          "tbs/Pre-sets/Zermatt/Zermatt.",
       });
       return;
     }
@@ -1653,7 +1665,8 @@ export const sendGuestInviteHttp = onRequest({
 
 /**
  * Speaker workflow: send formal invitation HTML from
- * tbs/Snippets.Speakerinvitation as info@… using server-side Gmail OAuth
+ * tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation as info@…
+ * using server-side Gmail OAuth
  * (GMAIL_SPEAKER_SEND_* secrets).
  * Sets Status/inviteStatus to Invited + Speaker log line.
  * Expects JSON: { speakerId }.
@@ -1733,7 +1746,8 @@ export const sendSpeakerInviteHttp = onRequest({
     const htmlTemplate = String(template.html || "").trim();
     if (!htmlTemplate) {
       res.status(500).json({
-        error: "Speaker invitation template is empty in tbs/Snippets.",
+        error: "Speaker invitation template is empty in " +
+          "tbs/Pre-sets/Zermatt/Zermatt.",
       });
       return;
     }
@@ -1804,7 +1818,8 @@ export const sendSpeakerInviteHttp = onRequest({
 
 /**
  * Speaker workflow: send Request lodging HTML from
- * tbs/Snippets.Requestlodging as info@… to hotel AlX with speaker in Cc.
+ * tbs/Pre-sets/Zermatt/Zermatt.Requestlodging as info@…
+ * to hotel AlX with speaker in Cc.
  * Subject: "{Current event} - Lodging request".
  * On success sets Lodging to Requested + Speaker log line.
  * Expects JSON: { speakerId }.
@@ -1887,7 +1902,8 @@ export const sendSpeakerRequestLodgingHttp = onRequest({
     ).trim();
     if (!htmlTemplate) {
       res.status(500).json({
-        error: "Request lodging template is empty in tbs/Snippets.",
+        error: "Request lodging template is empty in " +
+          "tbs/Pre-sets/Zermatt/Zermatt.",
       });
       return;
     }

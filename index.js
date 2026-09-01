@@ -1,4 +1,4 @@
-/** Index standby line: Firestore `tbs/Snippets` field `Stand by` (edited in backend Snippets → Home). */
+/** Index standby line: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Stand by` (edited in backend Pre-sets → Home). */
 const firebaseConfig = {
     apiKey: 'AIzaSyANhRZZnQ9tXH-DmO8QQT-H-64LOaa0oAU',
     authDomain: 'tbs-app-e2062.firebaseapp.com',
@@ -18,6 +18,10 @@ const HOME_PAGE_URL = 'home.html';
 const INDEX_FIRESTORE_TIMEOUT_MS = 10000;
 const INDEX_SETTINGS_TIMEOUT_MS = 1500;
 const INDEX_STANDBY_MODE_CACHE_TTL_MS = 5 * 60 * 1000;
+
+function tbsPresetsZermattDocRef(db) {
+    return db.collection('tbs').doc('Pre-sets').collection('Zermatt').doc('Zermatt');
+}
 
 function withFirestoreTimeout(promise, label, timeoutMs) {
     return Promise.race([
@@ -122,8 +126,8 @@ async function loadIndexStandbyFromFirestore() {
     try {
         const db = firebase.firestore();
         const snap = await withFirestoreTimeout(
-            db.collection('tbs').doc('Snippets').get(),
-            'Firestore tbs/Snippets (index standby)'
+            tbsPresetsZermattDocRef(db).get(),
+            'Firestore tbs/Pre-sets/Zermatt/Zermatt (index standby)'
         );
         const data = snap.exists ? snap.data() || {} : {};
         const raw = data[FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD];
