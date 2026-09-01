@@ -8925,6 +8925,13 @@
                                 id="texteditor-preset-guest-sent-to-reserves-btn"
                                 aria-pressed="false"
                             >Guest sent to reserves</button>
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                data-snippet-key="tbsBackend:texteditor:preset:register-to-waiting-list"
+                                id="texteditor-preset-register-to-waiting-list-btn"
+                                aria-pressed="false"
+                            >Register to waiting list</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -19404,6 +19411,7 @@
         var TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:standby';
         var TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-invitation';
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
+        var TBS_TEXTEDITOR_PRESET_REGISTER_TO_WAITING_LIST_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:register-to-waiting-list';
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
@@ -19415,6 +19423,7 @@
         var FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD = 'Stand by';
         var FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD = 'Guest invitation';
         var FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD = 'Guest sent to reserves';
+        var FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD = 'Sendtoreserves';
         var FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD = 'Speakerinvitation';
         var FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD = 'Requestlodging';
         var FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD = 'Scrapbook';
@@ -19507,6 +19516,16 @@
                     loadOk: 'Guest sent to reserves loaded from Firestore (tbs/Snippets.Guest sent to reserves) into the editor.',
                     saveOk: 'Guest sent to reserves saved to Firestore (tbs/Snippets.Guest sent to reserves).',
                     saveErr: 'Failed to save Guest sent to reserves to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_PRESET_REGISTER_TO_WAITING_LIST_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
+                    metaLabel: 'Guest email templates — Register to waiting list',
+                    loadOk: 'Register to waiting list loaded from Firestore (tbs/Snippets.Sendtoreserves) into the editor.',
+                    saveOk: 'Register to waiting list saved to Firestore (tbs/Snippets.Sendtoreserves).',
+                    saveErr: 'Failed to save Register to waiting list to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
