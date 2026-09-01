@@ -1,5 +1,5 @@
 /**
- * Backend page: require Google sign-in before boot; expose Gmail token helper.
+ * Backend page: require Google sign-in before boot.
  */
 (function () {
     'use strict';
@@ -33,8 +33,4 @@
             }
             throw err;
         });
-
-    window.getBackendGmailAccessToken = function (options) {
-        return TbsAuth.ensureGmailAccessToken(options || {});
-    };
 })();

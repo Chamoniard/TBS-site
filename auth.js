@@ -1,5 +1,5 @@
 /**
- * Staff login page — Firebase Google sign-in (includes Gmail scope for backend).
+ * Staff login page — Firebase Google sign-in.
  */
 document.addEventListener('DOMContentLoaded', function () {
     const signInBtn = document.getElementById('googleSignInBtn');

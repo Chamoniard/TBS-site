@@ -2730,12 +2730,12 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     margin-right: 16px !important;
 }
 
-/* Intro slide: HTML-only from Firestore `speakerinfo` — no photo column (markup omits `.speaker-image`). */
+/* Speaker cards: name + Bio_long HTML (no photo column). */
 .home-section .speaker-card > .speaker-card-inner-wrapper {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
     gap: 0;
     width: 100%;
     min-width: 0;
@@ -2758,6 +2758,28 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 .home-section .speaker-card.speaker-card--tba > .speaker-card-inner-wrapper {
     min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.home-section .speaker-card--tba > .speaker-card-inner-wrapper > .speaker-content.home-carousel-tba-body {
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+}
+
+.home-section .speaker-card--tba .speaker-card-name.home-carousel-tba-title,
+.home-section .speaker-card--tba .home-carousel-tba-title {
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+    width: 100%;
 }
 
 /* Do not stretch every slide to the tallest peer (info HTML can be very tall). */
@@ -2879,30 +2901,6 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     width: 100%;
 }
 
-.home-section .speaker-card > .speaker-card-inner-wrapper > .speaker-image {
-    flex-shrink: 0;
-    width: 150px;
-    height: 150px;
-    min-width: 150px;
-    max-width: 150px;
-    min-height: 150px;
-    max-height: 150px;
-    margin: 0 12px 0 0;
-    border-radius: 20px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.2);
-    border: 2px solid #c8d0d8;
-    box-sizing: border-box;
-}
-
-.home-section .speaker-card > .speaker-card-inner-wrapper > .speaker-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    display: block;
-}
-
 .home-section .speaker-card > .speaker-card-inner-wrapper > .speaker-content {
     flex: 1 1 auto;
     min-width: 0;
@@ -2950,7 +2948,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     min-width: 0;
     overflow-wrap: break-word;
     word-wrap: break-word;
-    white-space: pre-wrap;
+    white-space: normal;
     font-size: 0.9rem;
     line-height: 1.6;
 }

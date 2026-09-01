@@ -1,14 +1,11 @@
 /**
- * Shared Firebase Google Auth + Gmail OAuth for staff login and backend.
+ * Shared Firebase Google Auth for staff login and backend.
  */
 (function (global) {
     'use strict';
 
     const LOGIN_URL = 'login.html';
     const BACKEND_URL = 'backend.html';
-    const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.modify';
-    const GMAIL_TOKEN_STORAGE_KEY = 'tbs_gmail_access_token';
-    const GMAIL_TOKEN_EXPIRY_STORAGE_KEY = 'tbs_gmail_access_token_expiry_ms';
 
     /** Require Google sign-in on localhost as well (for testing). */
     const GOOGLE_AUTH_SKIP_ON_LOCALHOST = false;
@@ -52,7 +49,6 @@
 
     function createGoogleProvider() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope(GMAIL_SCOPE);
         provider.setCustomParameters({ prompt: 'select_account' });
         return provider;
     }
@@ -63,44 +59,6 @@
         return providers.some(function (p) {
             return p && p.providerId === 'google.com';
         });
-    }
-
-    function storeGmailAccessToken(accessToken, expiresInSeconds) {
-        if (!accessToken) return;
-        const ttlMs = Math.max(60, Number(expiresInSeconds) || 3600) * 1000;
-        try {
-            global.sessionStorage.setItem(GMAIL_TOKEN_STORAGE_KEY, accessToken);
-            global.sessionStorage.setItem(GMAIL_TOKEN_EXPIRY_STORAGE_KEY, String(Date.now() + ttlMs - 60000));
-        } catch (e) {
-            /* ignore quota */
-        }
-    }
-
-    function readStoredGmailAccessToken() {
-        try {
-            const token = global.sessionStorage.getItem(GMAIL_TOKEN_STORAGE_KEY);
-            const expiry = Number(global.sessionStorage.getItem(GMAIL_TOKEN_EXPIRY_STORAGE_KEY) || 0);
-            if (!token) return '';
-            if (expiry && Date.now() > expiry) return '';
-            return token;
-        } catch (e) {
-            return '';
-        }
-    }
-
-    function clearStoredGmailAccessToken() {
-        try {
-            global.sessionStorage.removeItem(GMAIL_TOKEN_STORAGE_KEY);
-            global.sessionStorage.removeItem(GMAIL_TOKEN_EXPIRY_STORAGE_KEY);
-        } catch (e) {
-            /* ignore */
-        }
-    }
-
-    function captureGmailTokenFromCredential(credential) {
-        if (!credential || !credential.accessToken) return '';
-        storeGmailAccessToken(credential.accessToken, 3600);
-        return credential.accessToken;
     }
 
     function waitForAuthState(auth) {
@@ -121,7 +79,7 @@
 
     async function signInWithGoogle() {
         if (shouldSkipGoogleAuth()) {
-            return { user: null, accessToken: '', skipped: true };
+            return { user: null, skipped: true };
         }
         const auth = getAuth();
         const provider = createGoogleProvider();
@@ -129,11 +87,9 @@
         const user = result && result.user ? result.user : null;
         if (!isAllowedBackendUser(user)) {
             await auth.signOut();
-            clearStoredGmailAccessToken();
             throw new Error('This Google account is not authorized for the TBS backend.');
         }
-        const accessToken = captureGmailTokenFromCredential(result.credential);
-        return { user: user, accessToken: accessToken, skipped: false };
+        return { user: user, skipped: false };
     }
 
     async function requireBackendAccess() {
@@ -152,40 +108,7 @@
         return { user: user, skipped: false };
     }
 
-    async function ensureGmailAccessToken(options) {
-        const opts = options || {};
-        const stored = readStoredGmailAccessToken();
-        if (stored) return stored;
-
-        if (shouldSkipGoogleAuth()) {
-            return '';
-        }
-
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) {
-            throw new Error('Sign in with Google before using Gmail.');
-        }
-
-        const provider = createGoogleProvider();
-        if (!opts.forcePrompt) {
-            provider.setCustomParameters({ prompt: 'none' });
-        }
-        try {
-            const result = await auth.signInWithPopup(provider);
-            const token = captureGmailTokenFromCredential(result.credential);
-            if (token) return token;
-        } catch (err) {
-            if (!opts.forcePrompt) {
-                return ensureGmailAccessToken({ forcePrompt: true });
-            }
-            throw err;
-        }
-        throw new Error('Could not obtain Gmail access. Try again and allow Gmail permissions.');
-    }
-
     async function signOutStaff() {
-        clearStoredGmailAccessToken();
         if (typeof firebase !== 'undefined' && firebase.auth) {
             try {
                 await firebase.auth().signOut();
@@ -212,7 +135,6 @@
     global.TbsAuth = {
         LOGIN_URL: LOGIN_URL,
         BACKEND_URL: BACKEND_URL,
-        GMAIL_SCOPE: GMAIL_SCOPE,
         GOOGLE_AUTH_SKIP_ON_LOCALHOST: GOOGLE_AUTH_SKIP_ON_LOCALHOST,
         firebaseConfig: firebaseConfig,
         isLocalhost: isLocalhost,
@@ -222,9 +144,6 @@
         isAllowedBackendUser: isAllowedBackendUser,
         signInWithGoogle: signInWithGoogle,
         requireBackendAccess: requireBackendAccess,
-        ensureGmailAccessToken: ensureGmailAccessToken,
-        readStoredGmailAccessToken: readStoredGmailAccessToken,
-        clearStoredGmailAccessToken: clearStoredGmailAccessToken,
         signOutStaff: signOutStaff,
         getPostLoginRedirectUrl: getPostLoginRedirectUrl,
     };

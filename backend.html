@@ -74,8 +74,7 @@
         body.backend-page .content-editor,
         body.backend-page .content-viewer,
         body.backend-page .html-editor,
-        body.backend-page #texteditor .select-pre-set,
-        body.backend-page .folder-emails .emailer-message-list {
+        body.backend-page #texteditor .select-pre-set {
             overscroll-behavior: none;
         }
 
@@ -404,7 +403,7 @@
             box-shadow: none !important;
         }
 
-        /* Placeholder tabs (Overview) until their panels are built */
+        /* Placeholder tabs (Overview, E-mailer) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -445,7 +444,6 @@
         .aspects .navigation #lodging-toggle:not(.is-active),
         .aspects .navigation #content-toggle:not(.is-active),
         .aspects .navigation #texteditor-toggle:not(.is-active),
-        .aspects .navigation #emailer-toggle:not(.is-active),
         .aspects .navigation #finances-toggle:not(.is-active),
         .aspects .navigation #settings-toggle:not(.is-active) {
             background: transparent;
@@ -500,7 +498,6 @@
         .programme-section,
         .lodging-section,
         .content-editor-section,
-        .emailer-section,
         .finances-section,
         .settings-section {
             display: none;
@@ -532,7 +529,6 @@
         .programme-section.is-open,
         .lodging-section.is-open,
         .content-editor-section.is-open,
-        .emailer-section.is-open,
         .finances-section.is-open,
         .settings-section.is-open {
             display: flex;
@@ -567,281 +563,6 @@
             flex-direction: column;
             align-items: stretch;
             gap: 0;
-        }
-
-        .emailer-panels {
-            display: grid;
-            grid-template-columns: minmax(220px, 280px) minmax(240px, 380px) minmax(0, 1fr);
-            grid-template-rows: minmax(0, 1fr);
-            gap: 16px;
-            min-height: 0;
-            flex: 1 1 auto;
-            height: 100%;
-            align-items: stretch;
-        }
-
-        .emailer-folders,
-        .folder-emails,
-        .emailer-main {
-            background: transparent;
-            border-radius: 5px;
-            min-height: 0;
-            padding: 12px;
-            box-sizing: border-box;
-        }
-
-        .folder-emails {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            overflow: hidden;
-        }
-
-        .folder-emails-title {
-            margin: 0;
-            flex-shrink: 0;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #003153;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.25;
-        }
-
-        .folder-emails .emailer-message-list {
-            flex: 1 1 auto;
-            min-height: 0;
-        }
-
-        .emailer-folders {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        .emailer-folders #emailer-connect-btn,
-        .emailer-folders #emailer-auth-status {
-            flex-shrink: 0;
-        }
-
-        .emailer-folder-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex: 1 1 auto;
-            min-height: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .emailer-message-btn,
-        .emailer-action-btn {
-            font: inherit;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
-            background: #ffffff;
-            color: #003153;
-            padding: 8px 10px;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        /* Folder list: borderless, transparent; icon on the left (beats global gold button). */
-        body.backend-page button.emailer-folder-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0;
-            font: inherit;
-            font-size: 0.9rem;
-            font-weight: 500;
-            line-height: 1.3;
-            border: none;
-            border-radius: 5px;
-            background: transparent;
-            color: #003153;
-            padding: 6px 8px;
-            margin: 0;
-            text-align: left;
-            cursor: pointer;
-            box-sizing: border-box;
-            min-width: 0;
-        }
-
-        body.backend-page button.emailer-folder-btn::before {
-            content: '';
-            display: block;
-            width: 1.125rem;
-            height: 1.125rem;
-            flex-shrink: 0;
-            margin-right: 0.5rem;
-            background-color: currentColor;
-            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E");
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E");
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
-        }
-
-        body.backend-page button.emailer-folder-btn:hover {
-            background: rgba(0, 49, 83, 0.06);
-        }
-
-        body.backend-page button.emailer-folder-btn:focus-visible {
-            outline: 2px solid #71C7FE;
-            outline-offset: 2px;
-        }
-
-        body.backend-page button.emailer-folder-btn.is-active {
-            background: transparent;
-            color: #71C7FE;
-            font-weight: 600;
-        }
-
-        body.backend-page button.emailer-folder-btn.is-active:hover {
-            background: rgba(113, 199, 254, 0.08);
-        }
-
-        .emailer-message-btn.is-active {
-            background: #71C7FE;
-            color: #ffffff;
-            border-color: #71C7FE;
-        }
-
-        .emailer-folder-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .emailer-folder-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            min-width: 0;
-        }
-
-        body.backend-page button.emailer-folder-toggle {
-            flex: 0 0 auto;
-            width: 2rem;
-            min-width: 2rem;
-            height: 2rem;
-            padding: 0;
-            margin: 0;
-            border: 1px solid #cbd5e1;
-            border-radius: var(--backend-icon-btn-radius);
-            background: #f8fafc;
-            color: #003153;
-            font-size: 0.7rem;
-            font-weight: 600;
-            line-height: 1;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        body.backend-page button.emailer-folder-toggle:hover {
-            background: #e2e8f0;
-        }
-
-        .emailer-folder-toggle-spacer {
-            flex: 0 0 auto;
-            width: 2rem;
-            min-width: 2rem;
-            height: 2rem;
-        }
-
-        .emailer-folder-group-title,
-        .emailer-folder-placeholder {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #003153;
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
-        .emailer-folder-placeholder {
-            font-weight: 400;
-            color: #64748b;
-            padding: 8px 10px;
-            border: 1px dashed #cbd5e1;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .emailer-folder-nest {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding-left: 0.5rem;
-            margin-left: 0.35rem;
-            border-left: 2px solid #94a3b8;
-        }
-
-        .emailer-folder-list > .emailer-folder-group:first-of-type,
-        .emailer-folder-list > .emailer-folder-separator {
-            margin-top: 0;
-        }
-
-        .emailer-folder-separator {
-            height: 1px;
-            background: #cbd5e1;
-            margin: 6px 0;
-            flex-shrink: 0;
-        }
-
-        .emailer-folder-row .emailer-folder-btn {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
-        .emailer-main {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        .emailer-message-list {
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .emailer-editor {
-            flex: 1 1 auto;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .emailer-editor input,
-        .emailer-editor textarea {
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
-            padding: 8px 10px;
-            font: inherit;
-        }
-
-        .emailer-editor textarea {
-            flex: 1 1 auto;
-            min-height: 220px;
-            resize: vertical;
-        }
-
-        .emailer-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
         }
 
         .settings-section.is-open {
@@ -1060,12 +781,6 @@
             outline: 2px solid #003153;
             outline-offset: 2px;
             z-index: 1;
-        }
-
-        .emailer-status {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #334155;
         }
 
         .add-speaker-button,
@@ -4616,8 +4331,8 @@
             background: #ffffff;
         }
 
-        #guest-editor .guests-list-table tbody tr:hover td.guests-roster-name-cell,
-        #guest-editor .guests-list-table tbody tr.is-selected td.guests-roster-name-cell {
+        #guest-editor .guests-list-table tbody tr:hover td,
+        #guest-editor .guests-list-table tbody tr.is-selected td {
             background: #71C7FE;
         }
 
@@ -8053,7 +7768,6 @@
         body.backend-page #programme-editor,
         body.backend-page #lodging-editor,
         body.backend-page #content-editor,
-        body.backend-page #emailer-editor,
         body.backend-page #finances-editor,
         body.backend-page #settings-editor {
             flex: 1 1 0;
@@ -8848,7 +8562,14 @@
                             <a href="#lodging-editor" class="backend-editor-link" id="lodging-toggle" role="button" aria-expanded="false" aria-controls="lodging-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Lodging</a>
                             <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                             <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
-                            <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
+                            <span
+                                class="backend-editor-link backend-editor-link--inactive"
+                                id="emailer-toggle"
+                                role="button"
+                                aria-disabled="true"
+                                aria-expanded="false"
+                                tabindex="-1"
+                                title="Coming soon">E-mailer</span>
                             <a href="#finances-editor" class="backend-editor-link" id="finances-toggle" role="button" aria-expanded="false" aria-controls="finances-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Finances</a>
                             <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
                         </nav>
@@ -9266,7 +8987,7 @@
                                         Program speaker
                                     </button>
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-publish-speaker-btn" disabled aria-disabled="true" hidden aria-hidden="true">
-                                        Publish bio
+                                        <span class="speaker-publish-speaker-label">Publish bio</span>
                                     </button>
                                     </div>
                                     <div class="speaker-workflow-actions-arrow" id="speaker-workflow-actions-arrow-send-brief" hidden aria-hidden="true" aria-label="Next step">⬇</div>
@@ -10079,30 +9800,6 @@
                 </div>
             </section>
 
-            <section class="emailer-section" id="emailer-editor" aria-hidden="true" aria-label="E-mailer" data-name="emailer-editor">
-                <div class="emailer-panels">
-                    <aside class="emailer-folders" aria-label="Gmail folders">
-                        <button type="button" class="emailer-action-btn" id="emailer-connect-btn">Connect to Gmail</button>
-                        <p class="emailer-status" id="emailer-auth-status">Not connected.</p>
-                        <div class="emailer-folder-list" id="emailer-folder-list" aria-live="polite"></div>
-                    </aside>
-                    <div class="folder-emails" aria-label="E-mails in selected folder">
-                        <h3 class="folder-emails-title" id="folder-emails-heading">Messages</h3>
-                        <div class="emailer-message-list" id="emailer-message-list" aria-live="polite"></div>
-                    </div>
-                    <div class="emailer-main" aria-label="E-mail editor">
-                        <div class="emailer-editor">
-                            <input type="text" id="emailer-subject" placeholder="Subject">
-                            <textarea id="emailer-body" placeholder="Select an e-mail to view and edit its body"></textarea>
-                            <div class="emailer-actions">
-                                <button type="button" class="emailer-action-btn" id="emailer-save-draft-btn" disabled>Save as Gmail draft</button>
-                                <p class="emailer-status" id="emailer-editor-status"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section class="settings-section" id="settings-editor" aria-hidden="true" aria-label="Settings" data-name="settings-editor">
                 <div class="settings-body">
                     <div class="settings-site" id="settings-site">
@@ -10292,8 +9989,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script src="auth-common.js?v=20260605-google-auth"></script>
-    <script src="backend-auth.js?v=20260605-backend-loading"></script>
+    <script src="auth-common.js?v=20260901-no-emailer"></script>
+    <script src="backend-auth.js?v=20260901-no-emailer"></script>
     <script>
         // Firebase configuration (tbs-app-e2062) – Programme days + slots
         const firebaseConfig = {
@@ -10305,8 +10002,6 @@
             appId: '1:696221319423:web:805b69b93e93d206568cca',
             measurementId: 'G-HH4D0B5F2D'
         };
-        // Gmail (E-mailer): Web client ID from Google Cloud → APIs & Services → Credentials → OAuth 2.0 Client IDs.
-        window.TBS_GMAIL_CLIENT_ID = '696221319423-phc2to08bmn62tss89j8dforu8pjd7fk.apps.googleusercontent.com';
         const eventdates = ['2027-02-09', '2027-02-10', '2027-02-11', '2027-02-12'];
         let firestoreDb = null;
         let functionsApp = null;
@@ -15402,8 +15097,13 @@
         }
 
         function setGuestRosterItemSelection(itemEl) {
-            clearGuestRosterItemSelection();
-            if (itemEl) itemEl.classList.add('is-selected');
+            if (itemEl) {
+                var fromRow = String(itemEl.getAttribute('data-guests-id') || '').trim();
+                if (fromRow && !String(guestFormEditingDocId || '').trim()) {
+                    guestFormEditingDocId = fromRow;
+                }
+            }
+            syncGuestRosterSelectionHighlight();
         }
 
         function syncGuestRosterSelectionHighlight() {
@@ -17920,6 +17620,10 @@
                     b.setAttribute('aria-disabled', 'true');
                     b.classList.remove('is-active', 'is-done');
                 });
+                var publishLabelReset = document.querySelector(
+                    '#speaker-publish-speaker-btn .speaker-publish-speaker-label'
+                );
+                if (publishLabelReset) publishLabelReset.textContent = 'Publish bio';
             }
             function setSpeakerWorkflowStepState(btn, opts) {
                 if (!btn) return;
@@ -18183,18 +17887,21 @@
             showWorkflowPhaseButton(
                 document.getElementById('speaker-bio-received-btn'),
                 workflowPastInvite && lodgingPastNo && bioSt === 'No',
-                workflowPastInvite && lodgingPastNo && bioSt === 'Received'
+                workflowPastInvite && lodgingPastNo && (bioSt === 'Received' || bioSt === 'Uploaded')
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-program-speaker-btn'),
                 workflowPastInvite && lodgingPastNo,
                 false
             );
-            showWorkflowPhaseButton(
-                document.getElementById('speaker-publish-speaker-btn'),
-                workflowPastInvite && bioSt === 'Received',
-                false
-            );
+            var publishBtn = document.getElementById('speaker-publish-speaker-btn');
+            var publishActive = bioSt === 'Received';
+            var publishDone = bioSt === 'Uploaded';
+            showWorkflowPhaseButton(publishBtn, publishActive, publishDone);
+            var publishLabel = publishBtn && publishBtn.querySelector('.speaker-publish-speaker-label');
+            if (publishLabel) {
+                publishLabel.textContent = publishDone ? 'Bio published' : 'Publish bio';
+            }
             showWorkflowPhaseButton(document.getElementById('speaker-send-brief-btn'), false, false);
             if (sendBriefArrow) {
                 sendBriefArrow.hidden = false;
@@ -18476,7 +18183,14 @@
                         var eventLabel = String(g.event || '').trim();
                         if (!eventLabel) eventLabel = '-';
                         var eventBadgeClass = contentEventBadgeClassForLabel(eventLabel);
-                        html += '<tr class="guests-roster-row" data-guests-id="' + escapeHtml(g.id) + '">' +
+                        var guestSelected =
+                            String(g.id || '').trim() === String(guestFormEditingDocId || '').trim();
+                        html +=
+                            '<tr class="guests-roster-row' +
+                            (guestSelected ? ' is-selected' : '') +
+                            '" data-guests-id="' +
+                            escapeHtml(g.id) +
+                            '">' +
                             '<td class="guests-roster-name-cell">' + escapeHtml(guestLabel) + '</td>' +
                             '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>' +
                             guestRosterReadCellHtml(g.id, g.read) +
@@ -19318,6 +19032,8 @@
                 if (typeof showStatus === 'function') {
                     if (bioReceivedStatusLine) {
                         showStatus('success', bioReceivedStatusLine);
+                    } else if (next === 'Uploaded') {
+                        showStatus('success', name + ': Bio published');
                     } else {
                         showStatus('success', name + ': Bio updated');
                     }
@@ -21565,271 +21281,6 @@
             startContentBackgroundHydration(String(contentFormEditingDocId || '').trim());
         }
 
-        var gmailAccessToken = '';
-        var gmailSelectedLabelId = 'INBOX';
-        var gmailSelectedMessage = null;
-        var gmailLabels = [];
-        /** User labels only: segment -> { label, kids } tree (name split on "/"). */
-        var gmailUserRoots = {};
-        /** Which nested user-label folders are expanded: keys like "user:Work/Client". */
-        var gmailFolderExpandedKeys = {};
-        var gmailMessages = [];
-        var gmailTokenClient = null;
-
-        var GMAIL_SYSTEM_TOP_IDS = ['INBOX', 'SENT', 'DRAFT', 'SPAM', 'TRASH', 'STARRED'];
-        var GMAIL_SYSTEM_TOP_NAMES = {
-            INBOX: 'Inbox',
-            SENT: 'Sent',
-            DRAFT: 'Drafts',
-            SPAM: 'Spam',
-            TRASH: 'Trash',
-            STARRED: 'Starred'
-        };
-
-        function gmailResolveFolderHeading(labelId) {
-            if (!labelId) return 'Messages';
-            if (GMAIL_SYSTEM_TOP_NAMES[labelId]) return GMAIL_SYSTEM_TOP_NAMES[labelId];
-            for (var i = 0; i < gmailLabels.length; i++) {
-                var L = gmailLabels[i];
-                if (L && L.id === labelId) return L.name || labelId;
-            }
-            return labelId;
-        }
-
-        function buildGmailUserLabelTree(labels) {
-            var roots = {};
-            for (var i = 0; i < labels.length; i++) {
-                var label = labels[i];
-                if (!label || label.type !== 'user') continue;
-                var parts = String(label.name || '').split('/').filter(function(p) { return p.length; });
-                if (!parts.length) continue;
-                var cur = roots;
-                for (var j = 0; j < parts.length; j++) {
-                    var seg = parts[j];
-                    if (!cur[seg]) cur[seg] = { label: null, kids: {} };
-                    if (j === parts.length - 1) cur[seg].label = label;
-                    cur = cur[seg].kids;
-                }
-            }
-            return roots;
-        }
-
-        function renderGmailUserBranch(roots, pathParts) {
-            var keys = Object.keys(roots).sort(function(a, b) { return a.localeCompare(b); });
-            var html = '';
-            for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
-                var node = roots[key];
-                var kidKeys = Object.keys(node.kids || {});
-                var hasKids = kidKeys.length > 0;
-                var expandKey = 'user:' + pathParts.concat([key]).join('/');
-                var expanded = !!gmailFolderExpandedKeys[expandKey];
-                var selId = node.label ? node.label.id : '';
-                var cls = 'emailer-folder-btn' + (selId && selId === gmailSelectedLabelId ? ' is-active' : '');
-
-                html += '<div class="emailer-folder-group">';
-                html += '<div class="emailer-folder-row">';
-                if (hasKids) {
-                    html += '<button type="button" class="emailer-folder-toggle' + (expanded ? ' is-expanded' : '') + '" data-expand-key="' + escapeHtml(expandKey) + '" aria-expanded="' + (expanded ? 'true' : 'false') + '" title="Show or hide subfolders">' + (expanded ? '▼' : '▶') + '</button>';
-                } else {
-                    html += '<span class="emailer-folder-toggle-spacer" aria-hidden="true"></span>';
-                }
-                if (node.label) {
-                    html += '<button type="button" class="' + cls + '" data-label-id="' + escapeHtml(node.label.id) + '">' + escapeHtml(key) + '</button>';
-                } else {
-                    html += '<span class="emailer-folder-placeholder">' + escapeHtml(key) + '</span>';
-                }
-                html += '</div>';
-                if (hasKids && expanded) {
-                    html += '<div class="emailer-folder-nest">';
-                    html += renderGmailUserBranch(node.kids, pathParts.concat([key]));
-                    html += '</div>';
-                }
-                html += '</div>';
-            }
-            return html;
-        }
-
-        function decodeGmailBase64Url(data) {
-            if (!data) return '';
-            var padded = data.replace(/-/g, '+').replace(/_/g, '/');
-            while (padded.length % 4) padded += '=';
-            try { return decodeURIComponent(escape(window.atob(padded))); } catch (_) {}
-            try { return window.atob(padded); } catch (_) {}
-            return '';
-        }
-
-        function getGmailHeader(headers, name) {
-            if (!Array.isArray(headers)) return '';
-            for (var i = 0; i < headers.length; i++) {
-                var h = headers[i];
-                if (h && String(h.name || '').toLowerCase() === String(name || '').toLowerCase()) return h.value || '';
-            }
-            return '';
-        }
-
-        function extractGmailBody(payload) {
-            if (!payload) return '';
-            if (payload.body && payload.body.data) return decodeGmailBase64Url(payload.body.data);
-            var parts = Array.isArray(payload.parts) ? payload.parts : [];
-            for (var i = 0; i < parts.length; i++) {
-                var p = parts[i];
-                if (!p) continue;
-                var mime = String(p.mimeType || '').toLowerCase();
-                if (mime === 'text/plain' && p.body && p.body.data) return decodeGmailBase64Url(p.body.data);
-                var nested = extractGmailBody(p);
-                if (nested) return nested;
-            }
-            return '';
-        }
-
-        async function gmailApiRequest(path, init) {
-            if (!gmailAccessToken) throw new Error('Connect to Gmail first.');
-            var opts = init || {};
-            opts.headers = Object.assign({}, opts.headers || {}, { Authorization: 'Bearer ' + gmailAccessToken });
-            var res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/' + path, opts);
-            if (!res.ok) {
-                var errText = await res.text();
-                throw new Error('Gmail API error (' + res.status + '): ' + (errText || res.statusText));
-            }
-            if (res.status === 204) return {};
-            return res.json();
-        }
-
-        async function ensureGmailAccessForSending() {
-            if (gmailAccessToken) return true;
-            if (typeof showStatus === 'function') {
-                showStatus('info', 'Authorize Gmail to send this e-mail.');
-            }
-            await connectGmailClient({ forcePrompt: true, skipFolderLoad: true });
-            if (gmailAccessToken) return true;
-            if (typeof showStatus === 'function') {
-                showStatus('error', 'Gmail authorization is required before sending e-mail.');
-            }
-            return false;
-        }
-
-        function renderGmailFolders() {
-            var listEl = document.getElementById('emailer-folder-list');
-            if (!listEl) return;
-            if (!gmailLabels.length) {
-                listEl.innerHTML = '<p class="emailer-status">No folders.</p>';
-                return;
-            }
-            var parts = [];
-            var si;
-            for (si = 0; si < GMAIL_SYSTEM_TOP_IDS.length; si++) {
-                var sid = GMAIL_SYSTEM_TOP_IDS[si];
-                var found = null;
-                for (var li = 0; li < gmailLabels.length; li++) {
-                    if (gmailLabels[li] && gmailLabels[li].id === sid) {
-                        found = gmailLabels[li];
-                        break;
-                    }
-                }
-                if (!found) continue;
-                var cls = 'emailer-folder-btn' + (sid === gmailSelectedLabelId ? ' is-active' : '');
-                var disp = GMAIL_SYSTEM_TOP_NAMES[sid] || found.name || sid;
-                parts.push('<button type="button" class="' + cls + '" data-label-id="' + escapeHtml(sid) + '">' + escapeHtml(disp) + '</button>');
-            }
-
-            if (Object.keys(gmailUserRoots).length) {
-                parts.push(renderGmailUserBranch(gmailUserRoots, []));
-            }
-
-            listEl.innerHTML = parts.join('');
-        }
-
-        function renderGmailMessages() {
-            var listEl = document.getElementById('emailer-message-list');
-            if (!listEl) return;
-            if (!gmailMessages.length) {
-                listEl.innerHTML = '<p class="emailer-status">No e-mails in this folder.</p>';
-                return;
-            }
-            listEl.innerHTML = gmailMessages.map(function(msg) {
-                var cls = 'emailer-message-btn' + (gmailSelectedMessage && gmailSelectedMessage.id === msg.id ? ' is-active' : '');
-                return '<button type="button" class="' + cls + '" data-message-id="' + escapeHtml(msg.id || '') + '"><strong>' + escapeHtml(msg.subject || '(No subject)') + '</strong><br><span>' + escapeHtml(msg.from || '') + '</span></button>';
-            }).join('');
-        }
-
-        async function loadGmailMessages(labelId) {
-            gmailSelectedLabelId = labelId || gmailSelectedLabelId || 'INBOX';
-            var data = await gmailApiRequest('messages?maxResults=25&labelIds=' + encodeURIComponent(gmailSelectedLabelId));
-            var msgs = Array.isArray(data.messages) ? data.messages : [];
-            var details = await Promise.all(msgs.map(function(m) {
-                return gmailApiRequest('messages/' + encodeURIComponent(m.id) + '?format=metadata&metadataHeaders=Subject&metadataHeaders=From');
-            }));
-            gmailMessages = details.map(function(d) {
-                return { id: d.id || '', subject: getGmailHeader(d.payload && d.payload.headers, 'Subject') || '(No subject)', from: getGmailHeader(d.payload && d.payload.headers, 'From') || '' };
-            });
-            gmailSelectedMessage = null;
-            var subjectEl = document.getElementById('emailer-subject');
-            var bodyEl = document.getElementById('emailer-body');
-            var saveBtn = document.getElementById('emailer-save-draft-btn');
-            if (subjectEl) subjectEl.value = '';
-            if (bodyEl) bodyEl.value = '';
-            if (saveBtn) saveBtn.disabled = true;
-            renderGmailFolders();
-            renderGmailMessages();
-            var folderHeading = document.getElementById('folder-emails-heading');
-            if (folderHeading) folderHeading.textContent = gmailResolveFolderHeading(gmailSelectedLabelId);
-        }
-
-        async function loadGmailFolders() {
-            var authEl = document.getElementById('emailer-auth-status');
-            if (authEl) authEl.textContent = 'Loading folders...';
-            var data = await gmailApiRequest('labels');
-            gmailLabels = (data.labels || []).slice().sort(function(a, b) { return String(a.name || '').localeCompare(String(b.name || '')); });
-            gmailUserRoots = buildGmailUserLabelTree(gmailLabels);
-            gmailFolderExpandedKeys = {};
-            if (String(gmailSelectedLabelId || '').indexOf('CATEGORY_') === 0) {
-                gmailSelectedLabelId = 'INBOX';
-            }
-            var hasSelected = gmailLabels.some(function(l) { return l && l.id === gmailSelectedLabelId; });
-            if (!hasSelected) {
-                gmailSelectedLabelId = 'INBOX';
-                if (!gmailLabels.some(function(l) { return l && l.id === 'INBOX'; }) && gmailLabels[0]) {
-                    gmailSelectedLabelId = gmailLabels[0].id || 'INBOX';
-                }
-            }
-            renderGmailFolders();
-            if (authEl) authEl.textContent = 'Connected to Gmail.';
-            await loadGmailMessages(gmailSelectedLabelId);
-        }
-
-        async function openGmailMessage(messageId) {
-            if (!messageId) return;
-            var data = await gmailApiRequest('messages/' + encodeURIComponent(messageId) + '?format=full');
-            gmailSelectedMessage = { id: data.id || messageId };
-            var subjectEl = document.getElementById('emailer-subject');
-            var bodyEl = document.getElementById('emailer-body');
-            var saveBtn = document.getElementById('emailer-save-draft-btn');
-            if (subjectEl) subjectEl.value = getGmailHeader(data.payload && data.payload.headers, 'Subject') || '';
-            if (bodyEl) bodyEl.value = extractGmailBody(data.payload) || '';
-            if (saveBtn) saveBtn.disabled = false;
-            renderGmailMessages();
-        }
-
-        async function saveEditedEmailAsDraft() {
-            if (!gmailSelectedMessage) return;
-            var subjectEl = document.getElementById('emailer-subject');
-            var bodyEl = document.getElementById('emailer-body');
-            var statusEl = document.getElementById('emailer-editor-status');
-            var mime = ['Subject: ' + (subjectEl ? subjectEl.value : ''), 'Content-Type: text/plain; charset="UTF-8"', '', (bodyEl ? bodyEl.value : '')].join('\r\n');
-            var raw = btoa(unescape(encodeURIComponent(mime))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-            if (statusEl) statusEl.textContent = 'Saving draft...';
-            await gmailApiRequest('drafts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: { raw: raw } }) });
-            if (statusEl) statusEl.textContent = 'Saved as draft in Gmail.';
-        }
-
-        function gmailRfc822ToBase64Url(rfc822) {
-            return btoa(unescape(encodeURIComponent(rfc822)))
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_')
-                .replace(/=+$/g, '');
-        }
-
         /**
          * Send invitation e-mail to the selected guest via Cloud Function
          * `sendGuestInviteHttp` (server Gmail as GMAIL_SEND_FROM).
@@ -22157,53 +21608,9 @@
             }
         }
 
-        async function connectGmailClient(options) {
-            var authEl = document.getElementById('emailer-auth-status');
-            var opts = options || {};
-            try {
-                if (authEl) authEl.textContent = 'Connecting to Gmail…';
-                if (typeof TbsAuth !== 'undefined' && TbsAuth.shouldSkipGoogleAuth()) {
-                    if (authEl) authEl.textContent = 'Gmail requires Google sign-in (not skipped on localhost).';
-                    return;
-                }
-                var tokenFn = typeof window.getBackendGmailAccessToken === 'function'
-                    ? window.getBackendGmailAccessToken
-                    : (typeof TbsAuth !== 'undefined' ? TbsAuth.ensureGmailAccessToken.bind(TbsAuth) : null);
-                if (!tokenFn) {
-                    throw new Error('Gmail auth is not available.');
-                }
-                gmailAccessToken = await tokenFn({ forcePrompt: !!opts.forcePrompt });
-                if (!gmailAccessToken) {
-                    if (authEl) authEl.textContent = 'Gmail not connected.';
-                    return '';
-                }
-                if (opts.skipFolderLoad) {
-                    if (authEl) authEl.textContent = 'Gmail authorized for sending.';
-                    return gmailAccessToken;
-                }
-                await loadGmailFolders();
-                if (authEl) authEl.textContent = 'Connected to Gmail.';
-                return gmailAccessToken;
-            } catch (err) {
-                var code = err && err.code ? String(err.code) : '';
-                var msg = err && err.message ? String(err.message) : 'Failed to connect Gmail.';
-                if (code === 'auth/popup-blocked' || msg.indexOf('popup') !== -1) {
-                    console.warn('connectGmailClient: popup blocked — use E-mailer → Connect when pop-ups are allowed.');
-                    if (authEl) {
-                        authEl.textContent = 'Allow pop-ups for this site, then click Connect in E-mailer.';
-                    }
-                    return '';
-                }
-                console.error('connectGmailClient:', err);
-                if (authEl) authEl.textContent = msg;
-                throw err;
-            }
-        }
-
         function setBackendPanel(panel) {
             const isEditor = panel === 'editor';
             const isContent = panel === 'content';
-            const isEmailer = panel === 'emailer';
             const isFinances = panel === 'finances';
             const isSettings = panel === 'settings';
             const isGuests = panel === 'guests';
@@ -22211,14 +21618,13 @@
             const isLodging = panel === 'lodging';
             const isSpeakers =
                 panel === 'speakers' ||
-                (!isEditor && !isContent && !isEmailer && !isFinances && !isSettings && !isGuests && !isProgramme && !isLodging);
+                (!isEditor && !isContent && !isFinances && !isSettings && !isGuests && !isProgramme && !isLodging);
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
             const programmeEditorSection = document.getElementById('programme-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
-            const emailerSection = document.getElementById('emailer-editor');
             const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const editorToggle = document.getElementById('texteditor-toggle');
@@ -22227,7 +21633,6 @@
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
-            const emailerToggle = document.getElementById('emailer-toggle');
             const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
             if (texteditorSection) {
@@ -22253,10 +21658,6 @@
             if (contentEditorSection) {
                 contentEditorSection.classList.toggle('is-open', isContent);
                 contentEditorSection.setAttribute('aria-hidden', isContent ? 'false' : 'true');
-            }
-            if (emailerSection) {
-                emailerSection.classList.toggle('is-open', isEmailer);
-                emailerSection.setAttribute('aria-hidden', isEmailer ? 'false' : 'true');
             }
             if (financesSection) {
                 financesSection.classList.toggle('is-open', isFinances);
@@ -22289,10 +21690,6 @@
             if (contentToggle) {
                 contentToggle.setAttribute('aria-expanded', isContent ? 'true' : 'false');
                 contentToggle.classList.toggle('is-active', isContent);
-            }
-            if (emailerToggle) {
-                emailerToggle.setAttribute('aria-expanded', isEmailer ? 'true' : 'false');
-                emailerToggle.classList.toggle('is-active', isEmailer);
             }
             if (financesToggle) {
                 financesToggle.setAttribute('aria-expanded', isFinances ? 'true' : 'false');
@@ -22352,15 +21749,6 @@
             if (isLodging) {
                 void refreshLodgingSubcollectionsList();
             }
-            if (isEmailer) {
-                var emailerStatusEl = document.getElementById('emailer-editor-status');
-                if (emailerStatusEl) emailerStatusEl.textContent = 'Editing creates a Gmail draft copy.';
-                if (!gmailAccessToken) {
-                    connectGmailClient().catch(function (err) {
-                        console.warn('Gmail connect on emailer open:', err);
-                    });
-                }
-            }
             if (isSettings) {
                 void loadSiteSettingsFromFirestore().catch(function (err) {
                     console.error('loadSiteSettingsFromFirestore:', err);
@@ -22382,7 +21770,6 @@
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
-            const emailerToggle = document.getElementById('emailer-toggle');
             const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
             const texteditorSection = document.getElementById('texteditor');
@@ -22391,17 +21778,11 @@
             const programmeEditorSection = document.getElementById('programme-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
-            const emailerSection = document.getElementById('emailer-editor');
             const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const hasEvent = Boolean(selectedevent && String(selectedevent).trim());
             if (navigationEl) {
                 navigationEl.classList.toggle('navigation--no-event', !hasEvent);
-            }
-            if (emailerToggle) {
-                emailerToggle.setAttribute('aria-hidden', 'false');
-                emailerToggle.setAttribute('tabindex', '0');
-                emailerToggle.setAttribute('aria-disabled', 'false');
             }
             if (financesToggle) {
                 financesToggle.setAttribute('aria-hidden', 'false');
@@ -22468,10 +21849,6 @@
                     lodgingEditorSection.classList.remove('is-open');
                     lodgingEditorSection.setAttribute('aria-hidden', 'true');
                 }
-                if (emailerSection) {
-                    emailerSection.classList.remove('is-open');
-                    emailerSection.setAttribute('aria-hidden', 'true');
-                }
                 if (settingsSection) {
                     settingsSection.classList.remove('is-open');
                     settingsSection.setAttribute('aria-hidden', 'true');
@@ -22499,10 +21876,6 @@
                 if (lodgingToggle) {
                     lodgingToggle.setAttribute('aria-expanded', 'false');
                     lodgingToggle.classList.remove('is-active');
-                }
-                if (emailerToggle) {
-                    emailerToggle.setAttribute('aria-expanded', 'false');
-                    emailerToggle.classList.remove('is-active');
                 }
                 if (settingsToggle) {
                     settingsToggle.setAttribute('aria-expanded', 'false');
@@ -24543,7 +23916,6 @@
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
-            const emailerToggle = document.getElementById('emailer-toggle');
             if (texteditorToggle) {
                 texteditorToggle.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -24650,12 +24022,6 @@
                 });
             }
 
-            if (emailerToggle) {
-                emailerToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    setBackendPanel('emailer');
-                });
-            }
             const financesToggle = document.getElementById('finances-toggle');
             if (financesToggle) {
                 financesToggle.addEventListener('click', function(e) {
@@ -24675,61 +24041,6 @@
                     void onSettingsSiteToggleClick(btn);
                 });
             });
-            var emailerConnectBtn = document.getElementById('emailer-connect-btn');
-            if (emailerConnectBtn) {
-                emailerConnectBtn.addEventListener('click', function() {
-                    connectGmailClient({ forcePrompt: true }).catch(function(err) {
-                        var statusEl = document.getElementById('emailer-auth-status');
-                        if (statusEl) statusEl.textContent = err && err.message ? err.message : 'Failed to connect Gmail.';
-                    });
-                });
-            }
-            var folderListEl = document.getElementById('emailer-folder-list');
-            if (folderListEl) {
-                folderListEl.addEventListener('click', function(e) {
-                    var toggleBtn = e.target.closest('.emailer-folder-toggle');
-                    if (toggleBtn && folderListEl.contains(toggleBtn)) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var expandKey = toggleBtn.getAttribute('data-expand-key');
-                        if (!expandKey) return;
-                        if (gmailFolderExpandedKeys[expandKey]) delete gmailFolderExpandedKeys[expandKey];
-                        else gmailFolderExpandedKeys[expandKey] = true;
-                        renderGmailFolders();
-                        return;
-                    }
-                    var btn = e.target.closest('.emailer-folder-btn');
-                    if (!btn || !folderListEl.contains(btn)) return;
-                    var labelId = btn.getAttribute('data-label-id');
-                    if (!labelId) return;
-                    loadGmailMessages(labelId).catch(function(err) {
-                        var statusEl = document.getElementById('emailer-auth-status');
-                        if (statusEl) statusEl.textContent = err && err.message ? err.message : 'Failed loading folder.';
-                    });
-                });
-            }
-            var messageListEl = document.getElementById('emailer-message-list');
-            if (messageListEl) {
-                messageListEl.addEventListener('click', function(e) {
-                    var btn = e.target.closest('.emailer-message-btn');
-                    if (!btn || !messageListEl.contains(btn)) return;
-                    var messageId = btn.getAttribute('data-message-id');
-                    if (!messageId) return;
-                    openGmailMessage(messageId).catch(function(err) {
-                        var statusEl = document.getElementById('emailer-editor-status');
-                        if (statusEl) statusEl.textContent = err && err.message ? err.message : 'Failed loading e-mail.';
-                    });
-                });
-            }
-            var emailerSaveDraftBtn = document.getElementById('emailer-save-draft-btn');
-            if (emailerSaveDraftBtn) {
-                emailerSaveDraftBtn.addEventListener('click', function() {
-                    saveEditedEmailAsDraft().catch(function(err) {
-                        var statusEl = document.getElementById('emailer-editor-status');
-                        if (statusEl) statusEl.textContent = err && err.message ? err.message : 'Failed saving draft.';
-                    });
-                });
-            }
             var addSpeakerBtn = document.getElementById('add-speaker-button');
             var addSpeakerForm = document.getElementById('speaker-editor-panel');
             if (addSpeakerBtn && addSpeakerForm) {
@@ -25247,6 +24558,19 @@
                         return;
                     }
                     void setSpeakerRosterBioField(docId, 'Received', { workflowBioReceived: true });
+                });
+            }
+            var speakerPublishSpeakerBtn = document.getElementById('speaker-publish-speaker-btn');
+            if (speakerPublishSpeakerBtn) {
+                speakerPublishSpeakerBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (speakerPublishSpeakerBtn.disabled) return;
+                    var docId = String(speakerFormEditingDocId || '').trim();
+                    if (!docId) return;
+                    var sp = findSpeakerInMemory(docId);
+                    if (!sp || normalizeSpeakerBioStatus(sp.bioStatus) !== 'Received') return;
+                    void setSpeakerRosterBioField(docId, 'Uploaded');
                 });
             }
             var guestSendInvoiceBtn = document.getElementById('guest-send-invoice-btn');
@@ -25926,7 +25250,7 @@
                         syncAddGuestFormToMemoryIfEditing();
                         guestEditorScrollToManagementOnNextPopulate = true;
                         populateEditGuestFormFromRecord(guestFound);
-                        setGuestRosterItemSelection(guestRow);
+                        syncGuestRosterSelectionHighlight();
                     }
                 });
             }

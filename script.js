@@ -22,7 +22,7 @@ const firestoreHomeCache = {
     registrationManifesto: { value: '', fetchedAt: 0, promise: null },
     /** First programme-band card: `tbs/Snippets` field `Programmeinfo`. */
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
-    /** `tbs/Settings/Zermatt/Zermatt` field `displayspeakers` (`Yes` / `No`). */
+    /** `tbs/Settings/Zermatt/Zermatt` field `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
     /** `tbs/Settings/Zermatt/Zermatt` field `displayprogramme` (`Yes` / `No`). */
     siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null },
@@ -98,23 +98,37 @@ function bindViewLinks(view, onClick) {
 }
 
 const HOME_HISTORY_APP_KEY = 'tbs-home-sections';
-const HOME_SITE_EVENT_DEFAULT = 'Zermatt';
+const HOME_SITE_EVENT_DEFAULT = 'TBS27';
+const HOME_EVENT_LOCATION_DEFAULT = 'Zermatt';
+
+function isHomeHistoryState(state) {
+    return !!state && state.app === HOME_HISTORY_APP_KEY;
+}
 
 function homeHistoryState(view, extra) {
     const current = typeof window !== 'undefined' && window.history ? window.history.state : null;
     const fromExtra = extra && extra['site-event'];
     const fromCurrent = isHomeHistoryState(current) ? current['site-event'] : '';
     const siteEvent = fromExtra || fromCurrent || HOME_SITE_EVENT_DEFAULT;
+    const fromExtraLocation = extra && extra['event-location'];
+    const fromCurrentLocation = isHomeHistoryState(current) ? current['event-location'] : '';
+    const eventLocation = fromExtraLocation || fromCurrentLocation || HOME_EVENT_LOCATION_DEFAULT;
     const merged = Object.assign(
         { app: HOME_HISTORY_APP_KEY, view: view || 'home' },
         extra || {}
     );
     merged['site-event'] = siteEvent;
+    merged['event-location'] = eventLocation;
     return merged;
 }
 
-function isHomeHistoryState(state) {
-    return !!state && state.app === HOME_HISTORY_APP_KEY;
+function currentHomeSiteEvent() {
+    const current = typeof window !== 'undefined' && window.history ? window.history.state : null;
+    if (isHomeHistoryState(current)) {
+        const v = String(current['site-event'] || '').trim();
+        if (v) return v;
+    }
+    return HOME_SITE_EVENT_DEFAULT;
 }
 
 function pushHomeSectionHistory(view, extra) {
@@ -198,7 +212,10 @@ async function showSectionFromHistoryState(state) {
 function setupHomeSectionHistory() {
     if (typeof window === 'undefined' || window.__tbsHomeSectionHistoryBound) return;
     window.__tbsHomeSectionHistoryBound = true;
-    replaceHomeSectionHistory('home');
+    replaceHomeSectionHistory('home', {
+        'site-event': HOME_SITE_EVENT_DEFAULT,
+        'event-location': HOME_EVENT_LOCATION_DEFAULT
+    });
     window.addEventListener('popstate', function (ev) {
         void showSectionFromHistoryState(ev.state);
     });
@@ -611,7 +628,7 @@ function warmHomePageFirestoreCache() {
         void prefetchHomeProgrammeSliderData();
         void fetchHomeEventEventInfoFromFirebase(eventId);
         void fetchHomeEventSpeakerInfoFromFirebase(eventId);
-        void fetchHomeSpeakersListFromFirebase(eventId);
+        void fetchHomeSpeakersListFromFirebase(currentHomeSiteEvent());
         void fetchHomeEventLocationInfoFromFirebase(eventId);
         void fetchHomeRegistrationManifestoFromFirebase();
     } catch (e) {
@@ -4247,6 +4264,7 @@ const TBS27_HOME_PROGRAMME_EVENT_ID = 'TBS27';
 /** First home speaker card HTML: Firestore `tbs/snippets` field `Speakers`. */
 const HOME_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
+const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD_ALT = 'Displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
 const FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
 const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
@@ -4264,6 +4282,8 @@ const HOME_PASSWORD_PROTECT_VALUE = 'VilleTrollkarl';
 const HOME_PASSWORD_SESSION_STORAGE_KEY = 'tbs-home-password-ok';
 /** Placeholder slides when Settings hide speakers/programme roster (after optional info card). */
 const HOME_CAROUSEL_TBA_CARD_COUNT = 4;
+/** Home speaker track always has at least this many cards (info + speakers + TBA). */
+const HOME_SPEAKER_CAROUSEL_MIN_CARDS = 5;
 
 /** @returns {boolean} true when speaker roster cards should show (default Yes). */
 function normalizeHomeDisplaySpeakersSetting(value) {
@@ -4467,7 +4487,7 @@ async function fetchHomeSiteSettingsFromFirestore() {
             const data = snapData || {};
             return {
                 displaySpeakers: normalizeHomeDisplaySpeakersSetting(
-                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD]
+                    homeDisplaySpeakersValueFromSettingsData(data)
                 ),
                 displayProgramme: normalizeHomeDisplayProgrammeSetting(
                     data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD]
@@ -5102,56 +5122,91 @@ function compareHomeSpeakersForSort(a, b) {
     return String(a.id).localeCompare(String(b.id));
 }
 
-function normalizeHomeSpeakerBioPublish(v) {
-    const s = v != null ? String(v).trim().toLowerCase() : '';
+function homeDisplaySpeakersValueFromSettingsData(data) {
+    if (!data || typeof data !== 'object') return '';
+    const alt = data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD_ALT];
+    if (alt != null && String(alt).trim() !== '') return alt;
+    const primary = data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD];
+    if (primary != null && String(primary).trim() !== '') return primary;
+    return '';
+}
+
+function normalizeHomeSpeakerBioStatus(v) {
+    const s = v != null ? String(v).trim() : '';
     if (!s) return 'No';
-    if (s === 'yes' || s === 'true' || s === '1') return 'Yes';
-    return 'No';
+    const low = s.toLowerCase();
+    if (low === 'no') return 'No';
+    if (low === 'received') return 'Received';
+    if (low === 'uploaded') return 'Uploaded';
+    return s;
 }
 
-/** Normalized event label for home speaker filtering (e.g. `TBS 2027` → `tbs2027`). */
-function homeSpeakerEventNorm(ev) {
-    return String(ev || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '');
+function homeSpeakerValueLooksLikeBioStatusSelect(s) {
+    const t = String(s != null ? s : '').trim();
+    if (!t) return false;
+    const low = t.toLowerCase();
+    return low === 'no' || low === 'received' || low === 'uploaded';
 }
 
-/** True when a speaker row belongs on the current home event carousel. */
+function homeSpeakerBioStatusFromDoc(d) {
+    if (!d || typeof d !== 'object') return '';
+    if (d.bioStatus != null && String(d.bioStatus).trim() !== '') {
+        return String(d.bioStatus).trim();
+    }
+    if (d.Bio != null && homeSpeakerValueLooksLikeBioStatusSelect(d.Bio)) {
+        return String(d.Bio).trim();
+    }
+    if (d.Complete != null && String(d.Complete).trim() !== '') {
+        return String(d.Complete).trim();
+    }
+    if (d.Certificate != null && String(d.Certificate).trim() !== '') {
+        return String(d.Certificate).trim();
+    }
+    return '';
+}
+
+function homeSpeakerEventFromDoc(d) {
+    if (!d || typeof d !== 'object') return '';
+    if (d.event != null && String(d.event).trim() !== '') return String(d.event).trim();
+    if (d.Event != null && String(d.Event).trim() !== '') return String(d.Event).trim();
+    if (d.Events != null && String(d.Events).trim() !== '') return String(d.Events).trim();
+    return '';
+}
+
+/** True when speaker `event` is identical to history `site-event`. */
 function homeSpeakerDocMatchesHomeEvent(d) {
-    const ev = String(
-        d.Event != null ? d.Event : d.event != null ? d.event : d.Events != null ? d.Events : ''
-    ).trim();
-    if (!ev) return true;
-    const norm = homeSpeakerEventNorm(ev);
-    if (!norm) return true;
-    if (norm.includes('tbs27') || norm.includes('tbs2027')) return true;
-    if (norm.includes('2027') && norm.includes('tbs')) return true;
-    if (/tbs20\d{2}/.test(norm) && !norm.includes('2027') && !norm.includes('27')) return false;
-    return true;
+    const siteEvent = currentHomeSiteEvent();
+    if (!siteEvent) return false;
+    return homeSpeakerEventFromDoc(d) === siteEvent;
 }
 
-/** True when a speaker `item` doc should appear on the public home carousel. */
+/** True when a speaker `item` doc should appear on the public home carousel (`bioStatus` / `Bio` is Uploaded). */
 function homeSpeakerDocVisibleOnHome(d) {
     if (!d || typeof d !== 'object') return false;
-    const bioPublishRaw =
-        d.biopublish != null
-            ? d.biopublish
-            : d.BioPublish != null
-              ? d.BioPublish
-              : d['Bio publish'];
-    if (bioPublishRaw != null && String(bioPublishRaw).trim() !== '') {
-        if (normalizeHomeSpeakerBioPublish(bioPublishRaw) !== 'Yes') return false;
-    }
+    if (normalizeHomeSpeakerBioStatus(homeSpeakerBioStatusFromDoc(d)) !== 'Uploaded') return false;
     return homeSpeakerDocMatchesHomeEvent(d);
 }
 
 function homeSpeakerRowFromFirestoreItem(docId, d) {
+    const firstName =
+        d['First Name'] != null && String(d['First Name']).trim() !== ''
+            ? String(d['First Name']).trim()
+            : d.firstName != null
+              ? String(d.firstName)
+              : '';
+    const lastName =
+        d['Last name'] != null && String(d['Last name']).trim() !== ''
+            ? String(d['Last name']).trim()
+            : d['Last Name'] != null && String(d['Last Name']).trim() !== ''
+              ? String(d['Last Name']).trim()
+              : d.lastName != null
+                ? String(d.lastName)
+                : '';
     return {
         id: docId,
-        firstName: d['First Name'] != null ? String(d['First Name']) : d.firstName != null ? String(d.firstName) : '',
-        lastName: d['Last name'] != null ? String(d['Last name']) : d.lastName != null ? String(d.lastName) : '',
-        shortBio: d.Bio != null ? String(d.Bio) : d.shortBio != null ? String(d.shortBio) : '',
+        firstName: firstName,
+        lastName: lastName,
+        shortBio: d.shortBio != null ? String(d.shortBio) : '',
         longBio: d.Bio_long != null ? String(d.Bio_long) : d.longBio != null ? String(d.longBio) : ''
     };
 }
@@ -5628,7 +5683,7 @@ function appendHomeSpeakerinfoCard(track, html) {
     track.appendChild(article);
 }
 
-/** Placeholder speaker slide when `tbs/Settings/Zermatt/Zermatt.displayspeakers` is `No`. */
+/** Placeholder speaker slide used when Speakers TBA or to keep the track at five cards. */
 function appendHomeSpeakerTbaCard(track, stripeIndex) {
     const article = document.createElement('article');
     article.className = 'speaker-card speaker-card--tba ' + homeSpeakerStripeClass(stripeIndex != null ? stripeIndex : 0);
@@ -5648,35 +5703,22 @@ function appendHomeSpeakerTbaCard(track, stripeIndex) {
     track.appendChild(article);
 }
 
-/** Prefer long bio on home speaker cards (short bio reserved for future expand UI). */
+/** Home speaker card body: Firestore `tbs/Speakers/{id}/item` field `Bio_long`. */
 function homeSpeakerBioContentForCard(speaker) {
-    const longText = String(speaker.longBio || '').trim();
-    const shortText = String(speaker.shortBio || '').trim();
-    return longText || shortText;
+    return String(speaker && speaker.longBio != null ? speaker.longBio : '').trim();
 }
 
 function fillHomeSpeakerCardBioMain(bioMain, speaker) {
     const content = homeSpeakerBioContentForCard(speaker);
-    if (!content) {
-        bioMain.textContent = '';
-        return;
-    }
-    if (/<\s*\/?[a-z][\s\S]*>/i.test(content)) {
-        bioMain.innerHTML = content;
-    } else {
-        bioMain.textContent = content;
-    }
+    bioMain.innerHTML = content;
 }
 
-/**
- * @param {boolean} expandableLongBio — same rule as former per-card chevron: first real speaker when there is no
- * `speakerinfo` card has no long-bio expand. Cards with this flag toggle short/long bio on press.
- */
-function appendHomeSpeakerCard(track, speaker, expandableLongBio, stripeIndex) {
+function appendHomeSpeakerCard(track, speaker, stripeIndex) {
     const article = document.createElement('article');
     article.className = 'speaker-card ' + homeSpeakerStripeClass(stripeIndex != null ? stripeIndex : 0);
     const name =
         `${String(speaker.firstName || '').trim()} ${String(speaker.lastName || '').trim()}`.trim() || 'Speaker';
+    article.setAttribute('aria-label', name);
 
     const innerWrap = document.createElement('div');
     innerWrap.className = 'speaker-card-inner-wrapper';
@@ -5693,41 +5735,18 @@ function appendHomeSpeakerCard(track, speaker, expandableLongBio, stripeIndex) {
     bioEl.appendChild(bioMain);
     contentWrap.appendChild(nameEl);
     contentWrap.appendChild(bioEl);
-
-    const longBioSection = document.createElement('section');
-    longBioSection.className = 'speaker-card-long-bio';
-    longBioSection.hidden = true;
-    const longBioTitle = document.createElement('h4');
-    longBioTitle.className = 'speaker-card-long-bio-title';
-    longBioTitle.textContent = 'Bio';
-    const longBioMain = document.createElement('div');
-    longBioMain.className = 'speaker-card-long-bio-main about-text';
-    longBioSection.appendChild(longBioTitle);
-    longBioSection.appendChild(longBioMain);
-
-    const imageWrap = document.createElement('div');
-    imageWrap.className = 'speaker-image';
-    const img = document.createElement('img');
-    img.src = 'images/testimage.png';
-    img.alt = '';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    imageWrap.appendChild(img);
-
-    innerWrap.appendChild(imageWrap);
     innerWrap.appendChild(contentWrap);
-    innerWrap.appendChild(longBioSection);
     article.appendChild(innerWrap);
-    if (expandableLongBio) {
-        article.setAttribute('data-expandable-bio', '');
-        article.setAttribute('role', 'button');
-        article.setAttribute('tabindex', '0');
-        article.setAttribute('aria-expanded', 'false');
-        article.setAttribute('aria-label', homeSpeakerCardBioAriaLabel(name, false));
-    } else {
-        article.setAttribute('aria-label', name);
-    }
     track.appendChild(article);
+}
+
+function padHomeSpeakerTrackToMinCards(track) {
+    if (!track) return;
+    let stripe = track.querySelectorAll(':scope > article.speaker-card').length;
+    while (track.querySelectorAll(':scope > article.speaker-card').length < HOME_SPEAKER_CAROUSEL_MIN_CARDS) {
+        appendHomeSpeakerTbaCard(track, stripe);
+        stripe++;
+    }
 }
 
 function homeSpeakerBioTextForDisplay(speaker, expanded) {
@@ -5857,7 +5876,7 @@ function wireHomeSpeakerCardBioExpandOnce() {
 
 /**
  * Fills `.speakerslider-track`: optional intro card from `tbs/Snippets.Speakers`, then `tbs/Speakers/{id}/item`
- * rows (fallback: `events/{id}/speakers`). Uses `TBS27_HOME_PROGRAMME_EVENT_ID` like the home programme row.
+ * rows (fallback: `events/{id}/speakers`). Speakers are shown only when `event` is identical to history `site-event`.
  */
 async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     if (!speakersWrapperEl) return;
@@ -5866,7 +5885,8 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     const track = speakersWrapperEl.querySelector('.speakerslider-track');
     if (!track) return;
     try {
-        const eventId = TBS27_HOME_PROGRAMME_EVENT_ID;
+        const eventId = currentHomeSiteEvent();
+        const speakersPromise = fetchHomeSpeakersListFromFirebase(eventId);
         const settingsAndInfo = await Promise.all([
             withTimeout(fetchHomeDisplaySpeakersFromFirestore(), 6000, 'Firestore displayspeakers').catch(
                 function () {
@@ -5888,41 +5908,30 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
         };
 
         track.innerHTML = '';
-
-        if (!displaySpeakers) {
-            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
-            speakersWrapperEl._homeSpeakersList = [syntheticInfo];
-            speakersWrapperEl._homeSpeakersExpanded = false;
-            appendHomeSpeakerinfoCard(track, speakerinfoHtml);
-            for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
-                appendHomeSpeakerTbaCard(track, tbaIdx + 1);
-            }
-            return;
-        }
-
-        const speakers = await fetchHomeSpeakersListFromFirebase(eventId);
-        if (!speakers.length && !speakerinfoHtml) {
-            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
-            speakersWrapperEl._homeSpeakersList = [syntheticInfo];
-            speakersWrapperEl._homeSpeakersExpanded = false;
-            appendHomeSpeakerinfoCard(track, speakerinfoHtml);
-            return;
-        }
-
         speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
-        speakersWrapperEl._homeSpeakersList = [syntheticInfo].concat(speakers.slice());
         speakersWrapperEl._homeSpeakersExpanded = false;
         appendHomeSpeakerinfoCard(track, speakerinfoHtml);
+
+        if (!displaySpeakers) {
+            speakersWrapperEl._homeSpeakersList = [syntheticInfo];
+            padHomeSpeakerTrackToMinCards(track);
+            return;
+        }
+
+        const speakers = await speakersPromise;
+        speakersWrapperEl._homeSpeakersList = [syntheticInfo].concat(speakers.slice());
         speakers.forEach(function (s, i) {
-            appendHomeSpeakerCard(track, s, true, i + 1);
+            appendHomeSpeakerCard(track, s, i + 1);
         });
+        padHomeSpeakerTrackToMinCards(track);
     } catch (err) {
         console.error('populateHomeSpeakersSliderFromFirebase', err);
         track.innerHTML = '';
-        appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
+        appendHomeSpeakerinfoCard(track, '');
+        padHomeSpeakerTrackToMinCards(track);
     } finally {
-        if (!track.children.length) {
-            appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
+        if (track.querySelectorAll(':scope > article.speaker-card').length < HOME_SPEAKER_CAROUSEL_MIN_CARDS) {
+            padHomeSpeakerTrackToMinCards(track);
         }
         delete speakersWrapperEl.dataset.speakersScrollbarWired;
         wireSpeakersSliderScrollbar();
@@ -5940,7 +5949,7 @@ function finalizeHomeSpeakersSection(speakersWrap) {
     speakersWrap.setAttribute('aria-hidden', 'false');
     const track = speakersWrap.querySelector('.speakerslider-track');
     if (track && !track.children.length) {
-        appendHomeSpeakerPlaceholder(track, 'Speakers to be announced.');
+        padHomeSpeakerTrackToMinCards(track);
     }
     delete speakersWrap.dataset.speakersScrollbarWired;
     wireSpeakersSliderScrollbar();
