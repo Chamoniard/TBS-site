@@ -47,18 +47,62 @@
         return firebase.auth();
     }
 
+    function getFirestore() {
+        initFirebaseApp();
+        if (!firebase.firestore) {
+            throw new Error('Firebase Firestore SDK not loaded.');
+        }
+        return firebase.firestore();
+    }
+
+    function tbsBackendUsersCollectionRef() {
+        return getFirestore().collection('tbs').doc('Users').collection('backend_users');
+    }
+
+    /**
+     * Document `tbs/Users/backend_users/{email}` (tries the signed-in email, then lowercase).
+     */
+    async function fetchBackendUserRecord(email) {
+        var want = String(email || '').trim();
+        if (!want) return null;
+        var col = tbsBackendUsersCollectionRef();
+        var snap = await col.doc(want).get();
+        if (snap.exists) return snap.data() || {};
+        var lower = want.toLowerCase();
+        if (lower !== want) {
+            snap = await col.doc(lower).get();
+            if (snap.exists) return snap.data() || {};
+        }
+        return null;
+    }
+
     function createGoogleProvider() {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
         return provider;
     }
 
-    function isAllowedBackendUser(user) {
+    function isGoogleSignedInUser(user) {
         if (!user || !user.email) return false;
         const providers = Array.isArray(user.providerData) ? user.providerData : [];
         return providers.some(function (p) {
             return p && p.providerId === 'google.com';
         });
+    }
+
+    /** Google account with an email. Listing in backend_users is checked separately. */
+    function isAllowedBackendUser(user) {
+        return isGoogleSignedInUser(user);
+    }
+
+    async function isListedBackendUser(email) {
+        var rec = await fetchBackendUserRecord(email);
+        return !!rec;
+    }
+
+    async function assertListedBackendUser(user) {
+        if (!isGoogleSignedInUser(user)) return false;
+        return isListedBackendUser(user.email);
     }
 
     function waitForAuthState(auth) {
@@ -85,7 +129,22 @@
         const provider = createGoogleProvider();
         const result = await auth.signInWithPopup(provider);
         const user = result && result.user ? result.user : null;
-        if (!isAllowedBackendUser(user)) {
+        if (!isGoogleSignedInUser(user)) {
+            await auth.signOut();
+            throw new Error('This Google account is not authorized for the TBS backend.');
+        }
+        var listed = false;
+        try {
+            listed = await isListedBackendUser(user.email);
+        } catch (lookupErr) {
+            await auth.signOut();
+            throw new Error(
+                lookupErr && lookupErr.message
+                    ? lookupErr.message
+                    : 'Could not verify backend user access.'
+            );
+        }
+        if (!listed) {
             await auth.signOut();
             throw new Error('This Google account is not authorized for the TBS backend.');
         }
@@ -101,7 +160,29 @@
         if (!user) {
             user = await waitForAuthState(auth);
         }
-        if (!user || !isAllowedBackendUser(user)) {
+        if (!user || !isGoogleSignedInUser(user)) {
+            redirectToLogin();
+            return new Promise(function () {});
+        }
+        var listed = false;
+        try {
+            listed = await isListedBackendUser(user.email);
+        } catch (lookupErr) {
+            console.error('Backend user lookup failed:', lookupErr);
+            try {
+                await auth.signOut();
+            } catch (e) {
+                /* ignore */
+            }
+            redirectToLogin();
+            return new Promise(function () {});
+        }
+        if (!listed) {
+            try {
+                await auth.signOut();
+            } catch (e) {
+                /* ignore */
+            }
             redirectToLogin();
             return new Promise(function () {});
         }
@@ -141,7 +222,11 @@
         shouldSkipGoogleAuth: shouldSkipGoogleAuth,
         initFirebaseApp: initFirebaseApp,
         getAuth: getAuth,
+        getFirestore: getFirestore,
+        fetchBackendUserRecord: fetchBackendUserRecord,
         isAllowedBackendUser: isAllowedBackendUser,
+        isListedBackendUser: isListedBackendUser,
+        assertListedBackendUser: assertListedBackendUser,
         signInWithGoogle: signInWithGoogle,
         requireBackendAccess: requireBackendAccess,
         signOutStaff: signOutStaff,

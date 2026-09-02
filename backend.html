@@ -226,12 +226,110 @@
         .event-creator-bar .backend-top-trailing {
             display: flex;
             flex-wrap: nowrap;
-            align-items: center;
+            align-items: flex-start;
             justify-content: flex-end;
             gap: 0.5rem;
             flex: 0 0 auto;
             min-width: 0;
             margin-left: auto;
+        }
+
+        .backend-top-account {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.2rem;
+            flex: 0 0 auto;
+            min-width: 0;
+        }
+
+        .backend-top-account-actions {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .backend-user-email {
+            display: block;
+            box-sizing: border-box;
+            flex: 0 0 auto;
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            line-height: 1.2;
+            color: #FFD700;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .backend-user-email[hidden] {
+            display: none;
+        }
+
+        body.backend-page.backend-readonly button.guest-editor-padlock-btn,
+        body.backend-page.backend-readonly button.texteditor-padlock-btn,
+        body.backend-page.backend-readonly button.content-editor-padlock-btn,
+        body.backend-page.backend-readonly button.programme-padlock-btn,
+        body.backend-page.backend-readonly #add-speaker-button,
+        body.backend-page.backend-readonly #add-guest-button,
+        body.backend-page.backend-readonly #sync-guest-payments-btn,
+        body.backend-page.backend-readonly #add-content-button,
+        body.backend-page.backend-readonly #lodging-actions-add-button,
+        body.backend-page.backend-readonly #add-house-save-btn,
+        body.backend-page.backend-readonly #add-guest-delete-btn,
+        body.backend-page.backend-readonly #add-speaker-delete-btn,
+        body.backend-page.backend-readonly #content-editor-delete-btn,
+        body.backend-page.backend-readonly #add-content-save-btn,
+        body.backend-page.backend-readonly #save-guest-button,
+        body.backend-page.backend-readonly #save-speaker-button,
+        body.backend-page.backend-readonly #texteditor-save-btn,
+        body.backend-page.backend-readonly #save-programme-btn,
+        body.backend-page.backend-readonly #programme-add-session-btn,
+        body.backend-page.backend-readonly #programme-add-slot-btn,
+        body.backend-page.backend-readonly #programme-delete-session-btn,
+        body.backend-page.backend-readonly #settings-site .settings-site-toggle-option,
+        body.backend-page.backend-readonly .guest-workflow-step-btn,
+        body.backend-page.backend-readonly .speaker-workflow-phase-btn,
+        body.backend-page.backend-readonly .speaker-request-lodging-btn,
+        body.backend-page.backend-readonly .speaker-bio-requested-btn,
+        body.backend-page.backend-readonly #guest-send-invite-btn,
+        body.backend-page.backend-readonly #guest-send-invoice-btn,
+        body.backend-page.backend-readonly #speaker-send-formal-invite-btn,
+        body.backend-page.backend-readonly #finances-import-invoices-btn {
+            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        body.backend-page.backend-readonly .guests-invited-badge-btn,
+        body.backend-page.backend-readonly .guests-read-badge-btn,
+        body.backend-page.backend-readonly .guests-invoiced-badge-btn,
+        body.backend-page.backend-readonly .guests-paid-badge-btn,
+        body.backend-page.backend-readonly .speakers-status-badge-btn,
+        body.backend-page.backend-readonly .speakers-lodging-badge-btn,
+        body.backend-page.backend-readonly .speakers-bio-badge-btn,
+        body.backend-page.backend-readonly .speakers-programmed-badge-btn,
+        body.backend-page.backend-readonly .speaker-roster-presented-btn,
+        body.backend-page.backend-readonly .content-editor-badge-btn,
+        body.backend-page.backend-readonly .guests-invited-option,
+        body.backend-page.backend-readonly .guests-read-option,
+        body.backend-page.backend-readonly .guests-invoiced-option,
+        body.backend-page.backend-readonly .guests-paid-option,
+        body.backend-page.backend-readonly .speakers-status-option,
+        body.backend-page.backend-readonly .speakers-lodging-option,
+        body.backend-page.backend-readonly .speakers-bio-option,
+        body.backend-page.backend-readonly .speakers-programmed-option {
+            pointer-events: none;
         }
 
         .backend-logo-stack {
@@ -243,23 +341,35 @@
             min-width: 0;
         }
 
+        .eventnavigation-meta {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: baseline;
+            justify-content: flex-start;
+            gap: 1rem;
+            width: 100%;
+            margin: 0.2rem 0 0;
+            min-width: 0;
+        }
+
         .event-creator-bar #status-container.backend-status-ticker,
         .eventnavigation #status-container.backend-status-ticker {
             display: block;
-            flex: 0 0 400px;
-            width: 400px;
-            min-width: 400px;
-            max-width: 400px;
-            min-height: 2rem;
+            flex: 1 1 0;
+            width: auto;
+            min-width: 0;
+            max-width: none;
+            min-height: 0;
             height: auto;
             margin: 0;
-            padding: 0;
+            padding: 0 0 0 8px;
             box-sizing: border-box;
-            border: 1px solid #9ca3af;
-            border-radius: 5px;
-            background: rgba(15, 23, 42, 0.25);
+            border: none;
+            border-radius: 0;
+            background: transparent;
             overflow: hidden;
-            align-self: center;
+            align-self: baseline;
         }
 
         .backend-status-ticker-viewport {
@@ -267,22 +377,22 @@
             width: 100%;
             max-width: 100%;
             height: auto;
-            min-height: 2rem;
+            min-height: 0;
             overflow: hidden;
             position: relative;
             box-sizing: border-box;
         }
 
         .backend-status-ticker-track {
-            display: flex;
-            align-items: center;
+            display: block;
             width: 100%;
             max-width: 100%;
-            min-height: 2rem;
+            min-height: 0;
             height: auto;
-            white-space: normal;
+            white-space: nowrap;
             transform: none;
             animation: none;
+            overflow: hidden;
         }
 
         .backend-status-ticker-track.is-static {
@@ -291,35 +401,29 @@
         }
 
         .backend-status-ticker-segment {
-            display: flex;
-            align-items: center;
+            display: block;
             width: 100%;
             max-width: 100%;
-            min-height: 2rem;
+            min-height: 0;
             height: auto;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.7rem;
-            font-weight: 400;
+            padding: 0;
             font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
             line-height: 1.2;
-            color: rgba(255, 255, 255, 0.92);
-            white-space: normal;
-            overflow-wrap: anywhere;
-            word-break: break-word;
+            color: #FFD700;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             box-sizing: border-box;
         }
 
-        .backend-status-ticker-segment.is-success {
-            color: #bbf7d0;
-        }
-
-        .backend-status-ticker-segment.is-error {
-            color: #F71941;
-        }
-
+        .backend-status-ticker-segment.is-success,
+        .backend-status-ticker-segment.is-error,
         .backend-status-ticker-segment.is-loading,
         .backend-status-ticker-segment.is-info {
-            color: rgba(255, 255, 255, 0.92);
+            color: #FFD700;
         }
 
         .eventnavigation .aspects {
@@ -403,7 +507,7 @@
             box-shadow: none !important;
         }
 
-        /* Placeholder tabs (Overview, E-mailer) until their panels are built */
+        /* Placeholder tabs (Overview, E-mailer, Finances) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -444,7 +548,6 @@
         .aspects .navigation #lodging-toggle:not(.is-active),
         .aspects .navigation #content-toggle:not(.is-active),
         .aspects .navigation #texteditor-toggle:not(.is-active),
-        .aspects .navigation #finances-toggle:not(.is-active),
         .aspects .navigation #settings-toggle:not(.is-active) {
             background: transparent;
             border: none;
@@ -7821,6 +7924,9 @@
             box-sizing: border-box;
             padding: 8px 16px;
             border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
         }
 
         .backend-top-bar {
@@ -8586,23 +8692,20 @@
                                 aria-expanded="false"
                                 tabindex="-1"
                                 title="Coming soon">E-mailer</span>
-                            <a href="#finances-editor" class="backend-editor-link" id="finances-toggle" role="button" aria-expanded="false" aria-controls="finances-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Finances</a>
+                            <span
+                                class="backend-editor-link backend-editor-link--inactive"
+                                id="finances-toggle"
+                                role="button"
+                                aria-disabled="true"
+                                aria-expanded="false"
+                                tabindex="-1"
+                                title="Coming soon">Finances</span>
                             <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
                         </nav>
                     </div>
                     <div class="backend-top-trailing">
-                        <div
-                            id="status-container"
-                            class="backend-status-ticker"
-                            aria-live="polite"
-                            aria-atomic="false"
-                            title="Status">
-                            <div class="backend-status-ticker-viewport">
-                                <div class="backend-status-ticker-track" id="status-ticker-track">
-                                    <span class="backend-status-ticker-segment" id="status">Ready</span>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="backend-top-account">
+                            <div class="backend-top-account-actions">
                         <div class="backend-current-event-group">
                             <div class="backend-current-event-picker">
                                 <button
@@ -8627,7 +8730,24 @@
                             </div>
                         </div>
                         <button type="button" class="backend-sign-out-btn" id="backend-sign-out-btn" hidden>Sign out</button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="eventnavigation-meta">
+                    <div
+                        id="status-container"
+                        class="backend-status-ticker"
+                        aria-live="polite"
+                        aria-atomic="false"
+                        title="Status">
+                        <div class="backend-status-ticker-viewport">
+                            <div class="backend-status-ticker-track" id="status-ticker-track">
+                                <span class="backend-status-ticker-segment" id="status">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="backend-user-email" id="backend-user-email" hidden></p>
                 </div>
             </div>
 
@@ -10092,8 +10212,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script src="auth-common.js?v=20260901-no-emailer"></script>
-    <script src="backend-auth.js?v=20260901-no-emailer"></script>
+    <script src="auth-common.js?v=20260902-backend-users-login"></script>
+    <script src="backend-auth.js?v=20260902-backend-users-login"></script>
     <script>
         // Firebase configuration (tbs-app-e2062) – Programme days + slots
         const firebaseConfig = {
@@ -10115,6 +10235,16 @@
         let guestsRosterInMemory = [];
         /** From `tbs/Settings` field `Current event` (and aliases); guests roster only includes rows whose `Event` matches. */
         var current_event = '';
+        /** Signed-in backend user's email. */
+        var backenduser = '';
+        /** From `tbs/Users/backend_users` field `Role`. */
+        var backenduserRole = '';
+        /** True when Role is `readonly` (case-insensitive). */
+        var backenduserIsReadonly = false;
+        /** True when `Access` is `All`; otherwise the dropdown is limited to `backenduserAllowedEvents`. */
+        var backenduserHasAllEventAccess = false;
+        /** Event names from `Access` when it is not `All`. */
+        var backenduserAllowedEvents = [];
         let guestFormEditingDocId = '';
         /** Guests Overwatch overview panel is open in the guest viewer. */
         var guestsOverwatchOpen = false;
@@ -10608,6 +10738,7 @@
         }
 
         async function flushSpeakersToFirebase(opts) {
+            if (backenduserIsReadonly) return false;
             opts = opts || {};
             if (speakerSyncTimer) {
                 clearTimeout(speakerSyncTimer);
@@ -10871,6 +11002,7 @@
         }
 
         async function flushContentToFirebase(opts) {
+            if (backenduserIsReadonly) return false;
             opts = opts || {};
             if (contentSyncTimer) {
                 clearTimeout(contentSyncTimer);
@@ -11218,6 +11350,7 @@
         }
 
         async function flushProgrammeDirtyToFirestore(options) {
+            if (backenduserIsReadonly) return false;
             options = options || {};
             if (programmeFirestoreSyncInFlight) {
                 return false;
@@ -11273,7 +11406,101 @@
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 firestoreDb = firebase.firestore();
             }
+            installFirestoreWriteGuards();
             return firestoreDb;
+        }
+
+        var firestoreWriteGuardsInstalled = false;
+
+        function backendReadonlyError() {
+            var err = new Error('Read-only access: this account cannot change data.');
+            err.code = 'backend-readonly';
+            return err;
+        }
+
+        function backendBlockIfReadonly() {
+            if (!backenduserIsReadonly) return false;
+            if (typeof showStatus === 'function') {
+                showStatus('error', 'Read-only access: this account cannot change data.');
+            }
+            return true;
+        }
+
+        function applyBackendReadonlyMode() {
+            document.body.classList.toggle('backend-readonly', !!backenduserIsReadonly);
+            if (!backenduserIsReadonly) return;
+            guestPadlockIsOpen = false;
+            speakerPadlockIsOpen = false;
+            contentPadlockIsOpen = false;
+            texteditorPadlockIsOpen = false;
+            programmePadlockIsOpen = false;
+            if (typeof syncGuestPadlockButtonUi === 'function') {
+                syncGuestPadlockButtonUi();
+                if (typeof syncGuestEditabilityFromPadlock === 'function') syncGuestEditabilityFromPadlock();
+            }
+            if (typeof syncSpeakerPadlockButtonUi === 'function') {
+                syncSpeakerPadlockButtonUi();
+                if (typeof syncSpeakerEditabilityFromPadlock === 'function') syncSpeakerEditabilityFromPadlock();
+            }
+            if (typeof syncContentPadlockButtonUi === 'function') {
+                syncContentPadlockButtonUi();
+                if (typeof syncContentEditabilityFromPadlock === 'function') syncContentEditabilityFromPadlock();
+            }
+            if (typeof syncTexteditorPadlockButtonUi === 'function') {
+                syncTexteditorPadlockButtonUi();
+                if (typeof syncTexteditorEditabilityFromPadlock === 'function') syncTexteditorEditabilityFromPadlock();
+            }
+            if (typeof syncProgrammePadlockButtonUi === 'function') {
+                syncProgrammePadlockButtonUi();
+                if (typeof syncProgrammeEditabilityFromPadlock === 'function') syncProgrammeEditabilityFromPadlock();
+            }
+        }
+
+        function installFirestoreWriteGuards() {
+            if (firestoreWriteGuardsInstalled) return;
+            if (typeof firebase === 'undefined' || !firebase.firestore) return;
+            firestoreWriteGuardsInstalled = true;
+            function rejectIfReadonly() {
+                if (backenduserIsReadonly) return Promise.reject(backendReadonlyError());
+                return null;
+            }
+            var docProto = firebase.firestore.DocumentReference.prototype;
+            var origSet = docProto.set;
+            docProto.set = function () {
+                var blocked = rejectIfReadonly();
+                if (blocked) return blocked;
+                return origSet.apply(this, arguments);
+            };
+            if (typeof docProto.update === 'function') {
+                var origUpdate = docProto.update;
+                docProto.update = function () {
+                    var blocked = rejectIfReadonly();
+                    if (blocked) return blocked;
+                    return origUpdate.apply(this, arguments);
+                };
+            }
+            var origDelete = docProto.delete;
+            docProto.delete = function () {
+                var blocked = rejectIfReadonly();
+                if (blocked) return blocked;
+                return origDelete.apply(this, arguments);
+            };
+            if (firebase.firestore.WriteBatch) {
+                var origCommit = firebase.firestore.WriteBatch.prototype.commit;
+                firebase.firestore.WriteBatch.prototype.commit = function () {
+                    var blocked = rejectIfReadonly();
+                    if (blocked) return blocked;
+                    return origCommit.apply(this, arguments);
+                };
+            }
+            if (firebase.firestore.CollectionReference && firebase.firestore.CollectionReference.prototype.add) {
+                var origAdd = firebase.firestore.CollectionReference.prototype.add;
+                firebase.firestore.CollectionReference.prototype.add = function () {
+                    var blocked = rejectIfReadonly();
+                    if (blocked) return blocked;
+                    return origAdd.apply(this, arguments);
+                };
+            }
         }
 
         /** Reject if Firestore does not settle in time (batch.commit can hang on bad networks). */
@@ -11763,6 +11990,8 @@
         }
 
         async function uploadContentImageFile(file, docId, meta) {
+            if (backenduserIsReadonly) throw backendReadonlyError();
+            var id = String(docId || '').trim();
             var id = String(docId || '').trim();
             if (!id) throw new Error('Select content before uploading image.');
             if (!file) throw new Error('No image selected.');
@@ -13203,6 +13432,7 @@
         }
 
         async function saveGuestFromEditor() {
+            if (backendBlockIfReadonly()) return false;
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) return true;
             var rec = findGuestInMemory(id);
@@ -14371,6 +14601,8 @@
         }
 
         async function saveSiteSettingToFirestore(settingKey, yesNoUi) {
+            if (backenduserIsReadonly) throw backendReadonlyError();
+            var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
             var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
             if (!field) throw new Error('Unknown site setting.');
             var db = getFirestore();
@@ -14384,6 +14616,7 @@
         }
 
         async function onSettingsSiteToggleClick(btn) {
+            if (backendBlockIfReadonly()) return;
             if (!btn || btn.disabled) return;
             var group = btn.closest('.settings-site-toggle');
             if (!group) return;
@@ -14473,6 +14706,115 @@
             return guestCoalesceCurrentEventField(data);
         }
 
+        function tbsBackendUsersCollectionRef(db) {
+            return db.collection('tbs').doc('Users').collection('backend_users');
+        }
+
+        function getSignedInBackendUserEmail() {
+            if (window.__backendAuthUser && window.__backendAuthUser.email) {
+                return String(window.__backendAuthUser.email).trim();
+            }
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                var authUser = firebase.auth().currentUser;
+                return authUser && authUser.email ? String(authUser.email).trim() : '';
+            }
+            return '';
+        }
+
+        function parseBackendUserAccess(accessVal) {
+            if (accessVal == null) {
+                return { all: false, events: [] };
+            }
+            var list = guestNormalizeStringList(accessVal);
+            if (!list.length) {
+                var raw = guestStringFromFirestoreValue(accessVal);
+                if (/^all$/i.test(raw)) return { all: true, events: [] };
+                return { all: false, events: [] };
+            }
+            for (var i = 0; i < list.length; i++) {
+                if (/^all$/i.test(String(list[i] || '').trim())) {
+                    return { all: true, events: [] };
+                }
+            }
+            return { all: false, events: list };
+        }
+
+        function backendUserCanAccessEvent(eventName) {
+            var ev = String(eventName || '').trim();
+            if (!ev) return false;
+            if (backenduserHasAllEventAccess) return true;
+            var want = ev.toLowerCase();
+            for (var i = 0; i < backenduserAllowedEvents.length; i++) {
+                if (String(backenduserAllowedEvents[i] || '').trim().toLowerCase() === want) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function resolveRestrictedBackendCurrentEvent() {
+            if (backenduserHasAllEventAccess) return String(current_event || '').trim();
+            var existing = String(current_event || '').trim();
+            if (backendUserCanAccessEvent(existing)) return existing;
+            if (backenduserAllowedEvents.length) return String(backenduserAllowedEvents[0] || '').trim();
+            return '';
+        }
+
+        function applyBackendUserCurrentEventFromSettings(settingsEvent) {
+            if (backenduserHasAllEventAccess) {
+                current_event = String(settingsEvent || '').trim();
+            } else {
+                current_event = resolveRestrictedBackendCurrentEvent();
+            }
+            selectedevent = String(current_event || '').trim();
+            updateBackendCurrentEventDisplay();
+        }
+
+        async function fetchBackendUserRecord(db, email) {
+            if (typeof TbsAuth !== 'undefined' && typeof TbsAuth.fetchBackendUserRecord === 'function') {
+                return TbsAuth.fetchBackendUserRecord(email);
+            }
+            var want = String(email || '').trim();
+            if (!want) return null;
+            var col = tbsBackendUsersCollectionRef(db);
+            var snap = await col.doc(want).get();
+            if (snap.exists) return snap.data() || {};
+            var lower = want.toLowerCase();
+            if (lower !== want) {
+                snap = await col.doc(lower).get();
+                if (snap.exists) return snap.data() || {};
+            }
+            return null;
+        }
+
+        async function loadBackendUserAccess(db) {
+            backenduserRole = '';
+            backenduserIsReadonly = false;
+            backenduserHasAllEventAccess = false;
+            backenduserAllowedEvents = [];
+            var email = String(backenduser || '').trim();
+            if (!email) {
+                applyBackendReadonlyMode();
+                return;
+            }
+            var data = await fetchBackendUserRecord(db, email);
+            if (!data) {
+                console.warn('No backend_users record for', email);
+                applyBackendReadonlyMode();
+                return;
+            }
+            backenduserRole = guestStringFromFirestoreValue(
+                data.Role != null ? data.Role : data.role
+            );
+            backenduserIsReadonly = /^readonly$/i.test(String(backenduserRole || '').trim());
+            var parsed = parseBackendUserAccess(
+                data.Access != null ? data.Access : data.access
+            );
+            backenduserHasAllEventAccess = parsed.all;
+            backenduserAllowedEvents = parsed.events.slice();
+            applyBackendReadonlyMode();
+        }
+
         /** `Event` on each `tbs/Guests/{id}/item` (not on the parent doc). */
         function guestCoalesceGuestItemEvent(d) {
             if (!d || typeof d !== 'object') return '';
@@ -14532,18 +14874,29 @@
                     'aria-label',
                     v ? 'Current event: ' + v + '. Choose current event' : 'Choose current event'
                 );
-                btn.setAttribute('title', v ? 'Current event: ' + v : 'Set field “Current event” on tbs/Settings');
+                btn.setAttribute(
+                    'title',
+                    v
+                        ? 'Current event: ' + v
+                        : backenduserHasAllEventAccess
+                          ? 'Set field “Current event” on tbs/Settings'
+                          : 'Choose an event from your Access list'
+                );
             }
             updateGuestsListHeadingDisplay();
             syncGuestInvoicedisnoBlock();
             syncGuestWorkflowAppliedButton();
         }
 
-        /** Programme / editor use `selectedevent`; keep it aligned with `tbs/Settings` → `Current event`. */
+        /** Programme / editor use `selectedevent`; keep it aligned with Settings or the user's Access. */
         async function syncSelectedAndCurrentEventFromSettings() {
             try {
                 var db = getFirestore();
-                current_event = await loadCurrentEventFromTbsSettings(db);
+                if (backenduserHasAllEventAccess) {
+                    current_event = await loadCurrentEventFromTbsSettings(db);
+                } else {
+                    current_event = resolveRestrictedBackendCurrentEvent();
+                }
                 selectedevent = String(current_event || '').trim();
                 updateBackendCurrentEventDisplay();
             } catch (err) {
@@ -14588,14 +14941,30 @@
             if (menu) menu.hidden = true;
         }
 
+        function currentEventDropdownEmptyMessage() {
+            return backenduserHasAllEventAccess
+                ? 'No events in Allevents.'
+                : 'No events available for this user.';
+        }
+
+        async function loadEventsForCurrentEventDropdown(db) {
+            if (backenduserHasAllEventAccess) {
+                return loadAlleventsFromTbsSettings(db);
+            }
+            return backenduserAllowedEvents.slice();
+        }
+
         function renderCurrentEventDropdown(events) {
             var menu = document.getElementById('backend-current-event-dropdown');
             if (!menu) return;
             var current = String(current_event || '').trim();
             var list = Array.isArray(events) ? events : [];
+            var emptyMsg = currentEventDropdownEmptyMessage();
             if (!list.length) {
                 menu.innerHTML =
-                    '<li><p class="backend-current-event-dropdown-empty">No events in Allevents.</p></li>';
+                    '<li><p class="backend-current-event-dropdown-empty">' +
+                    escapeHtml(emptyMsg) +
+                    '</p></li>';
                 return;
             }
             var html = '';
@@ -14616,7 +14985,9 @@
                     '</button></li>';
             }
             menu.innerHTML = html ||
-                '<li><p class="backend-current-event-dropdown-empty">No events in Allevents.</p></li>';
+                '<li><p class="backend-current-event-dropdown-empty">' +
+                escapeHtml(emptyMsg) +
+                '</p></li>';
         }
 
         async function openCurrentEventDropdown() {
@@ -14625,7 +14996,7 @@
             if (!btn || !menu) return;
             try {
                 var db = getFirestore();
-                var events = await loadAlleventsFromTbsSettings(db);
+                var events = await loadEventsForCurrentEventDropdown(db);
                 renderCurrentEventDropdown(events);
                 menu.hidden = false;
                 btn.setAttribute('aria-expanded', 'true');
@@ -14634,7 +15005,7 @@
                 if (typeof showStatus === 'function') {
                     showStatus(
                         'error',
-                        err && err.message ? err.message : 'Failed to load Allevents from Settings.'
+                        err && err.message ? err.message : 'Failed to load events for the event selector.'
                     );
                 }
                 closeCurrentEventDropdown();
@@ -14652,7 +15023,8 @@
         }
 
         /**
-         * Write `Current event` on tbs/Settings, then reload Speakers, Guests, and Programme for the new value.
+         * For users with Access `All`, write `Current event` on tbs/Settings, then reload
+         * Speakers, Guests, and Programme. Restricted users switch locally only.
          * @param {string} eventName
          */
         async function setCurrentEventAndRefreshRosters(eventName) {
@@ -14661,6 +15033,12 @@
             var prev = String(current_event || '').trim();
             closeCurrentEventDropdown();
             if (next === prev) return;
+            if (!backendUserCanAccessEvent(next)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'You do not have access to that event.');
+                }
+                return;
+            }
             if (currentEventSwitchInFlight) return;
             currentEventSwitchInFlight = true;
             try {
@@ -14668,9 +15046,11 @@
                     showStatus('loading', 'Switching current event to ' + next + '…');
                 }
                 var db = getFirestore();
-                var patch = {};
-                patch[FIRESTORE_TBS_SETTINGS_CURRENT_EVENT_FIELD] = next;
-                await tbsSettingsRootDocRef(db).set(patch, { merge: true });
+                if (backenduserHasAllEventAccess && !backenduserIsReadonly) {
+                    var patch = {};
+                    patch[FIRESTORE_TBS_SETTINGS_CURRENT_EVENT_FIELD] = next;
+                    await tbsSettingsRootDocRef(db).set(patch, { merge: true });
+                }
                 current_event = next;
                 selectedevent = next;
                 updateBackendCurrentEventDisplay();
@@ -16120,6 +16500,10 @@
 
         async function saveGuestsFilterSettingsToFirestore(next) {
             var normalized = normalizeGuestsFilterSettings(next);
+            if (backenduserIsReadonly) {
+                applyGuestsFilterSettingsLocal(normalized);
+                return;
+            }
             var db = getFirestore();
             var patch = {};
             patch[FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD] = guestsFilterIsActive(normalized)
@@ -17289,6 +17673,8 @@
         }
 
         function reconcileGuestStripePaymentsFromUi(opts) {
+            if (backendBlockIfReadonly()) return Promise.resolve();
+            opts = opts || {};
             opts = opts || {};
             var guestId = opts.guestId != null ? String(opts.guestId).trim() : '';
             var fnUrl =
@@ -17495,6 +17881,10 @@
          * @return {Promise<object>}
          */
         function importFinancesInvoicesFromStripe(opts) {
+            if (backendBlockIfReadonly()) {
+                return Promise.reject(backendReadonlyError());
+            }
+            opts = opts || {};
             opts = opts || {};
             if (financesInvoicesLoaded && !opts.force && financesInvoicesInMemory.length) {
                 renderFinancesInvoicesTable();
@@ -18361,9 +18751,7 @@
                 ]);
                 var guestsParentSnap = snaps[0];
                 var settingsData = snaps[1] || {};
-                current_event = guestCoalesceCurrentEventField(settingsData);
-                selectedevent = String(current_event || '').trim();
-                updateBackendCurrentEventDisplay();
+                applyBackendUserCurrentEventFromSettings(guestCoalesceCurrentEventField(settingsData));
                 applyGuestsFilterSettingsFromSettingsData(settingsData);
                 if (!String(current_event || '').trim()) {
                     guestsRosterInMemory = [];
@@ -18448,9 +18836,9 @@
             speakerRosterInMemory = [];
             try {
                 var db = getFirestore();
-                current_event = await loadCurrentEventFromTbsSettings(db);
-                selectedevent = String(current_event || '').trim();
-                updateBackendCurrentEventDisplay();
+                applyBackendUserCurrentEventFromSettings(
+                    backenduserHasAllEventAccess ? await loadCurrentEventFromTbsSettings(db) : ''
+                );
                 if (!String(current_event || '').trim()) {
                     renderSpeakerRoster();
                     return;
@@ -21409,6 +21797,8 @@
          * On success sets Invited=Yes + log line in Firestore.
          */
         async function sendGuestInvitationEmail() {
+            if (backendBlockIfReadonly()) return;
+            var legacyBtn = document.getElementById('guest-send-invite-btn');
             var legacyBtn = document.getElementById('guest-send-invite-btn');
             var workflowBtn = document.getElementById('guest-workflow-send-invite-btn');
             var id = String(guestFormEditingDocId || '').trim();
@@ -21518,6 +21908,8 @@
          * On success sets Status=Invited + log line in Firestore.
          */
         async function sendSpeakerFormalInvitationEmail() {
+            if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('speaker-send-formal-invite-btn');
             var btn = document.getElementById('speaker-send-formal-invite-btn');
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') {
@@ -21627,6 +22019,8 @@
          * On success sets Lodging=Requested + log line.
          */
         async function sendSpeakerRequestLodgingEmail() {
+            if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('speaker-request-lodging-btn');
             var btn = document.getElementById('speaker-request-lodging-btn');
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') {
@@ -21730,6 +22124,7 @@
         }
 
         function setBackendPanel(panel) {
+            if (panel === 'finances') return;
             const isEditor = panel === 'editor';
             const isContent = panel === 'content';
             const isFinances = panel === 'finances';
@@ -21907,8 +22302,8 @@
             }
             if (financesToggle) {
                 financesToggle.setAttribute('aria-hidden', 'false');
-                financesToggle.setAttribute('tabindex', '0');
-                financesToggle.setAttribute('aria-disabled', 'false');
+                financesToggle.setAttribute('tabindex', '-1');
+                financesToggle.setAttribute('aria-disabled', 'true');
             }
             if (settingsToggle) {
                 settingsToggle.setAttribute('aria-hidden', 'false');
@@ -23905,47 +24300,27 @@
             if (!track || !container) return;
             var last = backendStatusTickerLines.length
                 ? backendStatusTickerLines[backendStatusTickerLines.length - 1]
-                : 'Ready';
-            var latestType = '';
-            if (backendStatusTickerLines.length) {
-                var lastLine = last || '';
-                if (lastLine.indexOf('[error]') === 0) latestType = 'error';
-                else if (lastLine.indexOf('[…]') === 0) latestType = 'loading';
-                else if (lastLine.indexOf('[ok]') === 0) latestType = 'success';
-                else latestType = 'info';
-            }
+                : formatStatusMessageWithTime('Ready');
             var safe = typeof escapeHtml === 'function' ? escapeHtml(last) : last;
-            var typeClass =
-                latestType === 'error'
-                    ? ' is-error'
-                    : latestType === 'success'
-                      ? ' is-success'
-                      : latestType === 'loading'
-                        ? ' is-loading'
-                        : ' is-info';
             track.classList.add('is-static');
             track.style.animationDuration = '';
             track.innerHTML =
-                '<span class="backend-status-ticker-segment' +
-                typeClass +
-                '" id="status">' +
+                '<span class="backend-status-ticker-segment" id="status">' +
                 safe +
                 '</span>';
             container.setAttribute('title', last);
         }
 
         function showStatus(type, message) {
-            var kind = String(type || 'info').trim().toLowerCase();
             var line = formatStatusMessageWithTime(message);
-            if (kind === 'error') line = '[error] ' + line;
-            else if (kind === 'loading') line = '[…] ' + line;
-            else if (kind === 'success') line = '[ok] ' + line;
             backendStatusTickerLines.push(line);
             while (backendStatusTickerLines.length > BACKEND_STATUS_TICKER_MAX) {
                 backendStatusTickerLines.shift();
             }
             refreshBackendStatusTicker();
         }
+
+        refreshBackendStatusTicker();
 
         var backendLoadingFailsafeTimer = null;
         var BACKEND_LOADING_FAILSAFE_MS = 120000;
@@ -24030,6 +24405,27 @@
                     TbsAuth.signOutStaff();
                 });
             }
+            var userEmailEl = document.getElementById('backend-user-email');
+            backenduser = getSignedInBackendUserEmail();
+            if (userEmailEl && backenduser) {
+                userEmailEl.textContent = backenduser;
+                userEmailEl.hidden = false;
+            }
+            try {
+                await loadBackendUserAccess(getFirestore());
+            } catch (err) {
+                console.error('loadBackendUserAccess:', err);
+                backenduserHasAllEventAccess = false;
+                backenduserAllowedEvents = [];
+                backenduserIsReadonly = false;
+                applyBackendReadonlyMode();
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to load backend user access.'
+                    );
+                }
+            }
             initCurrentEventPicker();
             const texteditorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
@@ -24090,6 +24486,7 @@
             if (lodgingActionsAddBtn && addHousePanel) {
                 lodgingActionsAddBtn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    if (backendBlockIfReadonly()) return;
                     setAddHousePanelHidden(!addHousePanel.hidden);
                     if (!addHousePanel.hidden && addHouseNameInput) addHouseNameInput.focus();
                 });
@@ -24097,6 +24494,7 @@
 
             if (addHouseSaveBtn) {
                 addHouseSaveBtn.addEventListener('click', async function() {
+                    if (backendBlockIfReadonly()) return;
                     var houseName = addHouseNameInput ? String(addHouseNameInput.value || '').trim() : '';
                     var bedsStr = addHouseBedsInput ? String(addHouseBedsInput.value || '').trim() : '';
                     if (!houseName) {
@@ -24143,13 +24541,6 @@
                 });
             }
 
-            const financesToggle = document.getElementById('finances-toggle');
-            if (financesToggle) {
-                financesToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    setBackendPanel('finances');
-                });
-            }
             const settingsToggle = document.getElementById('settings-toggle');
             if (settingsToggle) {
                 settingsToggle.addEventListener('click', function(e) {
@@ -24172,6 +24563,7 @@
             if (addSpeakerBtn && addSpeakerForm) {
                 addSpeakerBtn.addEventListener('click', async function() {
                     if (addSpeakerBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
                     try {
                         var saved = await persistOpenSpeakerToFirebaseIfNeeded();
                         if (!saved) return;
@@ -24246,6 +24638,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (speakerPadlockBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
                     speakerPadlockIsOpen = !speakerPadlockIsOpen;
                     syncSpeakerPadlockButtonUi();
                     syncSpeakerEditabilityFromPadlock();
@@ -24483,6 +24876,7 @@
             var addGuestBtn = document.getElementById('add-guest-button');
             if (addGuestBtn) {
                 addGuestBtn.addEventListener('click', function() {
+                    if (backendBlockIfReadonly()) return;
                     closeGuestsOverwatch();
                     clearGuestRosterItemSelection();
                     clearGuestEditorForm();
@@ -24702,6 +25096,8 @@
             var guestSendInvoiceBtn = document.getElementById('guest-send-invoice-btn');
             var guestWorkflowSendInvoiceBtn = document.getElementById('guest-workflow-send-invoice-btn');
             function sendGuestStripeInvoiceFromUi() {
+                if (backendBlockIfReadonly()) return;
+                var iid = String(guestFormEditingDocId || '').trim();
                 var iid = String(guestFormEditingDocId || '').trim();
                 var ig = iid ? findGuestInMemory(iid) : null;
                 if (!iid || !ig || !guestInvoicedisnoBlockShouldShow(ig)) return;
@@ -25119,6 +25515,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (guestPadlockBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
                     guestPadlockIsOpen = !guestPadlockIsOpen;
                     syncGuestPadlockButtonUi();
                     syncGuestEditabilityFromPadlock();
@@ -25440,6 +25837,8 @@
                 });
             }
             async function onAddContentToolbarClick() {
+                if (backendBlockIfReadonly()) return;
+                var editingId = String(contentFormEditingDocId || '').trim();
                 var editingId = String(contentFormEditingDocId || '').trim();
                 if (editingId) {
                     var editingRec = findContentInMemory(editingId);
@@ -25574,6 +25973,7 @@
                 contentPadlockBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     if (contentPadlockBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
                     contentPadlockIsOpen = !contentPadlockIsOpen;
                     contentDeleteConfirmArmed = false;
                     syncContentPadlockButtonUi();
@@ -25937,6 +26337,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (texteditorPadlockBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
                     texteditorPadlockIsOpen = !texteditorPadlockIsOpen;
                     syncTexteditorPadlockButtonUi();
                     syncTexteditorEditabilityFromPadlock();
@@ -26309,6 +26710,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (programmePadlockBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
                     programmePadlockIsOpen = !programmePadlockIsOpen;
                     syncProgrammePadlockButtonUi();
                     syncProgrammeEditabilityFromPadlock();

@@ -19,9 +19,20 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
         TbsAuth.initFirebaseApp();
         TbsAuth.getAuth().onAuthStateChanged(function (user) {
-            if (!user || !TbsAuth.isAllowedBackendUser(user)) return;
+            if (!user) return;
             if (TbsAuth.shouldSkipGoogleAuth()) return;
-            window.location.replace(TbsAuth.getPostLoginRedirectUrl());
+            TbsAuth.assertListedBackendUser(user)
+                .then(function (ok) {
+                    if (ok) {
+                        window.location.replace(TbsAuth.getPostLoginRedirectUrl());
+                        return;
+                    }
+                    return TbsAuth.getAuth().signOut();
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    return TbsAuth.getAuth().signOut();
+                });
         });
     } catch (err) {
         console.error(err);
