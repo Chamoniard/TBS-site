@@ -20,6 +20,10 @@ const firestoreHomeCache = {
     locationInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — events/{id} field locationinfo (home Location band body)
     eventInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — tbs/Pre-sets/Zermatt/Zermatt field Eventinfo (home .event-contents)
     registrationManifesto: { value: '', fetchedAt: 0, promise: null },
+    /** `tbs/Settings/{event-location}/{event-location}` field `Waiting_list`. */
+    siteSettingsWaitingList: { value: false, location: '', fetchedAt: 0, promise: null },
+    /** `tbs/Pre-sets/{event-location}/{event-location}` field `Sendtoreserves`. */
+    sendToReserves: { value: '', location: '', fetchedAt: 0, promise: null },
     /** First programme-band card: `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
     /** `tbs/Settings/Zermatt/Zermatt` field `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
@@ -134,6 +138,15 @@ function currentHomeSiteEvent() {
         if (v) return v;
     }
     return HOME_SITE_EVENT_DEFAULT;
+}
+
+function currentHomeEventLocation() {
+    const current = typeof window !== 'undefined' && window.history ? window.history.state : null;
+    if (isHomeHistoryState(current)) {
+        const v = String(current['event-location'] || '').trim();
+        if (v) return v;
+    }
+    return HOME_EVENT_LOCATION_DEFAULT;
 }
 
 function pushHomeSectionHistory(view, extra) {
@@ -2415,14 +2428,20 @@ function layoutSponsorLogosRowElement(row) {
     if (isMobile && !row.classList.contains('sponsor-logos-row') && !row.classList.contains('sponsor-logos--two-rows')) {
         const groups = sponsorLogoMobileRowGroups(row);
         if (!groups.length) return;
-        let hUsed = maxH;
+        let hUsed = Infinity;
         for (let g = 0; g < groups.length; g++) {
-            const hRow = sponsorLogoUniformHeightForGroup(groups[g], w, gapPx, maxH, true);
+            const hRow = sponsorLogoUniformHeightForGroup(
+                groups[g],
+                w,
+                gapPx,
+                Number.POSITIVE_INFINITY,
+                false
+            );
             if (hRow == null) return;
             hUsed = Math.min(hUsed, hRow);
         }
-        hUsed = Math.min(maxH, hUsed * 1.2);
-        applySponsorLogoUniformHeight(images, hUsed, true);
+        if (!Number.isFinite(hUsed) || !(hUsed > 0)) return;
+        applySponsorLogoUniformHeight(images, hUsed, true, false);
         return;
     }
 
@@ -2590,6 +2609,7 @@ const HOME_REGISTRATION_OUTER_HTML = `
                             <form class="registration-form" novalidate aria-label="Registration form">
                                 <h3 class="section-titles registration-section-title" id="home-registration-heading">Registration</h3>
                                 <p class="registration-manifesto">In order to facilitate interaction between participants TBS is intentionally kept small. Attendance is limited.</p>
+                                <div class="registration-to-reserves" id="registration-to-reserves" hidden></div>
                                 <div class="registration-form-row registration-form-row--two-up">
                                     <div class="registration-field">
                                         <label for="reg-first-name">First name <span class="registration-required-asterisk">*</span></label>
@@ -3356,12 +3376,17 @@ function runHomePageBackgroundHydration(homeSection, ctx) {
         .then(function (results) {
             const registrationManifestoHtml =
                 results && results.length > 0 && typeof results[0] === 'string' ? results[0] : '';
+            const registrationToReservesState =
+                results && results.length > 1 && results[1] && typeof results[1] === 'object'
+                    ? results[1]
+                    : { show: false, html: '' };
             finalizeHomeSpeakersSection(speakersWrap);
             if (regWrap) {
                 const manifestoEl = regWrap.querySelector('p.registration-manifesto');
                 if (manifestoEl && registrationManifestoHtml.trim()) {
                     manifestoEl.innerHTML = registrationManifestoHtml;
                 }
+                applyHomeRegistrationToReserves(regWrap, registrationToReservesState);
             }
             requestAnimationFrame(function () {
                 wireHomeSponsorLogosRowLayout(sponsorsWrap);
@@ -3608,6 +3633,8 @@ function runHomeDeferredHydration(homeSection, ctx) {
     const regWrap = ctx.regWrap;
     const sponsorsWrap = ctx.sponsorsWrap;
     const registrationManifestoPromise = ctx.registrationManifestoPromise;
+    const registrationToReservesPromise =
+        ctx.registrationToReservesPromise || Promise.resolve({ show: false, html: '' });
 
     const revealHomeBands = function () {
         if (introOuter) {
@@ -3629,7 +3656,7 @@ function runHomeDeferredHydration(homeSection, ctx) {
         speakersWrap: speakersWrap,
         regWrap: regWrap,
         sponsorsWrap: sponsorsWrap,
-        promises: [registrationManifestoPromise]
+        promises: [registrationManifestoPromise, registrationToReservesPromise]
     });
 
     return Promise.all([
@@ -3710,6 +3737,9 @@ async function showFeedContent() {
         const registrationManifestoPromise = regWrap
             ? fetchHomeRegistrationManifestoFromFirebase()
             : Promise.resolve('');
+        const registrationToReservesPromise = regWrap
+            ? fetchHomeRegistrationToReservesFromFirebase()
+            : Promise.resolve({ show: false, html: '' });
         const registrationOpenPromise = regWrap
             ? fetchHomeRegistrationOpenFromFirestore().catch(function (err) {
                   console.error('fetchHomeRegistrationOpenFromFirestore', err);
@@ -3819,7 +3849,8 @@ async function showFeedContent() {
                 speakersWrap: speakersWrap,
                 regWrap: regWrap,
                 sponsorsWrap: sponsorsWrap,
-                registrationManifestoPromise: registrationManifestoPromise
+                registrationManifestoPromise: registrationManifestoPromise,
+                registrationToReservesPromise: registrationToReservesPromise
             });
 
             setHomePageLoading(false);
@@ -4273,9 +4304,20 @@ const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD_ALT = 'Displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
 const FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
 const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
+const FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
 
 function tbsSettingsDocRef(db) {
     return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
+}
+
+function tbsSettingsLocationDocRef(db, location) {
+    const loc = String(location || '').trim() || HOME_EVENT_LOCATION_DEFAULT;
+    return db.collection('tbs').doc('Settings').collection(loc).doc(loc);
+}
+
+function tbsPresetsLocationDocRef(db, location) {
+    const loc = String(location || '').trim() || HOME_EVENT_LOCATION_DEFAULT;
+    return db.collection('tbs').doc('Pre-sets').collection(loc).doc(loc);
 }
 
 async function fetchTbsSettingsFields(db) {
@@ -4304,6 +4346,12 @@ function normalizeHomeDisplayProgrammeSetting(value) {
     if (s === 'no' || s === 'n') return false;
     if (s === 'yes' || s === 'y') return true;
     return true;
+}
+
+/** @returns {boolean} true when guest registrations go to the waiting list (default No). */
+function normalizeHomeWaitingListSetting(value) {
+    const s = String(value == null ? '' : value).trim().toLowerCase();
+    return s === 'yes' || s === 'y';
 }
 
 /** @returns {boolean} true when the public home page requires a password (default No). */
@@ -4576,6 +4624,8 @@ async function fetchHomeRegistrationOpenFromFirestore() {
 }
 /** Home registration manifesto HTML: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Registration`. */
 const HOME_SNIPPETS_TEGISTRATION_FIELD = 'Registration';
+/** Home waiting-list copy: Firestore `tbs/Pre-sets/{event-location}/{event-location}` field `Sendtoreserves`. */
+const HOME_SNIPPETS_SEND_TO_RESERVES_FIELD = 'Sendtoreserves';
 /** Home Location body HTML: Firestore `events/{eventId}` field `locationinfo` (legacy; backend Pre-sets Location save is `tbs/Pre-sets/Zermatt/Zermatt.Locationinfo`). */
 const HOME_EVENT_LOCATIONINFO_FIELD = 'locationinfo';
 /** Home `.event-contents` HTML: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Eventinfo`. */
@@ -5435,6 +5485,100 @@ async function fetchHomeRegistrationManifestoFromFirebase() {
         promise: null
     };
     return typeof value === 'string' ? value : '';
+}
+
+function applyHomeRegistrationToReserves(regWrap, state) {
+    if (!regWrap) return;
+    const el = regWrap.querySelector('.registration-to-reserves');
+    if (!el) return;
+    const show = !!(state && state.show);
+    const html = state && state.html != null ? String(state.html) : '';
+    if (!show) {
+        el.hidden = true;
+        el.innerHTML = '';
+        return;
+    }
+    el.innerHTML = html;
+    el.hidden = false;
+}
+
+/** Waiting-list banner: `Waiting_list` on Settings/{location}/{location}, copy from Pre-sets `Sendtoreserves`. */
+async function fetchHomeRegistrationToReservesFromFirebase() {
+    if (typeof firebase === 'undefined') return { show: false, html: '' };
+    const location = currentHomeEventLocation();
+    const waitingCached = firestoreHomeCache.siteSettingsWaitingList;
+    const copyCached = firestoreHomeCache.sendToReserves;
+    if (
+        waitingCached &&
+        waitingCached.location === location &&
+        isFreshFirestoreCacheEntry(waitingCached) &&
+        copyCached &&
+        copyCached.location === location &&
+        isFreshFirestoreCacheEntry(copyCached)
+    ) {
+        return {
+            show: !!waitingCached.value,
+            html: typeof copyCached.value === 'string' ? copyCached.value : ''
+        };
+    }
+    if (waitingCached && waitingCached.location === location && waitingCached.promise) {
+        return waitingCached.promise;
+    }
+
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const settingsSnap = await withTimeout(
+                tbsSettingsLocationDocRef(db, location).get(),
+                10000,
+                'Firestore tbs/Settings/' + location + '/' + location + ' Waiting_list'
+            );
+            const settingsData = settingsSnap.exists ? settingsSnap.data() || {} : {};
+            const waitingRaw =
+                settingsData[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD] != null
+                    ? settingsData[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD]
+                    : settingsData.waiting_list;
+            const show = normalizeHomeWaitingListSetting(waitingRaw);
+            if (!show) return { show: false, html: '' };
+
+            const presetsSnap = await withTimeout(
+                tbsPresetsLocationDocRef(db, location).get(),
+                10000,
+                'Firestore tbs/Pre-sets/' + location + '/' + location + ' Sendtoreserves'
+            );
+            const presetsData = presetsSnap.exists ? presetsSnap.data() || {} : {};
+            const raw =
+                presetsData[HOME_SNIPPETS_SEND_TO_RESERVES_FIELD] != null
+                    ? presetsData[HOME_SNIPPETS_SEND_TO_RESERVES_FIELD]
+                    : '';
+            return { show: true, html: raw != null ? String(raw) : '' };
+        } catch (e) {
+            console.warn('[home Waiting_list / Sendtoreserves]', e);
+            return { show: false, html: '' };
+        }
+    })();
+
+    firestoreHomeCache.siteSettingsWaitingList = {
+        value: waitingCached ? waitingCached.value : false,
+        location: location,
+        fetchedAt: waitingCached ? Number(waitingCached.fetchedAt || 0) : 0,
+        promise: promise
+    };
+
+    const value = await promise;
+    firestoreHomeCache.siteSettingsWaitingList = {
+        value: !!(value && value.show),
+        location: location,
+        fetchedAt: Date.now(),
+        promise: null
+    };
+    firestoreHomeCache.sendToReserves = {
+        value: value && typeof value.html === 'string' ? value.html : '',
+        location: location,
+        fetchedAt: Date.now(),
+        promise: null
+    };
+    return value && typeof value === 'object' ? value : { show: false, html: '' };
 }
 
 /** HTML for the first programme-band slider card from `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
