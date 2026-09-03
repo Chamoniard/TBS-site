@@ -392,6 +392,13 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     margin: 0;
 }
 
+.home-section > .registration-section .registration-form > .registration-to-reserves:not([hidden]) {
+    border: 1px solid #a8e6ff;
+    border-radius: 5px;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
 .home-section > .registration-section .registration-form > .registration-manifesto + .registration-to-reserves:not([hidden]) {
     margin-top: 24px;
 }
