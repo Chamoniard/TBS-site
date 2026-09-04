@@ -6747,6 +6747,40 @@
             box-sizing: border-box;
         }
 
+        .speaker-bio-preview-popup[hidden] {
+            display: none !important;
+        }
+
+        .speaker-bio-preview-popup {
+            position: fixed;
+            inset: 0;
+            z-index: 10060;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .speaker-bio-preview-popup__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .speaker-bio-preview-popup__frame {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            border: 0;
+            background: transparent;
+            color-scheme: normal;
+        }
+
         .speaker-delete-confirm[hidden],
         .guest-delete-confirm[hidden] {
             display: none !important;
@@ -10106,6 +10140,24 @@
 
         </div>
     </main>
+
+    <div
+        id="speaker-bio-preview-popup"
+        class="speaker-bio-preview-popup"
+        hidden
+        aria-hidden="true"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Speaker bio preview"
+    >
+        <div class="speaker-bio-preview-popup__backdrop" id="speaker-bio-preview-popup-backdrop"></div>
+        <iframe
+            id="speaker-bio-preview-frame"
+            class="speaker-bio-preview-popup__frame"
+            title="Speaker card preview"
+            src="about:blank"
+        ></iframe>
+    </div>
 
     <div id="speaker-delete-confirm" class="speaker-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="speaker-delete-confirm-title">
         <div class="speaker-delete-confirm__backdrop" id="speaker-delete-confirm-backdrop"></div>
@@ -14206,6 +14258,50 @@
             dlg.setAttribute('aria-hidden', 'true');
         }
 
+        var SPEAKER_BIO_PREVIEW_HOME_URL = 'home.html?speaker-bio-preview=1';
+
+        function speakerBioPreviewPayload() {
+            var snap = readSpeakerBioFormSnapshot();
+            return {
+                type: 'tbs-speaker-bio-preview',
+                firstName: snap.firstName,
+                lastName: snap.lastName,
+                longBio: snap.longBio
+            };
+        }
+
+        function sendSpeakerBioPreviewToFrame() {
+            var iframe = document.getElementById('speaker-bio-preview-frame');
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage(speakerBioPreviewPayload(), window.location.origin);
+        }
+
+        function closeSpeakerBioPreviewPopup() {
+            var popup = document.getElementById('speaker-bio-preview-popup');
+            var iframe = document.getElementById('speaker-bio-preview-frame');
+            if (popup) {
+                popup.hidden = true;
+                popup.setAttribute('aria-hidden', 'true');
+            }
+            if (iframe) {
+                iframe.src = 'about:blank';
+            }
+        }
+
+        function openSpeakerBioPreviewPopup() {
+            if (isSpeakerEditorSelectionEmpty()) return;
+            var popup = document.getElementById('speaker-bio-preview-popup');
+            var iframe = document.getElementById('speaker-bio-preview-frame');
+            if (!popup || !iframe) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+            if (iframe.getAttribute('src') === SPEAKER_BIO_PREVIEW_HOME_URL) {
+                sendSpeakerBioPreviewToFrame();
+                return;
+            }
+            iframe.src = SPEAKER_BIO_PREVIEW_HOME_URL;
+        }
+
         async function performDeleteSpeakerFromFirebase() {
             closeSpeakerDeleteConfirmModal();
             var docId = String(speakerFormEditingDocId || '').trim();
@@ -16088,6 +16184,11 @@
                 var padlockActive = !selectionEmpty;
                 padlock.disabled = !padlockActive;
                 padlock.setAttribute('aria-disabled', padlockActive ? 'false' : 'true');
+            }
+            var previewBtn = document.getElementById('speaker-bio-preview');
+            if (previewBtn) {
+                previewBtn.disabled = selectionEmpty;
+                previewBtn.setAttribute('aria-disabled', selectionEmpty ? 'true' : 'false');
             }
             syncSpeakerPadlockButtonUi();
             updateSaveSpeakerToolbarButtonState();
@@ -24595,6 +24696,42 @@
                 });
                 updateSaveSpeakerToolbarButtonState();
             }
+            var speakerBioPreviewBtn = document.getElementById('speaker-bio-preview');
+            if (speakerBioPreviewBtn) {
+                speakerBioPreviewBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    if (speakerBioPreviewBtn.disabled) return;
+                    openSpeakerBioPreviewPopup();
+                });
+            }
+            var speakerBioPreviewBackdrop = document.getElementById('speaker-bio-preview-popup-backdrop');
+            if (speakerBioPreviewBackdrop) {
+                speakerBioPreviewBackdrop.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    closeSpeakerBioPreviewPopup();
+                });
+            }
+            var speakerBioPreviewFrame = document.getElementById('speaker-bio-preview-frame');
+            if (speakerBioPreviewFrame) {
+                speakerBioPreviewFrame.addEventListener('load', function () {
+                    var popup = document.getElementById('speaker-bio-preview-popup');
+                    if (!popup || popup.hidden) return;
+                    if (speakerBioPreviewFrame.getAttribute('src') !== SPEAKER_BIO_PREVIEW_HOME_URL) return;
+                    sendSpeakerBioPreviewToFrame();
+                });
+            }
+            window.addEventListener('message', function (ev) {
+                if (ev.origin !== window.location.origin) return;
+                var data = ev.data;
+                if (!data || typeof data !== 'object') return;
+                if (data.type === 'tbs-speaker-bio-preview-ready') {
+                    sendSpeakerBioPreviewToFrame();
+                    return;
+                }
+                if (data.type === 'tbs-speaker-bio-preview-close') {
+                    closeSpeakerBioPreviewPopup();
+                }
+            });
             var prevSpeakerBtn = document.getElementById('previous-speaker');
             var nextSpeakerBtn = document.getElementById('next-speaker');
             if (prevSpeakerBtn) {
@@ -26295,6 +26432,12 @@
             }
             document.addEventListener('keydown', function(ev) {
                 if (ev.key !== 'Escape') return;
+                var bioPreview = document.getElementById('speaker-bio-preview-popup');
+                if (bioPreview && !bioPreview.hidden) {
+                    ev.preventDefault();
+                    closeSpeakerBioPreviewPopup();
+                    return;
+                }
                 var speakerDlg = document.getElementById('speaker-delete-confirm');
                 if (speakerDlg && !speakerDlg.hidden) {
                     ev.preventDefault();

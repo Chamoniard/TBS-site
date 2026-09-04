@@ -1839,24 +1839,8 @@ body.home-view .home-section > .speaker-section {
     padding: 0;
 }
 
-.home-section > .sponsors-section .sponsors-section-inner-wrapper > .post-title {
-    flex-shrink: 0;
-    margin: 0 0 16px 0;
-    padding: 8px 0 0 0;
-    padding-left: 16px !important;
-    color: #ffffff !important;
-    text-align: left;
-    align-self: flex-start;
-    width: 100%;
-    scroll-margin-top: calc(var(--navbar-height) + 12px);
-    max-height: none;
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-    display: block;
-    -webkit-box-orient: unset;
-    overflow: visible;
-    text-overflow: unset;
-    padding-right: 0;
+.home-section > .sponsors-section .sponsors-section-title {
+    display: none;
 }
 
 .home-section > .sponsors-section .sponsor-logos {
@@ -2978,7 +2962,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     padding: 0;
     border: none;
     line-height: 1.25;
-    text-align: left;
+    text-align: center;
+    width: 100%;
 }
 
 .home-section .speaker-card-bio {
@@ -6089,8 +6074,8 @@ h3.section-titles {
         padding-top: 8px;
     }
 
-    .home-section > .sponsors-section .sponsors-section-inner-wrapper > .post-title {
-        font-size: 1.1rem !important;
+    .home-section > .sponsors-section .sponsors-section-title {
+        display: none;
     }
 }
 
@@ -7060,11 +7045,18 @@ h4 {
         color: #ffffff !important;
     }
 
-    .home-section > .sponsors-section .sponsors-section-inner-wrapper > .post-title {
-        padding-left: 16px !important;
+    .home-section > .sponsors-section .sponsors-section-title {
+        display: block;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 8px 0 4px 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        color: var(--tbs-icy-blue) !important;
         text-align: center !important;
         align-self: center;
         width: 100%;
+        scroll-margin-top: calc(var(--navbar-height) + 12px);
     }
 
     .home-section > .event-section .location-contents > .event-section-title {
@@ -7215,12 +7207,10 @@ h4 {
         color: var(--tbs-icy-blue) !important;
     }
 
-    .home-section > .sponsors-section .sponsors-section-inner-wrapper > .post-title {
+    .home-section > .sponsors-section .sponsors-section-title {
         padding-top: 8px !important;
-        padding-left: 16px !important;
-        padding-bottom: 0 !important;
-        margin-bottom: 16px !important;
-        color: #ffffff !important;
+        padding-bottom: 4px !important;
+        color: var(--tbs-icy-blue) !important;
     }
 
     /* Type badges tighter padding on mobile */
@@ -8587,7 +8577,7 @@ h4 {
 .home-section .speaker-card--skeleton .skeleton-title--speaker-name {
     height: 1.25rem;
     width: 58%;
-    margin: 0 0 0.75rem;
+    margin: 0 auto 0.75rem;
 }
 
 .home-section .speaker-card--skeleton .skeleton-text {
@@ -11733,7 +11723,6 @@ body.home-view :is(
     .about-title:not(.introslider-title),
     .introslider-section-title,
     .event-section-title,
-    .sponsors-section-title,
     .ondemand-section-title,
     .speaker-card-name:not(.home-carousel-tba-title),
     .speaker-card-long-bio-title,
@@ -11797,6 +11786,7 @@ body.backend-page h2 {
 body.home-view :is(
     .registration-section-title,
     .speakers-section-title,
+    .sponsors-section-title,
     .ondemand-section-title,
     .home-carousel-tba-title,
     .speaker-card-name.home-carousel-tba-title

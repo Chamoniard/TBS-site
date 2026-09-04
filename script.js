@@ -2200,8 +2200,9 @@ const HOME_SPONSOR_LOGO_SLOTS_HTML = `
 
 /** Home: sponsors band (below hero introslider; see positionHomeSponsorsAfterIntroslider). */
 const HOME_SPONSORS_SECTION_HTML = `
-                <div class="sponsors-section" role="region" aria-label="Sponsors">
+                <div class="sponsors-section" role="region" aria-labelledby="home-sponsors-heading">
                     <div class="sponsors-section-inner-wrapper">
+                        <h2 class="section-titles sponsors-section-title" id="home-sponsors-heading">Presented by</h2>
                         <div class="sponsor-logos">
 ${HOME_SPONSOR_LOGO_SLOTS_HTML}
                         </div>
@@ -5862,6 +5863,73 @@ function fillHomeSpeakerCardBioMain(bioMain, speaker) {
     bioMain.innerHTML = content;
 }
 
+function isHomeSpeakerBioPreviewMode() {
+    try {
+        return new URLSearchParams(window.location.search).get('speaker-bio-preview') === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+function postHomeSpeakerBioPreviewClose() {
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage({ type: 'tbs-speaker-bio-preview-close' }, window.location.origin);
+}
+
+function renderHomeSpeakerBioPreview(payload) {
+    const track = document.querySelector('.speakerslider-track');
+    if (!track) return;
+    track.innerHTML = '';
+    appendHomeSpeakerCard(
+        track,
+        {
+            firstName: payload && payload.firstName,
+            lastName: payload && payload.lastName,
+            longBio: payload && payload.longBio
+        },
+        1
+    );
+    const homeSection = document.querySelector('.home-section');
+    if (homeSection) {
+        fitHomeProgrammeCardsToContent(homeSection);
+    }
+}
+
+function bootHomeSpeakerBioPreviewMode() {
+    document.documentElement.classList.add('speaker-bio-preview-mode');
+    document.body.classList.add('home-view', 'speaker-bio-preview-mode');
+    document.body.classList.remove('loading');
+    const loading = document.getElementById('home-loading-screen');
+    if (loading) {
+        loading.classList.add('is-hidden');
+        loading.setAttribute('aria-hidden', 'true');
+        loading.setAttribute('aria-busy', 'false');
+    }
+    const robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute('content', 'noindex, nofollow');
+    const main = document.querySelector('.everything');
+    if (main) {
+        main.innerHTML = '<section class="home-section">' + HOME_SPEAKERS_SLIDER_HTML + '</section>';
+    }
+    window.addEventListener('message', function (ev) {
+        if (ev.origin !== window.location.origin) return;
+        if (!ev.data || ev.data.type !== 'tbs-speaker-bio-preview') return;
+        renderHomeSpeakerBioPreview(ev.data);
+    });
+    document.addEventListener(
+        'click',
+        function (ev) {
+            const card = document.querySelector('.speakerslider-track > .speaker-card');
+            if (card && card.contains(ev.target)) return;
+            postHomeSpeakerBioPreviewClose();
+        },
+        true
+    );
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'tbs-speaker-bio-preview-ready' }, window.location.origin);
+    }
+}
+
 function appendHomeSpeakerCard(track, speaker, stripeIndex) {
     const article = document.createElement('article');
     article.className = 'speaker-card ' + homeSpeakerStripeClass(stripeIndex != null ? stripeIndex : 0);
@@ -8532,6 +8600,10 @@ function setHomePageLoading(isLoading) {
 initPageScrollOnReload();
 
 document.addEventListener('DOMContentLoaded', async function() {
+    if (isHomeSpeakerBioPreviewMode()) {
+        bootHomeSpeakerBioPreviewMode();
+        return;
+    }
     scrollHomeToTop({ instant: true });
     try {
         warmHomePageFirestoreCache();

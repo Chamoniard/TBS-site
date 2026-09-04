@@ -665,6 +665,66 @@
     <noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
     </noscript>
+    <script>
+        (function () {
+            try {
+                if (new URLSearchParams(location.search).get('speaker-bio-preview') === '1') {
+                    document.documentElement.classList.add('speaker-bio-preview-mode');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        html.speaker-bio-preview-mode,
+        html.speaker-bio-preview-mode body {
+            background: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+        }
+        html.speaker-bio-preview-mode body {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 0 !important;
+        }
+        html.speaker-bio-preview-mode #home-loading-screen,
+        html.speaker-bio-preview-mode .header,
+        html.speaker-bio-preview-mode .footer,
+        html.speaker-bio-preview-mode .hero {
+            display: none !important;
+        }
+        html.speaker-bio-preview-mode body.home-view .everything,
+        html.speaker-bio-preview-mode body.home-view .home-section {
+            width: fit-content !important;
+            max-width: none !important;
+            min-height: 0 !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            padding-top: 0 !important;
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+        html.speaker-bio-preview-mode .speaker-section,
+        html.speaker-bio-preview-mode .speakers-inner-wrapper,
+        html.speaker-bio-preview-mode .speakerslider,
+        html.speaker-bio-preview-mode .speakerslider-track {
+            width: fit-content !important;
+            max-width: none !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+        html.speaker-bio-preview-mode .home-introslider-scrollbar {
+            display: none !important;
+        }
+    </style>
 </head>
 <body class="home-view loading">
     <div id="home-loading-screen" class="home-loading-screen" aria-live="polite" aria-busy="true" aria-label="Loading page">
@@ -818,6 +878,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260903-waiting-list-reserves" defer></script>
+    <script src="script.js?v=20260903-speaker-bio-preview" defer></script>
 </body>
 </html>
