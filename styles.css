@@ -1839,10 +1839,6 @@ body.home-view .home-section > .speaker-section {
     padding: 0;
 }
 
-.home-section > .sponsors-section .sponsors-section-title {
-    display: none;
-}
-
 .home-section > .sponsors-section .sponsor-logos {
     display: flex;
     flex-direction: row;
@@ -6073,10 +6069,6 @@ h3.section-titles {
         font-size: 1.7rem !important;
         padding-top: 8px;
     }
-
-    .home-section > .sponsors-section .sponsors-section-title {
-        display: none;
-    }
 }
 
 /* News grid layout */
@@ -7045,20 +7037,6 @@ h4 {
         color: #ffffff !important;
     }
 
-    .home-section > .sponsors-section .sponsors-section-title {
-        display: block;
-        flex-shrink: 0;
-        margin: 0;
-        padding: 8px 0 4px 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        color: var(--tbs-icy-blue) !important;
-        text-align: center !important;
-        align-self: center;
-        width: 100%;
-        scroll-margin-top: calc(var(--navbar-height) + 12px);
-    }
-
     .home-section > .event-section .location-contents > .event-section-title {
         text-align: center !important;
     }
@@ -7204,12 +7182,6 @@ h4 {
         padding-bottom: 4px !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
-        color: var(--tbs-icy-blue) !important;
-    }
-
-    .home-section > .sponsors-section .sponsors-section-title {
-        padding-top: 8px !important;
-        padding-bottom: 4px !important;
         color: var(--tbs-icy-blue) !important;
     }
 
@@ -11652,7 +11624,6 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .i
     .home-carousel-tba-title,
     .speaker-card-name,
     .speaker-card-long-bio-title,
-    .sponsors-section-title,
     .ondemand-section-title,
     .registration-section-title,
     .footer-logo-fallback-title,
@@ -11786,7 +11757,6 @@ body.backend-page h2 {
 body.home-view :is(
     .registration-section-title,
     .speakers-section-title,
-    .sponsors-section-title,
     .ondemand-section-title,
     .home-carousel-tba-title,
     .speaker-card-name.home-carousel-tba-title

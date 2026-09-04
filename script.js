@@ -2200,9 +2200,8 @@ const HOME_SPONSOR_LOGO_SLOTS_HTML = `
 
 /** Home: sponsors band (below hero introslider; see positionHomeSponsorsAfterIntroslider). */
 const HOME_SPONSORS_SECTION_HTML = `
-                <div class="sponsors-section" role="region" aria-labelledby="home-sponsors-heading">
+                <div class="sponsors-section" role="region" aria-label="Sponsors">
                     <div class="sponsors-section-inner-wrapper">
-                        <h2 class="section-titles sponsors-section-title" id="home-sponsors-heading">Presented by</h2>
                         <div class="sponsor-logos">
 ${HOME_SPONSOR_LOGO_SLOTS_HTML}
                         </div>
