@@ -460,8 +460,8 @@
             margin: 0;
             padding: 0;
             flex-shrink: 0;
-            align-self: center;
-            text-align: right;
+            align-self: stretch;
+            text-align: left;
             font-size: 0.875rem;
             font-weight: 500;
             font-family: 'Inter', sans-serif;
@@ -471,19 +471,8 @@
 
         #programme-editor .activities .programme-counter {
             margin: 0;
-            padding: 0 var(--backend-table-cell-pad-x) 0 0;
+            padding: 8px var(--backend-table-cell-pad-x);
             color: #64748b;
-        }
-
-        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            flex: 1 1 auto;
-            min-width: 0;
-            padding: 0;
-            box-sizing: border-box;
         }
 
         .navigation {
@@ -2551,6 +2540,88 @@
         #guest-editor .guests-actions #guests-overwatch-btn:focus,
         #guest-editor .guests-actions #guests-overwatch-btn:focus-visible,
         #guest-editor .guests-actions #guests-overwatch-btn:active {
+            border: none;
+            outline: none;
+            box-shadow: var(--backend-button-shadow);
+        }
+
+        /* Overwatch replaces the speaker editor entirely in the viewer. */
+        #speaker-editor .speaker-viewer.speaker-viewer--overwatch {
+            background: transparent;
+            position: relative;
+        }
+
+        #speaker-editor .speaker-viewer.speaker-viewer--overwatch > .speaker-editor-shell,
+        #speaker-editor .speaker-viewer.speaker-viewer--overwatch > .speaker-editor-empty {
+            display: none !important;
+        }
+
+        #speaker-editor .speaker-overwatch {
+            --guest-editor-shell-r: 8px;
+            --guest-editor-bw: 1px;
+            display: none !important;
+            flex-direction: column;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: var(--guest-editor-bw) solid #e2e8f0;
+            border-radius: var(--guest-editor-shell-r);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        #speaker-editor .speaker-viewer.speaker-viewer--overwatch > .speaker-overwatch.is-open {
+            display: flex !important;
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            width: auto;
+            height: auto;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        #speaker-editor .speaker-overwatch-title {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex: 0 0 auto;
+            margin: 0;
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+            box-sizing: border-box;
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            border-bottom: 1px solid #cbd5e1;
+            background: #ffffff;
+        }
+
+        #speaker-editor .speaker-overwatch-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            width: 100%;
+            background: #ffffff;
+            overflow: auto;
+            box-sizing: border-box;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+        }
+
+        #speaker-editor .speakers-actions #speakers-overwatch-btn,
+        #speaker-editor .speakers-actions #speakers-overwatch-btn.is-active,
+        #speaker-editor .speakers-actions #speakers-overwatch-btn:focus,
+        #speaker-editor .speakers-actions #speakers-overwatch-btn:focus-visible,
+        #speaker-editor .speakers-actions #speakers-overwatch-btn:active {
             border: none;
             outline: none;
             box-shadow: var(--backend-button-shadow);
@@ -4775,6 +4846,7 @@
         #guest-editor .guests-list > .edit-guest-top.guests-list-heading,
         #guest-editor .guest-viewer > .guest-editor > .edit-guest-top,
         #guest-editor .guest-overwatch-title,
+        #speaker-editor .speaker-overwatch-title,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
         #speaker-editor .edit-speaker-top,
         #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top,
@@ -8380,7 +8452,9 @@
         }
 
         #programme-editor .programme-activities-body {
-            flex: 1 1 0;
+            flex: 0 0 75%;
+            height: 75%;
+            max-height: 75%;
             min-width: 0;
             min-height: 0;
             display: flex;
@@ -8977,11 +9051,16 @@
                                         <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                     </svg>
                                 </button>
-                                <button type="button" class="add-speaker-button" id="filter-speakers" disabled aria-disabled="true" aria-label="Filter speakers (inactive)" title="Filter (inactive)">
-                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                        <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                    </svg>
-                                </button>
+                                    <button type="button" class="add-speaker-button" id="filter-speakers" disabled aria-disabled="true" aria-label="Filter speakers (inactive)" title="Filter (inactive)">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="speakers-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                                        </svg>
+                                    </button>
                             </div>
                             </div>
                         </div>
@@ -9225,6 +9304,10 @@
                             </div>
                         </div>
                         <p class="speaker-editor-empty" id="speaker-editor-empty" role="status">Select speaker</p>
+                    </div>
+                    <div class="speaker-overwatch" id="speaker-overwatch-panel" hidden aria-hidden="true" aria-label="Speaker overview">
+                        <h2 class="speaker-overwatch-title" id="speaker-overwatch-title">Overview</h2>
+                        <div class="speaker-overwatch-body" id="speaker-overwatch-body"></div>
                     </div>
                     </div>
                 </div>
@@ -9675,11 +9758,10 @@
                                     <span class="edit-guest-name-first" id="programme-activities-heading-label">ACTIVITIES</span>
                                 </div>
                             </div>
-                            <div class="edit-guest-top-trailing">
-                                <div class="programme-counter" id="programme-counter" hidden aria-live="polite">0 slots, 0 empty and 0 filled</div>
-                            </div>
+                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
                         </div>
                         <div class="programme-activities-body" id="programme-editor-activities-body"></div>
+                        <div class="programme-counter" id="programme-counter" hidden aria-live="polite">0 slots, 0 empty and 0 filled</div>
                     </div>
                 </div>
             </div>
@@ -10308,6 +10390,8 @@
         let guestFormEditingDocId = '';
         /** Guests Overwatch overview panel is open in the guest viewer. */
         var guestsOverwatchOpen = false;
+        /** Speakers Overwatch overview panel is open in the speaker viewer. */
+        var speakersOverwatchOpen = false;
         /** After prev/next guest: open **Guest management** strip if it was visible before navigation. */
         let guestEditorScrollToManagementOnNextPopulate = false;
         let guestEditorBottomPane = 'management';
@@ -13753,6 +13837,96 @@
             applyGuestsOverwatchUi();
         }
 
+        function applySpeakersOverwatchUi() {
+            var overwatch = document.getElementById('speaker-overwatch-panel');
+            var panel = document.getElementById('speaker-editor-panel');
+            var viewer = document.getElementById('speaker-viewer');
+            var emptyEl = document.getElementById('speaker-editor-empty');
+            var btn = document.getElementById('speakers-overwatch-btn');
+
+            if (viewer && overwatch && overwatch.parentElement !== viewer) {
+                viewer.appendChild(overwatch);
+            }
+            if (viewer && emptyEl && emptyEl.parentElement !== viewer) {
+                viewer.insertBefore(emptyEl, overwatch || null);
+            }
+
+            if (btn) {
+                btn.classList.toggle('is-active', !!speakersOverwatchOpen);
+                btn.setAttribute('aria-pressed', speakersOverwatchOpen ? 'true' : 'false');
+            }
+
+            if (speakersOverwatchOpen) {
+                if (viewer) {
+                    viewer.classList.remove('speaker-viewer--no-selection');
+                    viewer.classList.add('speaker-viewer--overwatch');
+                }
+                if (panel) {
+                    panel.hidden = true;
+                    panel.setAttribute('hidden', '');
+                    panel.setAttribute('aria-hidden', 'true');
+                    panel.classList.add('is-empty');
+                }
+                if (emptyEl) {
+                    emptyEl.hidden = true;
+                    emptyEl.setAttribute('hidden', '');
+                    emptyEl.setAttribute('aria-hidden', 'true');
+                }
+                if (overwatch) {
+                    overwatch.hidden = false;
+                    overwatch.removeAttribute('hidden');
+                    overwatch.classList.add('is-open');
+                    overwatch.setAttribute('aria-hidden', 'false');
+                }
+                var actions = document.getElementById('speaker-editor-actions');
+                if (actions) {
+                    actions.hidden = true;
+                    actions.setAttribute('aria-hidden', 'true');
+                }
+            } else {
+                if (viewer) viewer.classList.remove('speaker-viewer--overwatch');
+                if (panel) {
+                    panel.hidden = false;
+                    panel.removeAttribute('hidden');
+                    panel.removeAttribute('aria-hidden');
+                }
+                if (overwatch) {
+                    overwatch.hidden = true;
+                    overwatch.setAttribute('hidden', '');
+                    overwatch.classList.remove('is-open');
+                    overwatch.setAttribute('aria-hidden', 'true');
+                }
+            }
+        }
+
+        function closeSpeakersOverwatch() {
+            if (!speakersOverwatchOpen) return;
+            speakersOverwatchOpen = false;
+            applySpeakersOverwatchUi();
+        }
+
+        async function openSpeakersOverwatch() {
+            var id = String(speakerFormEditingDocId || '').trim();
+            if (id && id !== '_init') {
+                if (speakerBioFormChangedFromBaseline()) {
+                    await saveSpeakerFromEditor();
+                } else {
+                    syncAddSpeakerFormToMemoryIfEditing();
+                }
+            }
+            speakersOverwatchOpen = true;
+            speakerDraftFormActive = false;
+            speakerFormEditingDocId = '';
+            speakerPadlockIsOpen = false;
+            clearSpeakerRosterItemSelection();
+            clearSpeakerEditorFormFields();
+            captureSpeakerBioFormBaseline();
+            applySpeakersOverwatchUi();
+            updateSpeakerNavButtons();
+            updateAddSpeakerSaveButtonState();
+            updateAddSpeakerDeleteButtonState();
+        }
+
         function syncGuestEditabilityFromPadlock() {
             var panel = document.getElementById('guest-editor-panel');
             if (!panel) return;
@@ -13959,6 +14133,7 @@
         }
 
         function showSpeakerDraftForm() {
+            closeSpeakersOverwatch();
             speakerDraftFormActive = true;
             speakerFormEditingDocId = '';
             clearSpeakerRosterItemSelection();
@@ -14175,6 +14350,10 @@
         }
 
         function setSpeakerEditorEmptyState(isEmpty) {
+            if (speakersOverwatchOpen) {
+                applySpeakersOverwatchUi();
+                return;
+            }
             ensureSpeakerEditorEmptyInViewer();
             var panel = document.getElementById('speaker-editor-panel');
             var viewer = document.getElementById('speaker-viewer');
@@ -19736,6 +19915,7 @@
 
         function populateEditSpeakerFormFromRecord(s) {
             if (!s) return;
+            closeSpeakersOverwatch();
             speakerDraftFormActive = false;
             speakerPadlockIsOpen = false;
             speakerFormEditingDocId = String(s.id || '').trim();
@@ -22352,6 +22532,11 @@
             }
             if (isContent) {
                 loadAndRenderContentTable();
+            }
+            if (isSpeakers) {
+                void openSpeakersOverwatch().catch(function (err) {
+                    console.error('openSpeakersOverwatch on Speakers tab:', err);
+                });
             }
             if (isGuests) {
                 void loadAndRenderGuestsTable();
@@ -25025,6 +25210,16 @@
                     closeGuestsOverwatch();
                     clearGuestRosterItemSelection();
                     clearGuestEditorForm();
+                });
+            }
+            var speakersOverwatchBtn = document.getElementById('speakers-overwatch-btn');
+            if (speakersOverwatchBtn) {
+                speakersOverwatchBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openSpeakersOverwatch().catch(function (err) {
+                        console.error('speakers-overwatch-btn:', err);
+                    });
                 });
             }
             var guestsOverwatchBtn = document.getElementById('guests-overwatch-btn');
