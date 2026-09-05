@@ -298,6 +298,7 @@
         body.backend-page.backend-readonly #programme-add-slot-btn,
         body.backend-page.backend-readonly #programme-delete-session-btn,
         body.backend-page.backend-readonly #settings-site .settings-site-toggle-option,
+        body.backend-page.backend-readonly #settings-goals .settings-goal-number,
         body.backend-page.backend-readonly .guest-workflow-step-btn,
         body.backend-page.backend-readonly .speaker-workflow-phase-btn,
         body.backend-page.backend-readonly .speaker-request-lodging-btn,
@@ -496,7 +497,7 @@
             box-shadow: none !important;
         }
 
-        /* Placeholder tabs (Overview, Team, E-mailer, Finances) until their panels are built */
+        /* Placeholder tabs (Overview, E-mailer, Finances) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -533,6 +534,7 @@
         /* Unselected tabs: transparent, no border, white label. */
         .aspects .navigation #speakers-toggle:not(.is-active),
         .aspects .navigation #guests-toggle:not(.is-active),
+        .aspects .navigation #team-toggle:not(.is-active),
         .aspects .navigation #programme-toggle:not(.is-active),
         .aspects .navigation #lodging-toggle:not(.is-active),
         .aspects .navigation #content-toggle:not(.is-active),
@@ -587,6 +589,7 @@
 
         .speakers-overview,
         .guest-overview-section,
+        .team-section,
         .programme-section,
         .lodging-section,
         .content-editor-section,
@@ -618,6 +621,7 @@
 
         .speakers-overview.is-open,
         .guest-overview-section.is-open,
+        .team-section.is-open,
         .programme-section.is-open,
         .lodging-section.is-open,
         .content-editor-section.is-open,
@@ -695,7 +699,8 @@
         }
 
         .settings-site,
-        .settings-sections {
+        .settings-sections,
+        .settings-goals {
             flex: 0 0 auto;
             border: none;
             border-radius: 5px;
@@ -805,6 +810,7 @@
 
         .settings-site-toggle-label {
             display: block;
+            margin: 0;
             font-family: 'Inter', sans-serif;
             font-size: 0.875rem;
             font-weight: 500;
@@ -889,6 +895,36 @@
             outline: 2px solid #003153;
             outline-offset: 2px;
             z-index: 1;
+        }
+
+        #settings-goals .settings-goal-number {
+            width: 4.5rem;
+            min-width: 4.5rem;
+            max-width: 4.5rem;
+            margin: 0;
+            padding: 0.35rem 0.5rem;
+            border: 1px solid #003153;
+            border-radius: 5px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            box-sizing: border-box;
+            box-shadow: var(--backend-button-shadow);
+        }
+
+        #settings-goals .settings-goal-number:focus {
+            outline: 2px solid #003153;
+            outline-offset: 2px;
+        }
+
+        #settings-goals .settings-goal-number:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         .add-speaker-button,
@@ -2029,6 +2065,7 @@
         #content-editor .content-list-table,
         #content-editor .content-roster-table,
         #guest-editor .guests-list-table,
+        #team-editor .guests-list-table,
         #finances-editor .guests-list-table,
         #speaker-editor .speakers-roster-table,
         #programme-editor .programme-speakers-table,
@@ -2045,6 +2082,7 @@
         #content-editor .content-list-table thead th,
         #content-editor .content-roster-table thead th,
         #guest-editor .guests-list-table thead th,
+        #team-editor .guests-list-table thead th,
         #finances-editor .guests-list-table thead th,
         #speaker-editor .speakers-roster-table thead th,
         #programme-editor .programme-speakers-table thead th {
@@ -2058,6 +2096,7 @@
         #content-editor .content-list-table tbody td,
         #content-editor .content-roster-table tbody td,
         #guest-editor .guests-list-table tbody td,
+        #team-editor .guests-list-table tbody td,
         #finances-editor .guests-list-table tbody td,
         #speaker-editor .speakers-roster-table tbody td,
         #programme-editor .programme-speakers-table tbody td,
@@ -3018,6 +3057,134 @@
             align-items: stretch;
             gap: 0;
             min-height: 0;
+        }
+
+        #team-editor,
+        .team-section,
+        .team-section.is-open {
+            --editor-gunmetal-border: #e2e8f0;
+            background: #e2e8f0;
+            border: none;
+            padding: 16px;
+        }
+
+        #team-editor.is-open,
+        .team-section.is-open {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            min-height: 0;
+        }
+
+        #team-editor .team-overview {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            margin-top: 0;
+            min-width: 0;
+            flex: 1 1 0;
+            min-height: 0;
+            overflow: hidden;
+            height: 100%;
+            align-self: stretch;
+            box-sizing: border-box;
+        }
+
+        #team-editor .team-list {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            min-height: 0;
+            overflow: hidden;
+            flex: 1 1 0;
+            height: 100%;
+            align-self: stretch;
+            background: transparent;
+            padding: 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        #team-editor .team-list .guests-roster-list {
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #team-editor .team-list .guests-roster-scroll {
+            flex: 1 1 0;
+            min-height: 0;
+            height: auto;
+        }
+
+        #team-editor .team-list > .edit-guest-top.guests-list-heading {
+            background-color: #ffffff;
+            margin: 0;
+            border-radius: 5px 5px 0 0;
+            align-items: center;
+            gap: 0;
+            justify-content: flex-start;
+            color: #000000;
+            border-bottom: 1px solid #cbd5e1;
+            box-sizing: border-box;
+            flex: 0 0 auto;
+            width: 100%;
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+        }
+
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer {
+            display: none;
+        }
+
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 0 var(--backend-table-cell-pad-x) 0 0;
+            box-sizing: border-box;
+        }
+
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap {
+            flex: 0 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .edit-guest-name-last {
+            color: #000000;
+            justify-content: flex-start;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .selected-guestname {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0.5rem;
+            padding: 8px 0;
+            box-sizing: border-box;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 100%;
         }
 
         #finances-editor,
@@ -4397,13 +4564,15 @@
         }
 
         /* Pack guest columns to the left; headers + pills stay centered in each column. */
-        #guest-editor .guests-roster-items {
+        #guest-editor .guests-roster-items,
+        #team-editor .guests-roster-items {
             width: max-content;
             min-width: max-content;
             margin-right: auto;
         }
 
-        #guest-editor .guests-list-table {
+        #guest-editor .guests-list-table,
+        #team-editor .guests-list-table {
             width: max-content;
             min-width: max-content;
         }
@@ -4509,12 +4678,14 @@
         }
 
         /* Guests roster: first column stays fixed while the table scrolls horizontally. */
-        #guest-editor .guests-list-table thead th:nth-child(1) {
+        #guest-editor .guests-list-table thead th:nth-child(1),
+        #team-editor .guests-list-table thead th:nth-child(1) {
             left: 0;
             z-index: 3;
         }
 
-        #guest-editor .guests-list-table tbody td.guests-roster-name-cell {
+        #guest-editor .guests-list-table tbody td.guests-roster-name-cell,
+        #team-editor .guests-list-table tbody td.guests-roster-name-cell {
             position: sticky;
             left: 0;
             z-index: 1;
@@ -4522,8 +4693,20 @@
         }
 
         #guest-editor .guests-list-table tbody tr:hover td,
-        #guest-editor .guests-list-table tbody tr.is-selected td {
+        #guest-editor .guests-list-table tbody tr.is-selected td,
+        #team-editor .guests-list-table tbody tr:hover td,
+        #team-editor .guests-list-table tbody tr.is-selected td {
             background: #71C7FE;
+        }
+
+        #team-editor .guests-list-table tbody tr,
+        #team-editor .guests-list-table tbody td {
+            height: calc(var(--backend-roster-pill-min-height) + (2 * var(--backend-roster-row-pad-y)));
+            box-sizing: border-box;
+        }
+
+        #team-editor .guests-list-table tbody td {
+            line-height: 1.2;
         }
 
         .speakers-roster-table tbody td,
@@ -4538,6 +4721,7 @@
 
         .speaker-roster-row,
         .guests-roster-row,
+        .team-roster-row,
         .content-roster-row {
             cursor: pointer;
             background: #fff;
@@ -5993,6 +6177,8 @@
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #team-editor .team-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-last,
@@ -7990,6 +8176,7 @@
         body.backend-page .texteditor,
         body.backend-page #speaker-editor,
         body.backend-page #guest-editor,
+        body.backend-page #team-editor,
         body.backend-page #programme-editor,
         body.backend-page #lodging-editor,
         body.backend-page #content-editor,
@@ -8788,14 +8975,7 @@
                                 title="Coming soon">Overview</span>
                             <a href="#speaker-editor" class="backend-editor-link is-active" id="speakers-toggle" role="button" aria-expanded="true" aria-controls="speaker-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Speakers</a>
                             <a href="#guest-editor" class="backend-editor-link" id="guests-toggle" role="button" aria-expanded="false" aria-controls="guest-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Guests</a>
-                            <span
-                                class="backend-editor-link backend-editor-link--inactive"
-                                id="team-toggle"
-                                role="button"
-                                aria-disabled="true"
-                                aria-expanded="false"
-                                tabindex="-1"
-                                title="Coming soon">Team</span>
+                            <a href="#team-editor" class="backend-editor-link" id="team-toggle" role="button" aria-expanded="false" aria-controls="team-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Team</a>
                             <a href="#programme-editor" class="backend-editor-link" id="programme-toggle" role="button" aria-expanded="false" aria-controls="programme-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Programme</a>
                             <a href="#lodging-editor" class="backend-editor-link" id="lodging-toggle" role="button" aria-expanded="false" aria-controls="lodging-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Lodging</a>
                             <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
@@ -9701,6 +9881,35 @@
                 </div>
             </section>
 
+            <section class="team-section" id="team-editor" aria-hidden="true" aria-label="Team" data-name="team-editor">
+                <div class="team-overview">
+                    <div class="team-list" id="team-list" aria-label="Team list">
+                        <div class="edit-guest-top guests-list-heading" id="team-list-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Team list title">
+                                    <span class="edit-guest-name-first" id="team-list-heading-event" aria-live="polite">—</span>
+                                    <span class="edit-guest-name-last" id="team-list-heading-suffix">TEAM</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                        </div>
+                        <div class="guests-roster-list" id="team-roster-list">
+                            <div class="guests-roster-scroll">
+                                <div class="guests-roster-items" id="team-roster-items" aria-live="polite">
+                                    <table class="guests-list-table" role="grid" aria-label="Team">
+                                        <thead>
+                                            <tr></tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="programme-section" id="programme-editor" aria-hidden="true" aria-label="Programme" data-name="programme-editor">
             <div class="programme-editor">
                 <div class="editor-body">
@@ -10213,6 +10422,34 @@
                                     <button type="button" class="settings-site-toggle-option" data-section-key="registration" data-value="no" aria-pressed="false">No</button>
                                     <button type="button" class="settings-site-toggle-option is-active" data-section-key="registration" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-goals" id="settings-goals">
+                        <div class="settings-site-toggles">
+                            <div class="edit-guest-top guests-list-heading speakers-list-top" id="settings-goals-heading">
+                                <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                                <div class="selected-guestname-wrap">
+                                    <div class="selected-guestname" role="group" aria-label="Goals">
+                                        <span class="edit-guest-name-first">Goals</span>
+                                    </div>
+                                </div>
+                                <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                            </div>
+                            <div class="settings-site-toggle-row">
+                                <div class="settings-site-toggle-label-wrap">
+                                    <label class="settings-site-toggle-label" id="settings-goal-n-team-label" for="settings-goal-n-team">N Team</label>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="settings-goal-n-team"
+                                    name="settings-goal-n-team"
+                                    class="settings-goal-number"
+                                    min="0"
+                                    step="1"
+                                    inputmode="numeric"
+                                    aria-labelledby="settings-goal-n-team-label"
+                                >
                             </div>
                         </div>
                     </div>
@@ -14721,9 +14958,11 @@
         var FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
         var FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
         var FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
+        var FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD = 'N Team';
         /** Document `tbs/Settings/Zermatt/Zermatt` field `filterguests` (JSON map of guests-table filters). */
         var FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD = 'filterguests';
         var siteSettingsSaveInFlight = false;
+        var settingsGoalNTeamLastSaved = null;
 
         function tbsSettingsDocRef(db) {
             return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
@@ -14736,6 +14975,118 @@
         function tbsSettingsRootDocRef(db) {
             return db.collection('tbs').doc('Settings');
         }
+
+        /** Document `tbs/Settings/{event}/{event}` (event-specific settings, including `nteam`). */
+        function tbsSettingsEventDocRef(db, eventName) {
+            var ev = String(eventName || '').trim();
+            return db.collection('tbs').doc('Settings').collection(ev).doc(ev);
+        }
+
+        /** Document `tbs/Team` (parent). Each subcollection is one team member. */
+        function tbsTeamParentDocRef(db) {
+            return db.collection('tbs').doc('Team');
+        }
+
+        function teamIdsFromTbsTeamParentData(data) {
+            if (!data || typeof data !== 'object') return [];
+            var arrayKeys = [
+                'teamIds',
+                'memberIds',
+                'rowIds',
+                'ids',
+                'order',
+                'teamOrder',
+                'documents',
+                'collectionIds',
+                'subcollections',
+            ];
+            for (var i = 0; i < arrayKeys.length; i++) {
+                var k = arrayKeys[i];
+                var v = data[k];
+                if (Array.isArray(v) && v.length) {
+                    var out = v
+                        .map(function (x) {
+                            return String(x != null ? x : '').trim();
+                        })
+                        .filter(Boolean);
+                    if (out.length) return out;
+                }
+            }
+            return [];
+        }
+
+        async function listTeamIdsViaCloudFunction() {
+            var projectId = String((firebaseConfig && firebaseConfig.projectId) || '').trim();
+            if (!projectId) return [];
+            var fnUrl =
+                'https://us-central1-' +
+                projectId +
+                '.cloudfunctions.net/listTbsTeamCollectionIdsHttp';
+            var resp = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}',
+            });
+            var data = {};
+            try {
+                data = await resp.json();
+            } catch (_) {}
+            if (!resp.ok) {
+                console.warn(
+                    'listTeamIdsViaCloudFunction',
+                    resp.status,
+                    data && data.error ? data.error : ''
+                );
+                return [];
+            }
+            return Array.isArray(data.collectionIds) ? data.collectionIds : [];
+        }
+
+        async function listTeamIdsUnderTbsTeam(db) {
+            var seen = Object.create(null);
+            var ids = [];
+            function addId(raw) {
+                var id = String(raw != null ? raw : '').trim();
+                if (!id || seen[id]) return;
+                seen[id] = true;
+                ids.push(id);
+            }
+            try {
+                var fnIds = await listTeamIdsViaCloudFunction();
+                if (Array.isArray(fnIds)) fnIds.forEach(addId);
+            } catch (fnErr) {
+                console.warn('listTeamIdsUnderTbsTeam function', fnErr);
+            }
+            if (ids.length) return ids;
+            try {
+                var idToken = await ensureFirebaseAuthForFirestoreRest();
+                var restIds = await firestoreRestListCollectionIdsUnderDocumentPath(
+                    'tbs/Team',
+                    idToken
+                );
+                if (Array.isArray(restIds)) restIds.forEach(addId);
+            } catch (restErr) {
+                console.warn('listTeamIdsUnderTbsTeam REST', restErr);
+            }
+            try {
+                var sdkIds = await firestoreSdkListCollectionIdsUnderParent(db, 'Team');
+                if (Array.isArray(sdkIds)) sdkIds.forEach(addId);
+            } catch (sdkErr) {
+                console.warn('listTeamIdsUnderTbsTeam SDK', sdkErr);
+            }
+            try {
+                var parentSnap = await tbsTeamParentDocRef(db).get();
+                if (parentSnap && parentSnap.exists) {
+                    teamIdsFromTbsTeamParentData(parentSnap.data() || {}).forEach(addId);
+                }
+            } catch (parentErr) {
+                console.warn('listTeamIdsUnderTbsTeam parent', parentErr);
+            }
+            return ids;
+        }
+
+        var FIRESTORE_TBS_SETTINGS_NTEAM_FIELD_KEYS = ['nteam', 'nTeam', 'N Team', 'NTeam'];
+        var TEAM_TABLE_MAX_ROWS = 200;
 
         var TBS_SETTINGS_EVENT_FIELD_KEYS = [
             'Current event',
@@ -14880,7 +15231,310 @@
                 'passwordProtectHome',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD], false)
             );
+            setSettingsGoalNTeamUi(data[FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD]);
             syncWaitingListToggleEnabledFromUi();
+        }
+
+        function normalizeSettingsGoalNumber(value) {
+            if (value == null || value === '') return null;
+            var n = typeof value === 'number' ? value : parseInt(String(value).trim(), 10);
+            if (!Number.isFinite(n) || n < 0) return null;
+            return Math.floor(n);
+        }
+
+        function setSettingsGoalNTeamUi(value) {
+            var input = document.getElementById('settings-goal-n-team');
+            var n = normalizeSettingsGoalNumber(value);
+            settingsGoalNTeamLastSaved = n;
+            if (input) input.value = n == null ? '' : String(n);
+        }
+
+        async function saveSettingsGoalNTeamToFirestore(n) {
+            if (backenduserIsReadonly) throw backendReadonlyError();
+            var db = getFirestore();
+            var patch = {};
+            patch[FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD] = n;
+            await tbsSettingsDocRef(db).set(patch, { merge: true });
+        }
+
+        async function onSettingsGoalNTeamCommit() {
+            if (backendBlockIfReadonly()) {
+                setSettingsGoalNTeamUi(settingsGoalNTeamLastSaved);
+                return;
+            }
+            var input = document.getElementById('settings-goal-n-team');
+            if (!input) return;
+            var raw = String(input.value || '').trim();
+            var n = raw === '' ? null : normalizeSettingsGoalNumber(raw);
+            if (raw !== '' && n == null) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'N Team must be a whole number of 0 or more.');
+                }
+                setSettingsGoalNTeamUi(settingsGoalNTeamLastSaved);
+                return;
+            }
+            if (n === settingsGoalNTeamLastSaved) {
+                setSettingsGoalNTeamUi(n);
+                return;
+            }
+            if (n == null) {
+                setSettingsGoalNTeamUi(settingsGoalNTeamLastSaved);
+                return;
+            }
+            if (siteSettingsSaveInFlight) return;
+            siteSettingsSaveInFlight = true;
+            try {
+                if (typeof showStatus === 'function') showStatus('loading', 'Saving goal…');
+                await saveSettingsGoalNTeamToFirestore(n);
+                settingsGoalNTeamLastSaved = n;
+                setSettingsGoalNTeamUi(n);
+                if (typeof showStatus === 'function') showStatus('success', 'Goal saved.');
+            } catch (err) {
+                console.error('saveSettingsGoalNTeamToFirestore:', err);
+                try {
+                    await loadSiteSettingsFromFirestore();
+                } catch (reloadErr) {
+                    console.error('loadSiteSettingsFromFirestore:', reloadErr);
+                }
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to save goal.');
+                }
+            } finally {
+                siteSettingsSaveInFlight = false;
+            }
+        }
+
+        function coalesceFirestoreFieldValue(data, keys) {
+            if (!data || typeof data !== 'object' || !keys || !keys.length) return null;
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                if (!Object.prototype.hasOwnProperty.call(data, k) || data[k] == null) continue;
+                return data[k];
+            }
+            return null;
+        }
+
+        function renderTeamTableRows(count, emptyMessage) {
+            renderTeamTable([], count, emptyMessage);
+        }
+
+        function teamMemberRecordFromDoc(docId, d) {
+            d = d || {};
+            return {
+                id: String(docId || '').trim(),
+                firstName: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, [
+                        'firstname',
+                        'firstName',
+                        'First name',
+                        'First Name',
+                        'Firstname',
+                    ])
+                ),
+                lastName: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, [
+                        'lastname',
+                        'lastName',
+                        'Last name',
+                        'Last Name',
+                        'Lastname',
+                    ])
+                ),
+                event: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['event', 'Event', 'Events'])
+                ),
+            };
+        }
+
+        function teamMemberMatchesCurrentEvent(rec) {
+            var ev = String(rec && rec.event != null ? rec.event : '').trim();
+            if (!ev) return true;
+            return rosterRecordEventMatchesCurrentEvent(rec);
+        }
+
+        function compareTeamMembers(a, b) {
+            var la = String(a && a.lastName ? a.lastName : '').trim().toLowerCase();
+            var lb = String(b && b.lastName ? b.lastName : '').trim().toLowerCase();
+            var c = la.localeCompare(lb);
+            if (c !== 0) return c;
+            var fa = String(a && a.firstName ? a.firstName : '').trim().toLowerCase();
+            var fb = String(b && b.firstName ? b.firstName : '').trim().toLowerCase();
+            c = fa.localeCompare(fb);
+            if (c !== 0) return c;
+            return String(a && a.id ? a.id : '').localeCompare(String(b && b.id ? b.id : ''));
+        }
+
+        function bestTeamMemberRecord(records) {
+            var best = null;
+            var bestScore = -1;
+            if (!Array.isArray(records)) return null;
+            for (var i = 0; i < records.length; i++) {
+                var rec = records[i];
+                if (!rec) continue;
+                var score =
+                    (rec.firstName ? 2 : 0) +
+                    (rec.lastName ? 2 : 0) +
+                    (rec.event ? 1 : 0);
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = rec;
+                }
+            }
+            return best;
+        }
+
+        function renderTeamTable(members, rowCount, emptyMessage) {
+            var itemsEl = document.getElementById('team-roster-items');
+            if (!itemsEl) return;
+            var list = Array.isArray(members) ? members.slice() : [];
+            var nteam = Math.max(0, Math.floor(Number(rowCount) || 0));
+            var n = Math.max(nteam, list.length);
+            if (n > TEAM_TABLE_MAX_ROWS) n = TEAM_TABLE_MAX_ROWS;
+            var html =
+                '<table class="guests-list-table" role="grid" aria-label="Team">' +
+                '<thead><tr>' +
+                '<th scope="col">Name</th>' +
+                '</tr></thead><tbody>';
+            if (n < 1) {
+                if (emptyMessage) {
+                    html +=
+                        '<tr class="team-roster-row">' +
+                        '<td class="guests-roster-empty">' +
+                        escapeHtml(emptyMessage) +
+                        '</td></tr>';
+                }
+            } else {
+                for (var i = 0; i < n; i++) {
+                    var m = list[i];
+                    if (m) {
+                        var nameLabel = (
+                            String(m.firstName || '').trim() +
+                            ' ' +
+                            String(m.lastName || '').trim()
+                        ).trim();
+                        html +=
+                            '<tr class="team-roster-row" data-team-index="' +
+                            i +
+                            '" data-team-id="' +
+                            escapeHtml(m.id) +
+                            '">' +
+                            '<td class="guests-roster-name-cell">' +
+                            (nameLabel ? escapeHtml(nameLabel) : '&nbsp;') +
+                            '</td></tr>';
+                    } else {
+                        html +=
+                            '<tr class="team-roster-row" data-team-index="' +
+                            i +
+                            '"><td class="guests-roster-name-cell">&nbsp;</td></tr>';
+                    }
+                }
+            }
+            html += '</tbody></table>';
+            itemsEl.innerHTML = html;
+        }
+
+        async function fetchTeamMembersFromFirestore(eventName) {
+            var ev = String(eventName || '').trim();
+            if (!ev) return [];
+            var db = getFirestore();
+            var ids = await listTeamIdsUnderTbsTeam(db);
+            if (!ids.length) return [];
+            var parent = tbsTeamParentDocRef(db);
+            var raw = [];
+            var chunkSize = 8;
+            for (var i = 0; i < ids.length; i += chunkSize) {
+                var chunk = ids.slice(i, i + chunkSize);
+                var colSnaps = await Promise.all(
+                    chunk.map(function (rowId) {
+                        return parent.collection(rowId).get();
+                    })
+                );
+                for (var j = 0; j < chunk.length; j++) {
+                    var memberId = chunk[j];
+                    var colSnap = colSnaps[j];
+                    var candidates = [];
+                    if (colSnap && !colSnap.empty) {
+                        colSnap.forEach(function (doc) {
+                            candidates.push(
+                                teamMemberRecordFromDoc(memberId, doc.data() || {})
+                            );
+                        });
+                    }
+                    var matching = candidates.filter(teamMemberMatchesCurrentEvent);
+                    var picked = bestTeamMemberRecord(
+                        matching.length ? matching : candidates
+                    );
+                    if (!picked && (!colSnap || colSnap.empty)) {
+                        var sameIdSnap = await parent.collection(memberId).doc(memberId).get();
+                        if (sameIdSnap && sameIdSnap.exists) {
+                            picked = teamMemberRecordFromDoc(
+                                memberId,
+                                sameIdSnap.data() || {}
+                            );
+                        }
+                    }
+                    if (picked) raw.push(picked);
+                }
+            }
+            var out = raw.filter(teamMemberMatchesCurrentEvent);
+            out.sort(compareTeamMembers);
+            return out;
+        }
+
+        async function fetchTeamRowCountFromFirestore() {
+            var eventName = String(current_event || '').trim();
+            if (!eventName) return { nteam: 0, error: 'no-event' };
+            var db = getFirestore();
+            var eventSnap = await tbsSettingsEventDocRef(db, eventName).get();
+            var eventData = eventSnap && eventSnap.exists ? eventSnap.data() || {} : {};
+            var n = normalizeSettingsGoalNumber(
+                coalesceFirestoreFieldValue(eventData, FIRESTORE_TBS_SETTINGS_NTEAM_FIELD_KEYS)
+            );
+            if (n == null) {
+                return { nteam: 0, error: 'no-nteam', eventName: eventName };
+            }
+            return { nteam: n, eventName: eventName };
+        }
+
+        async function loadAndRenderTeamTable() {
+            updateGuestsListHeadingDisplay();
+            var eventName = String(current_event || '').trim();
+            if (!eventName) {
+                renderTeamTable([], 0, 'Set a current event to load the team table.');
+                return;
+            }
+            try {
+                var result = await fetchTeamRowCountFromFirestore();
+                var nteam = result.error === 'no-nteam' ? 0 : result.nteam;
+                if (result.error === 'no-nteam' && typeof showStatus === 'function') {
+                    showStatus('error', 'Team: missing nteam for ' + eventName + '.');
+                }
+                var members = await fetchTeamMembersFromFirestore(eventName);
+                if (!members.length && nteam < 1) {
+                    renderTeamTable(
+                        [],
+                        0,
+                        result.error === 'no-nteam'
+                            ? 'No nteam on tbs/Settings/' + eventName + '/' + eventName + '.'
+                            : 'No team members in tbs/Team.'
+                    );
+                    return;
+                }
+                renderTeamTable(members, nteam, '');
+            } catch (err) {
+                console.error('loadAndRenderTeamTable:', err);
+                renderTeamTable(
+                    [],
+                    0,
+                    err && err.message ? err.message : 'Failed to load team table.'
+                );
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to load team table.'
+                    );
+                }
+            }
         }
 
         async function saveSiteSettingToFirestore(settingKey, yesNoUi) {
@@ -15140,6 +15794,8 @@
             if (eventEl) eventEl.textContent = eventLabel;
             var speakersEventEl = document.getElementById('speakers-list-heading-event');
             if (speakersEventEl) speakersEventEl.textContent = eventLabel;
+            var teamEventEl = document.getElementById('team-list-heading-event');
+            if (teamEventEl) teamEventEl.textContent = eventLabel;
             var programmeEventEl = document.getElementById('programme-list-heading-event');
             if (programmeEventEl) programmeEventEl.textContent = eventLabel;
             var settingsEventEl = document.getElementById('settings-list-heading-event');
@@ -15342,6 +15998,12 @@
                     fetchSpeakersForSelectedEvent(),
                     loadProgrammeFromFirestore(next),
                 ]);
+                var teamEditorEl = document.getElementById('team-editor');
+                if (teamEditorEl && teamEditorEl.classList.contains('is-open')) {
+                    void loadAndRenderTeamTable().catch(function (err) {
+                        console.error('loadAndRenderTeamTable:', err);
+                    });
+                }
                 var selectedGuestId = String(guestFormEditingDocId || '').trim();
                 if (selectedGuestId && !findGuestInMemory(selectedGuestId)) {
                     clearGuestEditorForm();
@@ -22419,14 +23081,23 @@
             const isFinances = panel === 'finances';
             const isSettings = panel === 'settings';
             const isGuests = panel === 'guests';
+            const isTeam = panel === 'team';
             const isProgramme = panel === 'programme';
             const isLodging = panel === 'lodging';
             const isSpeakers =
                 panel === 'speakers' ||
-                (!isEditor && !isContent && !isFinances && !isSettings && !isGuests && !isProgramme && !isLodging);
+                (!isEditor &&
+                    !isContent &&
+                    !isFinances &&
+                    !isSettings &&
+                    !isGuests &&
+                    !isTeam &&
+                    !isProgramme &&
+                    !isLodging);
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
+            const teamEditorSection = document.getElementById('team-editor');
             const programmeEditorSection = document.getElementById('programme-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
@@ -22435,6 +23106,7 @@
             const editorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');
+            const teamToggle = document.getElementById('team-toggle');
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
@@ -22451,6 +23123,10 @@
             if (guestEditorSection) {
                 guestEditorSection.classList.toggle('is-open', isGuests);
                 guestEditorSection.setAttribute('aria-hidden', isGuests ? 'false' : 'true');
+            }
+            if (teamEditorSection) {
+                teamEditorSection.classList.toggle('is-open', isTeam);
+                teamEditorSection.setAttribute('aria-hidden', isTeam ? 'false' : 'true');
             }
             if (programmeEditorSection) {
                 programmeEditorSection.classList.toggle('is-open', isProgramme);
@@ -22484,6 +23160,10 @@
                 guestsToggle.setAttribute('aria-expanded', isGuests ? 'true' : 'false');
                 guestsToggle.classList.toggle('is-active', isGuests);
             }
+            if (teamToggle) {
+                teamToggle.setAttribute('aria-expanded', isTeam ? 'true' : 'false');
+                teamToggle.classList.toggle('is-active', isTeam);
+            }
             if (programmeToggle) {
                 programmeToggle.setAttribute('aria-expanded', isProgramme ? 'true' : 'false');
                 programmeToggle.classList.toggle('is-active', isProgramme);
@@ -22509,7 +23189,7 @@
                 programmeCounterEl.hidden = !isProgramme;
                 if (isProgramme) updateProgrammeCounterDisplay();
             }
-            if (isGuests || isSpeakers) updateGuestsListHeadingDisplay();
+            if (isGuests || isSpeakers || isTeam) updateGuestsListHeadingDisplay();
             var contentActionsEl = document.getElementById('content-actions');
             if (contentActionsEl) {
                 contentActionsEl.hidden = !isContent;
@@ -22559,6 +23239,11 @@
             if (isLodging) {
                 void refreshLodgingSubcollectionsList();
             }
+            if (isTeam) {
+                void loadAndRenderTeamTable().catch(function (err) {
+                    console.error('loadAndRenderTeamTable:', err);
+                });
+            }
             if (isSettings) {
                 void loadSiteSettingsFromFirestore().catch(function (err) {
                     console.error('loadSiteSettingsFromFirestore:', err);
@@ -22577,6 +23262,7 @@
             const editorToggle = document.getElementById('texteditor-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');
+            const teamToggle = document.getElementById('team-toggle');
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
@@ -22585,6 +23271,7 @@
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
+            const teamEditorSection = document.getElementById('team-editor');
             const programmeEditorSection = document.getElementById('programme-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
@@ -22619,6 +23306,11 @@
                 guestsToggle.setAttribute('tabindex', '0');
                 guestsToggle.setAttribute('aria-disabled', 'false');
             }
+            if (teamToggle) {
+                teamToggle.setAttribute('aria-hidden', 'false');
+                teamToggle.setAttribute('tabindex', '0');
+                teamToggle.setAttribute('aria-disabled', 'false');
+            }
             if (programmeToggle) {
                 programmeToggle.setAttribute('aria-hidden', 'false');
                 programmeToggle.setAttribute('tabindex', '0');
@@ -22651,6 +23343,10 @@
                     guestEditorSection.classList.remove('is-open');
                     guestEditorSection.setAttribute('aria-hidden', 'true');
                 }
+                if (teamEditorSection) {
+                    teamEditorSection.classList.remove('is-open');
+                    teamEditorSection.setAttribute('aria-hidden', 'true');
+                }
                 if (programmeEditorSection) {
                     programmeEditorSection.classList.remove('is-open');
                     programmeEditorSection.setAttribute('aria-hidden', 'true');
@@ -22678,6 +23374,10 @@
                 if (guestsToggle) {
                     guestsToggle.setAttribute('aria-expanded', 'false');
                     guestsToggle.classList.remove('is-active');
+                }
+                if (teamToggle) {
+                    teamToggle.setAttribute('aria-expanded', 'false');
+                    teamToggle.classList.remove('is-active');
                 }
                 if (programmeToggle) {
                     programmeToggle.setAttribute('aria-expanded', 'false');
@@ -24752,6 +25452,13 @@
                     setBackendPanel('guests');
                 });
             }
+            var teamToggle = document.getElementById('team-toggle');
+            if (teamToggle) {
+                teamToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setBackendPanel('team');
+                });
+            }
             if (programmeToggle) {
                 programmeToggle.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -24852,6 +25559,18 @@
                     onSettingsSectionToggleClick(btn);
                 });
             });
+            var settingsGoalNTeamInput = document.getElementById('settings-goal-n-team');
+            if (settingsGoalNTeamInput) {
+                settingsGoalNTeamInput.addEventListener('blur', function() {
+                    void onSettingsGoalNTeamCommit();
+                });
+                settingsGoalNTeamInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        settingsGoalNTeamInput.blur();
+                    }
+                });
+            }
             var addSpeakerBtn = document.getElementById('add-speaker-button');
             var addSpeakerForm = document.getElementById('speaker-editor-panel');
             if (addSpeakerBtn && addSpeakerForm) {

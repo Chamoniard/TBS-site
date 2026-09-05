@@ -2351,3 +2351,41 @@ export const submitRegistrationHttp = onRequest({
     });
   }
 });
+
+/**
+ * Lists every subcollection under document `tbs/Team`.
+ * Each subcollection is one team member. Browser clients cannot call
+ * Firestore listCollectionIds (403).
+ */
+export const listTbsTeamCollectionIdsHttp = onRequest({
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "GET" && req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  try {
+    const db = getFirestore();
+    const cols = await db.collection("tbs").doc("Team").listCollections();
+    const collectionIds = cols
+      .map((col) => String(col.id || "").trim())
+      .filter(Boolean);
+    res.status(200).json({collectionIds});
+  } catch (err) {
+    logger.error("listTbsTeamCollectionIdsHttp failed", {err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Could not list team members.",
+    });
+  }
+});
