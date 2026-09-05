@@ -582,6 +582,51 @@ function initMobileViewerYouTubePlayer(viewerRoot) {
     playBtn.addEventListener('click', () => activateMobileViewerYouTube(postVideo));
 }
 
+/** Stop YouTube/HTML5 playback in the video viewer so audio does not continue after leaving. */
+function stopViewerMedia(root) {
+    const viewer =
+        root ||
+        document.querySelector('.everything > .viewer-section') ||
+        document.querySelector('.viewer-section');
+    if (!viewer) return;
+    viewer.querySelectorAll('iframe').forEach(function (iframe) {
+        try {
+            const win = iframe.contentWindow;
+            if (win) {
+                win.postMessage(
+                    '{"event":"command","func":"stopVideo","args":""}',
+                    '*'
+                );
+                win.postMessage(
+                    '{"event":"command","func":"pauseVideo","args":""}',
+                    '*'
+                );
+            }
+        } catch (e) {
+            /* ignore cross-origin */
+        }
+        iframe.src = 'about:blank';
+        iframe.removeAttribute('src');
+    });
+    viewer.querySelectorAll('video, audio').forEach(function (media) {
+        try {
+            media.pause();
+            media.currentTime = 0;
+        } catch (e) {
+            /* ignore */
+        }
+        media.removeAttribute('src');
+        media.querySelectorAll('source').forEach(function (source) {
+            source.removeAttribute('src');
+        });
+        try {
+            media.load();
+        } catch (e2) {
+            /* ignore */
+        }
+    });
+}
+
 /**
  * Start loading unique post thumbnail URLs into the browser image cache as soon as
  * `allPosts` exists (Past talks / #blogGrid may not be mounted yet on first paint).
@@ -1084,6 +1129,7 @@ function showPostOnSamePage(post, options) {
             }
         }
 
+        stopViewerMedia(viewerSection);
         viewerSection.classList.remove('is-collapsed');
         viewerSection.hidden = false;
         viewerSection.setAttribute('aria-hidden', 'false');
@@ -1118,6 +1164,7 @@ async function showBlogFeed(options) {
     if (main) {
         const viewerSection = main.querySelector(':scope > .viewer-section');
         if (viewerSection) {
+            stopViewerMedia(viewerSection);
             viewerSection.classList.add('is-collapsed');
             viewerSection.hidden = true;
             viewerSection.setAttribute('aria-hidden', 'true');
@@ -3257,6 +3304,7 @@ function collapseViewerAndPastTalksForHome() {
     if (!main) return;
     const viewerSection = main.querySelector(':scope > .viewer-section');
     if (viewerSection) {
+        stopViewerMedia(viewerSection);
         viewerSection.classList.add('is-collapsed');
         viewerSection.hidden = true;
         viewerSection.setAttribute('aria-hidden', 'true');

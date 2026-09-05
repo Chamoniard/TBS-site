@@ -1226,14 +1226,35 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
       entries.filter((e) => e.guestId === filterGuestId) :
       entries;
 
+    const alreadyPaidIds = new Set<string>();
+    const stillUnpaidIds = new Set<string>();
+    const updatedIds = new Set<string>();
+    const checkedIds = new Set<string>();
+
+    const noteAlreadyPaid = (guestId: string) => {
+      if (updatedIds.has(guestId)) return;
+      alreadyPaidIds.add(guestId);
+      stillUnpaidIds.delete(guestId);
+    };
+    const noteUpdated = (guestId: string) => {
+      updatedIds.add(guestId);
+      alreadyPaidIds.delete(guestId);
+      stillUnpaidIds.delete(guestId);
+    };
+    const noteStillUnpaid = (guestId: string) => {
+      if (updatedIds.has(guestId) || alreadyPaidIds.has(guestId)) return;
+      stillUnpaidIds.add(guestId);
+    };
+
     const unpaidWithInvoice = scoped.filter((entry) => {
       const paidYes = String(entry.data["Paid"] || "")
         .trim()
         .toLowerCase() === "yes";
       const invoiceId = String(entry.data["Stripe Invoice Id"] || "").trim();
       if (!invoiceId) return false;
+      checkedIds.add(entry.guestId);
       if (paidYes) {
-        summary.alreadyPaid++;
+        noteAlreadyPaid(entry.guestId);
         return false;
       }
       return true;
@@ -1241,7 +1262,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
 
     const retrieveOne = async (entry: GuestItemIndexEntry) => {
       const invoiceId = String(entry.data["Stripe Invoice Id"] || "").trim();
-      summary.checked++;
+      checkedIds.add(entry.guestId);
       try {
         const invoice = await stripe.invoices.retrieve(invoiceId);
         const invoiceFields: StripePaidInvoiceFields = {
@@ -1256,7 +1277,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           created: invoice.created,
         };
         if (!isStripeInvoicePaid(invoiceFields)) {
-          summary.openOrUnpaid++;
+          noteStillUnpaid(entry.guestId);
           return;
         }
         const result = await applyStripePaidInvoiceToGuest(
@@ -1264,10 +1285,9 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           invoiceFields,
         );
         if (result.updated) {
-          summary.updated++;
-          summary.updatedGuestIds.push(entry.guestId);
+          noteUpdated(entry.guestId);
         } else if (result.alreadyPaid) {
-          summary.alreadyPaid++;
+          noteAlreadyPaid(entry.guestId);
         }
       } catch (err) {
         logger.warn("reconcileStripePaidInvoicesHttp retrieve failed", {
@@ -1331,18 +1351,22 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           invoiceFields,
         );
         const guestIdFromPath = itemRef.parent.id;
+        checkedIds.add(guestIdFromPath);
         if (result.updated) {
-          summary.updated++;
-          if (!summary.updatedGuestIds.includes(guestIdFromPath)) {
-            summary.updatedGuestIds.push(guestIdFromPath);
-          }
+          noteUpdated(guestIdFromPath);
         } else if (result.alreadyPaid) {
-          summary.alreadyPaid++;
+          noteAlreadyPaid(guestIdFromPath);
         }
       }
       if (!list.has_more || list.data.length === 0) break;
       startingAfter = list.data[list.data.length - 1].id;
     }
+
+    summary.checked = checkedIds.size;
+    summary.alreadyPaid = alreadyPaidIds.size;
+    summary.openOrUnpaid = stillUnpaidIds.size;
+    summary.updated = updatedIds.size;
+    summary.updatedGuestIds = Array.from(updatedIds);
 
     logger.info("reconcileStripePaidInvoicesHttp done", summary);
     res.status(200).json(summary);
