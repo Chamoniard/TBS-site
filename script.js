@@ -1008,19 +1008,47 @@ function setupEventListeners() {
     });
     }
 
+    setupMoreVideosCardListeners();
+}
+
+let moreVideosListenersWired = false;
+
+function openMoreVideosCard(card) {
+    if (!card) return;
+    const postId = String(card.getAttribute('data-post-id') || '').trim();
+    if (postId) {
+        const fromAll = (allPosts || []).find((post) => post && String(post.id) === postId);
+        if (fromAll) {
+            showPostOnSamePage(fromAll);
+            return;
+        }
+        const rec = (window.allNewsRecords || window.allContentRecords || []).find(
+            (record) => record && String(record.id) === postId
+        );
+        if (rec) {
+            showPostOnSamePage(feedRecordToPastTalksPost(rec));
+            return;
+        }
+    }
+    const url = card.getAttribute('data-youtube-url');
+    if (url) showVideoFromUrl(url);
+}
+
+function setupMoreVideosCardListeners() {
+    if (moreVideosListenersWired) return;
+    moreVideosListenersWired = true;
     document.addEventListener('click', function (e) {
-        const card = e.target.closest('#morevideosCards .morevideos-card[data-youtube-url]');
+        const card = e.target.closest('#morevideosCards .morevideos-card');
         if (!card) return;
-        const url = card.getAttribute('data-youtube-url');
-        if (url) showVideoFromUrl(url);
+        e.preventDefault();
+        openMoreVideosCard(card);
     });
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter' && e.key !== ' ') return;
-        const card = e.target.closest('#morevideosCards .morevideos-card[data-youtube-url]');
+        const card = e.target.closest('#morevideosCards .morevideos-card');
         if (!card) return;
         e.preventDefault();
-        const url = card.getAttribute('data-youtube-url');
-        if (url) showVideoFromUrl(url);
+        openMoreVideosCard(card);
     });
 }
 
@@ -1153,6 +1181,7 @@ function showPostOnSamePage(post, options) {
         requestAnimationFrame(() => scrollHomeToTop());
         
         // Populate morevideos container with latest 20 videos
+        setupMoreVideosCardListeners();
         populateMoreVideosCards(post.id);
         
         // Match morevideos container height to post content height
@@ -6954,6 +6983,16 @@ function escapeHtmlAttr(value) {
         .replace(/'/g, '&#39;');
 }
 
+let moreVideosPopulateToken = 0;
+
+function listPostsForMoreVideos() {
+    if (allPosts && allPosts.length) return allPosts;
+    const records = window.allNewsRecords || window.allContentRecords || [];
+    const posts = buildPastTalksPostsFromFeedRecords(records);
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return posts;
+}
+
 // Populate morevideos container with latest 20 videos (latest first)
 async function populateMoreVideosCards(currentPostId) {
     const morevideosCards = document.getElementById('morevideosCards');
@@ -6961,18 +7000,27 @@ async function populateMoreVideosCards(currentPostId) {
         console.error('morevideosCards element not found');
         return;
     }
-    
+    const token = ++moreVideosPopulateToken;
+
     try {
+        let sourcePosts = listPostsForMoreVideos();
+        if (!sourcePosts.length) {
+            await loadPostsFromFirebase({ silent: true });
+            if (token !== moreVideosPopulateToken) return;
+            sourcePosts = listPostsForMoreVideos();
+        }
+
         // Show latest 20 videos from ALL events (no category/event filter), exclude current post only
-        const latestVideos = (allPosts || [])
-            .filter(post => post && post.youtubeUrl && post.id != currentPostId)
+        const latestVideos = (sourcePosts || [])
+            .filter((post) => post && post.youtubeUrl && String(post.id) !== String(currentPostId))
             .slice(0, 20);
-        
+
+        if (token !== moreVideosPopulateToken) return;
         if (latestVideos.length === 0) {
             morevideosCards.innerHTML = '<p>No other videos available.</p>';
             return;
         }
-        
+
         // Create cards for videos with a custom image or a YouTube still fallback.
         let cardsHTML = '';
         latestVideos.forEach((post) => {
@@ -6988,20 +7036,23 @@ async function populateMoreVideosCards(currentPostId) {
             const safeImgSrc = escapeHtmlAttr(imageUrl);
             const safeYoutubeUrl = escapeHtmlAttr(post.youtubeUrl);
             const safeTitle = escapeHtmlAttr(post.title || '');
+            const safePostId = escapeHtmlAttr(post.id);
             cardsHTML += `
-                    <div class="morevideos-card" role="button" tabindex="0" data-youtube-url="${safeYoutubeUrl}" aria-label="${safeTitle}">
+                    <div class="morevideos-card" role="button" tabindex="0" data-post-id="${safePostId}" data-youtube-url="${safeYoutubeUrl}" aria-label="${safeTitle}">
                         <div class="morevideos-card-image">
                             <img src="${safeImgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
                         </div>
                     </div>
                 `;
         });
-        
-        morevideosCards.innerHTML = cardsHTML;
-        
+
+        if (token !== moreVideosPopulateToken) return;
+        morevideosCards.innerHTML = cardsHTML || '<p>No other videos available.</p>';
     } catch (error) {
         console.error('Error populating morevideos cards:', error);
-        morevideosCards.innerHTML = '<p>Error loading related videos.</p>';
+        if (token === moreVideosPopulateToken) {
+            morevideosCards.innerHTML = '<p>Error loading related videos.</p>';
+        }
     }
 }
 
