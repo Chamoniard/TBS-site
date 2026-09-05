@@ -325,33 +325,45 @@ function buildViewerPostMetaBadgesHtml(post) {
     return parts.join('');
 }
 
+/** Body HTML for the video viewer from `tbs/Content/{id}/item` field `Content`. */
+function pickFeedRecordBodyHtml(fields) {
+    if (!fields || typeof fields !== 'object') return '';
+    const raw = fields.Content || fields['Post Content'] || fields.content || fields.Text || '';
+    return raw == null ? '' : String(raw);
+}
+
+function feedRecordToPastTalksPost(record) {
+    const fields = (record && record.fields) || {};
+    const youtubeUrl =
+        fields.Youtube || fields.URL || fields['Video URL'] || fields.Link || fields['YouTube URL'] || null;
+    const resolvedImage = extractFeedRecordImageUrl(fields);
+    return {
+        id: record && record.id,
+        title: fields.Title || 'Untitled',
+        name: fields.Name || null,
+        excerpt: fields.Excerpt || 'No excerpt available',
+        content: pickFeedRecordBodyHtml(fields),
+        category: normalizeEventField(fields.Event || fields.Events),
+        type: fields.Type || null,
+        topic: fields.Topic || getSampleTopic(),
+        date: fields.Date || (record && record.createdTime) || new Date().toISOString().split('T')[0],
+        readTime: fields['Read Time'] || '5 min',
+        likes: fields.Likes || 0,
+        comments: fields.Comments || 0,
+        image: resolvedImage || '📝',
+        slug: fields.Slug || generateSlug(fields.Title || 'untitled'),
+        featured: fields.Featured || false,
+        youtubeUrl: youtubeUrl,
+        url: youtubeUrl || '',
+        youtube: youtubeUrl || '',
+        fieldColour: fields.Fieldcolour || null,
+    };
+}
+
 function buildPastTalksPostsFromFeedRecords(allRecords) {
-    const videoRecords = allRecords.filter(
-        (record) => record.fields.Type && isVideoOrEditType(record.fields.Type)
-    );
-    return videoRecords.map((record) => {
-        const resolvedImage = extractFeedRecordImageUrl(record.fields);
-        const imageUrl = resolvedImage || '📝';
-        return {
-            id: record.id,
-            title: record.fields.Title || 'Untitled',
-            name: record.fields.Name || null,
-            excerpt: record.fields.Excerpt || 'No excerpt available',
-            content: record.fields.Content || record.fields['Post Content'] || '',
-            category: normalizeEventField(record.fields.Event || record.fields.Events),
-            type: record.fields.Type || null,
-            topic: record.fields.Topic || getSampleTopic(),
-            date: record.fields.Date || new Date().toISOString().split('T')[0],
-            readTime: record.fields['Read Time'] || '5 min',
-            likes: record.fields.Likes || 0,
-            comments: record.fields.Comments || 0,
-            image: imageUrl,
-            slug: record.fields.Slug || generateSlug(record.fields.Title || 'untitled'),
-            featured: record.fields.Featured || false,
-            youtubeUrl: record.fields.Youtube || null,
-            fieldColour: record.fields.Fieldcolour || null,
-        };
-    });
+    return (allRecords || [])
+        .filter((record) => record && record.fields && record.fields.Type && isVideoOrEditType(record.fields.Type))
+        .map(feedRecordToPastTalksPost);
 }
 
 /**
@@ -6755,60 +6767,43 @@ function showVideoFromUrl(videoUrl) {
         return urlMatch;
     });
     
-    if (videoPost) {
-        // Show the video like in the blog, but indicate it's from the feed
-        showPostOnSamePage(videoPost);
-    } else {
-        // If not found in blog posts, try to find in news feed data
-        if (window.allNewsRecords && window.allNewsRecords.length > 0) {
-            const newsVideoRecord = window.allNewsRecords.find(record => {
-                if (!record || !record.fields) return false;
-                
-                const recordUrl = record.fields.URL;
-                if (!recordUrl) return false;
-                
-                // Try exact match first
-                if (recordUrl === videoUrl) return true;
-                
-                // Try YouTube ID extraction
-                const extractYouTubeId = (url) => {
-                    if (!url) return null;
-                    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/);
-                    return match ? match[1] : null;
-                };
-                
-                const targetId = extractYouTubeId(videoUrl);
-                const recordId = extractYouTubeId(recordUrl);
-                
-                return targetId && recordId && targetId === recordId;
-            });
-            
-            if (newsVideoRecord) {
-                // Convert news record to blog post format
-                const convertedPost = {
-                    id: newsVideoRecord.id,
-                    title: newsVideoRecord.fields.Title || 'Video',
-                    name: newsVideoRecord.fields.Name || null, // Add Name field
-                    excerpt: newsVideoRecord.fields.Text || 'Video content',
-                    content: newsVideoRecord.fields.Text || 'Video content',
-                    category: newsVideoRecord.fields.Type || 'video',
-                    topic: newsVideoRecord.fields.Type || 'video',
-                    date: newsVideoRecord.fields.Date || newsVideoRecord.createdTime || new Date().toISOString().split('T')[0],
-                    readTime: '5 min',
-                    likes: 0,
-                    comments: 0,
-                    image: null,
-                    youtubeUrl: newsVideoRecord.fields.URL,
-                    url: newsVideoRecord.fields.URL,
-                    youtube: newsVideoRecord.fields.URL,
-                    slug: newsVideoRecord.id,
-                    featured: false
-                };
-                
-                showPostOnSamePage(convertedPost);
-                return;
-            }
+    if (!videoPost && window.allNewsRecords && window.allNewsRecords.length > 0) {
+        const newsVideoRecord = window.allNewsRecords.find(record => {
+            if (!record || !record.fields) return false;
+
+            const recordUrls = [
+                record.fields.Youtube,
+                record.fields.URL,
+                record.fields['Video URL'],
+                record.fields.Link,
+                record.fields['YouTube URL']
+            ].filter(Boolean);
+
+            if (recordUrls.some((url) => url === videoUrl)) return true;
+
+            const targetId = extractYouTubeId(videoUrl);
+            if (!targetId) return false;
+            return recordUrls.some((url) => extractYouTubeId(url) === targetId);
+        });
+
+        if (newsVideoRecord) {
+            videoPost = feedRecordToPastTalksPost(newsVideoRecord);
         }
+    }
+
+    if (videoPost && !videoPost.content) {
+        const feedRec = (window.allNewsRecords || []).find(
+            (record) => record && String(record.id) === String(videoPost.id)
+        );
+        if (feedRec) {
+            videoPost = Object.assign({}, videoPost, {
+                content: pickFeedRecordBodyHtml(feedRec.fields)
+            });
+        }
+    }
+
+    if (videoPost) {
+        showPostOnSamePage(videoPost);
     }
 }
 
@@ -7243,7 +7238,7 @@ async function createNewsCard(record) {
         const videoUrl = record.fields.URL || record.fields['Video URL'] || record.fields.Link || record.fields['YouTube URL'] || record.fields['Video Link'] || record.fields.Youtube;
         
         if ((trimmedType === 'video' || trimmedType === 'edit') && videoUrl) {
-            showVideoFromUrl(videoUrl);
+            showPostOnSamePage(feedRecordToPastTalksPost(record));
         } else {
             // For non-video cards, show alert for now
             alert('More content coming soon!');
