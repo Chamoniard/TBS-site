@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Public reads for website media assets.
+    match /tbs/Content/{contentId}/images/{fileName} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Keep everything else private by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
