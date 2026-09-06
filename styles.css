@@ -2577,7 +2577,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     padding-right: 0;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x pan-y;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
+    cursor: grab;
 }
 
 .home-section .speakerslider-track > .speaker-placeholder {
@@ -3079,8 +3080,10 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 body.horizontal-slider-dragging,
 body.horizontal-slider-dragging * {
+    cursor: grabbing !important;
     user-select: none !important;
     -webkit-user-select: none !important;
+    scroll-behavior: auto !important;
 }
 
 /* Wide screens: introslider pink bar; programme + speakers scroll with no visible bar */
@@ -4109,6 +4112,7 @@ body.home-view .home-section > .home-social-row-container {
     box-shadow: none;
     padding-left: 0;
     padding-right: 0;
+    cursor: grab;
 }
 
 /* TBS27 slides: same fixed column width as home introslider panels */

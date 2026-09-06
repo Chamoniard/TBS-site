@@ -1787,10 +1787,11 @@ function wireHorizontalCardSliderDragScrolling(root) {
         function finishDrag() {
             if (!mouseActive) return;
             if (dragging) {
-                suppressClickUntil = Date.now() + 350;
+                suppressClickUntil = Date.now() + 400;
             }
             mouseActive = false;
             dragging = false;
+            slider.style.removeProperty('scroll-behavior');
             document.body.classList.remove('horizontal-slider-dragging');
             document.removeEventListener('mousemove', onMouseMove, true);
             document.removeEventListener('mouseup', finishDrag, true);
@@ -1803,26 +1804,35 @@ function wireHorizontalCardSliderDragScrolling(root) {
             if (!dragging) {
                 if (Math.abs(dx) < dragThreshold || Math.abs(dx) < Math.abs(dy)) return;
                 dragging = true;
+                slider.style.scrollBehavior = 'auto';
                 document.body.classList.add('horizontal-slider-dragging');
             }
             slider.scrollLeft = startScrollLeft - dx;
             e.preventDefault();
         }
 
-        slider.addEventListener('mousedown', function (e) {
-            if (e.button !== 0) return;
-            if (slider.scrollWidth <= slider.clientWidth) return;
-            mouseActive = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startScrollLeft = slider.scrollLeft;
-            dragging = false;
-            document.addEventListener('mousemove', onMouseMove, true);
-            document.addEventListener('mouseup', finishDrag, true);
-        });
+        slider.addEventListener(
+            'mousedown',
+            function (e) {
+                if (e.button !== 0) return;
+                if (e.target && e.target.closest && e.target.closest('a, button, input, textarea, select')) {
+                    return;
+                }
+                if (slider.scrollWidth <= slider.clientWidth + 1) return;
+                mouseActive = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startScrollLeft = slider.scrollLeft;
+                dragging = false;
+                // Stop bio text / images from stealing the gesture before drag starts.
+                e.preventDefault();
+                document.addEventListener('mousemove', onMouseMove, true);
+                document.addEventListener('mouseup', finishDrag, true);
+            },
+            true
+        );
 
         slider.addEventListener('dragstart', function (e) {
-            if (!mouseActive) return;
             e.preventDefault();
         });
 
@@ -6147,6 +6157,7 @@ function wireHomeSpeakerCardBioExpandOnce() {
         function (ev) {
             const card = ev.target.closest('.speakerslider-track > article.speaker-card[data-expandable-bio]');
             if (!card) return;
+            if (document.body.classList.contains('horizontal-slider-dragging')) return;
             if (ev.target.closest('a')) return;
             const section = card.closest('#speakers-section');
             if (!section || !section.closest('.home-section')) return;
@@ -6240,6 +6251,7 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
         }
         delete speakersWrapperEl.dataset.speakersScrollbarWired;
         wireSpeakersSliderScrollbar();
+        wireHorizontalCardSliderDragScrolling(speakersWrapperEl);
         finalizeHomeSpeakersSection(speakersWrapperEl);
         const homeSection = speakersWrapperEl.closest('.home-section');
         if (homeSection) fitHomeProgrammeCardsToContent(homeSection);

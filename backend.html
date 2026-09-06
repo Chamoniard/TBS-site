@@ -298,6 +298,7 @@
         body.backend-page.backend-readonly #programme-add-slot-btn,
         body.backend-page.backend-readonly #programme-delete-session-btn,
         body.backend-page.backend-readonly #settings-site .settings-site-toggle-option,
+        body.backend-page.backend-readonly #settings-sections .settings-site-toggle-option[data-setting-key],
         body.backend-page.backend-readonly #settings-goals .settings-goal-number,
         body.backend-page.backend-readonly .guest-workflow-step-btn,
         body.backend-page.backend-readonly .speaker-workflow-phase-btn,
@@ -682,6 +683,23 @@
             overflow: auto;
         }
 
+        #settings-not-upcoming {
+            margin: 0;
+            padding: 1.25rem var(--backend-panel-header-pad-x, 16px);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #0f172a;
+            line-height: 1.35;
+            background: #ffffff;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #settings-not-upcoming[hidden] {
+            display: none !important;
+        }
+
         .settings-columns {
             display: flex;
             flex-direction: row;
@@ -696,6 +714,10 @@
             border-radius: 5px;
             box-shadow: none;
             box-sizing: border-box;
+        }
+
+        .settings-columns[hidden] {
+            display: none !important;
         }
 
         .settings-site,
@@ -774,6 +796,19 @@
             min-width: 0;
             word-break: break-word;
             text-transform: uppercase;
+        }
+
+        #settings-goals .settings-goals-event-location {
+            font-size: 1.2rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #000000;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            line-height: 1.2;
         }
 
         .settings-site-toggles {
@@ -10292,7 +10327,14 @@
 
             <section class="settings-section" id="settings-editor" aria-hidden="true" aria-label="Settings" data-name="settings-editor">
                 <div class="settings-body">
-                    <div class="settings-columns">
+                    <p
+                        class="settings-not-upcoming"
+                        id="settings-not-upcoming"
+                        hidden
+                        aria-hidden="true"
+                        aria-live="polite"
+                        role="status"></p>
+                    <div class="settings-columns" id="settings-columns">
                     <div class="settings-site" id="settings-site">
                         <div class="settings-site-toggles">
                             <div class="edit-guest-top guests-list-heading speakers-list-top" id="settings-list-heading">
@@ -10377,8 +10419,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-introslider-label">Introslider</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-introslider-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="introslider" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="introslider" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayIntroSlider" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayIntroSlider" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10386,8 +10428,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-event-presentation-label">Event presentation</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-event-presentation-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="eventPresentation" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="eventPresentation" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayEventInfo" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayEventInfo" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10395,8 +10437,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-sponsors-label">Sponsors</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-sponsors-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="sponsors" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="sponsors" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displaySponsors" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displaySponsors" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10404,8 +10446,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-latest-label">Latest</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-latest-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="latest" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="latest" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayNewsfeed" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayNewsfeed" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10413,8 +10455,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-programme-label">Programme</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-programme-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="programme" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="programme" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayProgrammeSlider" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayProgrammeSlider" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10422,8 +10464,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-speakers-label">Speakers</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-speakers-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="speakers" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="speakers" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displaySpeakersSlider" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displaySpeakersSlider" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10431,8 +10473,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-on-demand-label">On-demand</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-on-demand-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="onDemand" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="onDemand" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayOnDemand" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayOnDemand" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                             <div class="settings-site-toggle-row">
@@ -10440,8 +10482,8 @@
                                     <span class="settings-site-toggle-label" id="settings-section-registration-label">Registration</span>
                                 </div>
                                 <div class="settings-site-toggle" role="group" aria-labelledby="settings-section-registration-label">
-                                    <button type="button" class="settings-site-toggle-option" data-section-key="registration" data-value="no" aria-pressed="false">No</button>
-                                    <button type="button" class="settings-site-toggle-option is-active" data-section-key="registration" data-value="yes" aria-pressed="true">Yes</button>
+                                    <button type="button" class="settings-site-toggle-option" data-setting-key="displayRegistration" data-value="no" aria-pressed="false">No</button>
+                                    <button type="button" class="settings-site-toggle-option is-active" data-setting-key="displayRegistration" data-value="yes" aria-pressed="true">Yes</button>
                                 </div>
                             </div>
                         </div>
@@ -10455,7 +10497,13 @@
                                         <span class="edit-guest-name-first">Goals</span>
                                     </div>
                                 </div>
-                                <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                                <div class="edit-guest-top-trailing">
+                                    <span
+                                        class="settings-goals-event-location"
+                                        id="settings-goals-event-location"
+                                        aria-live="polite"
+                                        title="Event location">—</span>
+                                </div>
                             </div>
                             <div class="settings-site-toggle-row">
                                 <div class="settings-site-toggle-label-wrap">
@@ -10635,6 +10683,13 @@
         let guestsRosterInMemory = [];
         /** From `tbs/Settings` field `Current event` (and aliases); guests roster only includes rows whose `Event` matches. */
         var current_event = '';
+        /**
+         * From `tbs/Settings/{current_event}/{current_event}` field `event_location`
+         * (parent `tbs/Settings` used as fallback).
+         */
+        var event_location = '';
+        /** True when `tbs/Settings/{current_event}/{current_event}` exists. */
+        var currentEventHasSettingsDoc = false;
         /** Signed-in backend user's email. */
         var backenduser = '';
         /** From `tbs/Users/backend_users` field `Role`. */
@@ -14972,21 +15027,60 @@
             return [];
         }
 
-        /** Document `tbs/Settings/Zermatt/Zermatt`: site visibility toggles (`Yes` / `No` strings; `registrationopen` is boolean). */
+        /** Document `tbs/Settings/{event_location}/{event_location}`: site visibility toggles (`Yes` / `No` strings; `registrationopen` is boolean). */
         var FIRESTORE_TBS_SETTINGS_STANDBY_FIELD = 'Standby';
         var FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
         var FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_INTROSLIDER_FIELD = 'displayintroslider';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_EVENTINFO_FIELD = 'displayeventinfo';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_SPONSORS_FIELD = 'displaysponsors';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_NEWSFEED_FIELD = 'displaynewsfeed';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_SLIDER_FIELD = 'displayprogrammeslider';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_SLIDER_FIELD = 'displayspeakerslider';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD = 'displayondemand';
+        var FIRESTORE_TBS_SETTINGS_DISPLAY_REGISTRATION_FIELD = 'displayregistration';
         var FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
         var FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
         var FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
-        var FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD = 'N Team';
-        /** Document `tbs/Settings/Zermatt/Zermatt` field `filterguests` (JSON map of guests-table filters). */
+        /** Prefer `nteam` on the location doc (also accepts `N Team` aliases). */
+        var FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD = 'nteam';
+        /** Document `tbs/Settings/{event_location}/{event_location}` field `filterguests` (JSON map of guests-table filters). */
         var FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD = 'filterguests';
+        /** Section Yes/No fields created with default `Yes` when missing on the location doc. */
+        var FIRESTORE_TBS_SETTINGS_SECTION_YESNO_FIELDS = [
+            FIRESTORE_TBS_SETTINGS_DISPLAY_INTROSLIDER_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_EVENTINFO_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_SPONSORS_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_NEWSFEED_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_SLIDER_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_SLIDER_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD,
+            FIRESTORE_TBS_SETTINGS_DISPLAY_REGISTRATION_FIELD,
+        ];
         var siteSettingsSaveInFlight = false;
         var settingsGoalNTeamLastSaved = null;
 
-        function tbsSettingsDocRef(db) {
-            return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
+        /**
+         * Site settings for the active `event_location`.
+         * Path: `tbs/Settings/{event_location}/{event_location}`.
+         * @param {FirebaseFirestore.Firestore} db
+         * @param {string=} locationOpt
+         */
+        function tbsSettingsLocationDocRef(db, locationOpt) {
+            var loc = String(
+                locationOpt != null ? locationOpt : event_location || ''
+            ).trim();
+            if (!loc) {
+                throw new Error(
+                    'Missing event_location; expected tbs/Settings/{event_location}/{event_location}.'
+                );
+            }
+            return db.collection('tbs').doc('Settings').collection(loc).doc(loc);
+        }
+
+        /** Alias for location-scoped site settings writes/reads. */
+        function tbsSettingsDocRef(db, locationOpt) {
+            return tbsSettingsLocationDocRef(db, locationOpt);
         }
 
         function tbsPresetsZermattDocRef(db) {
@@ -14997,7 +15091,7 @@
             return db.collection('tbs').doc('Settings');
         }
 
-        /** Document `tbs/Settings/{event}/{event}` (event-specific settings, including `nteam`). */
+        /** Document `tbs/Settings/{event}/{event}` (event-specific settings, including `nteam` / `event_location`). */
         function tbsSettingsEventDocRef(db, eventName) {
             var ev = String(eventName || '').trim();
             return db.collection('tbs').doc('Settings').collection(ev).doc(ev);
@@ -15140,10 +15234,21 @@
             return out;
         }
 
-        async function fetchTbsSettingsFields(db) {
-            var destSnap = await tbsSettingsDocRef(db).get();
+        /**
+         * Location site settings + parent event fields (`Current event`, `Allevents`, …).
+         * @param {FirebaseFirestore.Firestore} db
+         * @param {string=} locationOpt Defaults to global `event_location`.
+         */
+        async function fetchTbsSettingsFields(db, locationOpt) {
+            var loc = String(
+                locationOpt != null ? locationOpt : event_location || ''
+            ).trim();
+            var dest = {};
+            if (loc) {
+                var destSnap = await tbsSettingsLocationDocRef(db, loc).get();
+                dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
+            }
             var parentSnap = await tbsSettingsRootDocRef(db).get();
-            var dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
             var parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
             return overlayTbsEventSettingsFromParent(dest, parent);
         }
@@ -15152,10 +15257,51 @@
             if (settingKey === 'standby') return FIRESTORE_TBS_SETTINGS_STANDBY_FIELD;
             if (settingKey === 'displaySpeakers') return FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD;
             if (settingKey === 'displayProgramme') return FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD;
+            if (settingKey === 'displayIntroSlider') return FIRESTORE_TBS_SETTINGS_DISPLAY_INTROSLIDER_FIELD;
+            if (settingKey === 'displayEventInfo') return FIRESTORE_TBS_SETTINGS_DISPLAY_EVENTINFO_FIELD;
+            if (settingKey === 'displaySponsors') return FIRESTORE_TBS_SETTINGS_DISPLAY_SPONSORS_FIELD;
+            if (settingKey === 'displayNewsfeed') return FIRESTORE_TBS_SETTINGS_DISPLAY_NEWSFEED_FIELD;
+            if (settingKey === 'displayProgrammeSlider') {
+                return FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_SLIDER_FIELD;
+            }
+            if (settingKey === 'displaySpeakersSlider') {
+                return FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_SLIDER_FIELD;
+            }
+            if (settingKey === 'displayOnDemand') return FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD;
+            if (settingKey === 'displayRegistration') {
+                return FIRESTORE_TBS_SETTINGS_DISPLAY_REGISTRATION_FIELD;
+            }
             if (settingKey === 'registrationOpen') return FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD;
             if (settingKey === 'waitingList') return FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD;
             if (settingKey === 'passwordProtectHome') return FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD;
             return '';
+        }
+
+        /**
+         * Create missing section Yes/No fields on the location settings doc (default Yes).
+         * @param {FirebaseFirestore.Firestore} db
+         * @param {Record<string, unknown>} data
+         * @return {Promise<Record<string, unknown>>}
+         */
+        async function ensureMissingSectionSettingsFields(db, data) {
+            var out = data && typeof data === 'object' ? Object.assign({}, data) : {};
+            if (backenduserIsReadonly || !currentEventHasSettingsDoc) return out;
+            var loc = String(event_location || '').trim();
+            if (!loc) return out;
+            var patch = {};
+            for (var i = 0; i < FIRESTORE_TBS_SETTINGS_SECTION_YESNO_FIELDS.length; i++) {
+                var field = FIRESTORE_TBS_SETTINGS_SECTION_YESNO_FIELDS[i];
+                if (
+                    !Object.prototype.hasOwnProperty.call(out, field) ||
+                    out[field] == null ||
+                    String(out[field]).trim() === ''
+                ) {
+                    patch[field] = 'Yes';
+                }
+            }
+            if (!Object.keys(patch).length) return out;
+            await tbsSettingsDocRef(db, loc).set(patch, { merge: true });
+            return Object.assign(out, patch);
         }
 
         /** UI toggle value `yes` | `no` from Firestore scalar. */
@@ -15166,7 +15312,7 @@
             return defaultYes !== false ? 'yes' : 'no';
         }
 
-        /** `tbs/Settings/Zermatt/Zermatt.registrationopen` is stored as boolean (legacy Yes/No strings still read). */
+        /** `tbs/Settings/{event_location}/{event_location}.registrationopen` is stored as boolean (legacy Yes/No strings still read). */
         function normalizeSettingsRegistrationOpenBoolean(value, defaultOpen) {
             if (value === true || value === false) return value;
             var s = guestStringFromFirestoreValue(value).toLowerCase();
@@ -15191,7 +15337,7 @@
             var want = normalizeSettingsYesNoUi(yesNoUi, true);
             document
                 .querySelectorAll(
-                    '#settings-site button.settings-site-toggle-option[data-setting-key="' + settingKey + '"]'
+                    '#settings-editor button.settings-site-toggle-option[data-setting-key="' + settingKey + '"]'
                 )
                 .forEach(function (opt) {
                     var optVal = String(opt.getAttribute('data-value') || '').toLowerCase();
@@ -15222,7 +15368,11 @@
 
         async function loadSiteSettingsFromFirestore() {
             var db = getFirestore();
-            var data = await fetchTbsSettingsFields(db);
+            if (!String(event_location || '').trim() && String(current_event || '').trim()) {
+                await syncEventLocationFromSettings(current_event);
+            }
+            var data = await fetchTbsSettingsFields(db, event_location);
+            data = await ensureMissingSectionSettingsFields(db, data);
             setSettingsSiteToggleUi(
                 'standby',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_STANDBY_FIELD], true)
@@ -15234,6 +15384,47 @@
             setSettingsSiteToggleUi(
                 'displayProgramme',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displayIntroSlider',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_INTROSLIDER_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displayEventInfo',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_EVENTINFO_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displaySponsors',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPONSORS_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displayNewsfeed',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_NEWSFEED_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displayProgrammeSlider',
+                normalizeSettingsYesNoUi(
+                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_SLIDER_FIELD],
+                    true
+                )
+            );
+            setSettingsSiteToggleUi(
+                'displaySpeakersSlider',
+                normalizeSettingsYesNoUi(
+                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_SLIDER_FIELD],
+                    true
+                )
+            );
+            setSettingsSiteToggleUi(
+                'displayOnDemand',
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD], true)
+            );
+            setSettingsSiteToggleUi(
+                'displayRegistration',
+                normalizeSettingsYesNoUi(
+                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_REGISTRATION_FIELD],
+                    true
+                )
             );
             setSettingsSiteToggleUi(
                 'registrationOpen',
@@ -15252,8 +15443,11 @@
                 'passwordProtectHome',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD], false)
             );
-            setSettingsGoalNTeamUi(data[FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD]);
+            setSettingsGoalNTeamUi(
+                coalesceFirestoreFieldValue(data, FIRESTORE_TBS_SETTINGS_NTEAM_FIELD_KEYS)
+            );
             syncWaitingListToggleEnabledFromUi();
+            updateEventLocationDisplay();
         }
 
         function normalizeSettingsGoalNumber(value) {
@@ -15272,6 +15466,11 @@
 
         async function saveSettingsGoalNTeamToFirestore(n) {
             if (backenduserIsReadonly) throw backendReadonlyError();
+            if (!currentEventHasSettingsDoc) {
+                throw new Error(
+                    String(current_event || '').trim() + ' is not an upcoming event.'
+                );
+            }
             var db = getFirestore();
             var patch = {};
             patch[FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD] = n;
@@ -15570,6 +15769,11 @@
 
         async function saveSiteSettingToFirestore(settingKey, yesNoUi) {
             if (backenduserIsReadonly) throw backendReadonlyError();
+            if (!currentEventHasSettingsDoc) {
+                throw new Error(
+                    String(current_event || '').trim() + ' is not an upcoming event.'
+                );
+            }
             var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
             var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
             if (!field) throw new Error('Unknown site setting.');
@@ -15672,6 +15876,136 @@
         async function loadCurrentEventFromTbsSettings(db) {
             var data = await fetchTbsSettingsFields(db);
             return guestCoalesceCurrentEventField(data);
+        }
+
+        /** Document `tbs/Settings/{event}/{event}` (and aliases) field `event_location`. */
+        function coalesceEventLocationField(data) {
+            if (!data || typeof data !== 'object') return '';
+            var keys = [
+                'event_location',
+                'eventLocation',
+                'Event location',
+                'Event Location',
+                'EVENT_LOCATION',
+                'Event_location',
+            ];
+            for (var ki = 0; ki < keys.length; ki++) {
+                var k = keys[ki];
+                if (!Object.prototype.hasOwnProperty.call(data, k) || data[k] == null) continue;
+                var s = guestStringFromFirestoreValue(data[k]);
+                if (s) return s;
+            }
+            return '';
+        }
+
+        /**
+         * Load `event_location` for the given (or current) event from
+         * `tbs/Settings/{event}/{event}`, falling back to parent `tbs/Settings`.
+         * @param {FirebaseFirestore.Firestore} db
+         * @param {string=} eventName
+         * @return {Promise<string>}
+         */
+        async function loadEventLocationFromTbsSettings(db, eventName) {
+            var ev = String(eventName != null ? eventName : current_event || '').trim();
+            if (!ev) return '';
+            var eventSnap = await tbsSettingsEventDocRef(db, ev).get();
+            var eventData = eventSnap && eventSnap.exists ? eventSnap.data() || {} : {};
+            var fromEvent = coalesceEventLocationField(eventData);
+            if (fromEvent) return fromEvent;
+            var parentSnap = await tbsSettingsRootDocRef(db).get();
+            var parentData = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
+            return coalesceEventLocationField(parentData);
+        }
+
+        /**
+         * True when `tbs/Settings/{event}/{event}` exists (event has a Settings subcollection doc).
+         * @param {FirebaseFirestore.Firestore} db
+         * @param {string=} eventName
+         * @return {Promise<boolean>}
+         */
+        async function currentEventSettingsDocExists(db, eventName) {
+            var ev = String(eventName != null ? eventName : current_event || '').trim();
+            if (!ev) return false;
+            var snap = await tbsSettingsEventDocRef(db, ev).get();
+            return !!(snap && snap.exists);
+        }
+
+        /**
+         * Show Settings panels only for upcoming events that have a Settings collection doc.
+         * Otherwise show “{event} is not an upcoming event.”
+         * @param {boolean} isUpcoming
+         */
+        function setSettingsUpcomingEventVisibility(isUpcoming) {
+            currentEventHasSettingsDoc = !!isUpcoming;
+            var columns = document.getElementById('settings-columns');
+            var msg = document.getElementById('settings-not-upcoming');
+            var ev = String(current_event || '').trim() || '—';
+            if (columns) {
+                columns.hidden = !isUpcoming;
+                columns.setAttribute('aria-hidden', isUpcoming ? 'false' : 'true');
+            }
+            if (msg) {
+                if (isUpcoming) {
+                    msg.hidden = true;
+                    msg.setAttribute('aria-hidden', 'true');
+                    msg.textContent = '';
+                } else {
+                    msg.hidden = false;
+                    msg.setAttribute('aria-hidden', 'false');
+                    msg.textContent = ev + ' is not an upcoming event.';
+                }
+            }
+        }
+
+        function updateEventLocationDisplay() {
+            var el = document.getElementById('settings-goals-event-location');
+            if (!el) return;
+            var v = String(event_location || '').trim();
+            el.textContent = v || '—';
+            el.setAttribute('title', v ? 'Event location: ' + v : 'Event location');
+        }
+
+        async function syncEventLocationFromSettings(eventName) {
+            try {
+                var db = getFirestore();
+                event_location = await loadEventLocationFromTbsSettings(db, eventName);
+            } catch (err) {
+                console.error('syncEventLocationFromSettings:', err);
+                event_location = '';
+            }
+            updateEventLocationDisplay();
+            return event_location;
+        }
+
+        /**
+         * Resolve event_location for the current (or given) event, then refresh Settings UI
+         * from tbs/Settings/{event_location}/{event_location}.
+         * If the event has no Settings collection doc, hide settings and show the
+         * “not an upcoming event” title instead.
+         * @param {string=} eventName
+         */
+        async function syncEventLocationAndSiteSettings(eventName) {
+            var ev = String(eventName != null ? eventName : current_event || '').trim();
+            var db = getFirestore();
+            var exists = false;
+            try {
+                exists = await currentEventSettingsDocExists(db, ev);
+            } catch (err) {
+                console.error('syncEventLocationAndSiteSettings exists check:', err);
+                exists = false;
+            }
+            setSettingsUpcomingEventVisibility(exists);
+            if (!exists) {
+                event_location = '';
+                updateEventLocationDisplay();
+                return;
+            }
+            await syncEventLocationFromSettings(ev);
+            try {
+                await loadSiteSettingsFromFirestore();
+            } catch (err) {
+                console.error('syncEventLocationAndSiteSettings loadSiteSettings:', err);
+            }
         }
 
         function tbsBackendUsersCollectionRef(db) {
@@ -15869,11 +16203,15 @@
                 }
                 selectedevent = String(current_event || '').trim();
                 updateBackendCurrentEventDisplay();
+                await syncEventLocationAndSiteSettings(current_event);
             } catch (err) {
                 console.error('syncSelectedAndCurrentEventFromSettings:', err);
                 current_event = '';
                 selectedevent = '';
+                event_location = '';
+                setSettingsUpcomingEventVisibility(false);
                 updateBackendCurrentEventDisplay();
+                updateEventLocationDisplay();
             }
         }
 
@@ -16024,6 +16362,7 @@
                 current_event = next;
                 selectedevent = next;
                 updateBackendCurrentEventDisplay();
+                await syncEventLocationAndSiteSettings(next);
                 await Promise.all([
                     fetchAllGuestsIntoMemory({ force: true, showLoading: true }),
                     fetchSpeakersForSelectedEvent(),
@@ -17484,6 +17823,11 @@
             if (backenduserIsReadonly) {
                 applyGuestsFilterSettingsLocal(normalized);
                 return;
+            }
+            if (!currentEventHasSettingsDoc) {
+                throw new Error(
+                    String(current_event || '').trim() + ' is not an upcoming event.'
+                );
             }
             var db = getFirestore();
             var patch = {};
@@ -19726,13 +20070,17 @@
             guestsRosterInMemory = [];
             try {
                 var db = getFirestore();
-                var snaps = await Promise.all([
-                    db.collection('tbs').doc('Guests').get(),
-                    fetchTbsSettingsFields(db),
-                ]);
-                var guestsParentSnap = snaps[0];
-                var settingsData = snaps[1] || {};
-                applyBackendUserCurrentEventFromSettings(guestCoalesceCurrentEventField(settingsData));
+                var guestsParentSnap = await db.collection('tbs').doc('Guests').get();
+                var parentSettingsSnap = await tbsSettingsRootDocRef(db).get();
+                var parentSettingsData =
+                    parentSettingsSnap && parentSettingsSnap.exists
+                        ? parentSettingsSnap.data() || {}
+                        : {};
+                applyBackendUserCurrentEventFromSettings(
+                    guestCoalesceCurrentEventField(parentSettingsData)
+                );
+                await syncEventLocationAndSiteSettings(current_event);
+                var settingsData = await fetchTbsSettingsFields(db, event_location);
                 applyGuestsFilterSettingsFromSettingsData(settingsData);
                 if (!String(current_event || '').trim()) {
                     guestsRosterInMemory = [];
@@ -19820,6 +20168,7 @@
                 applyBackendUserCurrentEventFromSettings(
                     backenduserHasAllEventAccess ? await loadCurrentEventFromTbsSettings(db) : ''
                 );
+                await syncEventLocationAndSiteSettings(current_event);
                 if (!String(current_event || '').trim()) {
                     renderSpeakerRoster();
                     return;
@@ -23276,8 +23625,8 @@
                 });
             }
             if (isSettings) {
-                void loadSiteSettingsFromFirestore().catch(function (err) {
-                    console.error('loadSiteSettingsFromFirestore:', err);
+                void syncEventLocationAndSiteSettings(current_event).catch(function (err) {
+                    console.error('syncEventLocationAndSiteSettings:', err);
                     if (typeof showStatus === 'function') {
                         showStatus('error', err && err.message ? err.message : 'Failed to load site settings.');
                     }
@@ -25587,7 +25936,11 @@
             });
             document.querySelectorAll('#settings-sections .settings-site-toggle-option').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    onSettingsSectionToggleClick(btn);
+                    if (btn.getAttribute('data-setting-key')) {
+                        void onSettingsSiteToggleClick(btn);
+                    } else {
+                        onSettingsSectionToggleClick(btn);
+                    }
                 });
             });
             var settingsGoalNTeamInput = document.getElementById('settings-goal-n-team');
