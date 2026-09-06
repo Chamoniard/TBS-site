@@ -798,19 +798,6 @@
             text-transform: uppercase;
         }
 
-        #settings-goals .settings-goals-event-location {
-            font-size: 1.2rem;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            color: #000000;
-            text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            line-height: 1.2;
-        }
-
         .settings-site-toggles {
             display: flex;
             flex-direction: column;
@@ -10408,8 +10395,8 @@
                             <div class="edit-guest-top guests-list-heading speakers-list-top" id="settings-sections-heading">
                                 <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                                 <div class="selected-guestname-wrap">
-                                    <div class="selected-guestname" role="group" aria-label="Sections">
-                                        <span class="edit-guest-name-first">Sections</span>
+                                    <div class="selected-guestname" role="group" aria-label="Display sections">
+                                        <span class="edit-guest-name-first">Display sections</span>
                                     </div>
                                 </div>
                                 <div class="edit-guest-top-trailing" aria-hidden="true"></div>
@@ -10497,13 +10484,7 @@
                                         <span class="edit-guest-name-first">Goals</span>
                                     </div>
                                 </div>
-                                <div class="edit-guest-top-trailing">
-                                    <span
-                                        class="settings-goals-event-location"
-                                        id="settings-goals-event-location"
-                                        aria-live="polite"
-                                        title="Event location">—</span>
-                                </div>
+                                <div class="edit-guest-top-trailing" aria-hidden="true"></div>
                             </div>
                             <div class="settings-site-toggle-row">
                                 <div class="settings-site-toggle-label-wrap">
@@ -15366,7 +15347,8 @@
                 });
         }
 
-        async function loadSiteSettingsFromFirestore() {
+        async function loadSiteSettingsFromFirestore(options) {
+            var opts = options && typeof options === 'object' ? options : {};
             var db = getFirestore();
             if (!String(event_location || '').trim() && String(current_event || '').trim()) {
                 await syncEventLocationFromSettings(current_event);
@@ -15447,7 +15429,7 @@
                 coalesceFirestoreFieldValue(data, FIRESTORE_TBS_SETTINGS_NTEAM_FIELD_KEYS)
             );
             syncWaitingListToggleEnabledFromUi();
-            updateEventLocationDisplay();
+            if (!opts.silentStatus) showSettingsDisplayStatus();
         }
 
         function normalizeSettingsGoalNumber(value) {
@@ -15512,7 +15494,7 @@
             } catch (err) {
                 console.error('saveSettingsGoalNTeamToFirestore:', err);
                 try {
-                    await loadSiteSettingsFromFirestore();
+                    await loadSiteSettingsFromFirestore({ silentStatus: true });
                 } catch (reloadErr) {
                     console.error('loadSiteSettingsFromFirestore:', reloadErr);
                 }
@@ -15834,7 +15816,7 @@
             } catch (err) {
                 console.error('saveSiteSettingToFirestore:', err);
                 try {
-                    await loadSiteSettingsFromFirestore();
+                    await loadSiteSettingsFromFirestore({ silentStatus: true });
                 } catch (reloadErr) {
                     console.error('loadSiteSettingsFromFirestore:', reloadErr);
                 }
@@ -15957,12 +15939,11 @@
             }
         }
 
-        function updateEventLocationDisplay() {
-            var el = document.getElementById('settings-goals-event-location');
-            if (!el) return;
-            var v = String(event_location || '').trim();
-            el.textContent = v || '—';
-            el.setAttribute('title', v ? 'Event location: ' + v : 'Event location');
+        function showSettingsDisplayStatus() {
+            if (typeof showStatus !== 'function') return;
+            var ev = String(current_event || '').trim() || '—';
+            var loc = String(event_location || '').trim() || '—';
+            showStatus('info', 'Displaying settings for ' + ev + ' in ' + loc);
         }
 
         async function syncEventLocationFromSettings(eventName) {
@@ -15973,7 +15954,6 @@
                 console.error('syncEventLocationFromSettings:', err);
                 event_location = '';
             }
-            updateEventLocationDisplay();
             return event_location;
         }
 
@@ -15997,7 +15977,6 @@
             setSettingsUpcomingEventVisibility(exists);
             if (!exists) {
                 event_location = '';
-                updateEventLocationDisplay();
                 return;
             }
             await syncEventLocationFromSettings(ev);
@@ -16211,7 +16190,6 @@
                 event_location = '';
                 setSettingsUpcomingEventVisibility(false);
                 updateBackendCurrentEventDisplay();
-                updateEventLocationDisplay();
             }
         }
 
