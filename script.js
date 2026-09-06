@@ -20,19 +20,21 @@ const firestoreHomeCache = {
     locationInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — events/{id} field locationinfo (home Location band body)
     eventInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — tbs/Pre-sets/Zermatt/Zermatt field Eventinfo (home .event-contents)
     registrationManifesto: { value: '', fetchedAt: 0, promise: null },
+    /** Full `tbs/Settings/{event-location}/{event-location}` document (all fields). */
+    siteSettingsFields: { value: {}, location: '', fetchedAt: 0, promise: null },
     /** `tbs/Settings/{event-location}/{event-location}` field `Waiting_list`. */
     siteSettingsWaitingList: { value: false, location: '', fetchedAt: 0, promise: null },
     /** `tbs/Pre-sets/{event-location}/{event-location}` field `Sendtoreserves`. */
     sendToReserves: { value: '', location: '', fetchedAt: 0, promise: null },
     /** First programme-band card: `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
-    /** `tbs/Settings/Zermatt/Zermatt` field `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
+    /** Derived from `siteSettingsFields`: `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
-    /** `tbs/Settings/Zermatt/Zermatt` field `displayprogramme` (`Yes` / `No`). */
+    /** Derived from `siteSettingsFields`: `displayprogramme` (`Yes` / `No`). */
     siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null },
-    /** `tbs/Settings/Zermatt/Zermatt` field `passwordprotecthome` (`Yes` / `No`). */
+    /** Derived from `siteSettingsFields`: `passwordprotecthome` (`Yes` / `No`). */
     siteSettingsPasswordProtectHome: { value: false, fetchedAt: 0, promise: null },
-    /** `tbs/Settings/Zermatt/Zermatt` field `registrationopen` (boolean). */
+    /** Derived from `siteSettingsFields`: `registrationopen` (boolean). */
     siteSettingsRegistrationOpen: { value: true, fetchedAt: 0, promise: null }
 };
 
@@ -4405,13 +4407,13 @@ const FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
 const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
 const FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
 
-function tbsSettingsDocRef(db) {
-    return db.collection('tbs').doc('Settings').collection('Zermatt').doc('Zermatt');
-}
-
 function tbsSettingsLocationDocRef(db, location) {
     const loc = String(location || '').trim() || HOME_EVENT_LOCATION_DEFAULT;
     return db.collection('tbs').doc('Settings').collection(loc).doc(loc);
+}
+
+function tbsSettingsDocRef(db, locationOpt) {
+    return tbsSettingsLocationDocRef(db, locationOpt);
 }
 
 function tbsPresetsLocationDocRef(db, location) {
@@ -4419,8 +4421,12 @@ function tbsPresetsLocationDocRef(db, location) {
     return db.collection('tbs').doc('Pre-sets').collection(loc).doc(loc);
 }
 
-async function fetchTbsSettingsFields(db) {
-    const destSnap = await tbsSettingsDocRef(db).get();
+/** All fields on `tbs/Settings/{event-location}/{event-location}`. */
+async function fetchTbsSettingsFields(db, locationOpt) {
+    const loc =
+        String(locationOpt != null ? locationOpt : currentHomeEventLocation() || '').trim() ||
+        HOME_EVENT_LOCATION_DEFAULT;
+    const destSnap = await tbsSettingsLocationDocRef(db, loc).get();
     return destSnap && destSnap.exists ? destSnap.data() || {} : {};
 }
 /** Site password when `passwordprotecthome` is `Yes` (client-side gate only). */
@@ -4577,113 +4583,49 @@ function showHomePasswordGate() {
     });
 }
 
-/** Blocks home load until password is accepted when `passwordprotecthome` is `Yes`. */
-async function ensureHomePasswordAccess() {
-    if (isHomePasswordSessionUnlocked()) return;
-    const settings = await fetchHomeSiteSettingsFromFirestore();
-    if (!settings.passwordProtectHome) return;
-    if (!homePasswordGatePromise) {
-        homePasswordGatePromise = showHomePasswordGate();
-    }
-    await homePasswordGatePromise;
+function cloneHomeSiteSettingsFields(data) {
+    if (!data || typeof data !== 'object') return {};
+    const out = {};
+    Object.keys(data).forEach(function (k) {
+        out[k] = data[k];
+    });
+    return out;
 }
 
-async function fetchHomeSiteSettingsFromFirestore() {
-    const speakersCached = firestoreHomeCache.siteSettingsDisplaySpeakers;
-    const programmeCached = firestoreHomeCache.siteSettingsDisplayProgramme;
-    const passwordCached = firestoreHomeCache.siteSettingsPasswordProtectHome;
-    const registrationOpenCached = firestoreHomeCache.siteSettingsRegistrationOpen;
-    if (
-        isFreshFirestoreCacheEntry(speakersCached) &&
-        isFreshFirestoreCacheEntry(programmeCached) &&
-        isFreshFirestoreCacheEntry(passwordCached) &&
-        isFreshFirestoreCacheEntry(registrationOpenCached)
-    ) {
-        return {
-            displaySpeakers: !!speakersCached.value,
-            displayProgramme: !!programmeCached.value,
-            passwordProtectHome: !!passwordCached.value,
-            registrationOpen: !!registrationOpenCached.value
-        };
-    }
-    if (speakersCached && speakersCached.promise) {
-        const displaySpeakers = await speakersCached.promise;
-        const displayProgramme =
-            programmeCached && programmeCached.promise
-                ? await programmeCached.promise
-                : !!programmeCached.value;
-        const passwordProtectHome =
-            passwordCached && passwordCached.promise
-                ? await passwordCached.promise
-                : !!passwordCached.value;
-        const registrationOpen =
-            registrationOpenCached && registrationOpenCached.promise
-                ? await registrationOpenCached.promise
-                : !!registrationOpenCached.value;
-        return {
-            displaySpeakers: !!displaySpeakers,
-            displayProgramme: !!displayProgramme,
-            passwordProtectHome: !!passwordProtectHome,
-            registrationOpen: !!registrationOpen
-        };
-    }
+/** In-memory `tbs/Settings/{event-location}/{event-location}` fields from the last home fetch. */
+function homeSiteSettingsFieldsInMemory() {
+    const cached = firestoreHomeCache.siteSettingsFields;
+    if (!cached || !cached.value || typeof cached.value !== 'object') return {};
+    return cached.value;
+}
 
-    const promise = (async function () {
-        try {
-            const db = getFirestore();
-            const snapData = await withTimeout(
-                fetchTbsSettingsFields(db),
-                10000,
-                'Firestore tbs/Settings/Zermatt/Zermatt'
-            );
-            const data = snapData || {};
-            return {
-                displaySpeakers: normalizeHomeDisplaySpeakersSetting(
-                    homeDisplaySpeakersValueFromSettingsData(data)
-                ),
-                displayProgramme: normalizeHomeDisplayProgrammeSetting(
-                    data[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD]
-                ),
-                passwordProtectHome: normalizeHomePasswordProtectSetting(
-                    data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD]
-                ),
-                registrationOpen: normalizeHomeRegistrationOpenSetting(
-                    data[FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD]
-                )
-            };
-        } catch (e) {
-            console.error('fetchHomeSiteSettingsFromFirestore', e);
-            return {
-                displaySpeakers: true,
-                displayProgramme: true,
-                passwordProtectHome: false,
-                registrationOpen: true
-            };
-        }
-    })();
+function homeSiteSettingsFromFields(data) {
+    const fields = data && typeof data === 'object' ? data : {};
+    const waitingRaw =
+        fields[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD] != null
+            ? fields[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD]
+            : fields.waiting_list;
+    return {
+        displaySpeakers: normalizeHomeDisplaySpeakersSetting(
+            homeDisplaySpeakersValueFromSettingsData(fields)
+        ),
+        displayProgramme: normalizeHomeDisplayProgrammeSetting(
+            fields[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD]
+        ),
+        passwordProtectHome: normalizeHomePasswordProtectSetting(
+            fields[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD]
+        ),
+        registrationOpen: normalizeHomeRegistrationOpenSetting(
+            fields[FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD]
+        ),
+        waitingList: normalizeHomeWaitingListSetting(waitingRaw)
+    };
+}
 
-    firestoreHomeCache.siteSettingsDisplaySpeakers = {
-        value: speakersCached ? speakersCached.value : true,
-        fetchedAt: speakersCached ? Number(speakersCached.fetchedAt || 0) : 0,
-        promise: promise.then((s) => s.displaySpeakers)
-    };
-    firestoreHomeCache.siteSettingsDisplayProgramme = {
-        value: programmeCached ? programmeCached.value : true,
-        fetchedAt: programmeCached ? Number(programmeCached.fetchedAt || 0) : 0,
-        promise: promise.then((s) => s.displayProgramme)
-    };
-    firestoreHomeCache.siteSettingsPasswordProtectHome = {
-        value: passwordCached ? passwordCached.value : false,
-        fetchedAt: passwordCached ? Number(passwordCached.fetchedAt || 0) : 0,
-        promise: promise.then((s) => s.passwordProtectHome)
-    };
-    firestoreHomeCache.siteSettingsRegistrationOpen = {
-        value: registrationOpenCached ? registrationOpenCached.value : true,
-        fetchedAt: registrationOpenCached ? Number(registrationOpenCached.fetchedAt || 0) : 0,
-        promise: promise.then((s) => s.registrationOpen)
-    };
-    const settings = await promise;
-    const now = Date.now();
+function rememberHomeSiteSettingsDerived(fields, location, fetchedAt) {
+    const settings = homeSiteSettingsFromFields(fields);
+    const loc = String(location || '').trim() || HOME_EVENT_LOCATION_DEFAULT;
+    const now = fetchedAt || Date.now();
     firestoreHomeCache.siteSettingsDisplaySpeakers = {
         value: settings.displaySpeakers,
         fetchedAt: now,
@@ -4704,6 +4646,113 @@ async function fetchHomeSiteSettingsFromFirestore() {
         fetchedAt: now,
         promise: null
     };
+    firestoreHomeCache.siteSettingsWaitingList = {
+        value: settings.waitingList,
+        location: loc,
+        fetchedAt: now,
+        promise: null
+    };
+    return settings;
+}
+
+function homeSiteSettingsResult(fields, location) {
+    const loc = String(location || '').trim() || HOME_EVENT_LOCATION_DEFAULT;
+    const cloned = cloneHomeSiteSettingsFields(fields);
+    const derived = homeSiteSettingsFromFields(cloned);
+    return {
+        displaySpeakers: derived.displaySpeakers,
+        displayProgramme: derived.displayProgramme,
+        passwordProtectHome: derived.passwordProtectHome,
+        registrationOpen: derived.registrationOpen,
+        waitingList: derived.waitingList,
+        location: loc,
+        fields: cloned
+    };
+}
+
+/** Blocks home load until password is accepted when `passwordprotecthome` is `Yes`. */
+async function ensureHomePasswordAccess() {
+    if (isHomePasswordSessionUnlocked()) return;
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    if (!settings.passwordProtectHome) return;
+    if (!homePasswordGatePromise) {
+        homePasswordGatePromise = showHomePasswordGate();
+    }
+    await homePasswordGatePromise;
+}
+
+async function fetchHomeSiteSettingsFromFirestore() {
+    const location = currentHomeEventLocation();
+    const cached = firestoreHomeCache.siteSettingsFields;
+    if (cached && cached.location === location && isFreshFirestoreCacheEntry(cached)) {
+        rememberHomeSiteSettingsDerived(
+            cached.value,
+            location,
+            Number(cached.fetchedAt || Date.now())
+        );
+        return homeSiteSettingsResult(cached.value, location);
+    }
+    if (cached && cached.location === location && cached.promise) {
+        return cached.promise;
+    }
+
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const snapData = await withTimeout(
+                fetchTbsSettingsFields(db, location),
+                10000,
+                'Firestore tbs/Settings/' + location + '/' + location
+            );
+            return homeSiteSettingsResult(snapData || {}, location);
+        } catch (e) {
+            console.error('fetchHomeSiteSettingsFromFirestore', e);
+            return homeSiteSettingsResult({}, location);
+        }
+    })();
+
+    firestoreHomeCache.siteSettingsFields = {
+        value: cached && cached.location === location && cached.value ? cached.value : {},
+        location: location,
+        fetchedAt: cached && cached.location === location ? Number(cached.fetchedAt || 0) : 0,
+        promise: promise
+    };
+    firestoreHomeCache.siteSettingsDisplaySpeakers = {
+        value: firestoreHomeCache.siteSettingsDisplaySpeakers.value,
+        fetchedAt: Number(firestoreHomeCache.siteSettingsDisplaySpeakers.fetchedAt || 0),
+        promise: promise.then((s) => s.displaySpeakers)
+    };
+    firestoreHomeCache.siteSettingsDisplayProgramme = {
+        value: firestoreHomeCache.siteSettingsDisplayProgramme.value,
+        fetchedAt: Number(firestoreHomeCache.siteSettingsDisplayProgramme.fetchedAt || 0),
+        promise: promise.then((s) => s.displayProgramme)
+    };
+    firestoreHomeCache.siteSettingsPasswordProtectHome = {
+        value: firestoreHomeCache.siteSettingsPasswordProtectHome.value,
+        fetchedAt: Number(firestoreHomeCache.siteSettingsPasswordProtectHome.fetchedAt || 0),
+        promise: promise.then((s) => s.passwordProtectHome)
+    };
+    firestoreHomeCache.siteSettingsRegistrationOpen = {
+        value: firestoreHomeCache.siteSettingsRegistrationOpen.value,
+        fetchedAt: Number(firestoreHomeCache.siteSettingsRegistrationOpen.fetchedAt || 0),
+        promise: promise.then((s) => s.registrationOpen)
+    };
+    firestoreHomeCache.siteSettingsWaitingList = {
+        value: firestoreHomeCache.siteSettingsWaitingList.value,
+        location: location,
+        fetchedAt: Number(firestoreHomeCache.siteSettingsWaitingList.fetchedAt || 0),
+        promise: promise.then((s) => s.waitingList)
+    };
+
+    const settings = await promise;
+    const now = Date.now();
+    firestoreHomeCache.siteSettingsFields = {
+        value: settings.fields,
+        location: settings.location,
+        fetchedAt: now,
+        promise: null
+    };
+    rememberHomeSiteSettingsDerived(settings.fields, settings.location, now);
     return settings;
 }
 
@@ -5601,45 +5650,29 @@ function applyHomeRegistrationToReserves(regWrap, state) {
     el.hidden = false;
 }
 
-/** Waiting-list banner: `Waiting_list` on Settings/{location}/{location}, copy from Pre-sets `Sendtoreserves`. */
+/** Waiting-list banner: `Waiting_list` from in-memory Settings, copy from Pre-sets `Sendtoreserves`. */
 async function fetchHomeRegistrationToReservesFromFirebase() {
     if (typeof firebase === 'undefined') return { show: false, html: '' };
     const location = currentHomeEventLocation();
-    const waitingCached = firestoreHomeCache.siteSettingsWaitingList;
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    const show = !!settings.waitingList;
+    if (!show) return { show: false, html: '' };
+
     const copyCached = firestoreHomeCache.sendToReserves;
-    if (
-        waitingCached &&
-        waitingCached.location === location &&
-        isFreshFirestoreCacheEntry(waitingCached) &&
-        copyCached &&
-        copyCached.location === location &&
-        isFreshFirestoreCacheEntry(copyCached)
-    ) {
+    if (copyCached && copyCached.location === location && isFreshFirestoreCacheEntry(copyCached)) {
         return {
-            show: !!waitingCached.value,
+            show: true,
             html: typeof copyCached.value === 'string' ? copyCached.value : ''
         };
     }
-    if (waitingCached && waitingCached.location === location && waitingCached.promise) {
-        return waitingCached.promise;
+    if (copyCached && copyCached.location === location && copyCached.promise) {
+        const html = await copyCached.promise;
+        return { show: true, html: typeof html === 'string' ? html : '' };
     }
 
     const promise = (async function () {
         try {
             const db = getFirestore();
-            const settingsSnap = await withTimeout(
-                tbsSettingsLocationDocRef(db, location).get(),
-                10000,
-                'Firestore tbs/Settings/' + location + '/' + location + ' Waiting_list'
-            );
-            const settingsData = settingsSnap.exists ? settingsSnap.data() || {} : {};
-            const waitingRaw =
-                settingsData[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD] != null
-                    ? settingsData[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD]
-                    : settingsData.waiting_list;
-            const show = normalizeHomeWaitingListSetting(waitingRaw);
-            if (!show) return { show: false, html: '' };
-
             const presetsSnap = await withTimeout(
                 tbsPresetsLocationDocRef(db, location).get(),
                 10000,
@@ -5650,34 +5683,28 @@ async function fetchHomeRegistrationToReservesFromFirebase() {
                 presetsData[HOME_SNIPPETS_SEND_TO_RESERVES_FIELD] != null
                     ? presetsData[HOME_SNIPPETS_SEND_TO_RESERVES_FIELD]
                     : '';
-            return { show: true, html: raw != null ? String(raw) : '' };
+            return raw != null ? String(raw) : '';
         } catch (e) {
             console.warn('[home Waiting_list / Sendtoreserves]', e);
-            return { show: false, html: '' };
+            return '';
         }
     })();
 
-    firestoreHomeCache.siteSettingsWaitingList = {
-        value: waitingCached ? waitingCached.value : false,
+    firestoreHomeCache.sendToReserves = {
+        value: copyCached && copyCached.location === location ? copyCached.value : '',
         location: location,
-        fetchedAt: waitingCached ? Number(waitingCached.fetchedAt || 0) : 0,
+        fetchedAt: copyCached && copyCached.location === location ? Number(copyCached.fetchedAt || 0) : 0,
         promise: promise
     };
 
-    const value = await promise;
-    firestoreHomeCache.siteSettingsWaitingList = {
-        value: !!(value && value.show),
-        location: location,
-        fetchedAt: Date.now(),
-        promise: null
-    };
+    const html = await promise;
     firestoreHomeCache.sendToReserves = {
-        value: value && typeof value.html === 'string' ? value.html : '',
+        value: typeof html === 'string' ? html : '',
         location: location,
         fetchedAt: Date.now(),
         promise: null
     };
-    return value && typeof value === 'object' ? value : { show: false, html: '' };
+    return { show: true, html: typeof html === 'string' ? html : '' };
 }
 
 /** HTML for the first programme-band slider card from `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
@@ -8710,6 +8737,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
     scrollHomeToTop({ instant: true });
+    setupHomeSectionHistory();
     try {
         warmHomePageFirestoreCache();
     } catch (warmErr) {
@@ -8728,7 +8756,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupNavbarTransparency();
     setupMobileMenu();
     applyMobileBottomNavbarLayout();
-    setupHomeSectionHistory();
 
     // Bind header nav in parallel with home paint (nav exists in home.html before feed inject).
     const navigationReady = setupNavigationListeners();
