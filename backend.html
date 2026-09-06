@@ -54,6 +54,7 @@
             --backend-table-cell-pad-x: 8px;
             --backend-roster-row-pad-y: 0.175rem;
             --backend-tab-pale-pink: #fbcfe8;
+            --backend-navbar-bg: #003153;
             background-color: #f1f5f9;
             height: 100%;
             max-height: 100vh;
@@ -8252,7 +8253,7 @@
 
         /* Event strip with aspect tabs beside the logo */
         .eventnavigation {
-            background: #003153;
+            background: var(--backend-navbar-bg, #003153);
             border: none;
             margin: 0;
             width: 100%;
@@ -15347,8 +15348,7 @@
                 });
         }
 
-        async function loadSiteSettingsFromFirestore(options) {
-            var opts = options && typeof options === 'object' ? options : {};
+        async function loadSiteSettingsFromFirestore() {
             var db = getFirestore();
             if (!String(event_location || '').trim() && String(current_event || '').trim()) {
                 await syncEventLocationFromSettings(current_event);
@@ -15429,7 +15429,6 @@
                 coalesceFirestoreFieldValue(data, FIRESTORE_TBS_SETTINGS_NTEAM_FIELD_KEYS)
             );
             syncWaitingListToggleEnabledFromUi();
-            if (!opts.silentStatus) showSettingsDisplayStatus();
         }
 
         function normalizeSettingsGoalNumber(value) {
@@ -15494,7 +15493,7 @@
             } catch (err) {
                 console.error('saveSettingsGoalNTeamToFirestore:', err);
                 try {
-                    await loadSiteSettingsFromFirestore({ silentStatus: true });
+                    await loadSiteSettingsFromFirestore();
                 } catch (reloadErr) {
                     console.error('loadSiteSettingsFromFirestore:', reloadErr);
                 }
@@ -15816,7 +15815,7 @@
             } catch (err) {
                 console.error('saveSiteSettingToFirestore:', err);
                 try {
-                    await loadSiteSettingsFromFirestore({ silentStatus: true });
+                    await loadSiteSettingsFromFirestore();
                 } catch (reloadErr) {
                     console.error('loadSiteSettingsFromFirestore:', reloadErr);
                 }
@@ -15941,9 +15940,25 @@
 
         function showSettingsDisplayStatus() {
             if (typeof showStatus !== 'function') return;
+            if (!currentEventHasSettingsDoc) return;
             var ev = String(current_event || '').trim() || '—';
             var loc = String(event_location || '').trim() || '—';
             showStatus('info', 'Displaying settings for ' + ev + ' in ' + loc);
+        }
+
+        function isSettingsEditorOpen() {
+            var section = document.getElementById('settings-editor');
+            return !!(section && section.classList.contains('is-open'));
+        }
+
+        /** Navbar: Zermatt keeps Prussian; Alaska uses near-black. */
+        function updateBackendNavbarForEventLocation() {
+            var loc = String(event_location || '').trim().toLowerCase();
+            var bg = loc === 'alaska' ? '#1a1a1a' : '#003153';
+            document.documentElement.style.setProperty('--backend-navbar-bg', bg);
+            if (document.body) {
+                document.body.style.setProperty('--backend-navbar-bg', bg);
+            }
         }
 
         async function syncEventLocationFromSettings(eventName) {
@@ -15954,6 +15969,7 @@
                 console.error('syncEventLocationFromSettings:', err);
                 event_location = '';
             }
+            updateBackendNavbarForEventLocation();
             return event_location;
         }
 
@@ -15977,6 +15993,7 @@
             setSettingsUpcomingEventVisibility(exists);
             if (!exists) {
                 event_location = '';
+                updateBackendNavbarForEventLocation();
                 return;
             }
             await syncEventLocationFromSettings(ev);
@@ -16190,6 +16207,7 @@
                 event_location = '';
                 setSettingsUpcomingEventVisibility(false);
                 updateBackendCurrentEventDisplay();
+                updateBackendNavbarForEventLocation();
             }
         }
 
@@ -16371,7 +16389,14 @@
                     setSpeakerEditorEmptyState(true);
                 }
                 if (typeof showStatus === 'function') {
-                    showStatus('success', 'Current event set to ' + next + '. Speakers, guests, and programme updated.');
+                    if (isSettingsEditorOpen()) {
+                        showSettingsDisplayStatus();
+                    } else {
+                        showStatus(
+                            'success',
+                            'Current event set to ' + next + '. Speakers, guests, and programme updated.'
+                        );
+                    }
                 }
             } catch (err) {
                 console.error('setCurrentEventAndRefreshRosters:', err);
@@ -23603,12 +23628,19 @@
                 });
             }
             if (isSettings) {
-                void syncEventLocationAndSiteSettings(current_event).catch(function (err) {
-                    console.error('syncEventLocationAndSiteSettings:', err);
-                    if (typeof showStatus === 'function') {
-                        showStatus('error', err && err.message ? err.message : 'Failed to load site settings.');
-                    }
-                });
+                void syncEventLocationAndSiteSettings(current_event)
+                    .then(function () {
+                        showSettingsDisplayStatus();
+                    })
+                    .catch(function (err) {
+                        console.error('syncEventLocationAndSiteSettings:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to load site settings.'
+                            );
+                        }
+                    });
             }
             if (isFinances) {
                 void importFinancesInvoicesFromStripe({ showLoading: true });
