@@ -12245,7 +12245,7 @@
             var payload = {
                 Name: g.name != null ? String(g.name) : '',
                 'Last name': g.lastName != null ? String(g.lastName) : '',
-                Email: g.email != null ? String(g.email) : '',
+                'E-mail': g.email != null ? String(g.email) : '',
                 'City/region': g.cityRegion != null ? String(g.cityRegion) : '',
                 Country: g.country != null ? String(g.country) : '',
                 'Employer 1': g.employer1 != null ? String(g.employer1) : '',
@@ -12269,6 +12269,11 @@
             if (ev) payload.Event = ev;
             if (g.cmeStatus != null && String(g.cmeStatus).trim() !== '') {
                 payload['CME status'] = String(g.cmeStatus);
+            }
+            var FV = firebase.firestore && firebase.firestore.FieldValue;
+            if (FV && typeof FV.delete === 'function') {
+                payload.Email = FV.delete();
+                payload.email = FV.delete();
             }
             return payload;
         }

@@ -52,10 +52,10 @@ const stripeInvoicePriceId = "price_1TnIigJ1nXZVJIUS4KTefGCf";
  */
 function pickGuestEmail(data: Record<string, unknown>): string {
   const candidates = [
-    data.email,
-    data.guestEmail,
     data["E-mail"],
     data.Email,
+    data.email,
+    data.guestEmail,
     data["E mail"],
   ];
   for (const value of candidates) {
