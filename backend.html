@@ -14243,7 +14243,11 @@
             editableInputIds.forEach(function (id) {
                 var el = document.getElementById(id);
                 if (!el) return;
-                el.disabled = !canEdit;
+                if (id === 'edit-guest-email') {
+                    el.disabled = false;
+                } else {
+                    el.disabled = !canEdit;
+                }
                 if (canEdit) {
                     el.removeAttribute('readonly');
                     el.removeAttribute('aria-readonly');
@@ -16774,6 +16778,43 @@
             return one ? [one] : [];
         }
 
+        function guestEmailFromDoc(d) {
+            if (!d || typeof d !== 'object') return '';
+            var hyphen = speakerCoalesceStringField(d, ['E-mail']);
+            var alt = speakerCoalesceStringField(d, ['Email', 'email']);
+            if (alt && hyphen && alt !== hyphen) return alt;
+            return hyphen || alt || '';
+        }
+
+        function guestEmailNeedsCanonicalMigrate(d) {
+            if (!d || typeof d !== 'object') return false;
+            var hyphen = speakerCoalesceStringField(d, ['E-mail']);
+            var alt = speakerCoalesceStringField(d, ['Email', 'email']);
+            if (alt && hyphen && alt !== hyphen) return true;
+            if (alt && !hyphen) return true;
+            return false;
+        }
+
+        async function persistGuestCanonicalEmailField(g) {
+            if (backenduserIsReadonly || !g) return;
+            var id = String(g.id || '').trim();
+            if (!id) return;
+            var email = g.email != null ? String(g.email) : '';
+            try {
+                var db = getFirestore();
+                var payload = { 'E-mail': email };
+                var FV = firebase.firestore && firebase.firestore.FieldValue;
+                if (FV && typeof FV.delete === 'function') {
+                    payload.Email = FV.delete();
+                    payload.email = FV.delete();
+                }
+                await tbsGuestItemRef(db, id).set(payload, { merge: true });
+                g.emailAliasConflict = false;
+            } catch (err) {
+                console.warn('persistGuestCanonicalEmailField:', err);
+            }
+        }
+
         function guestRecordFromTbsItemDoc(docId, d) {
             d = d || {};
             return {
@@ -16781,7 +16822,8 @@
                 event: guestCoalesceGuestItemEvent(d),
                 name: speakerCoalesceStringField(d, ['Name', 'name', 'First Name', 'firstName']),
                 lastName: speakerCoalesceStringField(d, ['Last name', 'Last Name', 'lastName']),
-                email: speakerCoalesceStringField(d, ['E-mail', 'Email', 'email']),
+                email: guestEmailFromDoc(d),
+                emailAliasConflict: guestEmailNeedsCanonicalMigrate(d),
                 cityRegion: guestCoalesceGuestItemFieldFromKeys(d, [
                     'City/region',
                     'City / region',
@@ -17487,6 +17529,9 @@
             if (guestEmailEl) guestEmailEl.value = g.email != null ? String(g.email) : '';
             if (guestCollEl) guestCollEl.textContent = 'Collection: tbs/Guests/' + guestFormEditingDocId + '/item';
             if (guestIdMetaEl) guestIdMetaEl.textContent = 'Guest ID: ' + (guestFormEditingDocId || '-');
+            if (g.emailAliasConflict) {
+                void persistGuestCanonicalEmailField(g);
+            }
             updateEditGuestNameHeading();
             updateGuestEditorProfileFields(g);
             syncGuestRosterSelectionHighlight();
@@ -27682,6 +27727,23 @@
                     el.addEventListener('change', onGuestBioFormInput);
                 }
             });
+            var guestEmailEl = document.getElementById('edit-guest-email');
+            if (guestEmailEl && !guestEmailEl._tbsPadlockGuard) {
+                guestEmailEl._tbsPadlockGuard = true;
+                function guardLockedGuestEmail(ev) {
+                    if (guestPadlockIsOpen) return;
+                    if (ev.type === 'click') {
+                        shakeGuestPadlockAngrily();
+                        return;
+                    }
+                    ev.preventDefault();
+                    shakeGuestPadlockAngrily();
+                }
+                guestEmailEl.addEventListener('keydown', guardLockedGuestEmail);
+                guestEmailEl.addEventListener('paste', guardLockedGuestEmail);
+                guestEmailEl.addEventListener('beforeinput', guardLockedGuestEmail);
+                guestEmailEl.addEventListener('click', guardLockedGuestEmail);
+            }
             ['edit-guest-bio', 'clinicalcontext-text'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) {
