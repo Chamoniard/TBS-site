@@ -2679,6 +2679,44 @@
             gap: 16px;
         }
 
+        #speaker-editor .speaker-overwatch-body .speakers-registered {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            flex: 0 0 8rem;
+            width: 8rem;
+            min-width: 8rem;
+            max-width: 8rem;
+            height: 5.75rem;
+            min-height: 5.75rem;
+            max-height: 5.75rem;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 1rem 1.1rem;
+            background: #71C7FE;
+            border: 1px solid #71C7FE;
+            border-radius: 5px;
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+        }
+
+        #speaker-editor .speaker-overwatch-body .speakers-registered-label {
+            margin: 0 0 0.35rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25;
+            color: #ffffff;
+        }
+
+        #speaker-editor .speaker-overwatch-body .speakers-registered-count {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
         #speaker-editor .speakers-actions #speakers-overwatch-btn,
         #speaker-editor .speakers-actions #speakers-overwatch-btn.is-active,
         #speaker-editor .speakers-actions #speakers-overwatch-btn:focus,
@@ -9531,7 +9569,12 @@
                     </div>
                     <div class="speaker-overwatch" id="speaker-overwatch-panel" hidden aria-hidden="true" aria-label="Speaker overview">
                         <h2 class="speaker-overwatch-title" id="speaker-overwatch-title">Overview</h2>
-                        <div class="speaker-overwatch-body" id="speaker-overwatch-body"></div>
+                        <div class="speaker-overwatch-body" id="speaker-overwatch-body">
+                            <div class="speakers-registered" id="speakers-registered" data-name="speakers.registered" aria-label="Speakers">
+                                <div class="speakers-registered-label">Speakers:</div>
+                                <div class="speakers-registered-count" id="speakers-registered-count" aria-live="polite">0</div>
+                            </div>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -14247,6 +14290,7 @@
                     overwatch.classList.add('is-open');
                     overwatch.setAttribute('aria-hidden', 'false');
                 }
+                updateSpeakersOverwatchCount();
                 var actions = document.getElementById('speaker-editor-actions');
                 if (actions) {
                     actions.hidden = true;
@@ -14266,6 +14310,22 @@
                     overwatch.setAttribute('aria-hidden', 'true');
                 }
             }
+        }
+
+        /** Count of speakers whose Event matches Current event. */
+        function countSpeakersForCurrentEvent() {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(speakerRosterInMemory)) return 0;
+            var n = 0;
+            for (var i = 0; i < speakerRosterInMemory.length; i++) {
+                if (rosterRecordEventMatchesCurrentEvent(speakerRosterInMemory[i])) n++;
+            }
+            return n;
+        }
+
+        function updateSpeakersOverwatchCount() {
+            var el = document.getElementById('speakers-registered-count');
+            if (el) el.textContent = String(countSpeakersForCurrentEvent());
         }
 
         function closeSpeakersOverwatch() {
@@ -20573,6 +20633,7 @@
             updateAddSpeakerDeleteButtonState();
             updateSpeakerNavButtons();
             renderProgrammeSpeakersTable();
+            if (speakersOverwatchOpen) updateSpeakersOverwatchCount();
         }
 
         function toggleSpeakerPresentedForRow(docId) {
