@@ -28,12 +28,16 @@ const firestoreHomeCache = {
     sendToReserves: { value: '', location: '', fetchedAt: 0, promise: null },
     /** First programme-band card: `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
+    /** `tbs/Pre-sets/{event-location}/{event-location}` field `CME-text`. */
+    onDemandCmeText: { value: '', location: '', fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `displayprogramme` (`Yes` / `No`). */
     siteSettingsDisplayProgramme: { value: true, fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `passwordprotecthome` (`Yes` / `No`). */
     siteSettingsPasswordProtectHome: { value: false, fetchedAt: 0, promise: null },
+    /** Derived from `siteSettingsFields`: `displayondemand` (`Yes` / `No`). */
+    siteSettingsDisplayOnDemand: { value: true, fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `registrationopen` (boolean). */
     siteSettingsRegistrationOpen: { value: true, fetchedAt: 0, promise: null }
 };
@@ -708,6 +712,7 @@ function warmHomePageFirestoreCache() {
         void fetchHomeSpeakersListFromFirebase(currentHomeSiteEvent());
         void fetchHomeEventLocationInfoFromFirebase(eventId);
         void fetchHomeRegistrationManifestoFromFirebase();
+        void fetchHomeOnDemandCmeTextFromFirebase();
     } catch (e) {
         console.warn('warmHomePageFirestoreCache:', e);
     }
@@ -2693,11 +2698,99 @@ const HOME_SPEAKERS_SLIDER_HTML = `
                 </div>
 `;
 
-/** On-demand band (pale inner card) between Programme and Registration. */
-const HOME_ONDEMAND_SECTION_HTML = `
-                <div class="ondemand-section" role="region" aria-labelledby="home-ondemand-heading">
-                    <div class="ondemand-inner-wrapper">
-                        <h2 class="section-titles ondemand-section-title" id="home-ondemand-heading">TBS On-demand</h2>
+function applyHomeOnDemandSectionVisibility(homeSection, visible) {
+    if (!homeSection) return;
+    const section = homeSection.querySelector(':scope > .on-demand-section');
+    if (!section) return;
+    const show = !!visible;
+    section.classList.toggle('is-settings-hidden', !show);
+    if (show) {
+        section.removeAttribute('hidden');
+        section.setAttribute('aria-hidden', 'false');
+    } else {
+        section.setAttribute('hidden', '');
+        section.setAttribute('aria-hidden', 'true');
+    }
+}
+
+async function syncHomeOnDemandSectionVisibility(homeSection) {
+    let show = false;
+    try {
+        show = await fetchHomeDisplayOnDemandFromFirestore();
+    } catch (err) {
+        console.error('syncHomeOnDemandSectionVisibility:', err);
+        show = false;
+    }
+    applyHomeOnDemandSectionVisibility(homeSection, show);
+    return show;
+}
+
+/** HTML for `.on-demand-left` from `tbs/Pre-sets/{event_location}/{event_location}` field `CME-text`. */
+async function fetchHomeOnDemandCmeTextFromFirebase() {
+    if (typeof firebase === 'undefined') return '';
+    const location = currentHomeEventLocation();
+    const cached = firestoreHomeCache.onDemandCmeText;
+    if (cached && cached.location === location && isFreshFirestoreCacheEntry(cached)) {
+        return typeof cached.value === 'string' ? cached.value : '';
+    }
+    if (cached && cached.location === location && cached.promise) {
+        const html = await cached.promise;
+        return typeof html === 'string' ? html : '';
+    }
+
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const snap = await withTimeout(
+                tbsPresetsLocationDocRef(db, location).get(),
+                10000,
+                'Firestore tbs/Pre-sets/' + location + '/' + location + ' CME-text'
+            );
+            const data = snap.exists ? snap.data() || {} : {};
+            const raw = data[HOME_SNIPPETS_CME_TEXT_FIELD] != null ? data[HOME_SNIPPETS_CME_TEXT_FIELD] : '';
+            return raw != null ? String(raw) : '';
+        } catch (e) {
+            console.warn('[home snippets CME-text]', e);
+            return '';
+        }
+    })();
+
+    firestoreHomeCache.onDemandCmeText = {
+        value: cached && cached.location === location && typeof cached.value === 'string' ? cached.value : '',
+        location: location,
+        fetchedAt: cached && cached.location === location ? Number(cached.fetchedAt || 0) : 0,
+        promise: promise
+    };
+
+    const value = await promise;
+    firestoreHomeCache.onDemandCmeText = {
+        value: typeof value === 'string' ? value : '',
+        location: location,
+        fetchedAt: Date.now(),
+        promise: null
+    };
+    return typeof value === 'string' ? value : '';
+}
+
+async function hydrateHomeOnDemandSection(homeSection) {
+    if (!homeSection) return;
+    const left = homeSection.querySelector('.on-demand-left');
+    if (!left) return;
+    let html = '';
+    try {
+        html = await fetchHomeOnDemandCmeTextFromFirebase();
+    } catch (err) {
+        console.error('hydrateHomeOnDemandSection:', err);
+        html = '';
+    }
+    left.innerHTML = String(html || '').trim() ? wrapHomeRichHtml(html) : '';
+}
+const HOME_ON_DEMAND_SECTION_HTML = `
+                <div class="on-demand-section" role="region" aria-labelledby="home-on-demand-heading">
+                    <div class="on-demand-inner-wrapper">
+                        <h2 class="section-titles on-demand-section-title" id="home-on-demand-heading">TBS ON-DEMAND</h2>
+                        <div class="on-demand-left" id="on-demand-left"></div>
+                        <div class="on-demand-right" id="on-demand-right"></div>
                     </div>
                 </div>
 `;
@@ -3603,6 +3696,7 @@ function revealHomeStageBands(homeSection, options) {
         ':scope > .feed-section',
         ':scope > .programme-section',
         ':scope > .speaker-section',
+        ':scope > .on-demand-section',
         ':scope > .registration-section',
         ':scope > .registration-section + .home-section-divider-band'
     ];
@@ -3645,7 +3739,7 @@ const HOME_SECTION_BANDS_HTML =
                 </div>
 ` +
     HOME_SPEAKERS_SLIDER_HTML +
-    HOME_ONDEMAND_SECTION_HTML +
+    HOME_ON_DEMAND_SECTION_HTML +
     HOME_REGISTRATION_OUTER_HTML +
     HOME_REGISTRATION_FOOTER_DIVIDER_HTML;
 
@@ -3810,18 +3904,23 @@ async function showFeedContent() {
         
         const homeSection = mountHomeSectionIntoMain(main);
         setupRegistrationFormValidation(homeSection);
+        await syncHomeOnDemandSectionVisibility(homeSection);
+        void hydrateHomeOnDemandSection(homeSection).catch(function (err) {
+            console.error('hydrateHomeOnDemandSection:', err);
+        });
         const pictureEl = homeSection && homeSection.querySelector(':scope > picture');
         const introOuter = homeSection && homeSection.querySelector(':scope > .introslider-section');
         const introWrap = introOuter && introOuter.querySelector(':scope > .introslider-inner-wrapper');
         const feedWrap = homeSection && homeSection.querySelector(':scope > .feed-section');
         const speakersWrap = homeSection && homeSection.querySelector(':scope > .speaker-section');
+        const onDemandWrap = homeSection && homeSection.querySelector(':scope > .on-demand-section');
         const regWrap = homeSection && homeSection.querySelector(':scope > .registration-section');
         const regDivider = homeSection && homeSection.querySelector(':scope > .registration-section + .home-section-divider-band');
         mountHomeProgrammeSliderShell(homeSection);
         positionHomeSponsorsAfterIntroslider(homeSection);
         const sponsorsWrap = getHomeSponsorsInnerWrapper(homeSection);
         const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
-        [sponsorsWrap, introOuter, feedWrap, speakersWrap, regWrap, regDivider, programmeWrap].forEach((el) => {
+        [sponsorsWrap, introOuter, feedWrap, speakersWrap, onDemandWrap, regWrap, regDivider, programmeWrap].forEach((el) => {
             if (el) el.classList.add('home-stage-hidden');
         });
         const programmeReady = prefetchHomeProgrammeSliderData().then(function () {
@@ -4403,6 +4502,8 @@ const HOME_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD = 'displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD_ALT = 'Displayspeakers';
 const FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD = 'displayprogramme';
+const FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD = 'displayondemand';
+const FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD_ALT = 'Displayondemand';
 const FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
 const FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
 const FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
@@ -4451,6 +4552,12 @@ function normalizeHomeDisplayProgrammeSetting(value) {
     if (s === 'no' || s === 'n') return false;
     if (s === 'yes' || s === 'y') return true;
     return true;
+}
+
+/** @returns {boolean} true only when Settings `displayondemand` is Yes. */
+function normalizeHomeDisplayOnDemandSetting(value) {
+    const s = String(value == null ? '' : value).trim().toLowerCase();
+    return s === 'yes' || s === 'y';
 }
 
 /** @returns {boolean} true when guest registrations go to the waiting list (default No). */
@@ -4612,6 +4719,9 @@ function homeSiteSettingsFromFields(data) {
         displayProgramme: normalizeHomeDisplayProgrammeSetting(
             fields[FIRESTORE_TBS_SETTINGS_DISPLAY_PROGRAMME_FIELD]
         ),
+        displayOnDemand: normalizeHomeDisplayOnDemandSetting(
+            homeDisplayOnDemandValueFromSettingsData(fields)
+        ),
         passwordProtectHome: normalizeHomePasswordProtectSetting(
             fields[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD]
         ),
@@ -4633,6 +4743,11 @@ function rememberHomeSiteSettingsDerived(fields, location, fetchedAt) {
     };
     firestoreHomeCache.siteSettingsDisplayProgramme = {
         value: settings.displayProgramme,
+        fetchedAt: now,
+        promise: null
+    };
+    firestoreHomeCache.siteSettingsDisplayOnDemand = {
+        value: settings.displayOnDemand,
         fetchedAt: now,
         promise: null
     };
@@ -4662,6 +4777,7 @@ function homeSiteSettingsResult(fields, location) {
     return {
         displaySpeakers: derived.displaySpeakers,
         displayProgramme: derived.displayProgramme,
+        displayOnDemand: derived.displayOnDemand,
         passwordProtectHome: derived.passwordProtectHome,
         registrationOpen: derived.registrationOpen,
         waitingList: derived.waitingList,
@@ -4727,6 +4843,11 @@ async function fetchHomeSiteSettingsFromFirestore() {
         fetchedAt: Number(firestoreHomeCache.siteSettingsDisplayProgramme.fetchedAt || 0),
         promise: promise.then((s) => s.displayProgramme)
     };
+    firestoreHomeCache.siteSettingsDisplayOnDemand = {
+        value: firestoreHomeCache.siteSettingsDisplayOnDemand.value,
+        fetchedAt: Number(firestoreHomeCache.siteSettingsDisplayOnDemand.fetchedAt || 0),
+        promise: promise.then((s) => s.displayOnDemand)
+    };
     firestoreHomeCache.siteSettingsPasswordProtectHome = {
         value: firestoreHomeCache.siteSettingsPasswordProtectHome.value,
         fetchedAt: Number(firestoreHomeCache.siteSettingsPasswordProtectHome.fetchedAt || 0),
@@ -4766,6 +4887,11 @@ async function fetchHomeDisplayProgrammeFromFirestore() {
     return settings.displayProgramme;
 }
 
+async function fetchHomeDisplayOnDemandFromFirestore() {
+    const settings = await fetchHomeSiteSettingsFromFirestore();
+    return settings.displayOnDemand;
+}
+
 async function fetchHomeRegistrationOpenFromFirestore() {
     const settings = await fetchHomeSiteSettingsFromFirestore();
     return settings.registrationOpen;
@@ -4780,6 +4906,8 @@ const HOME_EVENT_LOCATIONINFO_FIELD = 'locationinfo';
 const HOME_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
 /** First programme slider card body: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo` (backend Pre-sets → Programme intro). */
 const HOME_SNIPPETS_PROGRAMMEINFO_FIELD = 'Programmeinfo';
+/** On-demand left column: Firestore `tbs/Pre-sets/{event_location}/{event_location}` field `CME-text`. */
+const HOME_SNIPPETS_CME_TEXT_FIELD = 'CME-text';
 /** localStorage key for Programme intro snippet (must match backend `data-snippet-key`). */
 const TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = 'tbsBackend:texteditor:home:programmeinfo';
 /** ISO date per slider day card; `html` is read from `tbs/Programme/{event}/days/{ISO}/Programme` (same as backend Pre-sets). */
@@ -5330,6 +5458,15 @@ function homeDisplaySpeakersValueFromSettingsData(data) {
     const alt = data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD_ALT];
     if (alt != null && String(alt).trim() !== '') return alt;
     const primary = data[FIRESTORE_TBS_SETTINGS_DISPLAY_SPEAKERS_FIELD];
+    if (primary != null && String(primary).trim() !== '') return primary;
+    return '';
+}
+
+function homeDisplayOnDemandValueFromSettingsData(data) {
+    if (!data || typeof data !== 'object') return '';
+    const alt = data[FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD_ALT];
+    if (alt != null && String(alt).trim() !== '') return alt;
+    const primary = data[FIRESTORE_TBS_SETTINGS_DISPLAY_ONDEMAND_FIELD];
     if (primary != null && String(primary).trim() !== '') return primary;
     return '';
 }
@@ -6383,9 +6520,17 @@ function insertHomeProgrammeSection(programmeSection, homeSection) {
         homeSection.appendChild(programmeSection);
     }
     positionHomeSponsorsAfterIntroslider(homeSection);
+    const onDemandSection = homeSection.querySelector(':scope > .on-demand-section');
+    if (onDemandSection) {
+        const onDemandAnchor = speakersSliderWrapper || programmeSection;
+        if (onDemandAnchor) {
+            onDemandAnchor.insertAdjacentElement('afterend', onDemandSection);
+        }
+    }
     const registrationOuter = homeSection.querySelector(':scope > .registration-section');
     if (registrationOuter) {
-        const registrationAnchor = speakersSliderWrapper || programmeSection;
+        const registrationAnchor =
+            onDemandSection || speakersSliderWrapper || programmeSection;
         if (registrationAnchor) {
             registrationAnchor.insertAdjacentElement('afterend', registrationOuter);
         }

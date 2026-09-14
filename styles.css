@@ -1607,16 +1607,13 @@ body.home-view .home-section > .title-section,
 body.home-view .home-section > .sponsors-section,
 body.home-view .home-section > .introslider-section,
 body.home-view .home-section > .speaker-section,
+body.home-view .home-section > .on-demand-section,
 body.home-view .home-section > .registration-section,
 body.home-view .home-section > .programme-section {
     position: relative;
     z-index: 1;
     max-width: 100%;
     min-width: 0;
-}
-
-body.home-view .home-section > .ondemand-section {
-    display: none !important;
 }
 
 /* Feed band slightly above speakers so the load-more chevron can straddle the seam */
@@ -2042,7 +2039,7 @@ body.home-view .home-section > .speaker-section {
         order: 80;
     }
 
-    body.home-view .home-section > .ondemand-section {
+    body.home-view .home-section > .on-demand-section {
         order: 90;
     }
 
@@ -2471,14 +2468,14 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     }
 }
 
-/* Home: On-demand — Prussian outer band + pale pink inner panel (between Programme and Registration) */
-.home-section > .ondemand-section {
+/* Home: On-demand — pale pink band (same as .home-loading-screen) between Programme and Registration */
+.home-section > .on-demand-section {
     width: 100%;
     max-width: 100%;
     min-width: 0;
     position: relative;
     box-sizing: border-box;
-    background-color: #003153 !important;
+    background-color: var(--tbs-loading-pink) !important;
     padding-left: 8px;
     padding-right: 8px;
     padding-top: 0;
@@ -2487,21 +2484,93 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     border-radius: 0 !important;
 }
 
-.home-section > .ondemand-section .ondemand-inner-wrapper {
+.home-section > .on-demand-section .on-demand-inner-wrapper {
     width: 100%;
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    background-color: #fc70d7;
+    background-color: var(--tbs-loading-pink);
+    border: none;
     border-radius: 0;
     padding: 24px 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
 }
 
-.home-section > .ondemand-section .ondemand-section-title {
+@media (min-width: 769px) {
+    /* Same centered column as `.feed-section-inner-wrapper` (1400px, auto margins) */
+    .home-section > .on-demand-section {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .home-section > .on-demand-section .on-demand-inner-wrapper {
+        width: 1400px;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 24px;
+        padding-right: 0;
+        padding-bottom: 24px;
+        padding-left: 16px;
+        border: none;
+    }
+
+    .home-section > .on-demand-section .on-demand-left {
+        padding-left: 0;
+        padding-right: 16px;
+        box-sizing: border-box;
+    }
+
+    .home-section > .on-demand-section .on-demand-right {
+        padding-left: 16px;
+        padding-right: 16px;
+        box-sizing: border-box;
+    }
+}
+
+.home-section > .on-demand-section .on-demand-section-title {
+    grid-column: 1 / -1;
     flex-shrink: 0;
     margin: 0;
     padding: 0;
+    padding-left: 0 !important;
     color: #003153 !important;
+}
+
+.home-section > .on-demand-section .on-demand-left,
+.home-section > .on-demand-section .on-demand-right {
+    min-width: 0;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+.home-section > .on-demand-section .on-demand-left .home-rich-html {
+    font-size: inherit;
+    line-height: inherit;
+    color: #003153;
+}
+
+.home-section > .on-demand-section .on-demand-left .home-rich-html :where(p, li, td, th, span, div, a, strong, em, blockquote) {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.home-section > .on-demand-section .on-demand-left .home-rich-html p {
+    margin: 0 0 0.75em 0;
+}
+
+.home-section > .on-demand-section .on-demand-left .home-rich-html p:last-child {
+    margin-bottom: 0;
+}
+
+body.home-view .home-section > .on-demand-section.is-settings-hidden,
+body.home-view .home-section > .on-demand-section[hidden] {
+    display: none !important;
 }
 
 /* Home: speakers row — Prussian band; 8px horizontal inset on section + inner */
@@ -2534,7 +2603,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     overflow: visible;
     position: relative;
     background-color: #ffffff;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0 !important;
     padding: 0;
     padding-top: 24px;
     padding-bottom: 16px;
@@ -5956,12 +6025,17 @@ h3.section-titles {
 
 /* Section headings — same vertical rhythm (8px top, 4px bottom); left inset where noted */
 .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title,
-.home-section > .ondemand-section .ondemand-inner-wrapper > h2.section-titles.ondemand-section-title,
 .home-section > .event-section .location-contents > .event-section-title,
 .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider-section-title {
     padding-top: 0;
     padding-bottom: 0;
     padding-left: 16px !important;
+}
+
+.home-section > .on-demand-section .on-demand-inner-wrapper > h2.section-titles.on-demand-section-title {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0 !important;
 }
 
 .feed-section-inner-wrapper > h2.section-titles,
@@ -6003,7 +6077,7 @@ h3.section-titles {
 }
 
 /* On-demand heading: scroll target (fixed nav) */
-#home-ondemand-heading {
+#home-on-demand-heading {
     scroll-margin-top: calc(var(--navbar-height) + 12px);
 }
 
@@ -7022,7 +7096,7 @@ h4 {
 
     .feed-section-inner-wrapper > h2.section-titles,
     .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title,
-    .home-section > .ondemand-section .ondemand-inner-wrapper > h2.section-titles.ondemand-section-title {
+    .home-section > .on-demand-section .on-demand-inner-wrapper > h2.section-titles.on-demand-section-title {
         padding-top: 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -9271,7 +9345,7 @@ h4 {
     #home-programme-title,
     #home-location-heading,
     #home-event-welcome-heading,
-    #home-ondemand-heading,
+    #home-on-demand-heading,
     #home-feed-latest-heading,
     #home-registration-heading {
         scroll-margin-top: calc(var(--navbar-height) + 12px);
@@ -9945,7 +10019,7 @@ h4 {
     #home-programme-title,
     #home-location-heading,
     #home-event-welcome-heading,
-    #home-ondemand-heading,
+    #home-on-demand-heading,
     #home-feed-latest-heading,
     #home-registration-heading {
         scroll-margin-top: calc(var(--navbar-height) + 12px);
@@ -11628,7 +11702,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .i
     .home-carousel-tba-title,
     .speaker-card-name,
     .speaker-card-long-bio-title,
-    .ondemand-section-title,
+    .on-demand-section-title,
     .registration-section-title,
     .footer-logo-fallback-title,
     .header .nav-link,
@@ -11698,7 +11772,7 @@ body.home-view :is(
     .about-title:not(.introslider-title),
     .introslider-section-title,
     .event-section-title,
-    .ondemand-section-title,
+    .on-demand-section-title,
     .speaker-card-name:not(.home-carousel-tba-title),
     .speaker-card-long-bio-title,
     .featured-location-title,
@@ -11761,7 +11835,7 @@ body.backend-page h2 {
 body.home-view :is(
     .registration-section-title,
     .speakers-section-title,
-    .ondemand-section-title,
+    .on-demand-section-title,
     .home-carousel-tba-title,
     .speaker-card-name.home-carousel-tba-title
 ) {
