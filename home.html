@@ -143,8 +143,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260914-on-demand-pad" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260914-on-demand-pad">
+    <link rel="preload" href="styles.css?v=20260914-on-demand-m8" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260914-on-demand-m8">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -365,6 +365,22 @@
                 border: none !important;
                 border-radius: 0 !important;
                 box-sizing: border-box !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body.home-view .home-section > .on-demand-section,
+            body.home-view .on-demand-section {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            body.home-view .home-section .on-demand-inner-wrapper,
+            body.home-view .on-demand-inner-wrapper,
+            body.home-view .home-section .registration-section-inner-wrapper,
+            body.home-view .registration-section-inner-wrapper {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
             }
         }
 

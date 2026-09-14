@@ -2530,6 +2530,19 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     }
 }
 
+@media (max-width: 768px) {
+    .home-section > .on-demand-section {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .home-section > .on-demand-section .on-demand-inner-wrapper,
+    .home-section > .registration-section .registration-section-inner-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
 .home-section > .on-demand-section .on-demand-section-title {
     grid-column: 1 / -1;
     flex-shrink: 0;
