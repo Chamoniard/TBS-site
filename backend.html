@@ -10683,6 +10683,12 @@
         /** Event names from `Access` when it is not `All`. */
         var backenduserAllowedEvents = [];
         let guestFormEditingDocId = '';
+        var guestDirtyDocIds = Object.create(null);
+        var guestSyncTimer = null;
+        var guestPeriodicSyncTimer = null;
+        var guestSyncInFlight = false;
+        var GUEST_FIREBASE_DEBOUNCE_MS = 2000;
+        var GUEST_FIREBASE_PERIODIC_MS = 12000;
         /** Guests Overwatch overview panel is open in the guest viewer. */
         var guestsOverwatchOpen = false;
         /** Speakers Overwatch overview panel is open in the speaker viewer. */
@@ -13864,6 +13870,10 @@
             guestsRosterSortInPlace();
             renderGuestsRoster();
             syncGuestRosterSelectionHighlight();
+            if (guestBioFormChangedFromBaseline()) {
+                markGuestDocDirty(id);
+                scheduleGuestFirebaseSync();
+            }
         }
 
         function updateSaveGuestToolbarButtonState() {
@@ -13875,29 +13885,88 @@
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
         }
 
-        async function saveGuestFromEditor() {
+        function markGuestDocDirty(docId) {
+            var id = String(docId || '').trim();
+            if (id) guestDirtyDocIds[id] = true;
+        }
+
+        function scheduleGuestFirebaseSync() {
+            if (guestSyncTimer) clearTimeout(guestSyncTimer);
+            guestSyncTimer = setTimeout(function () {
+                guestSyncTimer = null;
+                flushGuestsToFirebase({ silent: true });
+            }, GUEST_FIREBASE_DEBOUNCE_MS);
+        }
+
+        async function flushGuestsToFirebase(opts) {
+            if (backenduserIsReadonly) return false;
+            opts = opts || {};
+            if (guestSyncTimer) {
+                clearTimeout(guestSyncTimer);
+                guestSyncTimer = null;
+            }
+            var editingId = String(guestFormEditingDocId || '').trim();
+            if (editingId) {
+                var editingRec = findGuestInMemory(editingId);
+                if (editingRec) readGuestFormIntoRecord(editingRec);
+            }
+            var idsToSync = Object.keys(guestDirtyDocIds);
+            if (!idsToSync.length) return true;
+            if (guestSyncInFlight) {
+                scheduleGuestFirebaseSync();
+                return true;
+            }
+            guestSyncInFlight = true;
+            var syncedIds = [];
+            try {
+                var db = getFirestore();
+                var batch = db.batch();
+                for (var i = 0; i < idsToSync.length; i++) {
+                    var docId = idsToSync[i];
+                    var rec = findGuestInMemory(docId);
+                    if (!rec) continue;
+                    batch.set(tbsGuestItemRef(db, docId), guestPayloadFromRecord(rec), { merge: true });
+                    syncedIds.push(docId);
+                }
+                if (!syncedIds.length) {
+                    for (var p = 0; p < idsToSync.length; p++) delete guestDirtyDocIds[idsToSync[p]];
+                    return true;
+                }
+                await batch.commit();
+                for (var w = 0; w < syncedIds.length; w++) {
+                    delete guestDirtyDocIds[syncedIds[w]];
+                }
+                if (editingId && syncedIds.indexOf(editingId) !== -1) {
+                    captureGuestBioFormBaseline();
+                    updateSaveGuestToolbarButtonState();
+                    syncGuestRosterSelectionHighlight();
+                }
+                if (typeof showStatus === 'function' && !opts.silent) {
+                    showStatus('success', 'Guest saved to Firebase.');
+                }
+                return true;
+            } catch (err) {
+                console.error('flushGuestsToFirebase:', err);
+                for (var j = 0; j < syncedIds.length; j++) markGuestDocDirty(syncedIds[j]);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to save guest.');
+                }
+                return false;
+            } finally {
+                guestSyncInFlight = false;
+                if (Object.keys(guestDirtyDocIds).length) scheduleGuestFirebaseSync();
+            }
+        }
+
+        async function saveGuestFromEditor(opts) {
             if (backendBlockIfReadonly()) return false;
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) return true;
             var rec = findGuestInMemory(id);
             if (!rec) return false;
             syncAddGuestFormToMemoryIfEditing();
-            try {
-                var db = getFirestore();
-                await tbsGuestItemRef(db, id).set(guestPayloadFromRecord(rec), { merge: true });
-                clearGuestRosterItemSelection();
-                clearGuestEditorForm();
-                if (typeof showStatus === 'function') {
-                    showStatus('success', 'Guest saved to Firebase.');
-                }
-                return true;
-            } catch (err) {
-                console.error('Save guest failed:', err);
-                if (typeof showStatus === 'function') {
-                    showStatus('error', err.message || 'Failed to save guest.');
-                }
-                return false;
-            }
+            markGuestDocDirty(id);
+            return flushGuestsToFirebase(opts || {});
         }
 
         function applyGuestsOverwatchUi() {
@@ -27842,6 +27911,10 @@
             speakerPeriodicSyncTimer = setInterval(function() {
                 if (Object.keys(speakerDirtyDocIds).length) flushSpeakersToFirebase();
             }, SPEAKER_FIREBASE_PERIODIC_MS);
+            if (guestPeriodicSyncTimer) clearInterval(guestPeriodicSyncTimer);
+            guestPeriodicSyncTimer = setInterval(function () {
+                if (Object.keys(guestDirtyDocIds).length) flushGuestsToFirebase({ silent: true });
+            }, GUEST_FIREBASE_PERIODIC_MS);
             if (contentPeriodicSyncTimer) clearInterval(contentPeriodicSyncTimer);
             contentPeriodicSyncTimer = setInterval(function () {
                 if (Object.keys(contentDirtyDocIds).length) flushContentToFirebase();
@@ -27849,6 +27922,11 @@
             document.addEventListener('visibilitychange', function() {
                 if (document.visibilityState === 'hidden' && Object.keys(speakerDirtyDocIds).length) {
                     flushSpeakersToFirebase({ silent: true });
+                }
+            });
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden' && Object.keys(guestDirtyDocIds).length) {
+                    flushGuestsToFirebase({ silent: true });
                 }
             });
             document.addEventListener('visibilitychange', function () {
