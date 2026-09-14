@@ -7590,6 +7590,28 @@ h4 {
         overflow: hidden !important;
     }
 
+    /*
+     * Mobile only: downward shadow on programme/speaker cards (not sliders).
+     * Keep overflow:hidden on the cards so JS fit-height still works.
+     * box-shadow is clipped by that overflow; filter drop-shadow is not.
+     * Track padding so overflow-y:hidden on the slider does not clip it.
+     */
+    body.home-view .home-section .programme-slider > *,
+    body.home-view .home-programme-section .programme-slider > *,
+    body.home-view .home-section .programme-slider > .programme-info,
+    body.home-view .home-programme-section .programme-slider > .programme-info,
+    body.home-view .home-section .speakerslider-track > .speaker-card,
+    body.home-view .home-section .speakerslider-track > .speaker-placeholder,
+    body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
+        filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.12));
+    }
+
+    body.home-view .home-section .programme-slider,
+    body.home-view .home-programme-section .programme-slider,
+    body.home-view .home-section .speakerslider-track {
+        padding-bottom: 16px;
+    }
+
     .home-section .speakerslider-track > .speaker-card:not(:first-child),
     .home-section .speakerslider-track > .speaker-placeholder:not(:first-child),
     .home-section .programme-slider > *:not(:first-child),
