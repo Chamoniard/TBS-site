@@ -178,6 +178,7 @@ body.loading:not(.home-view)::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    background-color: #ffffff;
 }
 
 .container {
@@ -1091,7 +1092,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 /* Home view: poster starts at viewport top; fixed header overlays the image */
 body.home-view .home-section {
     margin-top: 0 !important;
-    background-color: #003153 !important;
+    background-color: #ffffff !important;
     max-width: min(1400px, 100%);
     /* 1920×1300 scaled to max 1400px column width */
     --home-poster-layout-height: 948px;
@@ -1283,7 +1284,7 @@ body.home-view .hero {
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
-    background-color: #FAFAFA;
+    background-color: #ffffff;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -1834,6 +1835,10 @@ body.home-view .home-section > .speaker-section {
     background: #003153;
     border-radius: 0 !important;
     padding: 0;
+}
+
+.home-section > .sponsors-section .sponsors-section-title {
+    display: none;
 }
 
 .home-section > .sponsors-section .sponsor-logos {
@@ -2586,7 +2591,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     display: none !important;
 }
 
-/* Home: speakers row — Prussian band; 8px horizontal inset on section + inner */
+/* Home: speakers row — white canvas; 8px horizontal inset on section + inner */
 .home-section > .speaker-section {
     width: 100%;
     max-width: 100%;
@@ -2597,7 +2602,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     flex-direction: column;
     gap: 0;
     overflow: visible;
-    background-color: #003153;
+    background-color: #ffffff;
     padding-left: 8px;
     padding-right: 8px;
     padding-top: 0;
@@ -2615,17 +2620,19 @@ body.home-view .home-section > .on-demand-section[hidden] {
     gap: 0;
     overflow: visible;
     position: relative;
-    background-color: #ffffff;
+    background-color: #ffffff !important;
     border-radius: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
     padding: 0;
-    padding-top: 24px;
+    padding-top: 0;
     padding-bottom: 16px;
     min-height: min(50vh, 420px);
 }
 
 @media (min-width: 769px) {
     .home-section > .speaker-section .speakers-inner-wrapper {
-        padding-top: 40px;
+        padding-top: 0;
         padding-bottom: 40px;
     }
 }
@@ -2635,7 +2642,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    background-color: transparent;
+    background-color: #ffffff;
     border-radius: 0;
     overflow: visible;
 }
@@ -2657,6 +2664,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     box-sizing: border-box;
     padding-left: 0;
     padding-right: 0;
+    background-color: #ffffff;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x pan-y;
     scroll-behavior: auto;
@@ -2887,8 +2895,8 @@ body.home-view .home-section > .on-demand-section[hidden] {
 .home-section .programme-section .programme-slider.home-carousel--minimal,
 .home-programme-section .programme-slider.home-carousel--minimal {
     align-items: flex-start;
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     background-image: none !important;
 }
 
@@ -4151,8 +4159,8 @@ body.home-view .home-section > .home-social-row-container {
     display: flex;
     flex-direction: column;
     gap: 0;
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     background-image: none !important;
     box-shadow: none !important;
     overflow: visible;
@@ -4182,7 +4190,7 @@ body.home-view .home-section > .home-social-row-container {
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    background-color: transparent;
+    background-color: #ffffff;
     background-image: none;
     --introslider-column-width: var(--home-carousel-slide-width, 450px);
     align-items: flex-start;
@@ -4235,10 +4243,30 @@ body.home-view .home-section > .home-social-row-container {
  * Home programme (displayed): no inner scroll. Every slide — including
  * `.programme-info` — shares one size (CSS vars set in script.js).
  */
+body.home-view .home-section .programmeslider-innerwrapper,
+body.home-view .home-section .speakers-inner-wrapper {
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+body.home-view .home-section .speakerslider {
+    box-shadow: none !important;
+    filter: none !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+}
+
 body.home-view .home-section .programme-slider,
 body.home-view .home-programme-section .programme-slider,
 body.home-view .home-section .speakerslider-track {
     align-items: stretch;
+    gap: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none !important;
+    filter: none !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
 }
 
 body.home-view .home-section .programme-slider > *,
@@ -6106,12 +6134,12 @@ h3.section-titles {
 }
 
 .home-section > .programme-section .programmeslider-innerwrapper {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     background-image: none !important;
     box-shadow: none !important;
     padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    padding-bottom: 24px !important;
     padding-left: 0;
     padding-right: 0;
 }
@@ -6834,7 +6862,10 @@ h4 {
     }
 
     .home-section > .speaker-section .speakers-inner-wrapper {
-        padding: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 24px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .sponsors_wrapper {
@@ -7168,6 +7199,15 @@ h4 {
         padding-top: 24px;
     }
 
+    .home-section > .sponsors-section .sponsors-section-title {
+        display: block !important;
+        color: #ffffff !important;
+        text-align: center !important;
+        width: 100%;
+        margin: 0;
+        padding: 0 0 8px !important;
+    }
+
     .home-section > .sponsors-section .sponsors-section-inner-wrapper {
         flex-direction: column !important;
         align-items: stretch !important;
@@ -7181,7 +7221,7 @@ h4 {
         width: 100%;
         max-width: 100%;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: center;
         align-content: center;
         column-gap: var(--sponsor-logo-gap);
         row-gap: var(--sponsor-logo-gap);
@@ -7192,7 +7232,30 @@ h4 {
         flex: 0 0 auto;
         max-width: none;
         min-width: 0;
-        order: 0;
+        justify-content: center;
+    }
+
+    /* Visual order: Corpuls+Hamilton, Intersurgical+Qinflow, Heine */
+    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(1) {
+        order: 1;
+    }
+
+    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(2) {
+        order: 2;
+    }
+
+    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(4) {
+        order: 3;
+    }
+
+    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(5) {
+        order: 4;
+    }
+
+    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(3) {
+        order: 5;
+        flex: 1 1 100%;
+        max-width: 100%;
         justify-content: center;
     }
 
@@ -7300,7 +7363,10 @@ h4 {
     }
 
     .home-section .speakers-inner-wrapper {
-        padding: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 24px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
         box-sizing: border-box;
     }
 

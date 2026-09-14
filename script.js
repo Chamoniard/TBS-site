@@ -2307,6 +2307,7 @@ const HOME_SPONSOR_LOGO_SLOTS_HTML = `
 const HOME_SPONSORS_SECTION_HTML = `
                 <div class="sponsors-section" role="region" aria-label="Sponsors">
                     <div class="sponsors-section-inner-wrapper">
+                        <h2 class="section-titles sponsors-section-title" id="home-sponsors-heading">Presented by</h2>
                         <div class="sponsor-logos">
 ${HOME_SPONSOR_LOGO_SLOTS_HTML}
                         </div>
@@ -2330,20 +2331,37 @@ function sponsorLogosRowGapPx(rowEl) {
     return Number.isFinite(x) ? x : 0;
 }
 
-/** Mobile wrap layout: three logos on the first row, remaining on the second. */
+/** Mobile wrap: Corpuls+Hamilton, Intersurgical+Qinflow, Heine. */
 function sponsorLogoMobileRowGroups(row) {
     const slots = Array.from(row.querySelectorAll(':scope > .sponsor-logo-slot'));
-    const images = [];
+    const byAlt = {};
+    const leftover = [];
     for (let i = 0; i < slots.length; i++) {
         const img = slots[i].querySelector('img.sponsors-logo-image');
-        if (img) images.push(img);
+        if (!img) continue;
+        leftover.push(img);
+        const key = String(img.getAttribute('alt') || '').trim().toLowerCase();
+        if (key) byAlt[key] = img;
     }
-    const perRow = 3;
+    function pair(a, b) {
+        const imgs = [];
+        if (byAlt[a]) imgs.push(byAlt[a]);
+        if (byAlt[b]) imgs.push(byAlt[b]);
+        return imgs;
+    }
     const groups = [];
-    for (let i = 0; i < images.length; i += perRow) {
-        groups.push(images.slice(i, i + perRow));
+    const row1 = pair('corpuls', 'hamilton');
+    const row2 = pair('intersurgical', 'qinflow');
+    const row3 = byAlt.heine ? [byAlt.heine] : [];
+    if (row1.length) groups.push(row1);
+    if (row2.length) groups.push(row2);
+    if (row3.length) groups.push(row3);
+    if (groups.length) return groups;
+    const fallback = [];
+    for (let i = 0; i < leftover.length; i += 2) {
+        fallback.push(leftover.slice(i, i + 2));
     }
-    return groups;
+    return fallback;
 }
 
 /**

@@ -68,7 +68,7 @@
         }
         .hero { background: #f8fafc; color: #333; height: calc(var(--navbar-height) - 2px); min-height: calc(var(--navbar-height) - 2px); text-align: left; position: relative; width: 100%; margin: 0 0 8px 0; }
         @media (max-width: 768px) { .hero { margin: 0 !important; } }
-        body.home-view .home-section { margin-top: 0 !important; background-color: #003153 !important; }
+        body.home-view .home-section { margin-top: 0 !important; background-color: #ffffff !important; }
         body.home-view .hero { display: none !important; }
         body.home-view .header:not(.post-view) { background: transparent !important; box-shadow: none !important; }
         body.home-view .navbar { background: transparent !important; box-shadow: none !important; }
@@ -143,8 +143,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260914-on-demand-m8" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260914-on-demand-m8">
+    <link rel="preload" href="styles.css?v=20260914-noshadow" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260914-noshadow">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -153,6 +153,13 @@
         body.home-view.past-talks-open .home-section > picture {
             max-width: none !important;
             width: 100% !important;
+        }
+
+        body.home-view,
+        body.home-view .everything,
+        body.home-view .home-section {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
         }
 
         @media (min-width: 769px) {
@@ -327,12 +334,29 @@
             background-color: #ffffff !important;
         }
 
+        body.home-view .home-section .programmeslider-innerwrapper,
+        body.home-view .programmeslider-innerwrapper,
+        body.home-view .home-section .speakers-inner-wrapper,
+        body.home-view .speakers-inner-wrapper,
+        body.home-view .home-section .programme-slider,
+        body.home-view .programme-slider,
+        body.home-view .home-section .programme-section .programme-slider.home-carousel--minimal,
+        body.home-view .home-section .speakerslider,
+        body.home-view .home-section .speakerslider-track {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            box-shadow: none !important;
+            filter: none !important;
+        }
+
         body.home-view .home-section > .speaker-section,
         body.home-view .speaker-section {
             padding-left: 0 !important;
             padding-right: 0 !important;
             border: none !important;
             border-radius: 0 !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
         }
 
         body.home-view .home-section > .on-demand-section,
@@ -936,6 +960,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260914-on-demand-pad" defer></script>
+    <script src="script.js?v=20260914-sponsors-title" defer></script>
 </body>
 </html>
