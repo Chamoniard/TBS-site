@@ -11666,6 +11666,48 @@
             );
         }
 
+        /**
+         * After session-title writes only: update persisted names without copying live slot edits.
+         * A full snapshot here would clear programmeSlotsDirty and skip slot Firestore writes.
+         */
+        function syncProgrammePersistedSessionNamesFromState() {
+            var byDay = programmeState && programmeState.sessionsByDay ? programmeState.sessionsByDay : {};
+            var dates = Object.keys(byDay);
+            for (var di = 0; di < dates.length; di++) {
+                var dateStr = dates[di];
+                var sessions = byDay[dateStr] || [];
+                if (!programmePersistedSessionsByDay[dateStr]) {
+                    programmePersistedSessionsByDay[dateStr] = [];
+                }
+                var persistedList = programmePersistedSessionsByDay[dateStr];
+                for (var si = 0; si < sessions.length; si++) {
+                    var session = sessions[si];
+                    var sessionId = String(session && session.id ? session.id : '').trim();
+                    if (!sessionId) continue;
+                    var name = normalizeProgrammeSessionName(session.name);
+                    var found = null;
+                    for (var pi = 0; pi < persistedList.length; pi++) {
+                        if (String(persistedList[pi].id || '') === sessionId) {
+                            found = persistedList[pi];
+                            break;
+                        }
+                    }
+                    if (found) {
+                        found.name = name;
+                        if (session.order != null) found.order = session.order;
+                    } else {
+                        // Keep slots empty so any live slot edits remain dirty vs snapshot.
+                        persistedList.push({
+                            id: sessionId,
+                            name: name,
+                            order: session.order != null ? session.order : null,
+                            slots: []
+                        });
+                    }
+                }
+            }
+        }
+
         function getPersistedProgrammeSession(dateStr, sessionId) {
             var list = programmePersistedSessionsByDay[dateStr];
             if (!list) return null;
@@ -13700,7 +13742,7 @@
                 return;
             }
             await Promise.all(writes);
-            syncProgrammePersistedSnapshotFromState();
+            syncProgrammePersistedSessionNamesFromState();
             recomputeProgrammeEditDirtyFlags();
             if (!options.skipRefresh && !options.skipUiRefresh) {
                 refreshProgrammeEditorDays();
