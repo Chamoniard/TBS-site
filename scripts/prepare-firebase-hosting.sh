@@ -3,11 +3,18 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-rm -rf _site
+# Prefer a clean tree; if something undeletable remains (e.g. IDE .cursor), wipe contents instead.
+if [ -d _site ]; then
+  rm -rf _site 2>/dev/null || true
+fi
 mkdir -p _site
-rsync -a \
+if [ -d _site ]; then
+  find _site -mindepth 1 \( -name '.cursor' -prune \) -o -exec rm -rf {} + 2>/dev/null || true
+fi
+rsync -a --delete \
   --exclude '.git/' \
   --exclude '.github/' \
+  --exclude '.cursor/' \
   --exclude '_site/' \
   --exclude 'node_modules/' \
   --exclude 'functions/' \
