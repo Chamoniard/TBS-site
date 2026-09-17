@@ -291,6 +291,7 @@
         body.backend-page.backend-readonly #add-house-save-btn,
         body.backend-page.backend-readonly button.team-editor-padlock-btn,
         body.backend-page.backend-readonly #add-guest-delete-btn,
+        body.backend-page.backend-readonly #cancel-guest-btn,
         body.backend-page.backend-readonly #add-speaker-delete-btn,
         body.backend-page.backend-readonly #add-team-delete-btn,
         body.backend-page.backend-readonly #content-editor-delete-btn,
@@ -2476,7 +2477,6 @@
         #guest-editor .guest-overwatch-body .guests-invoiced,
         #guest-editor .guest-overwatch-body .guests-direct-transfer,
         #guest-editor .guest-overwatch-body .guests-not-invoiced,
-        #guest-editor .guest-overwatch-body .guests-not-decided,
         #guest-editor .guest-overwatch-body .guests-not-paid,
         #guest-editor .guest-overwatch-body .guests-cancelled,
         #guest-editor .guest-overwatch-body .guests-paid {
@@ -2512,9 +2512,9 @@
             box-sizing: border-box;
         }
 
+        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-registered,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invited,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-reserves,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-decided,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invoiced,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer,
         #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-invoiced,
@@ -2572,7 +2572,6 @@
         #guest-editor .guest-overwatch-body .guests-invoiced-label,
         #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
         #guest-editor .guest-overwatch-body .guests-not-invoiced-label,
-        #guest-editor .guest-overwatch-body .guests-not-decided-label,
         #guest-editor .guest-overwatch-body .guests-not-paid-label,
         #guest-editor .guest-overwatch-body .guests-cancelled-label,
         #guest-editor .guest-overwatch-body .guests-paid-label {
@@ -2594,7 +2593,6 @@
         #guest-editor .guest-overwatch-body .guests-invoiced-count,
         #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
         #guest-editor .guest-overwatch-body .guests-not-invoiced-count,
-        #guest-editor .guest-overwatch-body .guests-not-decided-count,
         #guest-editor .guest-overwatch-body .guests-not-paid-count,
         #guest-editor .guest-overwatch-body .guests-cancelled-count,
         #guest-editor .guest-overwatch-body .guests-paid-count {
@@ -4928,6 +4926,27 @@
             color: #ffffff;
         }
 
+        /* Roster tables: event pills are always the guest Yes green, regardless of event. */
+        #guest-editor .guests-list-table .content-badge.content-badge--event-tbs25,
+        #guest-editor .guests-list-table .content-badge.content-badge--event-tbs26,
+        #guest-editor .guests-list-table .content-badge.content-badge--event-tbs27,
+        #guest-editor .guests-list-table .content-badge.content-badge--event-default,
+        #speaker-editor .speakers-roster-table .content-badge.content-badge--event-tbs25,
+        #speaker-editor .speakers-roster-table .content-badge.content-badge--event-tbs26,
+        #speaker-editor .speakers-roster-table .content-badge.content-badge--event-tbs27,
+        #speaker-editor .speakers-roster-table .content-badge.content-badge--event-default,
+        #content-editor .content-list-table .content-badge.content-badge--event-tbs25,
+        #content-editor .content-list-table .content-badge.content-badge--event-tbs26,
+        #content-editor .content-list-table .content-badge.content-badge--event-tbs27,
+        #content-editor .content-list-table .content-badge.content-badge--event-default,
+        #content-editor .content-roster-table .content-badge.content-badge--event-tbs25,
+        #content-editor .content-roster-table .content-badge.content-badge--event-tbs26,
+        #content-editor .content-roster-table .content-badge.content-badge--event-tbs27,
+        #content-editor .content-roster-table .content-badge.content-badge--event-default {
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
+        }
+
         .speakers-list--roster,
         .guests-list--roster {
             display: flex;
@@ -5289,6 +5308,12 @@
             white-space: nowrap;
         }
 
+        #guest-editor .guests-list-table tbody td.guests-roster-name-cell.is-cancelled,
+        #guest-editor .guests-list-table tbody tr:hover td.guests-roster-name-cell.is-cancelled,
+        #guest-editor .guests-list-table tbody tr.is-selected td.guests-roster-name-cell.is-cancelled {
+            color: #94a3b8;
+        }
+
         #team-editor .team-list-table thead th {
             text-align: center;
         }
@@ -5335,6 +5360,15 @@
         #team-editor .team-list-table tbody tr:hover td,
         #team-editor .team-list-table tbody tr.is-selected td {
             background: #71C7FE;
+        }
+
+        #guest-editor .guests-list-table tbody tr.guests-roster-blank-row,
+        #guest-editor .guests-list-table tbody tr.guests-roster-blank-row:hover,
+        #guest-editor .guests-list-table tbody tr.guests-roster-blank-row td,
+        #guest-editor .guests-list-table tbody tr.guests-roster-blank-row:hover td {
+            background: #ffffff;
+            cursor: default;
+            pointer-events: none;
         }
 
         .speakers-roster-table tbody td,
@@ -6082,6 +6116,56 @@
             color: #ffffff;
             flex-shrink: 0;
             display: block;
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #cancel-guest-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            gap: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #000000 !important;
+            color: #ffffff !important;
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #cancel-guest-btn:hover:not(:disabled) {
+            background: #000000 !important;
+            color: #ffffff !important;
+            filter: brightness(1.15);
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #cancel-guest-btn:disabled,
+        #guest-editor .guest-editor-toolbar-trailing #cancel-guest-btn:hover:disabled {
+            background: #000000 !important;
+            color: #ffffff !important;
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #cancel-guest-btn span {
+            display: block;
+            line-height: 1;
+            color: #ffffff;
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #cancel-guest-btn.is-armed {
+            outline: 2px solid #000000;
+            outline-offset: 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
         #guest-editor .guest-editor-toolbar .add-speaker-delete-btn.is-armed,
@@ -7116,6 +7200,11 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-soldout {
+            background: var(--backend-roster-pill-black);
+            color: #ffffff;
+        }
+
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-cancelled {
             background: var(--backend-roster-pill-black);
             color: #ffffff;
         }
@@ -10320,6 +10409,9 @@
                                             <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
                                         </svg>
                                     </button>
+                                    <button type="button" class="cancel-guest-btn" id="cancel-guest-btn" disabled aria-disabled="true" title="Cancel guest" aria-label="Cancel guest">
+                                        <span aria-hidden="true">✗</span>
+                                    </button>
                                     <button type="button" class="add-speaker-delete-btn" id="add-guest-delete-btn" disabled aria-disabled="true" title="Delete guest" aria-label="Delete guest">
                                         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                                     </button>
@@ -10560,7 +10652,7 @@
                                         <div class="guests-registered-count" id="guests-registered-count" aria-live="polite">0</div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
-                                    <div class="guest-overwatch-split-row" role="group" aria-label="Invited, reserves, and not decided">
+                                    <div class="guest-overwatch-split-row" role="group" aria-label="Invited, reserves, and cancelled">
                                         <div class="guests-invited" id="guests-invited" data-name="guests.invited" aria-label="Invited guests">
                                             <div class="guests-invited-label">Invited:</div>
                                             <div class="guests-invited-count" id="guests-invited-count" aria-live="polite">0</div>
@@ -10571,9 +10663,9 @@
                                             <div class="guests-reserves-count" id="guests-reserves-count" aria-live="polite">0</div>
                                         </div>
                                         <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
-                                        <div class="guests-not-decided" id="guests-not-decided" data-name="guests.not-decided" aria-label="Guests not decided">
-                                            <div class="guests-not-decided-label">Not decided:</div>
-                                            <div class="guests-not-decided-count" id="guests-not-decided-count" aria-live="polite">0</div>
+                                        <div class="guests-cancelled" id="guests-cancelled" data-name="guests.cancelled" aria-label="Cancelled guests">
+                                            <div class="guests-cancelled-label">Cancelled:</div>
+                                            <div class="guests-cancelled-count" id="guests-cancelled-count" aria-live="polite">0</div>
                                         </div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
@@ -10594,7 +10686,7 @@
                                         </div>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
-                                    <div class="guest-overwatch-split-row" role="group" aria-label="Paid, not paid, and cancelled">
+                                    <div class="guest-overwatch-split-row" role="group" aria-label="Paid and not paid">
                                         <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
                                             <div class="guests-paid-label">Paid:</div>
                                             <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
@@ -10603,11 +10695,6 @@
                                         <div class="guests-not-paid" id="guests-not-paid" data-name="guests.not-paid" aria-label="Guests not paid">
                                             <div class="guests-not-paid-label">Not paid:</div>
                                             <div class="guests-not-paid-count" id="guests-not-paid-count" aria-live="polite">0</div>
-                                        </div>
-                                        <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
-                                        <div class="guests-cancelled" id="guests-cancelled" data-name="guests.cancelled" aria-label="Cancelled paid guests">
-                                            <div class="guests-cancelled-label">Cancelled:</div>
-                                            <div class="guests-cancelled-count" id="guests-cancelled-count" aria-live="polite">0</div>
                                         </div>
                                     </div>
                                 </div>
@@ -11474,6 +11561,17 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" class="speaker-delete-cancel-btn" id="guest-delete-cancel">Cancel</button>
                 <button type="button" class="speaker-delete-yes-btn" id="guest-delete-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="guest-cancel-confirm" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guest-cancel-confirm-title">
+        <div class="guest-delete-confirm__backdrop" id="guest-cancel-confirm-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <p id="guest-cancel-confirm-title">Cancel guest?</p>
+            <div class="guest-delete-confirm__actions">
+                <button type="button" class="speaker-delete-cancel-btn" id="guest-cancel-no">No</button>
+                <button type="button" class="speaker-delete-yes-btn" id="guest-cancel-yes">Yes</button>
             </div>
         </div>
     </div>
@@ -13313,6 +13411,9 @@
                 Attended: g.attended != null ? String(g.attended) : '',
                 Log: Array.isArray(g.log) ? g.log.slice() : [],
             };
+            if (g.cancelled != null && String(g.cancelled).trim() !== '') {
+                payload.cancelled = String(g.cancelled);
+            }
             if (g.readTime != null && String(g.readTime).trim() !== '') {
                 payload['Read time'] = String(g.readTime);
                 payload['Read Time'] = String(g.readTime);
@@ -15104,6 +15205,7 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestInvitedFieldIsYes(g.invited)) n++;
             }
             return n;
@@ -15117,20 +15219,8 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestInvitedFieldIsReserve(g.invited)) n++;
-            }
-            return n;
-        }
-
-        /** Invited=No for Current event. */
-        function countGuestsNotDecidedForCurrentEvent() {
-            if (!String(current_event || '').trim()) return 0;
-            if (!Array.isArray(guestsRosterInMemory)) return 0;
-            var n = 0;
-            for (var i = 0; i < guestsRosterInMemory.length; i++) {
-                var g = guestsRosterInMemory[i];
-                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
-                if (guestInvitedFieldIsNo(g.invited)) n++;
             }
             return n;
         }
@@ -15143,6 +15233,7 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestPaidFieldIsYes(g.paid)) n++;
             }
             return n;
@@ -15156,6 +15247,7 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestInvoicedFieldIsYes(g.invoiced)) n++;
             }
             return n;
@@ -15169,6 +15261,7 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestInvoicedFieldIsDirect(g.invoiced)) n++;
             }
             return n;
@@ -15182,6 +15275,7 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestInvitedFieldIsYes(g.invited) && guestInvoicedFieldIsNo(g.invoiced)) n++;
             }
             return n;
@@ -15195,12 +15289,13 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (guestPaidFieldIsNo(g.paid)) n++;
             }
             return n;
         }
 
-        /** Paid=Cancelled for Current event. */
+        /** cancelled=Yes for Current event. */
         function countGuestsCancelledForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
@@ -15208,7 +15303,7 @@
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
-                if (guestPaidFieldIsCancelled(g.paid)) n++;
+                if (guestCancelledFieldIsYes(g.cancelled)) n++;
             }
             return n;
         }
@@ -15220,8 +15315,6 @@
             if (invitedEl) invitedEl.textContent = String(countGuestsInvitedForCurrentEvent());
             var reservesEl = document.getElementById('guests-reserves-count');
             if (reservesEl) reservesEl.textContent = String(countGuestsReservesForCurrentEvent());
-            var notDecidedEl = document.getElementById('guests-not-decided-count');
-            if (notDecidedEl) notDecidedEl.textContent = String(countGuestsNotDecidedForCurrentEvent());
             var invoicedEl = document.getElementById('guests-invoiced-count');
             if (invoicedEl) invoicedEl.textContent = String(countGuestsInvoicedForCurrentEvent());
             var directEl = document.getElementById('guests-direct-transfer-count');
@@ -15706,13 +15799,20 @@
 
         function updateAddGuestDeleteButtonState() {
             var delBtn = document.getElementById('add-guest-delete-btn');
+            var cancelBtn = document.getElementById('cancel-guest-btn');
             var id = String(guestFormEditingDocId || '').trim();
             var hasGuest = id !== '';
             var canDelete = hasGuest && guestPadlockIsOpen;
+            var canCancel = hasGuest && guestPadlockIsOpen;
             if (delBtn) {
                 delBtn.disabled = !canDelete;
                 delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
                 if (!canDelete) delBtn.classList.remove('is-armed');
+            }
+            if (cancelBtn) {
+                cancelBtn.disabled = !canCancel;
+                cancelBtn.setAttribute('aria-disabled', canCancel ? 'false' : 'true');
+                if (!canCancel) cancelBtn.classList.remove('is-armed');
             }
         }
 
@@ -15739,6 +15839,65 @@
             dlg.setAttribute('aria-hidden', 'true');
             var delBtn = document.getElementById('add-guest-delete-btn');
             if (delBtn) delBtn.classList.remove('is-armed');
+        }
+
+        function openGuestCancelConfirmModal() {
+            var dlg = document.getElementById('guest-cancel-confirm');
+            if (!dlg) return;
+            var titleEl = document.getElementById('guest-cancel-confirm-title');
+            var id = String(guestFormEditingDocId || '').trim();
+            var rec = findGuestInMemory(id);
+            var firstName = rec ? String(rec.name || '').trim() : '';
+            var lastName = rec ? String(rec.lastName || '').trim() : '';
+            var name = (firstName + ' ' + lastName).trim() || guestRosterDisplayName(rec);
+            if (titleEl) titleEl.textContent = 'Cancel ' + name + '?';
+            var cancelBtn = document.getElementById('cancel-guest-btn');
+            if (cancelBtn) cancelBtn.classList.add('is-armed');
+            dlg.hidden = false;
+            dlg.setAttribute('aria-hidden', 'false');
+            var noBtn = document.getElementById('guest-cancel-no');
+            if (noBtn) noBtn.focus();
+        }
+
+        function closeGuestCancelConfirmModal() {
+            var dlg = document.getElementById('guest-cancel-confirm');
+            if (!dlg) return;
+            dlg.hidden = true;
+            dlg.setAttribute('aria-hidden', 'true');
+            var cancelBtn = document.getElementById('cancel-guest-btn');
+            if (cancelBtn) cancelBtn.classList.remove('is-armed');
+        }
+
+        async function performCancelGuestInFirebase() {
+            closeGuestCancelConfirmModal();
+            if (backendBlockIfReadonly()) return;
+            var docId = String(guestFormEditingDocId || '').trim();
+            if (!docId) return;
+            try {
+                var db = getFirestore();
+                var itemRef = tbsGuestItemRef(db, docId);
+                var snap = await itemRef.get();
+                var data = snap.exists ? snap.data() || {} : {};
+                var logLine = guestLogGuestCancelledLine();
+                var mergedLog = guestLogFromDoc(data).concat([logLine]);
+                await itemRef.set({ cancelled: 'Yes', Log: mergedLog }, { merge: true });
+                var rec = findGuestInMemory(docId);
+                if (rec) {
+                    rec.cancelled = 'Yes';
+                    rec.log = mergedLog.slice();
+                }
+                renderGuestsRoster();
+                updateGuestsOverwatchRegisteredCount();
+                syncGuestManagementLogPanel();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Guest cancelled.');
+                }
+            } catch (err) {
+                console.error('Cancel guest failed:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to cancel guest.');
+                }
+            }
         }
 
         async function performDeleteGuestFromFirebase() {
@@ -18963,15 +19122,25 @@
                     'Applied Date',
                     'appliedDate',
                 ]),
+                cancelled: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'cancelled',
+                    'Cancelled',
+                    'CANCELLED',
+                ]),
             };
         }
 
         function guestsRosterSortInPlace() {
             guestsRosterInMemory.sort(function(a, b) {
-                var aEvent = String(a.event || '').trim().toLowerCase();
-                var bEvent = String(b.event || '').trim().toLowerCase();
-                var byEvent = bEvent.localeCompare(aEvent, undefined, { sensitivity: 'base' });
-                if (byEvent !== 0) return byEvent;
+                var aCancelled = guestCancelledFieldIsYes(a && a.cancelled);
+                var bCancelled = guestCancelledFieldIsYes(b && b.cancelled);
+                if (aCancelled !== bCancelled) return aCancelled ? 1 : -1;
+                if (!aCancelled) {
+                    var aEvent = String(a.event || '').trim().toLowerCase();
+                    var bEvent = String(b.event || '').trim().toLowerCase();
+                    var byEvent = bEvent.localeCompare(aEvent, undefined, { sensitivity: 'base' });
+                    if (byEvent !== 0) return byEvent;
+                }
                 var aFirst = String(a.name || '').trim().toLowerCase();
                 var bFirst = String(b.name || '').trim().toLowerCase();
                 var byFirst = aFirst.localeCompare(bFirst, undefined, { sensitivity: 'base' });
@@ -20495,6 +20664,10 @@
             return guestLogYyMmDdPrefix() + ': Denied — sold out.';
         }
 
+        function guestLogGuestCancelledLine() {
+            return guestLogYyMmDdPrefix() + ': Guest is cancelled.';
+        }
+
         /**
          * From `#invitedisno`: set **Invited** to `Reserve` or `Sold out` and append one **Log** line.
          * Same gate as invite: Read Yes and Invited No (`guestReadisyesBlockShouldShow`).
@@ -20805,6 +20978,10 @@
         function guestInvoicedFieldIsCancel(invoicedVal) {
             var t = String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase();
             return t === 'cancel' || t === 'cancelled' || t === 'canceled';
+        }
+
+        function guestCancelledFieldIsYes(cancelledVal) {
+            return String(cancelledVal != null ? cancelledVal : '').trim().toLowerCase() === 'yes';
         }
 
         /** Paid is the literal “No” (case-insensitive). */
@@ -22045,6 +22222,31 @@
             }
         }
 
+        function guestRosterCancelledPillHtml(label) {
+            return (
+                '<td class="guests-roster-tag-cell">' +
+                '<span class="content-badge content-badge--guest-cancelled">' +
+                escapeHtml(label) +
+                '</span></td>'
+            );
+        }
+
+        function guestRosterCancelledSpacerRowHtml() {
+            return (
+                '<tr class="guests-roster-row guests-roster-blank-row" aria-hidden="true">' +
+                '<td class="guests-roster-name-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="content-roster-published-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '</tr>'
+            );
+        }
+
         function renderGuestsRoster() {
             var itemsEl = document.getElementById('guests-roster-items');
             if (!itemsEl) {
@@ -22103,13 +22305,21 @@
                         '">No guests match the current filter.</td>' +
                         '</tr>';
                 } else {
+                    var cancelledSpacerInserted = false;
                     for (var i = 0; i < filteredGuests.length; i++) {
                         var g = filteredGuests[i];
+                        if (guestCancelledFieldIsYes(g.cancelled) && !cancelledSpacerInserted) {
+                            html += guestRosterCancelledSpacerRowHtml();
+                            cancelledSpacerInserted = true;
+                        }
                         var guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
                         if (!guestLabel) guestLabel = '-';
                         var eventLabel = String(g.event || '').trim();
                         if (!eventLabel) eventLabel = '-';
-                        var eventBadgeClass = contentEventBadgeClassForLabel(eventLabel);
+                        var isCancelled = guestCancelledFieldIsYes(g.cancelled);
+                        var eventBadgeClass = isCancelled
+                            ? 'content-badge content-badge--guest-cancelled'
+                            : contentEventBadgeClassForLabel(eventLabel);
                         var guestSelected =
                             String(g.id || '').trim() === String(guestFormEditingDocId || '').trim();
                         html +=
@@ -22118,18 +22328,34 @@
                             '" data-guests-id="' +
                             escapeHtml(g.id) +
                             '">' +
-                            '<td class="guests-roster-name-cell">' + escapeHtml(guestLabel) + '</td>' +
-                            '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>' +
-                            guestRosterReadCellHtml(g.id, g.read) +
-                            guestRosterInvitedCellHtml(g.id, g.invited) +
-                            guestRosterInvoicedCellHtml(g.id, g.invoiced) +
-                            guestRosterPaidCellHtml(g.id, g.paid) +
-                            '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.briefed) + '</td>' +
-                            guestRosterSquareToggleHtml('attended', 'Attended', !!g.attended) +
-                            '<td class="guests-roster-tag-cell">' +
-                            guestRosterCmeBadgeHtml(g.cmeStatus) +
+                            '<td class="guests-roster-name-cell' +
+                            (isCancelled ? ' is-cancelled' : '') +
+                            '">' +
+                            escapeHtml(guestLabel) +
                             '</td>' +
-                            '</tr>';
+                            '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>';
+                        if (isCancelled) {
+                            html +=
+                                guestRosterCancelledPillHtml('Cancel') +
+                                guestRosterCancelledPillHtml('Cancel') +
+                                guestRosterCancelledPillHtml('Cancel') +
+                                guestRosterCancelledPillHtml('Cancel') +
+                                guestRosterCancelledPillHtml('Cancel') +
+                                guestRosterCancelledPillHtml('Cancel') +
+                                guestRosterCancelledPillHtml('Cancel');
+                        } else {
+                            html +=
+                                guestRosterReadCellHtml(g.id, g.read) +
+                                guestRosterInvitedCellHtml(g.id, g.invited) +
+                                guestRosterInvoicedCellHtml(g.id, g.invoiced) +
+                                guestRosterPaidCellHtml(g.id, g.paid) +
+                                '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.briefed) + '</td>' +
+                                guestRosterSquareToggleHtml('attended', 'Attended', !!g.attended) +
+                                '<td class="guests-roster-tag-cell">' +
+                                guestRosterCmeBadgeHtml(g.cmeStatus) +
+                                '</td>';
+                        }
+                        html += '</tr>';
                     }
                 }
             }
@@ -29942,6 +30168,30 @@
                     openGuestDeleteConfirmModal();
                 });
             }
+            var cancelGuestBtn = document.getElementById('cancel-guest-btn');
+            if (cancelGuestBtn) {
+                cancelGuestBtn.addEventListener('click', function () {
+                    if (cancelGuestBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
+                    var guestId = String(guestFormEditingDocId || '').trim();
+                    if (!guestId) return;
+                    openGuestCancelConfirmModal();
+                });
+            }
+            var guestCancelNo = document.getElementById('guest-cancel-no');
+            var guestCancelYes = document.getElementById('guest-cancel-yes');
+            var guestCancelBackdrop = document.getElementById('guest-cancel-confirm-backdrop');
+            if (guestCancelNo) {
+                guestCancelNo.addEventListener('click', closeGuestCancelConfirmModal);
+            }
+            if (guestCancelBackdrop) {
+                guestCancelBackdrop.addEventListener('click', closeGuestCancelConfirmModal);
+            }
+            if (guestCancelYes) {
+                guestCancelYes.addEventListener('click', function () {
+                    performCancelGuestInFirebase();
+                });
+            }
             var addTeamDeleteBtn = document.getElementById('add-team-delete-btn');
             if (addTeamDeleteBtn) {
                 addTeamDeleteBtn.addEventListener('click', function () {
@@ -29998,6 +30248,12 @@
                 if (guestDlg && !guestDlg.hidden) {
                     ev.preventDefault();
                     closeGuestDeleteConfirmModal();
+                    return;
+                }
+                var guestCancelDlg = document.getElementById('guest-cancel-confirm');
+                if (guestCancelDlg && !guestCancelDlg.hidden) {
+                    ev.preventDefault();
+                    closeGuestCancelConfirmModal();
                     return;
                 }
                 var teamDlg = document.getElementById('team-delete-confirm');
