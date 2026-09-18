@@ -505,7 +505,7 @@
             box-shadow: none !important;
         }
 
-        /* Placeholder tabs (Overview, E-mailer, Finances) until their panels are built */
+        /* Placeholder tabs (Overview, E-mailer, Finances, Admin) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -9785,7 +9785,7 @@
                         <img src="images/backendlogo.png?v=20260605-backendlogo-v3" alt="Backend logo" class="eventnavigation-logo" />
                     </div>
                     <div class="aspects">
-                        <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, team, programme, lodging, snippets, content, E-mailer, Finances, and Settings">
+                        <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, team, programme, lodging, snippets, content, E-mailer, Finances, Settings, and Admin">
                             <span
                                 class="backend-editor-link backend-editor-link--inactive"
                                 id="overview-toggle"
@@ -9818,6 +9818,14 @@
                                 tabindex="-1"
                                 title="Coming soon">Finances</span>
                             <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
+                            <span
+                                class="backend-editor-link backend-editor-link--inactive"
+                                id="admin-toggle"
+                                role="button"
+                                aria-disabled="true"
+                                aria-expanded="false"
+                                tabindex="-1"
+                                title="Coming soon">Admin</span>
                         </nav>
                     </div>
                     <div class="backend-top-trailing">
@@ -11777,6 +11785,7 @@
         ];
         var teamTableGoalRows = 0;
         var teamDirtyDocIds = Object.create(null);
+        var teamIdsPendingDelete = Object.create(null);
         var teamSyncTimer = null;
         var teamSyncInFlight = false;
         var guestDirtyDocIds = Object.create(null);
@@ -17160,7 +17169,8 @@
 
         function markTeamDocDirty(docId) {
             var id = String(docId || '').trim();
-            if (id) teamDirtyDocIds[id] = true;
+            if (!id || teamIdsPendingDelete[id]) return;
+            teamDirtyDocIds[id] = true;
         }
 
         function scheduleTeamFirebaseSync() {
@@ -17175,6 +17185,16 @@
             }, 0);
         }
 
+        async function waitWhileTeamSyncInFlight() {
+            var n = 0;
+            while (teamSyncInFlight && n < 80) {
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, 25);
+                });
+                n++;
+            }
+        }
+
         async function flushTeamToFirebase() {
             if (backenduserIsReadonly) return false;
             var ids = Object.keys(teamDirtyDocIds);
@@ -17186,14 +17206,19 @@
             teamSyncInFlight = true;
             try {
                 for (var i = 0; i < ids.length; i++) {
-                    var rec = findTeamInMemory(ids[i]);
-                    if (!rec) {
-                        delete teamDirtyDocIds[ids[i]];
+                    var id = ids[i];
+                    if (teamIdsPendingDelete[id]) {
+                        delete teamDirtyDocIds[id];
+                        continue;
+                    }
+                    var rec = findTeamInMemory(id);
+                    if (!rec || teamIdsPendingDelete[id]) {
+                        delete teamDirtyDocIds[id];
                         continue;
                     }
                     var saved = await saveTeamMemberToFirebase(rec);
                     if (!saved) continue;
-                    delete teamDirtyDocIds[ids[i]];
+                    delete teamDirtyDocIds[id];
                     var created = !!rec.pendingNewTeamCreatedNotice;
                     rec.pendingNewTeamCreatedNotice = false;
                     teamDraftFormActive = false;
@@ -17586,7 +17611,7 @@
         async function saveTeamMemberToFirebase(rec) {
             if (backenduserIsReadonly) return false;
             var id = String(rec && rec.id ? rec.id : '').trim();
-            if (!id) return false;
+            if (!id || teamIdsPendingDelete[id]) return false;
             var db = getFirestore();
             var FV = firebase.firestore.FieldValue;
             var batch = db.batch();
@@ -17714,12 +17739,35 @@
 
         async function performDeleteTeamFromFirebase() {
             closeTeamDeleteConfirmModal();
+            if (backendBlockIfReadonly()) return;
             var docId = String(teamFormEditingDocId || '').trim();
             if (!docId) return;
+            teamIdsPendingDelete[docId] = true;
+            if (teamSyncTimer) {
+                clearTimeout(teamSyncTimer);
+                teamSyncTimer = null;
+            }
+            delete teamDirtyDocIds[docId];
             try {
+                await waitWhileTeamSyncInFlight();
                 var db = getFirestore();
+                var col = tbsTeamParentDocRef(db).collection(docId);
+                var colSnap = await col.get();
                 var batch = db.batch();
-                batch.delete(tbsTeamItemRef(db, docId));
+                var seen = Object.create(null);
+                function addDelete(ref) {
+                    var path = String(ref && ref.path ? ref.path : '').trim();
+                    if (!path || seen[path]) return;
+                    seen[path] = true;
+                    batch.delete(ref);
+                }
+                if (colSnap && !colSnap.empty) {
+                    colSnap.forEach(function (doc) {
+                        addDelete(doc.ref);
+                    });
+                }
+                addDelete(col.doc('item'));
+                addDelete(col.doc(docId));
                 var FV = firebase.firestore.FieldValue;
                 batch.set(
                     tbsTeamParentDocRef(db),
@@ -17727,7 +17775,6 @@
                     { merge: true }
                 );
                 await batch.commit();
-                delete teamDirtyDocIds[docId];
                 for (var i = 0; i < teamRosterInMemory.length; i++) {
                     if (String(teamRosterInMemory[i].id || '') === docId) {
                         teamRosterInMemory.splice(i, 1);
@@ -17744,6 +17791,8 @@
                 if (typeof showStatus === 'function') {
                     showStatus('error', err.message || 'Failed to delete team member.');
                 }
+            } finally {
+                delete teamIdsPendingDelete[docId];
             }
         }
 
@@ -17910,6 +17959,7 @@
             updateGuestsListHeadingDisplay();
             var eventName = String(current_event || '').trim();
             teamDirtyDocIds = Object.create(null);
+            teamIdsPendingDelete = Object.create(null);
             if (teamSyncTimer) {
                 clearTimeout(teamSyncTimer);
                 teamSyncTimer = null;
@@ -25810,6 +25860,7 @@
             const contentToggle = document.getElementById('content-toggle');
             const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
+            const adminToggle = document.getElementById('admin-toggle');
             if (texteditorSection) {
                 texteditorSection.classList.toggle('is-open', isEditor);
                 texteditorSection.setAttribute('aria-hidden', isEditor ? 'false' : 'true');
@@ -25881,6 +25932,10 @@
             if (settingsToggle) {
                 settingsToggle.setAttribute('aria-expanded', isSettings ? 'true' : 'false');
                 settingsToggle.classList.toggle('is-active', isSettings);
+            }
+            if (adminToggle) {
+                adminToggle.setAttribute('aria-expanded', 'false');
+                adminToggle.classList.remove('is-active');
             }
             var programmeCounterEl = document.getElementById('programme-counter');
             if (programmeCounterEl) {
@@ -25973,6 +26028,7 @@
             const contentToggle = document.getElementById('content-toggle');
             const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
+            const adminToggle = document.getElementById('admin-toggle');
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
@@ -25995,6 +26051,11 @@
                 settingsToggle.setAttribute('aria-hidden', 'false');
                 settingsToggle.setAttribute('tabindex', '0');
                 settingsToggle.setAttribute('aria-disabled', 'false');
+            }
+            if (adminToggle) {
+                adminToggle.setAttribute('aria-hidden', 'false');
+                adminToggle.setAttribute('tabindex', '-1');
+                adminToggle.setAttribute('aria-disabled', 'true');
             }
             if (editorToggle) {
                 editorToggle.setAttribute('aria-hidden', 'false');
