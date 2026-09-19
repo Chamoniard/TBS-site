@@ -2877,6 +2877,7 @@ const HOME_REGISTRATION_OUTER_HTML = `
                                             <option value="Monaco">Monaco</option>
                                             <option value="Netherlands">Netherlands</option>
                                             <option value="New Zeeland">New Zeeland</option>
+                                            <option value="Northern Ireland">Northern Ireland</option>
                                             <option value="Norway">Norway</option>
                                             <option value="Poland">Poland</option>
                                             <option value="Portugal">Portugal</option>

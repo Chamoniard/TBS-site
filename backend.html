@@ -324,6 +324,8 @@
         body.backend-page.backend-readonly .guests-read-badge-btn,
         body.backend-page.backend-readonly .guests-invoiced-badge-btn,
         body.backend-page.backend-readonly .guests-paid-badge-btn,
+        body.backend-page.backend-readonly .guests-briefed-badge-btn,
+        body.backend-page.backend-readonly .guests-cme-badge-btn,
         body.backend-page.backend-readonly .speakers-status-badge-btn,
         body.backend-page.backend-readonly .speakers-lodging-badge-btn,
         body.backend-page.backend-readonly .speakers-bio-badge-btn,
@@ -334,6 +336,8 @@
         body.backend-page.backend-readonly .guests-read-option,
         body.backend-page.backend-readonly .guests-invoiced-option,
         body.backend-page.backend-readonly .guests-paid-option,
+        body.backend-page.backend-readonly .guests-briefed-option,
+        body.backend-page.backend-readonly .guests-cme-option,
         body.backend-page.backend-readonly .speakers-status-option,
         body.backend-page.backend-readonly .speakers-lodging-option,
         body.backend-page.backend-readonly .speakers-bio-option,
@@ -7182,6 +7186,16 @@
             color: #ffffff;
         }
 
+        #team-editor .team-list-table .content-badge.content-badge--team-logistics {
+            background: var(--backend-navbar-bg);
+            color: #ffffff;
+        }
+
+        #team-editor .team-list-table .content-badge.content-badge--team-auxillary {
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
+        }
+
         #guest-editor .guests-list-table .content-badge.content-badge--guest-field-empty,
         #team-editor .team-list-table .content-badge.content-badge--guest-field-empty {
             background: #f1f5f9;
@@ -7212,7 +7226,9 @@
         #guest-editor .guests-invited-wrap,
         #guest-editor .guests-read-wrap,
         #guest-editor .guests-invoiced-wrap,
-        #guest-editor .guests-paid-wrap {
+        #guest-editor .guests-paid-wrap,
+        #guest-editor .guests-briefed-wrap,
+        #guest-editor .guests-cme-wrap {
             position: relative;
             display: inline-block;
             max-width: 100%;
@@ -7221,7 +7237,9 @@
         #guest-editor .guests-list-table .guests-invited-badge-btn,
         #guest-editor .guests-list-table .guests-read-badge-btn,
         #guest-editor .guests-list-table .guests-invoiced-badge-btn,
-        #guest-editor .guests-list-table .guests-paid-badge-btn {
+        #guest-editor .guests-list-table .guests-paid-badge-btn,
+        #guest-editor .guests-list-table .guests-briefed-badge-btn,
+        #guest-editor .guests-list-table .guests-cme-badge-btn {
             cursor: pointer;
             font-weight: 400;
             font-size: 0.9rem;
@@ -7234,7 +7252,9 @@
         #guest-editor .guests-list-table .guests-invited-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-read-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-invoiced-badge-btn.is-armed,
-        #guest-editor .guests-list-table .guests-paid-badge-btn.is-armed {
+        #guest-editor .guests-list-table .guests-paid-badge-btn.is-armed,
+        #guest-editor .guests-list-table .guests-briefed-badge-btn.is-armed,
+        #guest-editor .guests-list-table .guests-cme-badge-btn.is-armed {
             outline: 2px solid #F71941;
             outline-offset: 0;
             box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
@@ -7242,7 +7262,14 @@
 
         #guest-editor .guests-invited-dropdown,
         #guest-editor .guests-read-dropdown,
-        #guest-editor .guests-paid-dropdown {
+        #guest-editor .guests-paid-dropdown,
+        #guest-editor .guests-briefed-dropdown,
+        #guest-editor .guests-cme-dropdown,
+        body.backend-page > ul.guests-invited-dropdown,
+        body.backend-page > ul.guests-read-dropdown,
+        body.backend-page > ul.guests-paid-dropdown,
+        body.backend-page > ul.guests-briefed-dropdown,
+        body.backend-page > ul.guests-cme-dropdown {
             position: absolute;
             left: 0;
             top: calc(100% + 3px);
@@ -7256,6 +7283,28 @@
             border-radius: 6px;
             box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
             box-sizing: border-box;
+        }
+
+        body.backend-page > ul.guests-invited-dropdown,
+        body.backend-page > ul.guests-read-dropdown,
+        body.backend-page > ul.guests-paid-dropdown,
+        body.backend-page > ul.guests-briefed-dropdown,
+        body.backend-page > ul.guests-cme-dropdown {
+            position: fixed;
+            z-index: 20001;
+        }
+
+        #guest-editor .guests-invited-dropdown[hidden],
+        #guest-editor .guests-read-dropdown[hidden],
+        #guest-editor .guests-paid-dropdown[hidden],
+        #guest-editor .guests-briefed-dropdown[hidden],
+        #guest-editor .guests-cme-dropdown[hidden],
+        body.backend-page > ul.guests-invited-dropdown[hidden],
+        body.backend-page > ul.guests-read-dropdown[hidden],
+        body.backend-page > ul.guests-paid-dropdown[hidden],
+        body.backend-page > ul.guests-briefed-dropdown[hidden],
+        body.backend-page > ul.guests-cme-dropdown[hidden] {
+            display: none !important;
         }
 
         #guest-editor .guests-invoiced-dropdown,
@@ -7288,7 +7337,14 @@
         #guest-editor .guests-read-dropdown > li,
         #guest-editor .guests-invoiced-dropdown > li,
         #guest-editor .guests-paid-dropdown > li,
-        body.backend-page > ul.guests-invoiced-dropdown > li {
+        #guest-editor .guests-briefed-dropdown > li,
+        #guest-editor .guests-cme-dropdown > li,
+        body.backend-page > ul.guests-invoiced-dropdown > li,
+        body.backend-page > ul.guests-invited-dropdown > li,
+        body.backend-page > ul.guests-read-dropdown > li,
+        body.backend-page > ul.guests-paid-dropdown > li,
+        body.backend-page > ul.guests-briefed-dropdown > li,
+        body.backend-page > ul.guests-cme-dropdown > li {
             margin: 0;
             padding: 0;
         }
@@ -7297,7 +7353,14 @@
         #guest-editor .guests-read-dropdown .guests-read-option,
         #guest-editor .guests-invoiced-dropdown .guests-invoiced-option,
         #guest-editor .guests-paid-dropdown .guests-paid-option,
-        body.backend-page > ul.guests-invoiced-dropdown .guests-invoiced-option {
+        #guest-editor .guests-briefed-dropdown .guests-briefed-option,
+        #guest-editor .guests-cme-dropdown .guests-cme-option,
+        body.backend-page > ul.guests-invoiced-dropdown .guests-invoiced-option,
+        body.backend-page > ul.guests-invited-dropdown .guests-invited-option,
+        body.backend-page > ul.guests-read-dropdown .guests-read-option,
+        body.backend-page > ul.guests-paid-dropdown .guests-paid-option,
+        body.backend-page > ul.guests-briefed-dropdown .guests-briefed-option,
+        body.backend-page > ul.guests-cme-dropdown .guests-cme-option {
             display: block;
             width: 100%;
             margin: 0;
@@ -7330,7 +7393,14 @@
 
         #guest-editor .guests-invited-dropdown .guests-invited-option:hover,
         #guest-editor .guests-read-dropdown .guests-read-option:hover,
-        #guest-editor .guests-paid-dropdown .guests-paid-option:hover {
+        #guest-editor .guests-paid-dropdown .guests-paid-option:hover,
+        #guest-editor .guests-briefed-dropdown .guests-briefed-option:hover,
+        #guest-editor .guests-cme-dropdown .guests-cme-option:hover,
+        body.backend-page > ul.guests-invited-dropdown .guests-invited-option:hover,
+        body.backend-page > ul.guests-read-dropdown .guests-read-option:hover,
+        body.backend-page > ul.guests-paid-dropdown .guests-paid-option:hover,
+        body.backend-page > ul.guests-briefed-dropdown .guests-briefed-option:hover,
+        body.backend-page > ul.guests-cme-dropdown .guests-cme-option:hover {
             background: #f1f5f9;
         }
 
@@ -11766,6 +11836,7 @@
             'Monaco',
             'Netherlands',
             'New Zeeland',
+            'Northern Ireland',
             'Norway',
             'Poland',
             'Portugal',
@@ -11813,6 +11884,12 @@
         /** Paid column: Yes / No / Cancelled; same two-step interaction. */
         var guestsPaidArmedDocId = '';
         var guestsPaidDropdownOpenDocId = '';
+        /** Briefed column: Yes / No; same two-step interaction. */
+        var guestsBriefedArmedDocId = '';
+        var guestsBriefedDropdownOpenDocId = '';
+        /** CME sent column: Sent / Ready / No CME; same two-step interaction. */
+        var guestsCmeArmedDocId = '';
+        var guestsCmeDropdownOpenDocId = '';
         /** Speaker Status / Lodging / Bio columns: first click arms badge; second opens value dropdown. */
         var speakersStatusArmedDocId = '';
         var speakersStatusDropdownOpenDocId = '';
@@ -12258,6 +12335,10 @@
 
         function speakerLogLodgingRequestedLine() {
             return guestLogYyMmDdPrefix() + ': Lodging requested';
+        }
+
+        function speakerLogLodgingConfirmedLine() {
+            return guestLogYyMmDdPrefix() + ': Lodging confirmed by hotel';
         }
 
         function speakerLogBioReceivedLine() {
@@ -16882,13 +16963,19 @@
         }
 
         function compareTeamMembers(a, b) {
-            var la = String(a && a.lastName ? a.lastName : '').trim().toLowerCase();
-            var lb = String(b && b.lastName ? b.lastName : '').trim().toLowerCase();
-            var c = la.localeCompare(lb);
+            var ta = String(a && a.team ? a.team : '').trim().toLowerCase();
+            var tb = String(b && b.team ? b.team : '').trim().toLowerCase();
+            if (!ta && tb) return 1;
+            if (ta && !tb) return -1;
+            var c = ta.localeCompare(tb);
             if (c !== 0) return c;
             var fa = String(a && a.firstName ? a.firstName : '').trim().toLowerCase();
             var fb = String(b && b.firstName ? b.firstName : '').trim().toLowerCase();
             c = fa.localeCompare(fb);
+            if (c !== 0) return c;
+            var la = String(a && a.lastName ? a.lastName : '').trim().toLowerCase();
+            var lb = String(b && b.lastName ? b.lastName : '').trim().toLowerCase();
+            c = la.localeCompare(lb);
             if (c !== 0) return c;
             return String(a && a.id ? a.id : '').localeCompare(String(b && b.id ? b.id : ''));
         }
@@ -16949,6 +17036,15 @@
             );
         }
 
+        function teamRosterTeamPillHtml(label) {
+            var t = String(label != null ? label : '').trim();
+            var low = t.toLowerCase();
+            var mod = ' content-badge--guest-status-yes';
+            if (low === 'logistics') mod = ' content-badge--team-logistics';
+            else if (low === 'auxillary') mod = ' content-badge--team-auxillary';
+            return '<span class="content-badge' + mod + '">' + escapeHtml(t || '—') + '</span>';
+        }
+
         function renderTeamTable(members, rowCount, emptyMessage) {
             var itemsEl = document.getElementById('team-roster-items');
             if (!itemsEl) return;
@@ -16956,6 +17052,7 @@
             teamRosterInMemory = list.filter(function (m) {
                 return m && String(m.id || '').trim();
             });
+            teamRosterInMemory.sort(compareTeamMembers);
             var nteam = Math.max(0, Math.floor(Number(rowCount) || 0));
             var n = Math.max(nteam, list.length);
             if (n > TEAM_TABLE_MAX_ROWS) n = TEAM_TABLE_MAX_ROWS;
@@ -16978,7 +17075,7 @@
                 }
             } else {
                 for (var i = 0; i < n; i++) {
-                    var m = list[i];
+                    var m = teamRosterInMemory[i];
                     if (m) {
                         var nameLabel = (
                             String(m.firstName || '').trim() +
@@ -17002,7 +17099,7 @@
                             teamRosterGreenPillHtml(eventLabel) +
                             '</td>' +
                             '<td class="team-roster-tag-cell">' +
-                            teamRosterGreenPillHtml(teamLabel) +
+                            teamRosterTeamPillHtml(teamLabel) +
                             '</td>' +
                             '<td class="team-roster-tag-cell">' +
                             teamRosterLodgingPillHtml(lodgingLabel) +
@@ -19917,8 +20014,10 @@
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
         var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Cancelled'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
+        var GUEST_BRIEFED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_CME_FILTER_VALUES = ['Sent', 'Ready', 'No CME'];
+        var GUEST_CME_MENU_VALUES = ['Sent', 'Ready', 'No CME'];
 
         function emptyGuestsFilterSettings() {
             return {
@@ -20235,7 +20334,7 @@
             );
         }
 
-        function unplaceGuestsInvoicedDropdown(dropdown) {
+        function unplaceGuestsRosterDropdown(dropdown) {
             if (!dropdown) return;
             dropdown.hidden = true;
             dropdown.style.position = '';
@@ -20256,7 +20355,7 @@
             }
         }
 
-        function placeGuestsInvoicedDropdown(anchorBtn, dropdown) {
+        function placeGuestsRosterDropdown(anchorBtn, dropdown) {
             if (!anchorBtn || !dropdown) return;
             if (!dropdown._rosterHome) {
                 dropdown._rosterHome = { parent: dropdown.parentNode, next: dropdown.nextSibling };
@@ -20281,15 +20380,48 @@
             }
         }
 
+        function findGuestsRosterDropdown(wrap, dropdownClass) {
+            if (wrap) {
+                var local = wrap.querySelector('.' + dropdownClass);
+                if (local) return local;
+                var bodyMenus = document.querySelectorAll('body > ul.' + dropdownClass);
+                for (var bi = 0; bi < bodyMenus.length; bi++) {
+                    var home = bodyMenus[bi]._rosterHome;
+                    if (home && home.parent === wrap) return bodyMenus[bi];
+                }
+            }
+            return document.querySelector('body > ul.' + dropdownClass);
+        }
+
+        function hideAllGuestsRosterDropdowns(dropdownClass) {
+            document.querySelectorAll('.' + dropdownClass).forEach(function(el) {
+                unplaceGuestsRosterDropdown(el);
+            });
+        }
+
+        function hideAllGuestRosterMenus() {
+            hideAllGuestsRosterDropdowns('guests-invited-dropdown');
+            hideAllGuestsRosterDropdowns('guests-read-dropdown');
+            hideAllGuestsRosterDropdowns('guests-invoiced-dropdown');
+            hideAllGuestsRosterDropdowns('guests-paid-dropdown');
+            hideAllGuestsRosterDropdowns('guests-briefed-dropdown');
+            hideAllGuestsRosterDropdowns('guests-cme-dropdown');
+        }
+
+        function unplaceGuestsInvoicedDropdown(dropdown) {
+            unplaceGuestsRosterDropdown(dropdown);
+        }
+
+        function placeGuestsInvoicedDropdown(anchorBtn, dropdown) {
+            placeGuestsRosterDropdown(anchorBtn, dropdown);
+        }
+
         function findGuestsInvoicedDropdown(wrap) {
-            return (wrap && wrap.querySelector('.guests-invoiced-dropdown')) ||
-                document.querySelector('body > ul.guests-invoiced-dropdown');
+            return findGuestsRosterDropdown(wrap, 'guests-invoiced-dropdown');
         }
 
         function hideAllGuestsInvoicedDropdowns() {
-            document.querySelectorAll('.guests-invoiced-dropdown').forEach(function(el) {
-                unplaceGuestsInvoicedDropdown(el);
-            });
+            hideAllGuestsRosterDropdowns('guests-invoiced-dropdown');
         }
 
         function clearGuestsInvoicedUiState() {
@@ -20341,9 +20473,7 @@
             document.querySelectorAll('#guest-editor .guests-paid-badge-btn.is-armed').forEach(function(b) {
                 b.classList.remove('is-armed');
             });
-            document.querySelectorAll('#guest-editor .guests-paid-dropdown').forEach(function(el) {
-                el.hidden = true;
-            });
+            hideAllGuestsRosterDropdowns('guests-paid-dropdown');
             document.querySelectorAll('#guest-editor .guests-paid-badge-btn').forEach(function(b) {
                 b.setAttribute('aria-expanded', 'false');
             });
@@ -20502,9 +20632,7 @@
             document.querySelectorAll('#guest-editor .guests-read-badge-btn.is-armed').forEach(function(b) {
                 b.classList.remove('is-armed');
             });
-            document.querySelectorAll('#guest-editor .guests-read-dropdown').forEach(function(el) {
-                el.hidden = true;
-            });
+            hideAllGuestsRosterDropdowns('guests-read-dropdown');
             document.querySelectorAll('#guest-editor .guests-read-badge-btn').forEach(function(b) {
                 b.setAttribute('aria-expanded', 'false');
             });
@@ -20558,9 +20686,7 @@
             document.querySelectorAll('#guest-editor .guests-invited-badge-btn.is-armed').forEach(function(b) {
                 b.classList.remove('is-armed');
             });
-            document.querySelectorAll('#guest-editor .guests-invited-dropdown').forEach(function(el) {
-                el.hidden = true;
-            });
+            hideAllGuestsRosterDropdowns('guests-invited-dropdown');
             document.querySelectorAll('#guest-editor .guests-invited-badge-btn').forEach(function(b) {
                 b.setAttribute('aria-expanded', 'false');
             });
@@ -20600,6 +20726,197 @@
                 syncGuestWorkflowSendInvoiceButton();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update Invited.');
+                }
+            }
+        }
+
+        function guestBriefedBadgeModifierClass(briefedVal) {
+            var t = String(briefedVal != null ? briefedVal : '').trim();
+            if (!t) return ' content-badge--guest-field-empty';
+            var low = t.toLowerCase();
+            if (low === 'yes' || low === 'y' || low === 'true') return ' content-badge--guest-status-yes';
+            if (low === 'no' || low === 'n' || low === 'false') return ' content-badge--guest-status-no';
+            return ' content-badge--guest-status-neutral';
+        }
+
+        function guestCmeBadgeModifierClass(status) {
+            var label =
+                status === 'Sent' || status === 'Ready' || status === 'No CME'
+                    ? status
+                    : normalizeGuestCmeStatusDisplay(status);
+            if (label === 'Sent') return ' content-badge--guest-status-yes';
+            if (label === 'No CME') return ' content-badge--guest-status-no';
+            if (label === 'Ready') return ' content-badge--guest-cme-ready';
+            return ' content-badge--guest-status-neutral';
+        }
+
+        function guestRosterBriefedCellHtml(docId, briefedVal) {
+            var raw = String(briefedVal != null ? briefedVal : '').trim();
+            var displayText = raw || '—';
+            var mod = guestBriefedBadgeModifierClass(briefedVal);
+            var opts = [];
+            for (var bv = 0; bv < GUEST_BRIEFED_MENU_VALUES.length; bv++) {
+                var v = GUEST_BRIEFED_MENU_VALUES[bv];
+                opts.push(
+                    '<li role="none"><button type="button" class="guests-briefed-option" role="menuitem" data-briefed-value="' +
+                    escapeHtml(v) +
+                    '">' +
+                    escapeHtml(v) +
+                    '</button></li>'
+                );
+            }
+            return (
+                '<td class="guests-roster-tag-cell guests-briefed-cell">' +
+                '<div class="guests-briefed-wrap">' +
+                '<button type="button" class="content-badge guests-briefed-badge-btn' +
+                mod +
+                '" data-guests-id="' +
+                escapeHtml(docId) +
+                '" aria-haspopup="menu" aria-expanded="false" title="Briefed: first click selects row, second opens values">' +
+                escapeHtml(displayText) +
+                '</button>' +
+                '<ul class="guests-briefed-dropdown" hidden role="menu">' +
+                opts.join('') +
+                '</ul></div></td>'
+            );
+        }
+
+        function clearGuestsBriefedUiState() {
+            guestsBriefedArmedDocId = '';
+            guestsBriefedDropdownOpenDocId = '';
+            document.querySelectorAll('#guest-editor .guests-briefed-badge-btn.is-armed').forEach(function(b) {
+                b.classList.remove('is-armed');
+            });
+            hideAllGuestsRosterDropdowns('guests-briefed-dropdown');
+            document.querySelectorAll('#guest-editor .guests-briefed-badge-btn').forEach(function(b) {
+                b.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        async function setGuestBriefedField(docId, value) {
+            var id = String(docId || '').trim();
+            if (!id) return;
+            var allowed = Object.create(null);
+            for (var ai = 0; ai < GUEST_BRIEFED_MENU_VALUES.length; ai++) {
+                allowed[GUEST_BRIEFED_MENU_VALUES[ai]] = true;
+            }
+            if (!allowed[value]) return;
+            var rec = findGuestInMemory(id);
+            if (!rec) return;
+            var prev = rec.briefed;
+            rec.briefed = value;
+            guestsBriefedArmedDocId = '';
+            guestsBriefedDropdownOpenDocId = '';
+            clearGuestsInvitedUiState();
+            clearGuestsReadUiState();
+            clearGuestsInvoicedUiState();
+            clearGuestsPaidUiState();
+            clearGuestsCmeUiState();
+            renderGuestsRoster();
+            try {
+                var db = getFirestore();
+                await db
+                    .collection('tbs')
+                    .doc('Guests')
+                    .collection(id)
+                    .doc('item')
+                    .set({ Briefed: value }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Briefed = ' + value + '.');
+                }
+            } catch (err) {
+                console.error('setGuestBriefedField:', err);
+                rec.briefed = prev;
+                renderGuestsRoster();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to update Briefed.');
+                }
+            }
+        }
+
+        function guestRosterCmeCellHtml(docId, status) {
+            var label =
+                status === 'Sent' || status === 'Ready' || status === 'No CME'
+                    ? status
+                    : normalizeGuestCmeStatusDisplay(status);
+            var displayText = label || '—';
+            var mod = guestCmeBadgeModifierClass(label);
+            var opts = [];
+            for (var cv = 0; cv < GUEST_CME_MENU_VALUES.length; cv++) {
+                var v = GUEST_CME_MENU_VALUES[cv];
+                opts.push(
+                    '<li role="none"><button type="button" class="guests-cme-option" role="menuitem" data-cme-value="' +
+                    escapeHtml(v) +
+                    '">' +
+                    escapeHtml(v) +
+                    '</button></li>'
+                );
+            }
+            return (
+                '<td class="guests-roster-tag-cell guests-cme-cell">' +
+                '<div class="guests-cme-wrap">' +
+                '<button type="button" class="content-badge guests-cme-badge-btn' +
+                mod +
+                '" data-guests-id="' +
+                escapeHtml(docId) +
+                '" aria-haspopup="menu" aria-expanded="false" title="CME sent: first click selects row, second opens values">' +
+                escapeHtml(displayText) +
+                '</button>' +
+                '<ul class="guests-cme-dropdown" hidden role="menu">' +
+                opts.join('') +
+                '</ul></div></td>'
+            );
+        }
+
+        function clearGuestsCmeUiState() {
+            guestsCmeArmedDocId = '';
+            guestsCmeDropdownOpenDocId = '';
+            document.querySelectorAll('#guest-editor .guests-cme-badge-btn.is-armed').forEach(function(b) {
+                b.classList.remove('is-armed');
+            });
+            hideAllGuestsRosterDropdowns('guests-cme-dropdown');
+            document.querySelectorAll('#guest-editor .guests-cme-badge-btn').forEach(function(b) {
+                b.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        async function setGuestCmeField(docId, value) {
+            var id = String(docId || '').trim();
+            if (!id) return;
+            var allowed = Object.create(null);
+            for (var ai = 0; ai < GUEST_CME_MENU_VALUES.length; ai++) {
+                allowed[GUEST_CME_MENU_VALUES[ai]] = true;
+            }
+            if (!allowed[value]) return;
+            var rec = findGuestInMemory(id);
+            if (!rec) return;
+            var prev = rec.cmeStatus;
+            rec.cmeStatus = value;
+            guestsCmeArmedDocId = '';
+            guestsCmeDropdownOpenDocId = '';
+            clearGuestsInvitedUiState();
+            clearGuestsReadUiState();
+            clearGuestsInvoicedUiState();
+            clearGuestsPaidUiState();
+            clearGuestsBriefedUiState();
+            renderGuestsRoster();
+            try {
+                var db = getFirestore();
+                await db
+                    .collection('tbs')
+                    .doc('Guests')
+                    .collection(id)
+                    .doc('item')
+                    .set({ 'CME sent': value, 'CME status': value }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: CME sent = ' + value + '.');
+                }
+            } catch (err) {
+                console.error('setGuestCmeField:', err);
+                rec.cmeStatus = prev;
+                renderGuestsRoster();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to update CME sent.');
                 }
             }
         }
@@ -21966,16 +22283,17 @@
                 lodgingBtn.setAttribute('aria-hidden', 'false');
                 lodgingBtn.disabled = !runRequestLodging;
                 lodgingBtn.setAttribute('aria-disabled', runRequestLodging ? 'false' : 'true');
+                var lodgingRequestedOrConfirmed =
+                    workflowPastInvite && (lodgingSt === 'Requested' || lodgingSt === 'Confirmed');
                 setSpeakerWorkflowStepState(lodgingBtn, {
                     active: canRequestLodging,
-                    done: workflowPastInvite && lodgingSt === 'Requested'
+                    done: lodgingRequestedOrConfirmed
                 });
                 var requestLodgingLabel = lodgingBtn.querySelector('.speaker-request-lodging-label');
                 if (requestLodgingLabel) {
-                    requestLodgingLabel.textContent =
-                        workflowPastInvite && lodgingSt === 'Requested'
-                            ? 'Lodging requested'
-                            : 'Request lodging';
+                    requestLodgingLabel.textContent = lodgingRequestedOrConfirmed
+                        ? 'Lodging requested'
+                        : 'Request lodging';
                 }
             }
             if (bioRequestedBtn) {
@@ -21991,9 +22309,12 @@
                 });
             }
             if (ownLodgingBtn) {
-                // When Lodging is Requested, hide Own lodging (and OR) entirely.
+                // Hide Own lodging (and OR) once lodging is requested or confirmed.
                 var showOwnLodgingChoice = Boolean(
-                    s && workflowPastInvite && lodgingSt !== 'Requested'
+                    s &&
+                        workflowPastInvite &&
+                        lodgingSt !== 'Requested' &&
+                        lodgingSt !== 'Confirmed'
                 );
                 ownLodgingBtn.hidden = !showOwnLodgingChoice;
                 ownLodgingBtn.setAttribute('aria-hidden', showOwnLodgingChoice ? 'false' : 'true');
@@ -22006,7 +22327,10 @@
             }
             if (lodgingSep) {
                 var showLodgingOr = Boolean(
-                    s && workflowPastInvite && lodgingSt !== 'Requested'
+                    s &&
+                        workflowPastInvite &&
+                        lodgingSt !== 'Requested' &&
+                        lodgingSt !== 'Confirmed'
                 );
                 lodgingSep.hidden = !showLodgingOr;
                 lodgingSep.setAttribute('aria-hidden', showLodgingOr ? 'false' : 'true');
@@ -22036,7 +22360,7 @@
             showWorkflowPhaseButton(
                 document.getElementById('speaker-confirm-lodging-btn'),
                 workflowPastInvite && lodgingSt === 'Requested',
-                workflowPastInvite && lodgingSt === 'Own lodging'
+                workflowPastInvite && lodgingSt === 'Confirmed'
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-bio-received-btn'),
@@ -22311,6 +22635,11 @@
             guestsInvoicedDropdownOpenDocId = '';
             guestsPaidArmedDocId = '';
             guestsPaidDropdownOpenDocId = '';
+            guestsBriefedArmedDocId = '';
+            guestsBriefedDropdownOpenDocId = '';
+            guestsCmeArmedDocId = '';
+            guestsCmeDropdownOpenDocId = '';
+            hideAllGuestRosterMenus();
             guestsRosterSortInPlace();
             var colCount = 9;
             var html = '<table class="guests-list-table" role="grid" aria-label="Guests roster">' +
@@ -22399,11 +22728,9 @@
                                 guestRosterInvitedCellHtml(g.id, g.invited) +
                                 guestRosterInvoicedCellHtml(g.id, g.invoiced) +
                                 guestRosterPaidCellHtml(g.id, g.paid) +
-                                '<td class="guests-roster-tag-cell">' + guestRosterBadgeHtmlForScalar(g.briefed) + '</td>' +
+                                guestRosterBriefedCellHtml(g.id, g.briefed) +
                                 guestRosterSquareToggleHtml('attended', 'Attended', !!g.attended) +
-                                '<td class="guests-roster-tag-cell">' +
-                                guestRosterCmeBadgeHtml(g.cmeStatus) +
-                                '</td>';
+                                guestRosterCmeCellHtml(g.id, g.cmeStatus);
                         }
                         html += '</tr>';
                     }
@@ -23132,7 +23459,8 @@
             }
         }
 
-        async function setSpeakerRosterLodgingField(docId, value) {
+        async function setSpeakerRosterLodgingField(docId, value, opts) {
+            opts = opts || {};
             var id = String(docId || '').trim();
             if (!id) return;
             var allowed = Object.create(null);
@@ -23153,11 +23481,15 @@
             }
             var prevSpeakerLog = Array.isArray(rec.speakerLog) ? rec.speakerLog.slice() : [];
             rec.lodging = next;
-            var pushedOwnLodgingLog = false;
+            var pushedLodgingLog = false;
             if (next === 'Own lodging') {
                 if (!Array.isArray(rec.speakerLog)) rec.speakerLog = [];
                 rec.speakerLog.push(speakerLogOwnLodgingLine());
-                pushedOwnLodgingLog = true;
+                pushedLodgingLog = true;
+            } else if (next === 'Confirmed' && opts.workflowConfirmLodging) {
+                if (!Array.isArray(rec.speakerLog)) rec.speakerLog = [];
+                rec.speakerLog.push(speakerLogLodgingConfirmedLine());
+                pushedLodgingLog = true;
             }
             clearSpeakerStatusUiState();
             clearSpeakerLodgingUiState();
@@ -23174,6 +23506,8 @@
                 if (typeof showStatus === 'function') {
                     if (next === 'Own lodging') {
                         showStatus('success', name + ': Speaker has own lodging');
+                    } else if (next === 'Confirmed' && opts.workflowConfirmLodging) {
+                        showStatus('success', name + ': Lodging confirmed by hotel');
                     } else {
                         showStatus('success', name + ': Lodging updated');
                     }
@@ -23181,7 +23515,7 @@
             } catch (err) {
                 console.error('setSpeakerRosterLodgingField:', err);
                 rec.lodging = prev;
-                if (pushedOwnLodgingLog) {
+                if (pushedLodgingLog) {
                     rec.speakerLog = prevSpeakerLog.slice();
                 }
                 markSpeakerDocDirty(id);
@@ -28889,6 +29223,25 @@
                     void setSpeakerRosterLodgingField(docId, 'Own lodging');
                 });
             }
+            var speakerConfirmLodgingBtn = document.getElementById('speaker-confirm-lodging-btn');
+            if (speakerConfirmLodgingBtn) {
+                speakerConfirmLodgingBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (speakerConfirmLodgingBtn.disabled || !speakerPadlockIsOpen) return;
+                    var docId = String(speakerFormEditingDocId || '').trim();
+                    if (!docId || docId === '_init') return;
+                    var sp = findSpeakerInMemory(docId);
+                    if (
+                        !sp ||
+                        normalizeSpeakerInviteStatus(sp.inviteStatus) !== 'Invited' ||
+                        normalizeSpeakerLodging(sp.lodging) !== 'Requested'
+                    ) {
+                        return;
+                    }
+                    void setSpeakerRosterLodgingField(docId, 'Confirmed', { workflowConfirmLodging: true });
+                });
+            }
             var speakerBioReceivedBtn = document.getElementById('speaker-bio-received-btn');
             if (speakerBioReceivedBtn) {
                 speakerBioReceivedBtn.addEventListener('click', function(ev) {
@@ -29483,6 +29836,126 @@
             if (guestEditorBottomEl) {
                 syncGuestEditorToolbarForBottomScroll();
             }
+            function guestRosterPillMenuSpecs() {
+                return [
+                    {
+                        optionClass: 'guests-invited-option',
+                        btnClass: 'guests-invited-badge-btn',
+                        wrapClass: 'guests-invited-wrap',
+                        dropdownClass: 'guests-invited-dropdown',
+                        dataAttr: 'data-invited-value',
+                        setField: setGuestInvitedField,
+                        getArmed: function() { return guestsInvitedArmedDocId; },
+                        setArmed: function(v) { guestsInvitedArmedDocId = v; },
+                        getOpen: function() { return guestsInvitedDropdownOpenDocId; },
+                        setOpen: function(v) { guestsInvitedDropdownOpenDocId = v; }
+                    },
+                    {
+                        optionClass: 'guests-read-option',
+                        btnClass: 'guests-read-badge-btn',
+                        wrapClass: 'guests-read-wrap',
+                        dropdownClass: 'guests-read-dropdown',
+                        dataAttr: 'data-read-value',
+                        setField: setGuestReadField,
+                        getArmed: function() { return guestsReadArmedDocId; },
+                        setArmed: function(v) { guestsReadArmedDocId = v; },
+                        getOpen: function() { return guestsReadDropdownOpenDocId; },
+                        setOpen: function(v) { guestsReadDropdownOpenDocId = v; }
+                    },
+                    {
+                        optionClass: 'guests-invoiced-option',
+                        btnClass: 'guests-invoiced-badge-btn',
+                        wrapClass: 'guests-invoiced-wrap',
+                        dropdownClass: 'guests-invoiced-dropdown',
+                        dataAttr: 'data-invoiced-value',
+                        setField: setGuestInvoicedField,
+                        getArmed: function() { return guestsInvoicedArmedDocId; },
+                        setArmed: function(v) { guestsInvoicedArmedDocId = v; },
+                        getOpen: function() { return guestsInvoicedDropdownOpenDocId; },
+                        setOpen: function(v) { guestsInvoicedDropdownOpenDocId = v; }
+                    },
+                    {
+                        optionClass: 'guests-paid-option',
+                        btnClass: 'guests-paid-badge-btn',
+                        wrapClass: 'guests-paid-wrap',
+                        dropdownClass: 'guests-paid-dropdown',
+                        dataAttr: 'data-paid-value',
+                        setField: setGuestPaidField,
+                        getArmed: function() { return guestsPaidArmedDocId; },
+                        setArmed: function(v) { guestsPaidArmedDocId = v; },
+                        getOpen: function() { return guestsPaidDropdownOpenDocId; },
+                        setOpen: function(v) { guestsPaidDropdownOpenDocId = v; }
+                    },
+                    {
+                        optionClass: 'guests-briefed-option',
+                        btnClass: 'guests-briefed-badge-btn',
+                        wrapClass: 'guests-briefed-wrap',
+                        dropdownClass: 'guests-briefed-dropdown',
+                        dataAttr: 'data-briefed-value',
+                        setField: setGuestBriefedField,
+                        getArmed: function() { return guestsBriefedArmedDocId; },
+                        setArmed: function(v) { guestsBriefedArmedDocId = v; },
+                        getOpen: function() { return guestsBriefedDropdownOpenDocId; },
+                        setOpen: function(v) { guestsBriefedDropdownOpenDocId = v; }
+                    },
+                    {
+                        optionClass: 'guests-cme-option',
+                        btnClass: 'guests-cme-badge-btn',
+                        wrapClass: 'guests-cme-wrap',
+                        dropdownClass: 'guests-cme-dropdown',
+                        dataAttr: 'data-cme-value',
+                        setField: setGuestCmeField,
+                        getArmed: function() { return guestsCmeArmedDocId; },
+                        setArmed: function(v) { guestsCmeArmedDocId = v; },
+                        getOpen: function() { return guestsCmeDropdownOpenDocId; },
+                        setOpen: function(v) { guestsCmeDropdownOpenDocId = v; }
+                    }
+                ];
+            }
+            function selectGuestRosterRowFromPill(id) {
+                var rec = findGuestInMemory(id);
+                if (!rec) return;
+                if (String(guestFormEditingDocId || '').trim() === String(id || '').trim()) return;
+                syncAddGuestFormToMemoryIfEditing();
+                guestEditorScrollToManagementOnNextPopulate = true;
+                populateEditGuestFormFromRecord(rec);
+                syncGuestRosterSelectionHighlight();
+            }
+            function handleGuestsRosterDropdownButton(btn, spec) {
+                var row = btn.closest('.guests-roster-row');
+                var id = row && row.getAttribute('data-guests-id');
+                var wrap = btn.closest('.' + spec.wrapClass);
+                var dropdown = findGuestsRosterDropdown(wrap, spec.dropdownClass);
+                if (!id || !dropdown) return false;
+                selectGuestRosterRowFromPill(id);
+                if (spec.getArmed() === id) {
+                    if (!dropdown.hidden) {
+                        unplaceGuestsRosterDropdown(dropdown);
+                        btn.setAttribute('aria-expanded', 'false');
+                        spec.setOpen('');
+                    } else {
+                        hideAllGuestsRosterDropdowns(spec.dropdownClass);
+                        document.querySelectorAll('#guest-editor .' + spec.btnClass).forEach(function(b) {
+                            b.setAttribute('aria-expanded', 'false');
+                        });
+                        placeGuestsRosterDropdown(btn, dropdown);
+                        btn.setAttribute('aria-expanded', 'true');
+                        spec.setOpen(id);
+                    }
+                } else {
+                    document.querySelectorAll('#guest-editor .' + spec.btnClass + '.is-armed').forEach(function(b) {
+                        b.classList.remove('is-armed');
+                    });
+                    hideAllGuestsRosterDropdowns(spec.dropdownClass);
+                    document.querySelectorAll('#guest-editor .' + spec.btnClass).forEach(function(b) {
+                        b.setAttribute('aria-expanded', 'false');
+                    });
+                    spec.setOpen('');
+                    spec.setArmed(id);
+                    btn.classList.add('is-armed');
+                }
+                return true;
+            }
             var guestsRosterItemsEl = document.getElementById('guests-roster-items');
             if (guestsRosterItemsEl) {
                 guestsRosterItemsEl.addEventListener('click', function(ev) {
@@ -29493,203 +29966,32 @@
                         var tRow = toggleBtn.closest('.guests-roster-row');
                         var tId = tRow && tRow.getAttribute('data-guests-id');
                         var tField = toggleBtn.getAttribute('data-guest-field');
-                        if (tId && tField) void toggleGuestRosterField(tId, tField);
+                        if (tId && tField) {
+                            selectGuestRosterRowFromPill(tId);
+                            void toggleGuestRosterField(tId, tField);
+                        }
                         return;
                     }
-                    var invitedOpt = ev.target.closest('.guests-invited-option');
-                    if (invitedOpt && guestsRosterItemsEl.contains(invitedOpt)) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        var val = invitedOpt.getAttribute('data-invited-value');
-                        var optRow = invitedOpt.closest('.guests-roster-row');
-                        var optId = optRow && optRow.getAttribute('data-guests-id');
-                        if (optId && val) void setGuestInvitedField(optId, val);
-                        return;
-                    }
-                    var readOpt = ev.target.closest('.guests-read-option');
-                    if (readOpt && guestsRosterItemsEl.contains(readOpt)) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        var readVal = readOpt.getAttribute('data-read-value');
-                        var readOptRow = readOpt.closest('.guests-roster-row');
-                        var readOptId = readOptRow && readOptRow.getAttribute('data-guests-id');
-                        if (readOptId && readVal) void setGuestReadField(readOptId, readVal);
-                        return;
-                    }
-                    var invoicedOpt = ev.target.closest('.guests-invoiced-option');
-                    if (invoicedOpt && guestsRosterItemsEl.contains(invoicedOpt)) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        var invVal = invoicedOpt.getAttribute('data-invoiced-value');
-                        var invRow = invoicedOpt.closest('.guests-roster-row');
-                        var invId = invRow && invRow.getAttribute('data-guests-id');
-                        if (invId && invVal) void setGuestInvoicedField(invId, invVal);
-                        return;
-                    }
-                    var paidOpt = ev.target.closest('.guests-paid-option');
-                    if (paidOpt && guestsRosterItemsEl.contains(paidOpt)) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        var paidVal = paidOpt.getAttribute('data-paid-value');
-                        var paidRow = paidOpt.closest('.guests-roster-row');
-                        var paidId = paidRow && paidRow.getAttribute('data-guests-id');
-                        if (paidId && paidVal) void setGuestPaidField(paidId, paidVal);
-                        return;
-                    }
-                    var invitedBtn = ev.target.closest('.guests-invited-badge-btn');
-                    if (invitedBtn && guestsRosterItemsEl.contains(invitedBtn)) {
-                        ev.preventDefault();
-                        var invRow = invitedBtn.closest('.guests-roster-row');
-                        var invId = invRow && invRow.getAttribute('data-guests-id');
-                        var wrap = invitedBtn.closest('.guests-invited-wrap');
-                        var dropdown = wrap && wrap.querySelector('.guests-invited-dropdown');
-                        if (invId && dropdown) {
-                            if (guestsInvitedArmedDocId === invId) {
-                                if (!dropdown.hidden) {
-                                    dropdown.hidden = true;
-                                    invitedBtn.setAttribute('aria-expanded', 'false');
-                                    guestsInvitedDropdownOpenDocId = '';
-                                } else {
-                                    document.querySelectorAll('#guest-editor .guests-invited-dropdown').forEach(function(el) {
-                                        el.hidden = true;
-                                    });
-                                    document.querySelectorAll('#guest-editor .guests-invited-badge-btn').forEach(function(b) {
-                                        b.setAttribute('aria-expanded', 'false');
-                                    });
-                                    dropdown.hidden = false;
-                                    invitedBtn.setAttribute('aria-expanded', 'true');
-                                    guestsInvitedDropdownOpenDocId = invId;
-                                }
-                            } else {
-                                document.querySelectorAll('#guest-editor .guests-invited-badge-btn.is-armed').forEach(function(b) {
-                                    b.classList.remove('is-armed');
-                                });
-                                document.querySelectorAll('#guest-editor .guests-invited-dropdown').forEach(function(el) {
-                                    el.hidden = true;
-                                });
-                                document.querySelectorAll('#guest-editor .guests-invited-badge-btn').forEach(function(b) {
-                                    b.setAttribute('aria-expanded', 'false');
-                                });
-                                guestsInvitedDropdownOpenDocId = '';
-                                guestsInvitedArmedDocId = invId;
-                                invitedBtn.classList.add('is-armed');
-                            }
+                    var pillSpecs = guestRosterPillMenuSpecs();
+                    var psi;
+                    for (psi = 0; psi < pillSpecs.length; psi++) {
+                        var optEl = ev.target.closest('.' + pillSpecs[psi].optionClass);
+                        if (optEl && guestsRosterItemsEl.contains(optEl)) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            var optVal = optEl.getAttribute(pillSpecs[psi].dataAttr);
+                            var optRow = optEl.closest('.guests-roster-row');
+                            var optId = optRow && optRow.getAttribute('data-guests-id');
+                            if (optId && optVal) void pillSpecs[psi].setField(optId, optVal);
+                            return;
                         }
                     }
-                    var readBtn = ev.target.closest('.guests-read-badge-btn');
-                    if (readBtn && guestsRosterItemsEl.contains(readBtn)) {
-                        ev.preventDefault();
-                        var readRow = readBtn.closest('.guests-roster-row');
-                        var readId = readRow && readRow.getAttribute('data-guests-id');
-                        var readWrap = readBtn.closest('.guests-read-wrap');
-                        var readDropdown = readWrap && readWrap.querySelector('.guests-read-dropdown');
-                        if (readId && readDropdown) {
-                            if (guestsReadArmedDocId === readId) {
-                                if (!readDropdown.hidden) {
-                                    readDropdown.hidden = true;
-                                    readBtn.setAttribute('aria-expanded', 'false');
-                                    guestsReadDropdownOpenDocId = '';
-                                } else {
-                                    document.querySelectorAll('#guest-editor .guests-read-dropdown').forEach(function(el) {
-                                        el.hidden = true;
-                                    });
-                                    document.querySelectorAll('#guest-editor .guests-read-badge-btn').forEach(function(b) {
-                                        b.setAttribute('aria-expanded', 'false');
-                                    });
-                                    readDropdown.hidden = false;
-                                    readBtn.setAttribute('aria-expanded', 'true');
-                                    guestsReadDropdownOpenDocId = readId;
-                                }
-                            } else {
-                                document.querySelectorAll('#guest-editor .guests-read-badge-btn.is-armed').forEach(function(b) {
-                                    b.classList.remove('is-armed');
-                                });
-                                document.querySelectorAll('#guest-editor .guests-read-dropdown').forEach(function(el) {
-                                    el.hidden = true;
-                                });
-                                document.querySelectorAll('#guest-editor .guests-read-badge-btn').forEach(function(b) {
-                                    b.setAttribute('aria-expanded', 'false');
-                                });
-                                guestsReadDropdownOpenDocId = '';
-                                guestsReadArmedDocId = readId;
-                                readBtn.classList.add('is-armed');
-                            }
-                        }
-                    }
-                    var invoicedBtn = ev.target.closest('.guests-invoiced-badge-btn');
-                    if (invoicedBtn && guestsRosterItemsEl.contains(invoicedBtn)) {
-                        ev.preventDefault();
-                        var invRow2 = invoicedBtn.closest('.guests-roster-row');
-                        var invId2 = invRow2 && invRow2.getAttribute('data-guests-id');
-                        var invWrap = invoicedBtn.closest('.guests-invoiced-wrap');
-                        var invDropdown = findGuestsInvoicedDropdown(invWrap);
-                        if (invId2 && invDropdown) {
-                            if (guestsInvoicedArmedDocId === invId2) {
-                                if (!invDropdown.hidden) {
-                                    unplaceGuestsInvoicedDropdown(invDropdown);
-                                    invoicedBtn.setAttribute('aria-expanded', 'false');
-                                    guestsInvoicedDropdownOpenDocId = '';
-                                } else {
-                                    hideAllGuestsInvoicedDropdowns();
-                                    document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn').forEach(function(b) {
-                                        b.setAttribute('aria-expanded', 'false');
-                                    });
-                                    placeGuestsInvoicedDropdown(invoicedBtn, invDropdown);
-                                    invoicedBtn.setAttribute('aria-expanded', 'true');
-                                    guestsInvoicedDropdownOpenDocId = invId2;
-                                }
-                            } else {
-                                document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn.is-armed').forEach(function(b) {
-                                    b.classList.remove('is-armed');
-                                });
-                                hideAllGuestsInvoicedDropdowns();
-                                document.querySelectorAll('#guest-editor .guests-invoiced-badge-btn').forEach(function(b) {
-                                    b.setAttribute('aria-expanded', 'false');
-                                });
-                                guestsInvoicedDropdownOpenDocId = '';
-                                guestsInvoicedArmedDocId = invId2;
-                                invoicedBtn.classList.add('is-armed');
-                            }
-                        }
-                    }
-                    var paidBtn = ev.target.closest('.guests-paid-badge-btn');
-                    if (paidBtn && guestsRosterItemsEl.contains(paidBtn)) {
-                        ev.preventDefault();
-                        var paidRow2 = paidBtn.closest('.guests-roster-row');
-                        var paidId2 = paidRow2 && paidRow2.getAttribute('data-guests-id');
-                        var paidWrap = paidBtn.closest('.guests-paid-wrap');
-                        var paidDropdown = paidWrap && paidWrap.querySelector('.guests-paid-dropdown');
-                        if (paidId2 && paidDropdown) {
-                            if (guestsPaidArmedDocId === paidId2) {
-                                if (!paidDropdown.hidden) {
-                                    paidDropdown.hidden = true;
-                                    paidBtn.setAttribute('aria-expanded', 'false');
-                                    guestsPaidDropdownOpenDocId = '';
-                                } else {
-                                    document.querySelectorAll('#guest-editor .guests-paid-dropdown').forEach(function(el) {
-                                        el.hidden = true;
-                                    });
-                                    document.querySelectorAll('#guest-editor .guests-paid-badge-btn').forEach(function(b) {
-                                        b.setAttribute('aria-expanded', 'false');
-                                    });
-                                    paidDropdown.hidden = false;
-                                    paidBtn.setAttribute('aria-expanded', 'true');
-                                    guestsPaidDropdownOpenDocId = paidId2;
-                                }
-                            } else {
-                                document.querySelectorAll('#guest-editor .guests-paid-badge-btn.is-armed').forEach(function(b) {
-                                    b.classList.remove('is-armed');
-                                });
-                                document.querySelectorAll('#guest-editor .guests-paid-dropdown').forEach(function(el) {
-                                    el.hidden = true;
-                                });
-                                document.querySelectorAll('#guest-editor .guests-paid-badge-btn').forEach(function(b) {
-                                    b.setAttribute('aria-expanded', 'false');
-                                });
-                                guestsPaidDropdownOpenDocId = '';
-                                guestsPaidArmedDocId = paidId2;
-                                paidBtn.classList.add('is-armed');
-                            }
+                    for (psi = 0; psi < pillSpecs.length; psi++) {
+                        var pillBtn = ev.target.closest('.' + pillSpecs[psi].btnClass);
+                        if (pillBtn && guestsRosterItemsEl.contains(pillBtn)) {
+                            ev.preventDefault();
+                            handleGuestsRosterDropdownButton(pillBtn, pillSpecs[psi]);
+                            return;
                         }
                     }
                     var guestRow = ev.target.closest('.guests-roster-row');
@@ -29703,7 +30005,9 @@
                         ev.target.closest('.guests-invited-wrap') ||
                         ev.target.closest('.guests-read-wrap') ||
                         ev.target.closest('.guests-invoiced-wrap') ||
-                        ev.target.closest('.guests-paid-wrap')
+                        ev.target.closest('.guests-paid-wrap') ||
+                        ev.target.closest('.guests-briefed-wrap') ||
+                        ev.target.closest('.guests-cme-wrap')
                     ) {
                         return;
                     }
@@ -29719,22 +30023,33 @@
                 });
             }
             document.addEventListener('click', function(ev) {
-                var invoicedOptDoc = ev.target.closest('.guests-invoiced-option');
-                if (invoicedOptDoc) {
-                    var invValDoc = invoicedOptDoc.getAttribute('data-invoiced-value');
-                    var invIdDoc = guestsInvoicedDropdownOpenDocId;
-                    if (!invIdDoc) {
-                        var invRowDoc = invoicedOptDoc.closest('.guests-roster-row');
-                        invIdDoc = invRowDoc && invRowDoc.getAttribute('data-guests-id');
+                var docSpecs = guestRosterPillMenuSpecs();
+                var dsi;
+                for (dsi = 0; dsi < docSpecs.length; dsi++) {
+                    var optDoc = ev.target.closest('.' + docSpecs[dsi].optionClass);
+                    if (optDoc) {
+                        var valDoc = optDoc.getAttribute(docSpecs[dsi].dataAttr);
+                        var idDoc = docSpecs[dsi].getOpen();
+                        if (!idDoc) {
+                            var rowDoc = optDoc.closest('.guests-roster-row');
+                            idDoc = rowDoc && rowDoc.getAttribute('data-guests-id');
+                        }
+                        if (idDoc && valDoc) void docSpecs[dsi].setField(idDoc, valDoc);
+                        return;
                     }
-                    if (invIdDoc && invValDoc) void setGuestInvoicedField(invIdDoc, invValDoc);
-                    return;
                 }
                 if (ev.target.closest('.guests-invoiced-dropdown')) return;
+                if (ev.target.closest('.guests-invited-dropdown')) return;
+                if (ev.target.closest('.guests-read-dropdown')) return;
+                if (ev.target.closest('.guests-paid-dropdown')) return;
+                if (ev.target.closest('.guests-briefed-dropdown')) return;
+                if (ev.target.closest('.guests-cme-dropdown')) return;
                 if (ev.target.closest('.guests-invited-wrap')) return;
                 if (ev.target.closest('.guests-read-wrap')) return;
                 if (ev.target.closest('.guests-invoiced-wrap')) return;
                 if (ev.target.closest('.guests-paid-wrap')) return;
+                if (ev.target.closest('.guests-briefed-wrap')) return;
+                if (ev.target.closest('.guests-cme-wrap')) return;
                 if (ev.target.closest('.speakers-status-wrap')) return;
                 if (ev.target.closest('.speakers-lodging-wrap')) return;
                 if (ev.target.closest('.speakers-bio-wrap')) return;
@@ -29743,6 +30058,8 @@
                 clearGuestsReadUiState();
                 clearGuestsInvoicedUiState();
                 clearGuestsPaidUiState();
+                clearGuestsBriefedUiState();
+                clearGuestsCmeUiState();
                 clearSpeakerStatusUiState();
                 clearSpeakerLodgingUiState();
                 clearSpeakerBioUiState();
