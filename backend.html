@@ -71,6 +71,7 @@
 
         /* No rubber-band / scroll chaining on inner scroll areas (macOS Safari, etc.). */
         body.backend-page .speaker-roster-scroll,
+        body.backend-page .contacts-roster-scroll,
         body.backend-page .content-list-scroll,
         body.backend-page .speaker-viewer,
         body.backend-page .content-editor,
@@ -509,7 +510,7 @@
             box-shadow: none !important;
         }
 
-        /* Placeholder tabs (Overview, E-mailer, Finances, Admin) until their panels are built */
+        /* Placeholder tabs (Overview, Finances, Admin) until their panels are built */
         .aspects .navigation .backend-editor-link.backend-editor-link--inactive {
             pointer-events: none;
             cursor: not-allowed;
@@ -550,6 +551,7 @@
         .aspects .navigation #programme-toggle:not(.is-active),
         .aspects .navigation #lodging-toggle:not(.is-active),
         .aspects .navigation #content-toggle:not(.is-active),
+        .aspects .navigation #emailer-toggle:not(.is-active),
         .aspects .navigation #texteditor-toggle:not(.is-active),
         .aspects .navigation #settings-toggle:not(.is-active) {
             background: transparent;
@@ -605,6 +607,7 @@
         .programme-section,
         .lodging-section,
         .content-editor-section,
+        .emailer-overview-section,
         .finances-section,
         .settings-section {
             display: none;
@@ -637,6 +640,7 @@
         .programme-section.is-open,
         .lodging-section.is-open,
         .content-editor-section.is-open,
+        .emailer-overview-section.is-open,
         .finances-section.is-open,
         .settings-section.is-open {
             display: flex;
@@ -1385,6 +1389,37 @@
             max-width: 100%;
             box-sizing: border-box;
             margin: 0;
+        }
+
+        #guest-editor #guest-editor-actions .guest-workflow-invite-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #guest-editor #guest-editor-actions .guest-workflow-invite-row.is-stacked {
+            flex-direction: column;
+        }
+
+        #guest-editor #guest-editor-actions .guest-workflow-invite-sep {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            margin: 0;
+            color: #338a17;
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            user-select: none;
+            pointer-events: none;
         }
 
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn {
@@ -3061,6 +3096,8 @@
         }
 
         body.backend-page #guest-editor #guest-editor-actions[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-to-reserves-btn[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-to-reserves-sep[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-send-invite-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #readisno[hidden],
         body.backend-page #guest-editor #guest-editor-actions #invitedisno[hidden],
@@ -3118,6 +3155,494 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+        }
+
+        #emailer-editor,
+        .emailer-overview-section,
+        .emailer-overview-section.is-open {
+            --editor-gunmetal-border: #e2e8f0;
+            --backend-roster-pill-width: 7.5rem;
+            --backend-roster-pill-min-height: calc(0.9rem * 1.2 + 4px);
+            background: #e2e8f0;
+            border: none;
+            padding: 16px;
+        }
+
+        #emailer-editor.is-open,
+        .emailer-overview-section.is-open {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            min-height: 0;
+        }
+
+        #emailer-editor .emailer-overview {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            margin-top: 0;
+            min-width: 0;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #emailer-editor .emailer-bottom-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 0;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        #emailer-editor .emailer-bottom-track {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 16px;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        #emailer-editor .contacts-list {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            min-height: 0;
+            overflow: hidden;
+            flex: 2 1 0;
+            background: transparent;
+            padding: 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        #emailer-editor .contacts-list .contacts-roster-list {
+            flex: 1 1 0;
+            min-height: 0;
+        }
+
+        #emailer-editor .contact-viewer {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-height: 0;
+            min-width: 0;
+            overflow: hidden;
+            padding: 0;
+            align-self: stretch;
+            background: transparent;
+        }
+
+        #emailer-editor .contact-editor-shell {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            width: 100%;
+            align-self: stretch;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        #emailer-editor .contact-viewer > .contact-editor-shell > .contact-editor {
+            --emailer-editor-shell-r: 8px;
+            --emailer-editor-bw: 1px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            flex: 1 1 0;
+            min-width: 0;
+            align-self: stretch;
+            min-height: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: transparent;
+            border: var(--emailer-editor-bw) solid #e2e8f0;
+            border-radius: var(--emailer-editor-shell-r);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading,
+        #emailer-editor .contact-viewer > .contact-editor-shell > .contact-editor > .edit-contact-top {
+            background-color: #ffffff;
+            margin: 0;
+            border-radius: 5px 5px 0 0;
+            align-items: center;
+            gap: 0;
+            justify-content: flex-start;
+            color: #000000;
+            border-bottom: 1px solid #cbd5e1;
+            box-sizing: border-box;
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+        }
+
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading {
+            flex: 0 0 auto;
+            width: 100%;
+            padding-left: var(--backend-table-cell-pad-x);
+            padding-right: 0;
+        }
+
+        #emailer-editor .edit-contact-top .edit-contact-top-spacer {
+            display: none;
+        }
+
+        #emailer-editor .edit-contact-top .selected-contactname-wrap {
+            flex: 0 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        #emailer-editor .edit-contact-top .selected-contactname,
+        #emailer-editor .edit-contact-top .edit-contact-name-first,
+        #emailer-editor .edit-contact-top .edit-contact-name-last {
+            color: #000000;
+            justify-content: flex-start;
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            display: inline;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        #emailer-editor .selected-contactname {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            gap: 0.5rem;
+            padding: 8px 0;
+            box-sizing: border-box;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        #emailer-editor .edit-contact-top-trailing {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            padding: 0 var(--backend-table-cell-pad-x) 0 0;
+            box-sizing: border-box;
+        }
+
+        #emailer-editor .contacts-list-heading .emailer-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+            margin: 0;
+            height: 100%;
+            min-height: 0;
+            max-height: 100%;
+            width: auto;
+            max-width: 100%;
+            padding: 0;
+            box-sizing: border-box;
+            border: none !important;
+            border-radius: 0;
+            overflow: visible;
+            background: transparent !important;
+            box-shadow: none;
+            outline: none;
+        }
+
+        #emailer-editor .emailer-actions .emailer-roster-search {
+            flex: 0 1 11rem;
+            width: 11rem;
+            min-width: 7rem;
+            max-width: 14rem;
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0 0.65rem;
+            border: 1px solid #71C7FE;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            line-height: 1.2;
+            outline: none;
+        }
+
+        #emailer-editor .emailer-actions .emailer-roster-search::placeholder {
+            color: #94a3b8;
+        }
+
+        #emailer-editor .emailer-actions .emailer-roster-search:disabled {
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-actions .add-speaker-button,
+        #emailer-editor .emailer-editor-toolbar .add-speaker-button,
+        #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn {
+            flex: 0 0 auto;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            border-radius: var(--backend-icon-btn-radius);
+            padding: 0;
+            box-sizing: border-box;
+            background: var(--backend-button-yellow);
+            border: none;
+            box-shadow: var(--backend-button-shadow);
+            color: #003153;
+            cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-editor-toolbar {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 0;
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border-bottom: none;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn svg {
+            flex-shrink: 0;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            border-radius: var(--backend-icon-btn-radius);
+            background: var(--backend-button-yellow);
+            color: #003153;
+            font-size: 0;
+            line-height: 0;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button svg {
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            gap: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #000000 !important;
+            color: #ffffff !important;
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: not-allowed;
+            opacity: 0.45;
+            filter: none;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn span {
+            display: block;
+            line-height: 1;
+            color: #ffffff;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            gap: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: #F71941 !important;
+            color: #ffffff !important;
+            font-size: 0;
+            line-height: 0;
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn svg,
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn svg path {
+            color: #ffffff;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #emailer-editor .emailer-editor-bottom {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            gap: 0;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            width: 100%;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            padding: 0;
+            background-color: #f1f5f9;
+            border-radius: 0 0 calc(var(--emailer-editor-shell-r) - var(--emailer-editor-bw))
+                calc(var(--emailer-editor-shell-r) - var(--emailer-editor-bw));
+        }
+
+        #emailer-editor .emailer-editor-bottom .emailer-workflow-nav {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            align-self: stretch;
+            gap: 4px;
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 8px 16px 0;
+            box-sizing: border-box;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            background: #ffffff;
+        }
+
+        body.backend-page #emailer-editor .emailer-editor-bottom .emailer-workflow-nav-link,
+        body.backend-page #emailer-editor .emailer-editor-bottom .emailer-workflow-nav-link:disabled {
+            display: inline-block;
+            margin: 0;
+            width: auto;
+            min-width: 0;
+            padding: 0.25rem 0.625rem;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.3;
+            color: #9ca3af;
+            text-decoration: none;
+            cursor: default;
+            appearance: none;
+            -webkit-appearance: none;
+            filter: none;
+            transform: none;
+            opacity: 1;
+        }
+
+        #emailer-editor .emailer-editor-bottom-panes {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            gap: 0;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+            border: none;
+            border-radius: 0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .emailer-filter-contacts-btn {
+            position: relative;
+            overflow: visible;
+        }
+
+        .emailer-filter-contacts-active-mark {
+            position: absolute;
+            top: -0.2rem;
+            right: -0.2rem;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 0.85rem;
+            height: 0.85rem;
+            border-radius: 50%;
+            background: #FF00FF;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .emailer-filter-contacts-active-mark[hidden] {
+            display: none !important;
         }
 
         #finances-editor,
@@ -5107,6 +5632,7 @@
 
         .speaker-roster-list,
         .guests-roster-list,
+        .contacts-roster-list,
         .team-roster-list,
         .content-list {
             flex: 1;
@@ -5129,6 +5655,7 @@
         /* Only this region scrolls; thead stays sticky inside it. */
         .speaker-roster-scroll,
         .guests-roster-scroll,
+        .contacts-roster-scroll,
         .team-roster-scroll,
         .content-list-scroll {
             flex: 1 1 0;
@@ -5143,12 +5670,14 @@
         }
 
         .guests-roster-scroll,
+        .contacts-roster-scroll,
         .team-roster-scroll {
             height: 100%;
         }
 
         .speaker-roster-items,
         .guests-roster-items,
+        .contacts-roster-items,
         .team-roster-items,
         .content-list-items {
             flex: 0 0 auto;
@@ -5158,6 +5687,7 @@
         }
 
         .guests-roster-items,
+        .contacts-roster-items,
         .team-roster-items {
             width: 100%;
             min-width: 100%;
@@ -5640,6 +6170,7 @@
 
         .edit-speaker-top,
         .edit-guest-top,
+        .edit-contact-top,
         .edit-team-top {
             display: flex;
             flex-direction: row;
@@ -6194,6 +6725,9 @@
         #content-editor .content-actions .add-content-btn:disabled,
         #guest-editor .guests-actions .add-speaker-button:disabled,
         #speaker-editor .speakers-actions .add-speaker-button:disabled,
+        #emailer-editor .emailer-actions .add-speaker-button:disabled,
+        #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn:disabled,
+        #emailer-editor .emailer-editor-toolbar #emailer-save-contact-button:disabled,
         #team-editor .team-actions .add-speaker-button:disabled,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled,
         #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved),
@@ -6220,6 +6754,9 @@
         #content-editor .content-actions .add-content-btn:disabled:hover,
         #guest-editor .guests-actions .add-speaker-button:disabled:hover,
         #speaker-editor .speakers-actions .add-speaker-button:disabled:hover,
+        #emailer-editor .emailer-actions .add-speaker-button:disabled:hover,
+        #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn:disabled:hover,
+        #emailer-editor .emailer-editor-toolbar #emailer-save-contact-button:disabled:hover,
         #team-editor .team-actions .add-speaker-button:disabled:hover,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled:hover,
         #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved):hover,
@@ -7518,6 +8055,7 @@
 
         .edit-speaker-name-heading,
         .selected-guestname,
+        .selected-contactname,
         .selected-teamname {
             margin: 0;
             flex: 1 1 auto;
@@ -7536,6 +8074,8 @@
         .edit-speaker-name-last,
         .edit-guest-name-first,
         .edit-guest-name-last,
+        .edit-contact-name-first,
+        .edit-contact-name-last,
         .edit-team-name-first,
         .edit-team-name-last {
             display: block;
@@ -9071,6 +9611,7 @@
         body.backend-page #programme-editor,
         body.backend-page #lodging-editor,
         body.backend-page #content-editor,
+        body.backend-page #emailer-editor,
         body.backend-page #finances-editor,
         body.backend-page #settings-editor {
             flex: 1 1 0;
@@ -9871,14 +10412,7 @@
                             <a href="#lodging-editor" class="backend-editor-link" id="lodging-toggle" role="button" aria-expanded="false" aria-controls="lodging-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Lodging</a>
                             <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                             <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
-                            <span
-                                class="backend-editor-link backend-editor-link--inactive"
-                                id="emailer-toggle"
-                                role="button"
-                                aria-disabled="true"
-                                aria-expanded="false"
-                                tabindex="-1"
-                                title="Coming soon">E-mailer</span>
+                            <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
                             <span
                                 class="backend-editor-link backend-editor-link--inactive"
                                 id="finances-toggle"
@@ -10548,9 +11082,15 @@
                                                     Read application
                                                 </button>
                                                 <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
-                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-invite-btn" disabled aria-disabled="true">
-                                                    Send invite to —
+                                                <div class="guest-workflow-invite-row" id="guest-workflow-invite-row">
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-to-reserves-btn" hidden aria-hidden="true" disabled aria-disabled="true">
+                                                    Send to reserves
                                                 </button>
+                                                <span class="guest-workflow-invite-sep" id="guest-workflow-send-to-reserves-sep" hidden aria-hidden="true">/</span>
+                                                <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-invite-btn" disabled aria-disabled="true">
+                                                    Send invite
+                                                </button>
+                                                </div>
                                                 <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
                                                 <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-invoice-btn" disabled aria-disabled="true">
                                                     Send invoice
@@ -11328,6 +11868,160 @@
                 </div>
             </section>
 
+            <section class="emailer-overview-section" id="emailer-editor" aria-hidden="true" aria-label="E-mailer" data-name="emailer-editor">
+                <div class="emailer-overview">
+                    <div class="emailer-bottom-row" id="emailer-bottom-row">
+                        <div class="emailer-bottom-track" id="emailer-bottom-track">
+                        <div class="contacts-list contacts-list--roster" id="contacts-list" aria-label="Contacts list">
+                            <div class="edit-contact-top contacts-list-heading" id="contacts-list-heading">
+                                <div class="edit-contact-top-spacer" aria-hidden="true"></div>
+                                <div class="selected-contactname-wrap">
+                                    <div class="selected-contactname" role="group" aria-label="Contacts list title">
+                                        <span class="edit-contact-name-first" id="contacts-list-heading-event" aria-live="polite">—</span>
+                                        <span class="edit-contact-name-last" id="contacts-list-heading-suffix">CONTACTS</span>
+                                    </div>
+                                </div>
+                                <div class="edit-contact-top-trailing">
+                                <div id="emailer-actions" class="emailer-actions" aria-label="E-mailer actions">
+                                    <input
+                                        type="search"
+                                        id="emailer-roster-search"
+                                        class="emailer-roster-search"
+                                        placeholder="Search"
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                        aria-label="Search contacts"
+                                        disabled
+                                        aria-disabled="true"
+                                        readonly
+                                        tabindex="-1"
+                                    />
+                                    <button type="button" class="add-speaker-button" id="emailer-previous-contact" aria-label="Previous contact" title="Previous contact" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M14 6L8 12l6 6z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="emailer-next-contact" aria-label="Next contact" title="Next contact" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 6l6 6-6 6z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="emailer-add-contact-button" aria-label="Add contact" title="Add contact" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button emailer-filter-contacts-btn" id="emailer-filter-contacts" aria-label="Filter contacts" title="Filter contacts" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                        <span class="emailer-filter-contacts-active-mark" id="emailer-filter-contacts-active-mark" hidden aria-hidden="true">!</span>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="emailer-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="emailer-sync-payments-btn" aria-label="Sync Stripe payments" title="Sync Stripe payments" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="contacts-roster-list" id="contacts-roster-list">
+                                <div class="contacts-roster-scroll">
+                                    <div class="contacts-roster-items" id="contacts-roster-items" aria-live="polite"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="contact-viewer" id="emailer-contact-viewer" aria-label="Contact viewer">
+                            <div class="contact-editor-shell">
+                            <div class="contact-editor" id="contact-editor">
+                            <div class="edit-contact-top">
+                                <div class="edit-contact-top-spacer" aria-hidden="true"></div>
+                                <div class="selected-contactname-wrap">
+                                    <div class="selected-contactname" role="group" aria-label="Contact name">
+                                        <span class="edit-contact-name-first" id="emailer-edit-contact-name-first" aria-live="polite"></span>
+                                        <span class="edit-contact-name-last" id="emailer-edit-contact-name-last" aria-live="polite"></span>
+                                    </div>
+                                </div>
+                                <div class="edit-contact-top-trailing">
+                            <div class="emailer-editor-toolbar" role="toolbar" aria-label="Contact editor tools">
+                                <div class="emailer-editor-toolbar-trailing">
+                                    <button type="button" class="add-speaker-button emailer-editor-padlock-btn" id="emailer-editor-padlock-btn" aria-label="Lock contact" title="Lock" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path
+                                                fill="currentColor"
+                                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="texteditor-save-btn" id="emailer-save-contact-button" disabled aria-disabled="true" title="Save contact" aria-label="Save contact">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="emailer-cancel-contact-btn" id="emailer-cancel-contact-btn" disabled aria-disabled="true" title="Cancel contact" aria-label="Cancel contact">
+                                        <span aria-hidden="true">✗</span>
+                                    </button>
+                                    <button type="button" class="emailer-delete-contact-btn" id="emailer-delete-contact-btn" disabled aria-disabled="true" title="Delete contact" aria-label="Delete contact">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                            <div class="emailer-editor-bottom">
+                            <div class="emailer-workflow-nav" role="toolbar" aria-label="Contact editor sections">
+                                <button type="button" class="emailer-workflow-nav-link" id="emailer-display-contact-actions" aria-label="Contact workflow" title="Contact workflow" disabled aria-disabled="true">
+                                    <span class="display-editor-actions-text">Workflow</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="emailer-workflow-nav-link"
+                                    id="emailer-contact-bio-btn"
+                                    aria-label="Contact bio"
+                                    title="Contact bio"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <span class="emailer-editor-bio-text">Bio</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="emailer-workflow-nav-link"
+                                    id="emailer-contact-files-btn"
+                                    aria-label="Contact files"
+                                    title="Contact files"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <span class="display-editor-actions-text">Files</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="emailer-workflow-nav-link"
+                                    id="emailer-contact-log-btn"
+                                    aria-label="Contact log"
+                                    title="Contact log"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <span class="display-editor-actions-text">Log</span>
+                                </button>
+                            </div>
+                            <div class="emailer-editor-bottom-panes"></div>
+                            </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </section>
+
             <section class="finances-section" id="finances-editor" aria-hidden="true" aria-label="Finances" data-name="finances-editor">
                 <div class="finances-overview">
                     <div class="finances-panel finances-invoices-list" id="finances-invoices-list" aria-label="Invoices list">
@@ -11784,6 +12478,8 @@
          * (parent `tbs/Settings` used as fallback).
          */
         var event_location = '';
+        /** From `tbs/Settings/{event_location}/{event_location}` field `Waiting_list` (`Yes` / `No`). */
+        var siteWaitingListIsYes = false;
         /** True when `tbs/Settings/{current_event}/{current_event}` exists. */
         var currentEventHasSettingsDoc = false;
         /** Signed-in backend user's email. */
@@ -16811,6 +17507,9 @@
                 'waitingList',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD], false)
             );
+            siteWaitingListIsYes =
+                normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD], false) === 'yes';
+            syncGuestWorkflowSendToReservesButton();
             setSettingsSiteToggleUi(
                 'passwordProtectHome',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD], false)
@@ -18139,6 +18838,10 @@
             if (settingKey === 'registrationOpen') {
                 syncWaitingListToggleEnabledFromUi();
             }
+            if (settingKey === 'waitingList') {
+                siteWaitingListIsYes = uiValue === 'yes';
+                syncGuestWorkflowSendToReservesButton();
+            }
             if (wasActive) return;
 
             if (siteSettingsSaveInFlight) return;
@@ -18346,7 +19049,9 @@
             setSettingsUpcomingEventVisibility(exists);
             if (!exists) {
                 event_location = '';
+                siteWaitingListIsYes = false;
                 updateBackendNavbarForEventLocation();
+                syncGuestWorkflowSendToReservesButton();
                 return;
             }
             await syncEventLocationFromSettings(ev);
@@ -18514,6 +19219,8 @@
             if (programmeEventEl) programmeEventEl.textContent = eventLabel;
             var settingsEventEl = document.getElementById('settings-list-heading-event');
             if (settingsEventEl) settingsEventEl.textContent = eventLabel;
+            var contactsEventEl = document.getElementById('contacts-list-heading-event');
+            if (contactsEventEl) contactsEventEl.textContent = eventLabel;
         }
 
         function updateBackendCurrentEventDisplay() {
@@ -21071,6 +21778,7 @@
             try {
                 await itemRef.set({ Invited: invitedValue, Log: mergedLog }, { merge: true });
                 syncGuestSendInviteButton();
+                syncGuestWorkflowSendInviteButton();
                 syncGuestManagementLogPanel();
                 if (typeof showStatus === 'function') {
                     showStatus(
@@ -21086,6 +21794,7 @@
                 rec.log = prevLog;
                 renderGuestsRoster();
                 syncGuestSendInviteButton();
+                syncGuestWorkflowSendInviteButton();
                 syncGuestManagementLogPanel();
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to update guest.');
@@ -21513,8 +22222,6 @@
             if (!btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
-            var email = '';
-            if (g) email = String(g.email || g.guestEmail || '').trim();
             var invitedDone = Boolean(g && guestInvitedIsYes(g.invited));
             var canSend = Boolean(g && guestInviteAllowedByRosterFields(g));
             var canRun = canSend && guestPadlockIsOpen;
@@ -21523,7 +22230,7 @@
                 var dateLabel = guestInvitedDateLabelFromRecord(g) || '—';
                 label = 'Invite sent ' + dateLabel;
             } else {
-                label = email ? 'Send invite to ' + email : 'Send invite to —';
+                label = 'Send invite';
             }
             btn.textContent = label;
             btn.setAttribute('aria-label', label);
@@ -21533,6 +22240,92 @@
             btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
             btn.classList.toggle('is-active', canSend);
             btn.classList.toggle('is-done', invitedDone);
+            syncGuestWorkflowSendToReservesButton();
+        }
+
+        function syncGuestWorkflowSendToReservesButton() {
+            var btn = document.getElementById('guest-workflow-send-to-reserves-btn');
+            var sep = document.getElementById('guest-workflow-send-to-reserves-sep');
+            var row = document.getElementById('guest-workflow-invite-row');
+            var id = String(guestFormEditingDocId || '').trim();
+            var g = id ? findGuestInMemory(id) : null;
+            var invitedNo = Boolean(g && guestInvitedFieldIsNo(g.invited));
+            var invitedReserve = Boolean(g && guestInvitedFieldIsReserve(g.invited));
+            var show = Boolean(g && siteWaitingListIsYes && (invitedNo || invitedReserve));
+            var stacked = Boolean(show && invitedReserve);
+            var canSend = Boolean(show && invitedNo);
+            var canRun = canSend && guestPadlockIsOpen;
+            if (row) row.classList.toggle('is-stacked', stacked);
+            if (btn) {
+                btn.hidden = !show;
+                btn.setAttribute('aria-hidden', show ? 'false' : 'true');
+                btn.disabled = !canSend;
+                btn.setAttribute('aria-disabled', canRun ? 'false' : 'true');
+                btn.classList.toggle('is-active', canSend);
+                btn.classList.toggle('is-done', invitedReserve);
+            }
+            if (sep) {
+                sep.hidden = !show;
+                sep.setAttribute('aria-hidden', show ? 'false' : 'true');
+                sep.textContent = stacked ? '⬇' : '/';
+            }
+        }
+
+        async function sendGuestToReservesFromWorkflow() {
+            if (backendBlockIfReadonly()) return;
+            var id = String(guestFormEditingDocId || '').trim();
+            if (!id) {
+                if (typeof showStatus === 'function') showStatus('error', 'Select a guest first.');
+                return;
+            }
+            var rec = findGuestInMemory(id);
+            if (!rec || !siteWaitingListIsYes || !guestInvitedFieldIsNo(rec.invited)) return;
+            var logLine = guestLogSentToReservesLine();
+            var db = getFirestore();
+            var itemRef = db.collection('tbs').doc('Guests').collection(id).doc('item');
+            var snap;
+            try {
+                snap = await itemRef.get();
+            } catch (ge) {
+                console.error('sendGuestToReservesFromWorkflow get:', ge);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', ge && ge.message ? ge.message : 'Failed to load guest item.');
+                }
+                return;
+            }
+            var data = snap.exists ? snap.data() || {} : {};
+            var mergedLog = guestLogFromDoc(data).concat([logLine]);
+            var prevInvited = rec.invited;
+            var prevLog = Array.isArray(rec.log) ? rec.log.slice() : guestLogFromDoc(data).slice();
+            rec.invited = 'Reserve';
+            rec.log = mergedLog.slice();
+            guestsInvitedArmedDocId = '';
+            guestsInvitedDropdownOpenDocId = '';
+            clearGuestsInvitedUiState();
+            clearGuestsReadUiState();
+            clearGuestsInvoicedUiState();
+            renderGuestsRoster();
+            syncGuestWorkflowSendInviteButton();
+            try {
+                await itemRef.set({ Invited: 'Reserve', Log: mergedLog }, { merge: true });
+                syncGuestSendInviteButton();
+                syncGuestWorkflowSendInviteButton();
+                syncGuestManagementLogPanel();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Guest set to Reserve.');
+                }
+            } catch (err) {
+                console.error('sendGuestToReservesFromWorkflow:', err);
+                rec.invited = prevInvited;
+                rec.log = prevLog;
+                renderGuestsRoster();
+                syncGuestSendInviteButton();
+                syncGuestWorkflowSendInviteButton();
+                syncGuestManagementLogPanel();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to update guest.');
+                }
+            }
         }
 
         function syncGuestWorkflowSendInvoiceButton() {
@@ -26166,6 +26959,7 @@
             const isTeam = panel === 'team';
             const isProgramme = panel === 'programme';
             const isLodging = panel === 'lodging';
+            const isEmailer = panel === 'emailer';
             const isSpeakers =
                 panel === 'speakers' ||
                 (!isEditor &&
@@ -26175,7 +26969,8 @@
                     !isGuests &&
                     !isTeam &&
                     !isProgramme &&
-                    !isLodging);
+                    !isLodging &&
+                    !isEmailer);
             const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
@@ -26183,6 +26978,7 @@
             const programmeEditorSection = document.getElementById('programme-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
+            const emailerEditorSection = document.getElementById('emailer-editor');
             const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const editorToggle = document.getElementById('texteditor-toggle');
@@ -26192,6 +26988,7 @@
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
+            const emailerToggle = document.getElementById('emailer-toggle');
             const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
             const adminToggle = document.getElementById('admin-toggle');
@@ -26222,6 +27019,10 @@
             if (contentEditorSection) {
                 contentEditorSection.classList.toggle('is-open', isContent);
                 contentEditorSection.setAttribute('aria-hidden', isContent ? 'false' : 'true');
+            }
+            if (emailerEditorSection) {
+                emailerEditorSection.classList.toggle('is-open', isEmailer);
+                emailerEditorSection.setAttribute('aria-hidden', isEmailer ? 'false' : 'true');
             }
             if (financesSection) {
                 financesSection.classList.toggle('is-open', isFinances);
@@ -26259,6 +27060,10 @@
                 contentToggle.setAttribute('aria-expanded', isContent ? 'true' : 'false');
                 contentToggle.classList.toggle('is-active', isContent);
             }
+            if (emailerToggle) {
+                emailerToggle.setAttribute('aria-expanded', isEmailer ? 'true' : 'false');
+                emailerToggle.classList.toggle('is-active', isEmailer);
+            }
             if (financesToggle) {
                 financesToggle.setAttribute('aria-expanded', isFinances ? 'true' : 'false');
                 financesToggle.classList.toggle('is-active', isFinances);
@@ -26276,7 +27081,7 @@
                 programmeCounterEl.hidden = !isProgramme;
                 if (isProgramme) updateProgrammeCounterDisplay();
             }
-            if (isGuests || isSpeakers || isTeam) updateGuestsListHeadingDisplay();
+            if (isGuests || isSpeakers || isTeam || isEmailer) updateGuestsListHeadingDisplay();
             var contentActionsEl = document.getElementById('content-actions');
             if (contentActionsEl) {
                 contentActionsEl.hidden = !isContent;
@@ -26292,6 +27097,10 @@
             var guestActionsEl = document.getElementById('guests-actions');
             if (guestActionsEl) {
                 guestActionsEl.hidden = !isGuests;
+            }
+            var emailerActionsEl = document.getElementById('emailer-actions');
+            if (emailerActionsEl) {
+                emailerActionsEl.hidden = !isEmailer;
             }
             if (isEditor) {
                 invalidateIndexProgrammeCache();
@@ -26360,6 +27169,7 @@
             const programmeToggle = document.getElementById('programme-toggle');
             const lodgingToggle = document.getElementById('lodging-toggle');
             const contentToggle = document.getElementById('content-toggle');
+            const emailerToggle = document.getElementById('emailer-toggle');
             const financesToggle = document.getElementById('finances-toggle');
             const settingsToggle = document.getElementById('settings-toggle');
             const adminToggle = document.getElementById('admin-toggle');
@@ -26370,6 +27180,7 @@
             const programmeEditorSection = document.getElementById('programme-editor');
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
+            const emailerEditorSection = document.getElementById('emailer-editor');
             const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const hasEvent = Boolean(selectedevent && String(selectedevent).trim());
@@ -26426,6 +27237,11 @@
                 contentToggle.setAttribute('tabindex', '0');
                 contentToggle.setAttribute('aria-disabled', 'false');
             }
+            if (emailerToggle) {
+                emailerToggle.setAttribute('aria-hidden', 'false');
+                emailerToggle.setAttribute('tabindex', '0');
+                emailerToggle.setAttribute('aria-disabled', 'false');
+            }
             if (!hasEvent) {
                 if (texteditorSection) {
                     texteditorSection.classList.remove('is-open');
@@ -26438,6 +27254,10 @@
                 if (contentEditorSection) {
                     contentEditorSection.classList.remove('is-open');
                     contentEditorSection.setAttribute('aria-hidden', 'true');
+                }
+                if (emailerEditorSection) {
+                    emailerEditorSection.classList.remove('is-open');
+                    emailerEditorSection.setAttribute('aria-hidden', 'true');
                 }
                 if (guestEditorSection) {
                     guestEditorSection.classList.remove('is-open');
@@ -26470,6 +27290,10 @@
                 if (contentToggle) {
                     contentToggle.setAttribute('aria-expanded', 'false');
                     contentToggle.classList.remove('is-active');
+                }
+                if (emailerToggle) {
+                    emailerToggle.setAttribute('aria-expanded', 'false');
+                    emailerToggle.classList.remove('is-active');
                 }
                 if (guestsToggle) {
                     guestsToggle.setAttribute('aria-expanded', 'false');
@@ -28546,6 +29370,13 @@
                     setBackendPanel('content');
                 });
             }
+            var emailerToggle = document.getElementById('emailer-toggle');
+            if (emailerToggle) {
+                emailerToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setBackendPanel('emailer');
+                });
+            }
             if (guestsToggle) {
                 guestsToggle.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -29154,6 +29985,23 @@
                         console.error('guest-workflow-send-invite:', err);
                         if (typeof showStatus === 'function') {
                             showStatus('error', err && err.message ? err.message : 'Failed to send invitation.');
+                        }
+                    });
+                });
+            }
+            var guestWorkflowSendToReservesBtn = document.getElementById('guest-workflow-send-to-reserves-btn');
+            if (guestWorkflowSendToReservesBtn) {
+                guestWorkflowSendToReservesBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowSendToReservesBtn)) return;
+                    sendGuestToReservesFromWorkflow().catch(function(err) {
+                        console.error('guest-workflow-send-to-reserves:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to send guest to reserves.'
+                            );
                         }
                     });
                 });
