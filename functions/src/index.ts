@@ -1609,7 +1609,8 @@ export const sendGuestInviteHttp = onRequest({
     const data = snap.data() || {};
     if (!guestInviteAllowed(data)) {
       res.status(400).json({
-        error: "Invite is only available when Invited is Reserve, or when Read is Yes and Invited is No.",
+        error: "Invite is only available when Invited is Reserve, " +
+          "or when Read is Yes and Invited is No.",
       });
       return;
     }
