@@ -7620,7 +7620,11 @@
         #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field > input,
         #team-editor .team-editor-bio > .add-speaker-form-field > input,
         #team-editor .team-editor-bio > .add-speaker-form-field > select,
-        #team-editor .team-editor-bio .team-name-row .add-speaker-form-field > input {
+        #team-editor .team-editor-bio .team-name-row .add-speaker-form-field > input,
+        #emailer-editor .emailer-editor-bio > .add-speaker-form-field > input,
+        #emailer-editor .emailer-editor-bio > .add-speaker-form-field > select,
+        #emailer-editor .emailer-editor-bio > .add-speaker-form-field > textarea,
+        #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field > input {
             flex: 0 1 auto;
             min-width: 0;
             width: 100%;
@@ -7702,6 +7706,19 @@
 
         #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio select:not(:disabled) {
             cursor: pointer;
+        }
+
+        #emailer-editor .emailer-editor-bio select,
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M2.2 4.2L6 8.2l3.8-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 12px 12px;
+            padding-right: 2.25rem;
+        }
+
+        #emailer-editor .emailer-editor-bio textarea {
+            min-height: 8rem;
         }
 
         #speaker-editor .speaker-editor-bio input:focus,
@@ -12042,7 +12059,7 @@
                                             <path fill="currentColor" d="M10 6l6 6-6 6z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button" id="emailer-add-contact-button" aria-label="Add contact" title="Add contact" disabled aria-disabled="true">
+                                    <button type="button" class="add-speaker-button" id="emailer-add-contact-button" aria-label="Add contact" title="Add contact">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                         </svg>
@@ -12072,9 +12089,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="contact-viewer" id="emailer-contact-viewer" aria-label="Contact viewer">
+                        <div class="contact-viewer contact-viewer--no-selection" id="emailer-contact-viewer" aria-label="Contact viewer">
                             <div class="contact-editor-shell">
-                            <div class="contact-editor" id="contact-editor">
+                            <div class="contact-editor is-empty" id="contact-editor">
                             <div class="edit-contact-top">
                                 <div class="edit-contact-top-spacer" aria-hidden="true"></div>
                                 <div class="selected-contactname-wrap">
@@ -12109,7 +12126,7 @@
                             </div>
                                 </div>
                             </div>
-                            <div class="emailer-editor-bottom">
+                            <div class="emailer-editor-bottom is-showing-bio">
                             <div class="emailer-workflow-nav" role="toolbar" aria-label="Contact editor sections">
                                 <button type="button" class="emailer-workflow-nav-link" id="emailer-display-contact-actions" aria-label="Contact workflow" title="Contact workflow" disabled aria-disabled="true">
                                     <span class="display-editor-actions-text">Workflow</span>
@@ -12148,9 +12165,64 @@
                                     <span class="display-editor-actions-text">Log</span>
                                 </button>
                             </div>
-                            <div class="emailer-editor-bottom-panes"></div>
+                            <div class="emailer-editor-bottom-panes">
+                                <div class="emailer-editor-bio" id="emailer-editor-bio" aria-label="Contact bio">
+                                    <div class="guest-viewer-name-row" role="group" aria-label="Contact name">
+                                        <div class="add-speaker-form-field">
+                                            <label for="add-emailer-contact-first-name">First name</label>
+                                            <input
+                                                type="text"
+                                                id="add-emailer-contact-first-name"
+                                                name="firstName"
+                                                autocomplete="given-name"
+                                                spellcheck="false"
+                                            />
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="add-emailer-contact-last-name">Last name</label>
+                                            <input
+                                                type="text"
+                                                id="add-emailer-contact-last-name"
+                                                name="lastName"
+                                                autocomplete="family-name"
+                                                spellcheck="false"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="add-emailer-contact-email">E-mail</label>
+                                        <input
+                                            type="email"
+                                            id="add-emailer-contact-email"
+                                            name="email"
+                                            autocomplete="email"
+                                            spellcheck="false"
+                                        />
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="add-emailer-contact-category">Category</label>
+                                        <select id="add-emailer-contact-category" name="category" aria-label="Category">
+                                            <option value="">—</option>
+                                            <option value="Potential speaker">Potential speaker</option>
+                                            <option value="Speaker">Speaker</option>
+                                            <option value="Guest">Guest</option>
+                                            <option value="N/A">N/A</option>
+                                        </select>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="add-emailer-contact-notes">Notes</label>
+                                        <textarea
+                                            id="add-emailer-contact-notes"
+                                            name="notes"
+                                            rows="6"
+                                            spellcheck="true"
+                                        ></textarea>
+                                    </div>
+                                </div>
                             </div>
                             </div>
+                            </div>
+                            <p class="contact-editor-empty" id="contact-editor-empty" role="status">Select contact</p>
                             </div>
                         </div>
                     </div>
@@ -12637,6 +12709,9 @@
         var teamRosterInMemory = [];
         let teamEditorBottomPane = 'bio';
         let teamPadlockIsOpen = false;
+        let emailerDraftFormActive = false;
+        let emailerPadlockIsOpen = false;
+        let emailerEditorBottomPane = 'bio';
         var teamFormBaseline = null;
         var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary'];
         var TEAM_LODGING_OPTIONS = ['A', 'B', 'TBD', 'Own'];
@@ -18822,6 +18897,186 @@
             syncTeamRosterSelectionHighlight();
             syncTeamPadlockButtonUi();
             syncTeamEditabilityFromPadlock();
+        }
+
+        function getEmailerEditorBottomEl() {
+            return document.querySelector('#emailer-editor #contact-editor .emailer-editor-bottom');
+        }
+
+        function isEmailerViewerSelectionEmpty() {
+            var panel = document.getElementById('contact-editor');
+            return !panel || panel.classList.contains('is-empty');
+        }
+
+        function updateEditEmailerContactNameHeading() {
+            var firstEl = document.getElementById('emailer-edit-contact-name-first');
+            var lastEl = document.getElementById('emailer-edit-contact-name-last');
+            var firstInput = document.getElementById('add-emailer-contact-first-name');
+            var lastInput = document.getElementById('add-emailer-contact-last-name');
+            if (firstEl) {
+                firstEl.textContent = firstInput ? String(firstInput.value || '').trim() : '';
+            }
+            if (lastEl) {
+                lastEl.textContent = lastInput ? String(lastInput.value || '').trim() : '';
+            }
+        }
+
+        function clearEmailerEditorFormFields() {
+            var first = document.getElementById('add-emailer-contact-first-name');
+            var last = document.getElementById('add-emailer-contact-last-name');
+            var email = document.getElementById('add-emailer-contact-email');
+            var category = document.getElementById('add-emailer-contact-category');
+            var notes = document.getElementById('add-emailer-contact-notes');
+            if (first) first.value = '';
+            if (last) last.value = '';
+            if (email) email.value = '';
+            if (category) category.value = '';
+            if (notes) notes.value = '';
+            updateEditEmailerContactNameHeading();
+        }
+
+        function setEmailerEditorBottomPane(pane) {
+            var nextPane = pane === 'files' || pane === 'log' || pane === 'workflow' ? pane : 'bio';
+            emailerEditorBottomPane = nextPane;
+            var bottom = getEmailerEditorBottomEl();
+            if (bottom) {
+                bottom.classList.toggle('is-showing-bio', nextPane === 'bio');
+                bottom.classList.toggle('is-showing-files', nextPane === 'files');
+                bottom.classList.toggle('is-showing-log', nextPane === 'log');
+                bottom.classList.toggle('is-showing-workflow', nextPane === 'workflow');
+            }
+            syncEmailerEditorToolbar();
+        }
+
+        function syncEmailerPadlockButtonUi() {
+            var padlock = document.getElementById('emailer-editor-padlock-btn');
+            if (!padlock) return;
+            var closedPath =
+                'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+            var openPath =
+                'M18 8h-8V6c0-1.63 1.32-2.95 2.95-2.95 1.28 0 2.39.83 2.8 2h2.1c-.47-2.28-2.49-4-4.9-4C10.24 1.05 8 3.29 8 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z';
+            var svg = padlock.querySelector('svg');
+            var path = svg ? svg.querySelector('path') : null;
+            if (path) path.setAttribute('d', emailerPadlockIsOpen ? openPath : closedPath);
+            padlock.setAttribute(
+                'aria-label',
+                emailerPadlockIsOpen ? 'Lock contact' : 'Unlock contact'
+            );
+            padlock.setAttribute('title', emailerPadlockIsOpen ? 'Lock' : 'Unlock');
+            padlock.setAttribute('aria-pressed', emailerPadlockIsOpen ? 'true' : 'false');
+            var emailerRoot = document.getElementById('emailer-editor');
+            if (emailerRoot) {
+                emailerRoot.classList.toggle('emailer-padlock-unlocked', !!emailerPadlockIsOpen);
+            }
+        }
+
+        function syncEmailerEditabilityFromPadlock() {
+            var panel = document.getElementById('contact-editor');
+            var bio = document.getElementById('emailer-editor-bio');
+            if (!panel || !bio) return;
+            var canEdit = !panel.classList.contains('is-empty') && emailerPadlockIsOpen;
+            bio.querySelectorAll('input:not([type="hidden"]), textarea').forEach(function (el) {
+                if (canEdit) {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('aria-readonly');
+                    el.disabled = false;
+                } else {
+                    el.readOnly = true;
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('aria-readonly', 'true');
+                    el.disabled = false;
+                }
+            });
+            bio.querySelectorAll('select').forEach(function (el) {
+                el.disabled = !canEdit;
+            });
+        }
+
+        function syncEmailerEditorToolbar() {
+            var bioBtn = document.getElementById('emailer-contact-bio-btn');
+            var filesBtn = document.getElementById('emailer-contact-files-btn');
+            var logBtn = document.getElementById('emailer-contact-log-btn');
+            var workflowBtn = document.getElementById('emailer-display-contact-actions');
+            var padlock = document.getElementById('emailer-editor-padlock-btn');
+            var cancelBtn = document.getElementById('emailer-cancel-contact-btn');
+            var pane = emailerEditorBottomPane;
+            var selectionEmpty = isEmailerViewerSelectionEmpty();
+
+            if (bioBtn) {
+                bioBtn.disabled = selectionEmpty || pane === 'bio';
+                bioBtn.setAttribute(
+                    'aria-disabled',
+                    selectionEmpty || pane === 'bio' ? 'true' : 'false'
+                );
+                bioBtn.classList.toggle('is-active', !selectionEmpty && pane === 'bio');
+            }
+            if (filesBtn) {
+                filesBtn.disabled = true;
+                filesBtn.setAttribute('aria-disabled', 'true');
+                filesBtn.classList.remove('is-active');
+            }
+            if (logBtn) {
+                logBtn.disabled = true;
+                logBtn.setAttribute('aria-disabled', 'true');
+                logBtn.classList.remove('is-active');
+            }
+            if (workflowBtn) {
+                workflowBtn.disabled = true;
+                workflowBtn.setAttribute('aria-disabled', 'true');
+                workflowBtn.classList.remove('is-active');
+            }
+            if (padlock) {
+                padlock.disabled = selectionEmpty;
+                padlock.setAttribute('aria-disabled', selectionEmpty ? 'true' : 'false');
+            }
+            if (cancelBtn) {
+                cancelBtn.disabled = selectionEmpty;
+                cancelBtn.setAttribute('aria-disabled', selectionEmpty ? 'true' : 'false');
+            }
+            syncEmailerPadlockButtonUi();
+        }
+
+        function setEmailerViewerEmptyState(isEmpty) {
+            var panel = document.getElementById('contact-editor');
+            var viewer = document.getElementById('emailer-contact-viewer');
+            var emptyEl = document.getElementById('contact-editor-empty');
+            if (panel) {
+                panel.hidden = false;
+                panel.removeAttribute('aria-hidden');
+                panel.classList.toggle('is-empty', !!isEmpty);
+            }
+            if (viewer) viewer.classList.toggle('contact-viewer--no-selection', !!isEmpty);
+            if (emptyEl) {
+                emptyEl.hidden = !isEmpty;
+                emptyEl.setAttribute('aria-hidden', isEmpty ? 'false' : 'true');
+            }
+            if (isEmpty) {
+                emailerDraftFormActive = false;
+                emailerPadlockIsOpen = false;
+                setEmailerEditorBottomPane('bio');
+            }
+            syncEmailerEditorToolbar();
+            syncEmailerEditabilityFromPadlock();
+        }
+
+        function showEmailerDraftForm() {
+            emailerDraftFormActive = true;
+            clearEmailerEditorFormFields();
+            emailerPadlockIsOpen = true;
+            setEmailerViewerEmptyState(false);
+            setEmailerEditorBottomPane('bio');
+            syncEmailerPadlockButtonUi();
+            syncEmailerEditabilityFromPadlock();
+            syncEmailerEditorToolbar();
+            var first = document.getElementById('add-emailer-contact-first-name');
+            if (first) first.focus();
+        }
+
+        function closeEmailerDraftForm() {
+            emailerDraftFormActive = false;
+            emailerPadlockIsOpen = false;
+            clearEmailerEditorFormFields();
+            setEmailerViewerEmptyState(true);
         }
 
         async function fetchTeamMembersFromFirestore(eventName) {
@@ -30806,6 +31061,51 @@
                     }
                 });
             }
+            var addEmailerContactBtn = document.getElementById('emailer-add-contact-button');
+            if (addEmailerContactBtn) {
+                addEmailerContactBtn.addEventListener('click', function () {
+                    if (addEmailerContactBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
+                    showEmailerDraftForm();
+                });
+            }
+            var emailerFormRoot = document.getElementById('emailer-editor-bio');
+            if (emailerFormRoot) {
+                emailerFormRoot.querySelectorAll('input, textarea, select').forEach(function (el) {
+                    el.addEventListener('input', updateEditEmailerContactNameHeading);
+                    el.addEventListener('change', updateEditEmailerContactNameHeading);
+                });
+            }
+            var emailerContactBioBtn = document.getElementById('emailer-contact-bio-btn');
+            if (emailerContactBioBtn) {
+                emailerContactBioBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    if (isEmailerViewerSelectionEmpty()) return;
+                    setEmailerEditorBottomPane('bio');
+                });
+            }
+            var emailerPadlockBtn = document.getElementById('emailer-editor-padlock-btn');
+            if (emailerPadlockBtn) {
+                emailerPadlockBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    if (emailerPadlockBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
+                    emailerPadlockIsOpen = !emailerPadlockIsOpen;
+                    syncEmailerPadlockButtonUi();
+                    syncEmailerEditabilityFromPadlock();
+                });
+            }
+            var emailerCancelBtn = document.getElementById('emailer-cancel-contact-btn');
+            if (emailerCancelBtn) {
+                emailerCancelBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    if (emailerCancelBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
+                    closeEmailerDraftForm();
+                });
+            }
+            setEmailerViewerEmptyState(true);
             var saveTeamToolbarBtn = document.getElementById('save-team-button');
             if (saveTeamToolbarBtn) {
                 saveTeamToolbarBtn.addEventListener('click', function (ev) {
