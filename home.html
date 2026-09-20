@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#003153">
+    <meta name="theme-color" content="#003153" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#003153" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-29EQX26YGX"></script>
     <script>
@@ -26,6 +32,7 @@
     <style>
         /* Critical CSS for above-the-fold content */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #003153; }
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #ffffff; margin: 0; padding: 0; }
         .header { background: #003153; backdrop-filter: none; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); position: fixed; top: 0; width: 100%; z-index: 1000; transition: all 0.3s ease; }
         .navbar { padding: 16px 0; margin-bottom: 0; }
@@ -143,8 +150,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260914-card-shadow-soft" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260914-card-shadow-soft">
+    <link rel="preload" href="styles.css?v=20260920-iphone-chrome-blue" as="style">
+    <link rel="stylesheet" href="styles.css?v=20260920-iphone-chrome-blue">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -932,11 +939,10 @@
                 <div class="footer-section-row">
                     <h3 class="post-title">Social</h3>
                     <div class="hero-social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="https://x.com/TBS_Zermatt" target="_blank" rel="noopener noreferrer" aria-label="TBS Zermatt on X"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/tbszermatt/" target="_blank" rel="noopener noreferrer" aria-label="TBS Zermatt on Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/company/110041640/" target="_blank" rel="noopener noreferrer" aria-label="TBS Zermatt on LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.youtube.com/@TBSZermatt" target="_blank" rel="noopener noreferrer" aria-label="TBS Zermatt on YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div class="footer-section-row footer-section-contact">
@@ -975,6 +981,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20260914-sponsors-title" defer></script>
+    <script src="script.js?v=20260920-mobile-speakers" defer></script>
 </body>
 </html>

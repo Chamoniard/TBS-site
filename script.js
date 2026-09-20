@@ -723,7 +723,7 @@ const HOME_LOAD_POSTER_MAX_MS = 1200;
 /** Never keep the pink loader visible longer than this (failsafe). */
 const HOME_LOADING_FAILSAFE_MS = 15000;
 let homeLoadingFailsafeTimer = null;
-const HOME_LOAD_SPEAKERS_MAX_MS = 8000;
+const HOME_LOAD_SPEAKERS_MAX_MS = 12000;
 const HOME_LOAD_FEED_MAX_MS = 12000;
 
 function firebaseStorageAltMediaUrl(objectPath) {
@@ -3863,6 +3863,7 @@ function runHomeDeferredHydration(homeSection, ctx) {
         revealStuckHomeStageBands(homeSection);
         if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
         wireSliderIndicators();
+        scheduleFitHomeProgrammeCardsToContent();
     };
 
     // Registration copy can finish after unlock — do not block scroll on it.
@@ -5533,17 +5534,19 @@ function homeSpeakerEventFromDoc(d) {
 }
 
 /** True when speaker `event` is identical to history `site-event`. */
-function homeSpeakerDocMatchesHomeEvent(d) {
-    const siteEvent = currentHomeSiteEvent();
+function homeSpeakerDocMatchesHomeEvent(d, eventId) {
+    const siteEvent = String(
+        eventId || currentHomeSiteEvent() || HOME_SITE_EVENT_DEFAULT || ''
+    ).trim();
     if (!siteEvent) return false;
     return homeSpeakerEventFromDoc(d) === siteEvent;
 }
 
 /** True when a speaker `item` doc should appear on the public home carousel (`bioStatus` / `Bio` is Uploaded). */
-function homeSpeakerDocVisibleOnHome(d) {
+function homeSpeakerDocVisibleOnHome(d, eventId) {
     if (!d || typeof d !== 'object') return false;
     if (normalizeHomeSpeakerBioStatus(homeSpeakerBioStatusFromDoc(d)) !== 'Uploaded') return false;
-    return homeSpeakerDocMatchesHomeEvent(d);
+    return homeSpeakerDocMatchesHomeEvent(d, eventId);
 }
 
 function homeSpeakerRowFromFirestoreItem(docId, d) {
@@ -5570,26 +5573,44 @@ function homeSpeakerRowFromFirestoreItem(docId, d) {
     };
 }
 
-async function discoverHomeSpeakerRowIdsViaItemCollectionGroup(db) {
-    try {
-        const snap = await withTimeout(db.collectionGroup('item').get(), 15000, 'Firestore speakers collectionGroup');
-        const ids = [];
-        const seen = Object.create(null);
-        snap.forEach(function (doc) {
-            const parts = String(doc.ref.path || '').split('/');
-            if (parts.length === 4 && parts[0] === 'tbs' && parts[1] === 'Speakers' && parts[2]) {
-                const rowId = parts[2];
-                if (!seen[rowId]) {
-                    seen[rowId] = true;
-                    ids.push(rowId);
-                }
+function homeSpeakerRowIdsFromItemSnapshot(snap) {
+    const ids = [];
+    const seen = Object.create(null);
+    if (!snap) return ids;
+    snap.forEach(function (doc) {
+        const parts = String(doc.ref.path || '').split('/');
+        if (parts.length === 4 && parts[0] === 'tbs' && parts[1] === 'Speakers' && parts[2]) {
+            const rowId = parts[2];
+            if (!seen[rowId]) {
+                seen[rowId] = true;
+                ids.push(rowId);
             }
-        });
-        return ids;
-    } catch (e) {
-        console.warn('discoverHomeSpeakerRowIdsViaItemCollectionGroup:', e);
-        return [];
+        }
+    });
+    return ids;
+}
+
+async function discoverHomeSpeakerRowIdsViaItemCollectionGroup(db, eventId) {
+    const eid = String(eventId || currentHomeSiteEvent() || HOME_SITE_EVENT_DEFAULT || '').trim();
+    const queries = [];
+    if (eid) {
+        queries.push(db.collectionGroup('item').where('event', '==', eid));
+        queries.push(db.collectionGroup('item').where('Event', '==', eid));
     }
+    for (let i = 0; i < queries.length; i++) {
+        try {
+            const snap = await withTimeout(
+                queries[i].get(),
+                8000,
+                'Firestore speakers collectionGroup filtered'
+            );
+            const ids = homeSpeakerRowIdsFromItemSnapshot(snap);
+            if (ids.length) return ids;
+        } catch (e) {
+            console.warn('discoverHomeSpeakerRowIdsViaItemCollectionGroup filtered:', e);
+        }
+    }
+    return [];
 }
 
 function homeSpeakerIdsFromTbsParentData(data) {
@@ -5611,9 +5632,12 @@ function homeSpeakerIdsFromTbsParentData(data) {
  */
 async function fetchHomeSpeakersListFromFirebase(eventId) {
     if (typeof firebase === 'undefined') return [];
-    const cacheKey = eventId || '__tbs_speakers__';
+    const resolvedEventId = String(eventId || currentHomeSiteEvent() || HOME_SITE_EVENT_DEFAULT || '').trim();
+    const cacheKey = resolvedEventId || '__tbs_speakers__';
     const cached = firestoreHomeCache.speakersByEventId.get(cacheKey);
-    if (isFreshFirestoreCacheEntry(cached)) return Array.isArray(cached.value) ? cached.value : [];
+    if (isFreshFirestoreCacheEntry(cached) && Array.isArray(cached.value) && cached.value.length) {
+        return cached.value;
+    }
     if (cached && cached.promise) return cached.promise;
     const promise = (async function () {
     try {
@@ -5626,18 +5650,13 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
         const parentData = parentSnap && parentSnap.exists ? (parentSnap.data() || {}) : {};
         let ids = homeSpeakerIdsFromTbsParentData(parentData);
         if (!ids.length) {
-            ids = await discoverHomeSpeakerRowIdsViaItemCollectionGroup(db);
-            if (ids.length) {
-                try {
-                    await db.collection('tbs').doc('Speakers').set({ speakerIds: ids }, { merge: true });
-                } catch (manifestErr) {
-                    console.warn('fetchHomeSpeakersListFromFirebase manifest update:', manifestErr);
-                }
-            }
+            ids = await discoverHomeSpeakerRowIdsViaItemCollectionGroup(db, resolvedEventId);
         }
-        if (!ids.length) return [];
+        if (!ids.length) {
+            return fetchHomeSpeakersListFromEventSubcollection(resolvedEventId);
+        }
         const list = [];
-        const chunkSize = 12;
+        const chunkSize = 8;
         for (let i = 0; i < ids.length; i += chunkSize) {
             const chunk = ids.slice(i, i + chunkSize);
             const snaps = await Promise.all(
@@ -5645,23 +5664,26 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
                     db.collection('tbs').doc('Speakers').collection(rowId).doc('item').get(),
                     10000,
                     'Firestore tbs/Speakers/{id}/item'
-                ))
+                ).catch(function (itemErr) {
+                    console.warn('fetchHomeSpeakersListFromFirebase item', rowId, itemErr);
+                    return null;
+                }))
             );
             for (let j = 0; j < chunk.length; j++) {
                 const rowId = chunk[j];
                 const docSnap = snaps[j];
                 if (!docSnap || !docSnap.exists) continue;
                 const d = docSnap.data() || {};
-                if (!homeSpeakerDocVisibleOnHome(d)) continue;
+                if (!homeSpeakerDocVisibleOnHome(d, resolvedEventId)) continue;
                 list.push(homeSpeakerRowFromFirestoreItem(rowId, d));
             }
         }
         list.sort(compareHomeSpeakersForSort);
         if (list.length) return list;
-        return fetchHomeSpeakersListFromEventSubcollection(eventId);
+        return fetchHomeSpeakersListFromEventSubcollection(resolvedEventId);
     } catch (e) {
         console.error('fetchHomeSpeakersListFromFirebase', e);
-        return fetchHomeSpeakersListFromEventSubcollection(eventId);
+        return fetchHomeSpeakersListFromEventSubcollection(resolvedEventId);
     }
     })();
     firestoreHomeCache.speakersByEventId.set(cacheKey, {
@@ -5670,12 +5692,13 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
         promise: promise
     });
     const value = await promise;
+    const rows = Array.isArray(value) ? value : [];
     firestoreHomeCache.speakersByEventId.set(cacheKey, {
-        value: Array.isArray(value) ? value : [],
-        fetchedAt: Date.now(),
+        value: rows,
+        fetchedAt: rows.length ? Date.now() : 0,
         promise: null
     });
-    return Array.isArray(value) ? value : [];
+    return rows;
 }
 
 /** Legacy path: `events/{eventId}/speakers` (used when `tbs/Speakers` is empty). */
@@ -5692,7 +5715,7 @@ async function fetchHomeSpeakersListFromEventSubcollection(eventId) {
         const list = [];
         snap.forEach(function (doc) {
             const d = doc.data() || {};
-            if (!homeSpeakerDocVisibleOnHome(d)) return;
+            if (!homeSpeakerDocVisibleOnHome(d, eid)) return;
             list.push(homeSpeakerRowFromFirestoreItem(doc.id, d));
         });
         list.sort(compareHomeSpeakersForSort);
@@ -6379,10 +6402,14 @@ function wireHomeSpeakerCardBioExpandOnce() {
  */
 async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     if (!speakersWrapperEl) return;
-    finalizeHomeSpeakersSection(speakersWrapperEl);
+    speakersWrapperEl.dataset.speakersHydrating = '1';
+    mountHomeSpeakersSkeleton(speakersWrapperEl);
     wireHomeSpeakerCardBioExpandOnce();
     const track = speakersWrapperEl.querySelector('.speakerslider-track');
-    if (!track) return;
+    if (!track) {
+        delete speakersWrapperEl.dataset.speakersHydrating;
+        return;
+    }
     try {
         const eventId = currentHomeSiteEvent();
         const speakersPromise = fetchHomeSpeakersListFromFirebase(eventId);
@@ -6417,7 +6444,12 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
             return;
         }
 
-        const speakers = await speakersPromise;
+        let speakers = await speakersPromise;
+        if (!Array.isArray(speakers) || !speakers.length) {
+            const cacheKey = eventId || '__tbs_speakers__';
+            firestoreHomeCache.speakersByEventId.delete(cacheKey);
+            speakers = await fetchHomeSpeakersListFromFirebase(eventId);
+        }
         speakersWrapperEl._homeSpeakersList = [syntheticInfo].concat(speakers.slice());
         speakers.forEach(function (s, i) {
             appendHomeSpeakerCard(track, s, i + 1);
@@ -6429,6 +6461,7 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
         appendHomeSpeakerinfoCard(track, '');
         padHomeSpeakerTrackToMinCards(track);
     } finally {
+        delete speakersWrapperEl.dataset.speakersHydrating;
         if (track.querySelectorAll(':scope > article.speaker-card').length < HOME_SPEAKER_CAROUSEL_MIN_CARDS) {
             padHomeSpeakerTrackToMinCards(track);
         }
@@ -6448,7 +6481,11 @@ function finalizeHomeSpeakersSection(speakersWrap) {
     speakersWrap.removeAttribute('hidden');
     speakersWrap.setAttribute('aria-hidden', 'false');
     const track = speakersWrap.querySelector('.speakerslider-track');
-    if (track && !track.children.length) {
+    if (
+        track &&
+        !track.children.length &&
+        speakersWrap.dataset.speakersHydrating !== '1'
+    ) {
         padHomeSpeakerTrackToMinCards(track);
     }
     delete speakersWrap.dataset.speakersScrollbarWired;
@@ -6656,7 +6693,16 @@ function fitHomeProgrammeCardsToContent(root) {
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const baseWidth = cards[0].getBoundingClientRect().width;
-    if (!(baseWidth > 0)) return;
+    if (!(baseWidth > 0)) {
+        if (!homeSection._homeCarouselFitRetry) {
+            homeSection._homeCarouselFitRetry = 1;
+            window.requestAnimationFrame(function () {
+                homeSection._homeCarouselFitRetry = 0;
+                fitHomeProgrammeCardsToContent(homeSection);
+            });
+        }
+        return;
+    }
     const ratioHeight = baseWidth * (1920 / 1080);
 
     cards.forEach(function (card) {
@@ -6694,6 +6740,7 @@ function scheduleFitHomeProgrammeCardsToContent() {
 if (typeof window !== 'undefined' && !window.__tbsHomeProgrammeCardFitBound) {
     window.__tbsHomeProgrammeCardFitBound = true;
     window.addEventListener('resize', scheduleFitHomeProgrammeCardsToContent, { passive: true });
+    window.addEventListener('pageshow', scheduleFitHomeProgrammeCardsToContent);
 }
 
 async function hydrateHomeProgrammeSlider(homeSection) {

@@ -58,6 +58,13 @@ html, body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
+}
+
+html {
+    background-color: #003153;
+}
+
+body {
     background-color: #ffffff;
 }
 
@@ -69,6 +76,20 @@ body {
     margin: 0;
     padding: 0;
     transition: opacity 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    html::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: env(safe-area-inset-top, 0px);
+        background-color: #003153;
+        z-index: 2147483000;
+        pointer-events: none;
+    }
 }
 
 h1, h2, h3, h4, h5, h6 {
