@@ -653,18 +653,19 @@ async function sendGmailHtmlMessage(
 }
 
 /**
- * True when guest Read is Yes and Invited is No (invite workflow gate).
+ * True when Invited is Reserve, or when Read is Yes and Invited is No.
  * @param {Record<string, unknown>} data Guest item data.
  * @return {boolean} Whether invite may be sent.
  */
 function guestInviteAllowed(data: Record<string, unknown>): boolean {
   const read = String(
     data.Read ?? data.read ?? data.READ ?? "",
-  ).trim();
+  ).trim().toLowerCase();
   const invited = String(
     data.Invited ?? data.invited ?? "",
-  ).trim();
-  return read === "Yes" && invited === "No";
+  ).trim().toLowerCase();
+  if (invited === "reserve") return true;
+  return read === "yes" && invited === "no";
 }
 
 /**
@@ -1608,7 +1609,7 @@ export const sendGuestInviteHttp = onRequest({
     const data = snap.data() || {};
     if (!guestInviteAllowed(data)) {
       res.status(400).json({
-        error: "Invite is only available when Read is Yes and Invited is No.",
+        error: "Invite is only available when Invited is Reserve, or when Read is Yes and Invited is No.",
       });
       return;
     }

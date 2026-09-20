@@ -285,6 +285,7 @@
         body.backend-page.backend-readonly button.programme-padlock-btn,
         body.backend-page.backend-readonly #add-speaker-button,
         body.backend-page.backend-readonly #add-guest-button,
+        body.backend-page.backend-readonly #emailer-add-contact-button,
         body.backend-page.backend-readonly #add-team-button,
         body.backend-page.backend-readonly #sync-guest-payments-btn,
         body.backend-page.backend-readonly #add-content-button,
@@ -1285,7 +1286,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             align-self: stretch;
             gap: 4px;
             flex: 0 0 auto;
@@ -1613,7 +1614,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             align-self: stretch;
             gap: 4px;
             flex: 0 0 auto;
@@ -2394,6 +2395,7 @@
         #speaker-editor .speaker-editor-toolbar .add-speaker-button:hover:not(:disabled),
         #guest-editor .guests-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guest-editor-toolbar .add-speaker-button:hover:not(:disabled),
+        #emailer-editor .emailer-actions #emailer-add-contact-button:hover:not(:disabled),
         #team-editor .team-actions .add-speaker-button:hover:not(:disabled),
         #content-editor .content-actions .add-content-btn:hover:not(:disabled),
         #lodging-editor .lodging-actions .add-lodging-btn:hover:not(:disabled) {
@@ -3404,9 +3406,16 @@
             cursor: not-allowed;
         }
 
+        #emailer-editor .edit-contact-top button,
         #emailer-editor .emailer-actions .add-speaker-button,
         #emailer-editor .emailer-editor-toolbar .add-speaker-button,
-        #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn {
+        #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn,
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button,
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn,
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             flex: 0 0 auto;
             width: var(--backend-square-btn-size);
             height: var(--backend-square-btn-size);
@@ -3416,12 +3425,25 @@
             max-height: var(--backend-square-btn-size);
             border-radius: var(--backend-icon-btn-radius);
             padding: 0;
+            margin: 0;
+            gap: 0;
+            line-height: 0;
             box-sizing: border-box;
             background: var(--backend-button-yellow);
             border: none;
             box-shadow: var(--backend-button-shadow);
             color: #003153;
             cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-actions #emailer-add-contact-button:not(:disabled) {
+            cursor: pointer;
+        }
+
+        #emailer-editor .edit-contact-top button svg {
+            display: block;
+            flex-shrink: 0;
+            margin: 0;
         }
 
         #emailer-editor .emailer-editor-toolbar {
@@ -3453,18 +3475,10 @@
 
         #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn svg {
             flex-shrink: 0;
+            display: block;
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button {
-            flex: 0 0 var(--backend-square-btn-size);
-            width: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            border-radius: var(--backend-icon-btn-radius);
             background: var(--backend-button-yellow);
             color: #003153;
             font-size: 0;
@@ -3477,20 +3491,6 @@
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 var(--backend-square-btn-size);
-            width: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            gap: 0;
-            border: none;
-            border-radius: var(--backend-icon-btn-radius);
             background: #000000 !important;
             color: #ffffff !important;
             font-size: 1.125rem;
@@ -3502,23 +3502,14 @@
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn span {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             line-height: 1;
             color: #ffffff;
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn {
-            flex: 0 0 var(--backend-square-btn-size);
-            width: var(--backend-square-btn-size);
-            min-width: var(--backend-square-btn-size);
-            max-width: var(--backend-square-btn-size);
-            height: var(--backend-square-btn-size);
-            min-height: var(--backend-square-btn-size);
-            max-height: var(--backend-square-btn-size);
-            padding: 0;
-            gap: 0;
-            border: none;
-            border-radius: var(--backend-icon-btn-radius);
             background: #F71941 !important;
             color: #ffffff !important;
             font-size: 0;
@@ -3557,7 +3548,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             align-self: stretch;
             gap: 4px;
             flex: 0 0 auto;
@@ -3588,14 +3579,39 @@
             font-size: 1rem;
             font-weight: 400;
             line-height: 1.3;
-            color: #9ca3af;
+            color: #3d4852;
             text-decoration: none;
-            cursor: default;
+            cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
             filter: none;
             transform: none;
             opacity: 1;
+        }
+
+        body.backend-page #emailer-editor .emailer-editor-bottom .emailer-workflow-nav-link:disabled {
+            color: #3d4852;
+            cursor: default;
+        }
+
+        body.backend-page #emailer-editor .emailer-editor-bottom .emailer-workflow-nav-link.is-active,
+        body.backend-page #emailer-editor .emailer-editor-bottom .emailer-workflow-nav-link.is-active:disabled {
+            color: #000000;
+            background: transparent;
+            border: none;
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 0.2em;
+        }
+
+        body.backend-page #emailer-editor .contact-editor.is-empty .emailer-editor-bottom .emailer-workflow-nav-link,
+        body.backend-page #emailer-editor .contact-editor.is-empty .emailer-editor-bottom .emailer-workflow-nav-link:disabled,
+        body.backend-page #emailer-editor .contact-editor.is-empty .emailer-editor-bottom .emailer-workflow-nav-link.is-active,
+        body.backend-page #emailer-editor .contact-editor.is-empty .emailer-editor-bottom .emailer-workflow-nav-link.is-active:disabled {
+            color: #9ca3af;
+            font-weight: 400;
+            text-decoration: none;
+            cursor: default;
         }
 
         #emailer-editor .emailer-editor-bottom-panes {
@@ -3614,6 +3630,67 @@
             border-radius: 0;
             padding: 16px;
             box-sizing: border-box;
+        }
+
+        #emailer-editor .emailer-editor-bottom.is-showing-bio .emailer-editor-files,
+        #emailer-editor .emailer-editor-bottom.is-showing-bio .emailer-editor-log {
+            display: none !important;
+        }
+
+        #emailer-editor .emailer-editor-bio {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: 100%;
+            min-height: 0;
+            align-self: stretch;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+
+        #emailer-editor .contact-editor-empty {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border-radius: 8px;
+            background: #cbd5e1;
+            opacity: 0.95;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #emailer-editor .contact-editor-empty[hidden] {
+            display: none !important;
+        }
+
+        #emailer-editor .contact-viewer--no-selection {
+            background: #e2e8f0;
+        }
+
+        #emailer-editor .contact-viewer--no-selection .edit-contact-top,
+        #emailer-editor .contact-viewer--no-selection .emailer-editor-bottom {
+            display: none !important;
         }
 
         .emailer-filter-contacts-btn {
@@ -3935,7 +4012,7 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             align-self: stretch;
             gap: 4px;
             flex: 0 0 auto;
@@ -5899,10 +5976,31 @@
         #guest-editor .guests-list-table tbody tr.guests-roster-blank-row,
         #guest-editor .guests-list-table tbody tr.guests-roster-blank-row:hover,
         #guest-editor .guests-list-table tbody tr.guests-roster-blank-row td,
-        #guest-editor .guests-list-table tbody tr.guests-roster-blank-row:hover td {
+        #guest-editor .guests-list-table tbody tr.guests-roster-blank-row:hover td,
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row,
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row:hover,
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row td,
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row:hover td {
             background: #ffffff;
             cursor: default;
             pointer-events: none;
+        }
+
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row td.guests-roster-section-title-cell {
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+            box-sizing: border-box;
+            vertical-align: middle;
+            border-bottom: 1px solid #cbd5e1;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #000000;
+            text-align: left;
+            text-transform: uppercase;
         }
 
         .speakers-roster-table tbody td,
@@ -7474,6 +7572,8 @@
         #guest-editor .guest-editor-bio > .add-speaker-form-field,
         #guest-editor .guest-editor-bio .guest-viewer-name-row .add-speaker-form-field,
         #guest-editor .guest-editor-profile .add-speaker-form-field,
+        #emailer-editor .emailer-editor-bio > .add-speaker-form-field,
+        #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field,
         #speaker-editor .speaker-editor-bio > .add-speaker-form-field,
         #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field,
         #team-editor .team-editor-bio > .add-speaker-form-field,
@@ -7488,6 +7588,8 @@
         #guest-editor .guest-editor-bio > .add-speaker-form-field > label,
         #guest-editor .guest-editor-bio .guest-viewer-name-row .add-speaker-form-field > label,
         #guest-editor .guest-editor-profile .add-speaker-form-field > label,
+        #emailer-editor .emailer-editor-bio > .add-speaker-form-field > label,
+        #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field > label,
         #speaker-editor .speaker-editor-bio > .add-speaker-form-field > label,
         #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field > label,
         #team-editor .team-editor-bio > .add-speaker-form-field > label,
@@ -7538,6 +7640,9 @@
         #guest-editor .guest-editor-profile textarea,
         #guest-editor .guest-bio-display,
         #guest-editor .guest-clinical-context-display,
+        #emailer-editor .emailer-editor-bio input,
+        #emailer-editor .emailer-editor-bio select,
+        #emailer-editor .emailer-editor-bio textarea,
         #team-editor .team-editor-bio input:not([type="hidden"]),
         #team-editor .team-editor-bio select,
         #content-editor .add-content-form .add-content-form-field input:not([type="hidden"]):not([type="file"]),
@@ -7567,6 +7672,9 @@
         #guest-editor.guest-padlock-unlocked .guest-editor-profile textarea,
         #guest-editor.guest-padlock-unlocked .guest-bio-display,
         #guest-editor.guest-padlock-unlocked .guest-clinical-context-display,
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio input,
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio select,
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio textarea,
         #team-editor.team-padlock-unlocked .team-editor-bio input:not([type="hidden"]),
         #team-editor.team-padlock-unlocked .team-editor-bio select,
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field input:not([type="hidden"]):not([type="file"]),
@@ -7580,6 +7688,8 @@
         #guest-editor .guest-editor-bio input:not([readonly]),
         #guest-editor .guest-bio-display[contenteditable='true'],
         #guest-editor .guest-clinical-context-display[contenteditable='true'],
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio input:not([readonly]),
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio textarea:not([readonly]),
         #team-editor.team-padlock-unlocked .team-editor-bio input:not([type="hidden"]):not([readonly]),
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field input:not([readonly]),
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field textarea:not([readonly]) {
@@ -7590,6 +7700,10 @@
             cursor: pointer;
         }
 
+        #emailer-editor.emailer-padlock-unlocked .emailer-editor-bio select:not(:disabled) {
+            cursor: pointer;
+        }
+
         #speaker-editor .speaker-editor-bio input:focus,
         #speaker-editor .speaker-editor-bio textarea:focus,
         #guest-editor .guest-editor-bio input:focus,
@@ -7597,6 +7711,9 @@
         #guest-editor .guest-editor-profile textarea:focus,
         #guest-editor .guest-bio-display:focus,
         #guest-editor .guest-clinical-context-display:focus,
+        #emailer-editor .emailer-editor-bio input:focus,
+        #emailer-editor .emailer-editor-bio select:focus,
+        #emailer-editor .emailer-editor-bio textarea:focus,
         #team-editor .team-editor-bio input:focus,
         #team-editor .team-editor-bio select:focus,
         #content-editor .add-content-form .add-content-form-field input:focus,
@@ -7604,6 +7721,9 @@
         #speaker-editor .speaker-editor-bio input:focus-visible,
         #speaker-editor .speaker-editor-bio textarea:focus-visible,
         #guest-editor .guest-editor-bio input:focus-visible,
+        #emailer-editor .emailer-editor-bio input:focus-visible,
+        #emailer-editor .emailer-editor-bio select:focus-visible,
+        #emailer-editor .emailer-editor-bio textarea:focus-visible,
         #team-editor .team-editor-bio input:focus-visible,
         #team-editor .team-editor-bio select:focus-visible,
         #content-editor .add-content-form .add-content-form-field input:focus-visible,
@@ -7654,7 +7774,22 @@
             min-width: 0;
         }
 
+        #emailer-editor .contact-viewer .guest-viewer-name-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: stretch;
+            gap: 1rem 1.25rem;
+            width: 100%;
+            min-width: 0;
+        }
+
         #guest-editor .guest-viewer .guest-viewer-name-row > .add-speaker-form-field {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        #emailer-editor .contact-viewer .guest-viewer-name-row > .add-speaker-form-field {
             flex: 1 1 0;
             min-width: 0;
         }
@@ -7745,9 +7880,10 @@
             color: var(--backend-roster-status-ready-color);
         }
 
-        #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-reserve {
-            background: #5c6e72;
-            color: #ffffff;
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-reserve,
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-waitlist-reserve {
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-soldout {
@@ -19984,12 +20120,21 @@
             };
         }
 
+        function guestRosterIsWaitList(g) {
+            return Boolean(g) &&
+                !guestCancelledFieldIsYes(g.cancelled) &&
+                guestInvitedFieldIsReserve(g.invited);
+        }
+
         function guestsRosterSortInPlace() {
             guestsRosterInMemory.sort(function(a, b) {
                 var aCancelled = guestCancelledFieldIsYes(a && a.cancelled);
                 var bCancelled = guestCancelledFieldIsYes(b && b.cancelled);
                 if (aCancelled !== bCancelled) return aCancelled ? 1 : -1;
-                if (!aCancelled) {
+                var aWait = guestRosterIsWaitList(a);
+                var bWait = guestRosterIsWaitList(b);
+                if (aWait !== bWait) return aWait ? 1 : -1;
+                if (!aCancelled && !aWait) {
                     var aEvent = String(a.event || '').trim().toLowerCase();
                     var bEvent = String(b.event || '').trim().toLowerCase();
                     var byEvent = bEvent.localeCompare(aEvent, undefined, { sensitivity: 'base' });
@@ -21744,7 +21889,7 @@
 
         /**
          * From `#invitedisno`: set **Invited** to `Reserve` or `Sold out` and append one **Log** line.
-         * Same gate as invite: Read Yes and Invited No (`guestReadisyesBlockShouldShow`).
+         * Gate: Read Yes and Invited No (`guestReadisyesBlockShouldShow`).
          */
         async function setGuestInvitedFromReadisyesWithLog(docId, invitedValue, logLine) {
             var id = String(docId || '').trim();
@@ -22002,14 +22147,12 @@
         }
 
         /**
-         * Invite allowed only when roster row matches `tbs/Guests/{id}/item` values coalesced into
-         * the same `read` / `invited` strings shown in the guests table: Read exactly "Yes", Invited exactly "No".
+         * Invite allowed when Invited is Reserve, or when Read is Yes and Invited is No.
          */
         function guestInviteAllowedByRosterFields(g) {
             if (!g) return false;
-            var readVal = String(g.read != null ? g.read : '').trim();
-            var invitedVal = String(g.invited != null ? g.invited : '').trim();
-            return readVal === 'Yes' && invitedVal === 'No';
+            if (guestInvitedFieldIsReserve(g.invited)) return true;
+            return guestReadIsYes(g.read) && guestInvitedFieldIsNo(g.invited);
         }
 
         /** Read is the literal select value “No” (case-insensitive). */
@@ -22029,9 +22172,9 @@
             );
         }
 
-        /** `#invitedisno` (Read Yes, Invited No): same gate as **Send e-mail invitation**. */
+        /** `#invitedisno`: Read Yes and Invited No (not the Reserve invite path). */
         function guestReadisyesBlockShouldShow(g) {
-            return guestInviteAllowedByRosterFields(g);
+            return Boolean(g && guestReadIsYes(g.read) && guestInvitedFieldIsNo(g.invited));
         }
 
         /** Invoiced is the literal “No” (case-insensitive), or empty / unset. */
@@ -23398,20 +23541,25 @@
             );
         }
 
-        function guestRosterCancelledSpacerRowHtml() {
+        function guestRosterWaitListPillHtml() {
             return (
-                '<tr class="guests-roster-row guests-roster-blank-row" aria-hidden="true">' +
-                '<td class="guests-roster-name-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
-                '<td class="content-roster-published-cell">&nbsp;</td>' +
-                '<td class="guests-roster-tag-cell">&nbsp;</td>' +
+                '<td class="guests-roster-tag-cell">' +
+                '<span class="content-badge content-badge--guest-waitlist-reserve">Reserve</span></td>'
+            );
+        }
+
+        function guestRosterSectionRowHtml(title) {
+            return (
+                '<tr class="guests-roster-row guests-roster-blank-row guests-roster-section-row">' +
+                '<td class="guests-roster-section-title-cell" colspan="9">' +
+                escapeHtml(title) +
+                '</td>' +
                 '</tr>'
             );
+        }
+
+        function guestRosterBlankRowHtml() {
+            return guestRosterSectionRowHtml('');
         }
 
         function renderGuestsRoster() {
@@ -23477,11 +23625,17 @@
                         '">No guests match the current filter.</td>' +
                         '</tr>';
                 } else {
+                    var waitListSpacerInserted = false;
                     var cancelledSpacerInserted = false;
                     for (var i = 0; i < filteredGuests.length; i++) {
                         var g = filteredGuests[i];
+                        var isWaitList = guestRosterIsWaitList(g);
+                        if (isWaitList && !waitListSpacerInserted) {
+                            html += guestRosterSectionRowHtml('WAIT-LIST');
+                            waitListSpacerInserted = true;
+                        }
                         if (guestCancelledFieldIsYes(g.cancelled) && !cancelledSpacerInserted) {
-                            html += guestRosterCancelledSpacerRowHtml();
+                            html += guestRosterSectionRowHtml('CANCELLED');
                             cancelledSpacerInserted = true;
                         }
                         var guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
@@ -23491,7 +23645,9 @@
                         var isCancelled = guestCancelledFieldIsYes(g.cancelled);
                         var eventBadgeClass = isCancelled
                             ? 'content-badge content-badge--guest-cancelled'
-                            : contentEventBadgeClassForLabel(eventLabel);
+                            : isWaitList
+                                ? 'content-badge content-badge--guest-waitlist-reserve'
+                                : contentEventBadgeClassForLabel(eventLabel);
                         var guestSelected =
                             String(g.id || '').trim() === String(guestFormEditingDocId || '').trim();
                         html +=
@@ -23515,6 +23671,15 @@
                                 guestRosterCancelledPillHtml('Cancel') +
                                 guestRosterCancelledPillHtml('Cancel') +
                                 guestRosterCancelledPillHtml('Cancel');
+                        } else if (isWaitList) {
+                            html +=
+                                guestRosterWaitListPillHtml() +
+                                guestRosterWaitListPillHtml() +
+                                guestRosterWaitListPillHtml() +
+                                guestRosterWaitListPillHtml() +
+                                guestRosterWaitListPillHtml() +
+                                guestRosterWaitListPillHtml() +
+                                guestRosterWaitListPillHtml();
                         } else {
                             html +=
                                 guestRosterReadCellHtml(g.id, g.read) +
@@ -23526,6 +23691,9 @@
                                 guestRosterCmeCellHtml(g.id, g.cmeStatus);
                         }
                         html += '</tr>';
+                    }
+                    if (cancelledSpacerInserted) {
+                        html += guestRosterBlankRowHtml();
                     }
                 }
             }
@@ -26617,6 +26785,36 @@
         }
 
         /**
+         * Live `sendGuestInviteHttp` still requires Read=Yes and Invited=No.
+         * For wait-list invites, briefly match that so the e-mail can send locally
+         * without a functions deploy. Restore on failure.
+         */
+        async function prepareGuestItemForLiveInviteFunction(itemRef, g) {
+            var restore = {};
+            var prep = {};
+            if (guestInvitedFieldIsReserve(g.invited)) {
+                restore.Invited = 'Reserve';
+                prep.Invited = 'No';
+            }
+            if (!guestReadIsYes(g.read)) {
+                restore.Read = g.read != null && String(g.read).trim() !== '' ? g.read : 'No';
+                prep.Read = 'Yes';
+            }
+            if (!Object.keys(prep).length) return null;
+            await itemRef.set(prep, { merge: true });
+            return restore;
+        }
+
+        async function restoreGuestItemAfterFailedLiveInvite(itemRef, restore) {
+            if (!restore || !Object.keys(restore).length) return;
+            try {
+                await itemRef.set(restore, { merge: true });
+            } catch (restoreErr) {
+                console.error('restoreGuestItemAfterFailedLiveInvite:', restoreErr);
+            }
+        }
+
+        /**
          * Send invitation e-mail to the selected guest via Cloud Function
          * `sendGuestInviteHttp` (server Gmail as GMAIL_SEND_FROM).
          * Body from tbs/Pre-sets/Zermatt/Zermatt `Guest invitation` (loaded in the function).
@@ -26624,7 +26822,6 @@
          */
         async function sendGuestInvitationEmail() {
             if (backendBlockIfReadonly()) return;
-            var legacyBtn = document.getElementById('guest-send-invite-btn');
             var legacyBtn = document.getElementById('guest-send-invite-btn');
             var workflowBtn = document.getElementById('guest-workflow-send-invite-btn');
             var id = String(guestFormEditingDocId || '').trim();
@@ -26639,7 +26836,7 @@
             }
             if (!guestInviteAllowedByRosterFields(g)) {
                 if (typeof showStatus === 'function') {
-                    showStatus('error', 'Invite is only available when Read is Yes and Invited is No.');
+                    showStatus('error', 'Invite is only available when Invited is Reserve, or when Read is Yes and Invited is No.');
                 }
                 return;
             }
@@ -26660,7 +26857,10 @@
             if (typeof showStatus === 'function') {
                 showStatus('loading', 'Sending invite...');
             }
+            var itemRef = getFirestore().collection('tbs').doc('Guests').collection(id).doc('item');
+            var liveInviteRestore = null;
             try {
+                liveInviteRestore = await prepareGuestItemForLiveInviteFunction(itemRef, g);
                 var fnUrl =
                     'https://us-central1-' +
                     String(firebaseConfig.projectId || '').trim() +
@@ -26677,6 +26877,8 @@
                     payload = {};
                 }
                 if (!res.ok) {
+                    await restoreGuestItemAfterFailedLiveInvite(itemRef, liveInviteRestore);
+                    liveInviteRestore = null;
                     var errMsg =
                         payload && payload.error
                             ? String(payload.error)
@@ -26706,6 +26908,10 @@
                     var inviteLogLine = guestLogInvitationEmailedLine();
                     g.log = (Array.isArray(g.log) ? g.log.slice() : []).concat([inviteLogLine]);
                 }
+                if (liveInviteRestore && liveInviteRestore.Read !== undefined) {
+                    g.read = 'Yes';
+                }
+                liveInviteRestore = null;
                 renderGuestsRoster();
                 syncGuestSendInviteButton();
                 syncGuestWorkflowSendInviteButton();
@@ -26717,6 +26923,8 @@
                 }
             } catch (err) {
                 console.error('sendGuestInvitationEmail:', err);
+                await restoreGuestItemAfterFailedLiveInvite(itemRef, liveInviteRestore);
+                liveInviteRestore = null;
                 if (typeof showStatus === 'function') {
                     showStatus('error', err && err.message ? err.message : 'Failed to send invitation.');
                 }
