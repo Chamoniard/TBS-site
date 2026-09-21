@@ -313,6 +313,127 @@ async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
 }
 
 /**
+ * HTML from a Pre-sets field that may be a string or `{html|body|HTML}`.
+ * @param {unknown} raw Firestore field value.
+ * @return {string} HTML template string.
+ */
+function presetHtmlFromField(raw: unknown): string {
+  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
+    const obj = raw as Record<string, unknown>;
+    if (obj.html != null) return String(obj.html);
+    if (obj.body != null) return String(obj.body);
+    if (obj.HTML != null) return String(obj.HTML);
+    return "";
+  }
+  return raw != null ? String(raw) : "";
+}
+
+/**
+ * `event_location` from `tbs/Settings/{event}/{event}`.
+ * @param {Firestore} db Firestore instance.
+ * @param {string} eventName Current event label.
+ * @return {Promise<string>} Location id or empty.
+ */
+async function loadEventLocationForEvent(
+  db: Firestore,
+  eventName: string,
+): Promise<string> {
+  const ev = String(eventName || "").trim();
+  if (!ev) return "";
+  const snap = await db
+    .collection("tbs")
+    .doc("Settings")
+    .collection(ev)
+    .doc(ev)
+    .get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  const keys = [
+    "event_location",
+    "eventLocation",
+    "Event location",
+    "Event Location",
+    "EVENT_LOCATION",
+    "Event_location",
+  ];
+  for (const key of keys) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const v = String(data[key] || "").trim();
+      if (v) return v;
+    }
+  }
+  return "";
+}
+
+/**
+ * Guest waiting-list HTML from
+ * tbs/Pre-sets/{event_location}/{event_location}.
+ * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
+ * @return {Promise<string>} HTML template string.
+ */
+async function loadGuestSentToReservesHtml(
+  db: Firestore,
+  location: string,
+): Promise<string> {
+  const loc = String(location || "").trim();
+  if (!loc) return "";
+  const snap = await db
+    .collection("tbs")
+    .doc("Pre-sets")
+    .collection(loc)
+    .doc(loc)
+    .get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  return presetHtmlFromField(data["Guest sent to reserves"]);
+}
+
+/**
+ * First name + last name for waiting-list {{Name}}.
+ * @param {Record<string, unknown>} data Guest item data.
+ * @return {string} Display name.
+ */
+function pickGuestFirstAndLastName(
+  data: Record<string, unknown>,
+): string {
+  const first = String(
+    data.Name ||
+      data.name ||
+      data["First name"] ||
+      data.firstName ||
+      "",
+  ).trim();
+  const last = String(
+    data["Last name"] ||
+      data.lastName ||
+      data.LastName ||
+      "",
+  ).trim();
+  return `${first} ${last}`.trim();
+}
+
+/**
+ * True when Invited is the literal No.
+ * @param {Record<string, unknown>} data Guest item data.
+ * @return {boolean} Whether Send to reserves may run.
+ */
+function guestSentToReservesAllowed(
+  data: Record<string, unknown>,
+): boolean {
+  const invited = String(
+    data.Invited ?? data.invited ?? "",
+  ).trim().toLowerCase();
+  return invited === "no";
+}
+
+/**
+ * Log line after Send to reserves e-mail.
+ * @return {string} e.g. `260921: Sent to reserves.`
+ */
+function guestLogSentToReservesLine(): string {
+  return guestLogPrefixYyMmDd() + ": Sent to reserves.";
+}
+
+/**
  * Load speaker invitation HTML + optional subject from
  * tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation.
  * @param {Firestore} db Firestore instance.
@@ -1685,6 +1806,154 @@ export const sendGuestInviteHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Failed to send invitation.",
+    });
+  }
+});
+
+/**
+ * Guest workflow: send waiting-list HTML from
+ * tbs/Pre-sets/{event_location}/{event_location}
+ * field `Guest sent to reserves` as Registration@…
+ * using server-side Gmail OAuth (refresh token).
+ * Sets Invited=Reserve + log line.
+ * Expects JSON: { guestId }.
+ */
+export const sendGuestToReservesHttp = onRequest({
+  secrets: [
+    gmailSendClientIdParam,
+    gmailSendClientSecretParam,
+    gmailSendRefreshTokenParam,
+    gmailSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const guestId = String(body.guestId || "").trim();
+  if (!guestId) {
+    res.status(400).json({error: "Missing guestId."});
+    return;
+  }
+
+  const fromAddress = String(gmailSendFromParam.value() || "").trim();
+  if (!fromAddress || !fromAddress.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SEND_FROM secret.",
+    });
+    return;
+  }
+
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Guests")
+    .collection(guestId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Guest item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    if (!guestSentToReservesAllowed(data)) {
+      res.status(400).json({
+        error: "Send to reserves is only available when Invited is No.",
+      });
+      return;
+    }
+
+    const email = pickGuestEmail(data);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({error: "Guest has no valid email."});
+      return;
+    }
+
+    const eventLabel = await loadCurrentEventLabel(db);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+
+    const htmlTemplate = await loadGuestSentToReservesHtml(db, location);
+    if (!String(htmlTemplate).trim()) {
+      res.status(500).json({
+        error: "Guest sent to reserves template is empty in " +
+          "tbs/Pre-sets/" + location + "/" + location + ".",
+      });
+      return;
+    }
+
+    const guestName = pickGuestFirstAndLastName(data);
+    const subject = (eventLabel + " - Waiting list")
+      .replace(/[\r\n]/g, " ");
+    const html = String(htmlTemplate)
+      .split("{{Name}}")
+      .join(escapeHtml(guestName))
+      .split("{{Event}}")
+      .join(escapeHtml(eventLabel));
+
+    const accessToken = await refreshGmailSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    const logLine = guestLogSentToReservesLine();
+    await itemRef.set({
+      Invited: "Reserve",
+      Log: FieldValue.arrayUnion(logLine),
+    }, {merge: true});
+
+    logger.info("sendGuestToReservesHttp ok", {
+      guestId,
+      to: email,
+      from: fromAddress,
+      location,
+    });
+
+    res.status(200).json({
+      ok: true,
+      guestId,
+      to: email,
+      from: fromAddress,
+      logLine,
+      message: guestName ?
+        "Waiting-list e-mail sent to " + guestName :
+        "Waiting-list e-mail sent.",
+    });
+  } catch (err) {
+    logger.error("sendGuestToReservesHttp failed", {guestId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send waiting-list e-mail.",
     });
   }
 });

@@ -22671,6 +22671,7 @@
 
         async function sendGuestToReservesFromWorkflow() {
             if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('guest-workflow-send-to-reserves-btn');
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) {
                 if (typeof showStatus === 'function') showStatus('error', 'Select a guest first.');
@@ -22678,51 +22679,82 @@
             }
             var rec = findGuestInMemory(id);
             if (!rec || !siteWaitingListIsYes || !guestInvitedFieldIsNo(rec.invited)) return;
-            var logLine = guestLogSentToReservesLine();
-            var db = getFirestore();
-            var itemRef = db.collection('tbs').doc('Guests').collection(id).doc('item');
-            var snap;
-            try {
-                snap = await itemRef.get();
-            } catch (ge) {
-                console.error('sendGuestToReservesFromWorkflow get:', ge);
+            var toRaw = rec.email != null ? String(rec.email).trim() : '';
+            var emailEl = document.getElementById('edit-guest-email');
+            if (!toRaw && emailEl) toRaw = String(emailEl.value || '').trim();
+            if (!toRaw || /[\r\n]/.test(toRaw) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toRaw)) {
                 if (typeof showStatus === 'function') {
-                    showStatus('error', ge && ge.message ? ge.message : 'Failed to load guest item.');
+                    showStatus('error', 'This guest has no valid E-mail address.');
                 }
                 return;
             }
-            var data = snap.exists ? snap.data() || {} : {};
-            var mergedLog = guestLogFromDoc(data).concat([logLine]);
-            var prevInvited = rec.invited;
-            var prevLog = Array.isArray(rec.log) ? rec.log.slice() : guestLogFromDoc(data).slice();
-            rec.invited = 'Reserve';
-            rec.log = mergedLog.slice();
-            guestsInvitedArmedDocId = '';
-            guestsInvitedDropdownOpenDocId = '';
-            clearGuestsInvitedUiState();
-            clearGuestsReadUiState();
-            clearGuestsInvoicedUiState();
-            renderGuestsRoster();
-            syncGuestWorkflowSendInviteButton();
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending waiting-list e-mail...');
+            }
             try {
-                await itemRef.set({ Invited: 'Reserve', Log: mergedLog }, { merge: true });
-                syncGuestSendInviteButton();
-                syncGuestWorkflowSendInviteButton();
-                syncGuestManagementLogPanel();
-                if (typeof showStatus === 'function') {
-                    showStatus('success', 'Saved to Firebase: Guest set to Reserve.');
+                var fnUrl =
+                    'https://us-central1-' +
+                    String(firebaseConfig.projectId || '').trim() +
+                    '.cloudfunctions.net/sendGuestToReservesHttp';
+                var res = await fetch(fnUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ guestId: id }),
+                });
+                var payload = {};
+                try {
+                    payload = await res.json();
+                } catch (parseErr) {
+                    payload = {};
                 }
-            } catch (err) {
-                console.error('sendGuestToReservesFromWorkflow:', err);
-                rec.invited = prevInvited;
-                rec.log = prevLog;
+                if (!res.ok) {
+                    var errMsg =
+                        payload && payload.error
+                            ? String(payload.error)
+                            : 'Function call failed (' + res.status + ')';
+                    throw new Error(errMsg);
+                }
+                rec.invited = 'Reserve';
+                var logLine =
+                    payload && payload.logLine
+                        ? String(payload.logLine)
+                        : guestLogSentToReservesLine();
+                rec.log = (Array.isArray(rec.log) ? rec.log.slice() : []).concat([logLine]);
+                guestsInvitedArmedDocId = '';
+                guestsInvitedDropdownOpenDocId = '';
+                clearGuestsInvitedUiState();
+                clearGuestsReadUiState();
+                clearGuestsInvoicedUiState();
                 renderGuestsRoster();
                 syncGuestSendInviteButton();
                 syncGuestWorkflowSendInviteButton();
                 syncGuestManagementLogPanel();
+                var first = String(rec.name || '').trim();
+                var last = String(rec.lastName || '').trim();
+                var guestName = (first + ' ' + last).trim();
+                var sentOkMsg =
+                    payload && payload.message
+                        ? String(payload.message)
+                        : guestName
+                          ? 'Waiting-list e-mail sent to ' + guestName
+                          : 'Waiting-list e-mail sent.';
                 if (typeof showStatus === 'function') {
-                    showStatus('error', err && err.message ? err.message : 'Failed to update guest.');
+                    showStatus('success', sentOkMsg);
                 }
+            } catch (err) {
+                console.error('sendGuestToReservesFromWorkflow:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to send guest to reserves.'
+                    );
+                }
+            } finally {
+                syncGuestWorkflowSendToReservesButton();
             }
         }
 
