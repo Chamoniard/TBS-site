@@ -9166,6 +9166,22 @@
             cursor: default;
         }
 
+        #texteditor .texteditor-pane-heading #texteditor-save-btn.is-autosaving,
+        #texteditor .texteditor-pane-heading #texteditor-save-btn.is-autosaving:disabled {
+            opacity: 1;
+            cursor: wait;
+            pointer-events: none;
+            filter: none;
+        }
+
+        #texteditor .texteditor-pane-heading #texteditor-save-btn.is-autosaving > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.85s linear infinite;
+            will-change: transform;
+        }
+
         #texteditor .texteditor-pane-heading #texteditor-sync-btn {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
@@ -11458,12 +11474,12 @@
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
                                     <div class="guest-overwatch-split-row" role="group" aria-label="Paid and not paid">
-                                        <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid guests">
+                                        <div class="guests-paid" id="guests-paid" data-name="guests.paid" aria-label="Paid invoiced or direct-bank guests">
                                             <div class="guests-paid-label">Paid:</div>
                                             <div class="guests-paid-count" id="guests-paid-count" aria-live="polite">0</div>
                                         </div>
                                         <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
-                                        <div class="guests-not-paid" id="guests-not-paid" data-name="guests.not-paid" aria-label="Guests not paid">
+                                        <div class="guests-not-paid" id="guests-not-paid" data-name="guests.not-paid" aria-label="Unpaid invoiced or direct-bank guests">
                                             <div class="guests-not-paid-label">Not paid:</div>
                                             <div class="guests-not-paid-count" id="guests-not-paid-count" aria-live="polite">0</div>
                                         </div>
@@ -16222,7 +16238,12 @@
             return n;
         }
 
-        /** Paid=Yes for Current event. */
+        /** Invoiced=Yes or Direct — the invoices that exist. */
+        function guestHasIssuedInvoice(g) {
+            return guestInvoicedFieldIsYes(g && g.invoiced) || guestInvoicedFieldIsDirect(g && g.invoiced);
+        }
+
+        /** Paid=Yes among invoiced / direct-bank guests for Current event. */
         function countGuestsPaidForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
@@ -16231,6 +16252,7 @@
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
                 if (guestCancelledFieldIsYes(g.cancelled)) continue;
+                if (!guestHasIssuedInvoice(g)) continue;
                 if (guestPaidFieldIsYes(g.paid)) n++;
             }
             return n;
@@ -16278,7 +16300,7 @@
             return n;
         }
 
-        /** Paid=No for Current event. */
+        /** Invoiced / direct-bank guests who are not Paid=Yes for Current event. */
         function countGuestsNotPaidForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
@@ -16287,7 +16309,8 @@
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
                 if (guestCancelledFieldIsYes(g.cancelled)) continue;
-                if (guestPaidFieldIsNo(g.paid)) n++;
+                if (!guestHasIssuedInvoice(g)) continue;
+                if (!guestPaidFieldIsYes(g.paid)) n++;
             }
             return n;
         }
@@ -23828,13 +23851,6 @@
             );
         }
 
-        function guestRosterWaitListPillHtml() {
-            return (
-                '<td class="guests-roster-tag-cell">' +
-                '<span class="content-badge content-badge--guest-waitlist-reserve">Reserve</span></td>'
-            );
-        }
-
         function guestRosterSectionRowHtml(title) {
             return (
                 '<tr class="guests-roster-row guests-roster-blank-row guests-roster-section-row">' +
@@ -23932,9 +23948,7 @@
                         var isCancelled = guestCancelledFieldIsYes(g.cancelled);
                         var eventBadgeClass = isCancelled
                             ? 'content-badge content-badge--guest-cancelled'
-                            : isWaitList
-                                ? 'content-badge content-badge--guest-waitlist-reserve'
-                                : contentEventBadgeClassForLabel(eventLabel);
+                            : contentEventBadgeClassForLabel(eventLabel);
                         var guestSelected =
                             String(g.id || '').trim() === String(guestFormEditingDocId || '').trim();
                         html +=
@@ -23958,15 +23972,6 @@
                                 guestRosterCancelledPillHtml('Cancel') +
                                 guestRosterCancelledPillHtml('Cancel') +
                                 guestRosterCancelledPillHtml('Cancel');
-                        } else if (isWaitList) {
-                            html +=
-                                guestRosterWaitListPillHtml() +
-                                guestRosterWaitListPillHtml() +
-                                guestRosterWaitListPillHtml() +
-                                guestRosterWaitListPillHtml() +
-                                guestRosterWaitListPillHtml() +
-                                guestRosterWaitListPillHtml() +
-                                guestRosterWaitListPillHtml();
                         } else {
                             html +=
                                 guestRosterReadCellHtml(g.id, g.read) +
@@ -24956,6 +24961,10 @@
         var texteditorLastSavedSnapshot = '';
         /** After successful Firestore programme HTML save, show disabled "Saved" until the textarea is edited. */
         var texteditorProgrammeFirebaseSavedUi = false;
+        var texteditorFirebaseAutosaveTimer = null;
+        var texteditorFirebaseSaveInFlight = false;
+        var texteditorFirebaseSavePending = null;
+        var TEXTEDITOR_FIREBASE_AUTOSAVE_MS = 1500;
 
         function texteditorStorageKeyForProgrammeDay(eventId, dateStr) {
             return TBS_TEXTEDITOR_LS_PREFIX + 'event:' + String(eventId || '') + ':programme:' + String(dateStr || '');
@@ -25446,6 +25455,13 @@
                     '</svg>';
             }
             var key = ta.dataset.storageKey || '';
+            if (btn.classList.contains('is-autosaving')) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('title', 'Autosaving');
+                btn.setAttribute('aria-label', 'Autosaving');
+                return;
+            }
             var dirty = Boolean(key && ta.value !== texteditorLastSavedSnapshot);
             if (dirty) {
                 texteditorProgrammeFirebaseSavedUi = false;
@@ -25521,6 +25537,184 @@
                 localStorage.setItem(key, ta.value);
             } catch (err) {
                 console.warn('Text editor autosave:', err);
+            }
+        }
+
+        function texteditorKeyHasFirebaseTarget(key) {
+            var k = String(key || '').trim();
+            if (!k) return false;
+            if (homeSnippetFirestoreSpecForKey(k)) return true;
+            var ep = parseEventProgrammeKey(k);
+            return Boolean(ep && ep.eventId === selectedevent);
+        }
+
+        function cancelTexteditorFirebaseAutosaveTimer() {
+            if (texteditorFirebaseAutosaveTimer) {
+                clearTimeout(texteditorFirebaseAutosaveTimer);
+                texteditorFirebaseAutosaveTimer = null;
+            }
+        }
+
+        function setTexteditorSaveBtnAutosaving(on) {
+            var btn = document.getElementById('texteditor-save-btn');
+            if (!btn) return;
+            btn.classList.toggle('is-autosaving', !!on);
+            if (on) {
+                btn.classList.remove('texteditor-save-btn--saved');
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('title', 'Autosaving');
+                btn.setAttribute('aria-label', 'Autosaving');
+            } else {
+                updateTexteditorSaveButtonState();
+            }
+        }
+
+        function scheduleTexteditorFirebaseAutosave() {
+            if (backenduserIsReadonly) return;
+            var ta = document.getElementById('texteditor-code');
+            if (!ta) return;
+            var key = String(ta.dataset.storageKey || '').trim();
+            if (!texteditorKeyHasFirebaseTarget(key)) return;
+            if (ta.value === texteditorLastSavedSnapshot) return;
+            cancelTexteditorFirebaseAutosaveTimer();
+            texteditorFirebaseAutosaveTimer = setTimeout(function () {
+                texteditorFirebaseAutosaveTimer = null;
+                void saveTexteditorSourceToFirebase({ autosave: true });
+            }, TEXTEDITOR_FIREBASE_AUTOSAVE_MS);
+        }
+
+        function flushTexteditorFirebaseIfDirty() {
+            cancelTexteditorFirebaseAutosaveTimer();
+            var ta = document.getElementById('texteditor-code');
+            if (!ta) return;
+            var key = String(ta.dataset.storageKey || '').trim();
+            if (!key) return;
+            if (ta.value === texteditorLastSavedSnapshot) return;
+            void saveTexteditorSourceToFirebase({
+                autosave: true,
+                key: key,
+                html: ta.value
+            });
+        }
+
+        /**
+         * Write the Pre-sets editor to Firestore.
+         * @param {{ autosave?: boolean, key?: string, html?: string }} opts
+         * @return {Promise<boolean>}
+         */
+        async function saveTexteditorSourceToFirebase(opts) {
+            opts = opts || {};
+            if (backenduserIsReadonly) return false;
+            var ta = document.getElementById('texteditor-code');
+            if (!ta) return false;
+            var key = opts.key != null ? String(opts.key) : String(ta.dataset.storageKey || '');
+            var html = opts.html != null ? opts.html : ta.value;
+            if (!key || !texteditorKeyHasFirebaseTarget(key)) return false;
+            if (opts.key == null && html === texteditorLastSavedSnapshot) return false;
+
+            if (texteditorFirebaseSaveInFlight) {
+                texteditorFirebaseSavePending = {
+                    autosave: !!opts.autosave,
+                    key: key,
+                    html: html
+                };
+                return false;
+            }
+
+            if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
+                html = texteditorPreviewHtmlForProgrammeInfo(html);
+                if (opts.html == null && String(ta.dataset.storageKey || '') === key) {
+                    ta.value = html;
+                }
+            }
+            try {
+                localStorage.setItem(key, html);
+            } catch (err) {
+                console.warn('Text editor save:', err);
+            }
+
+            texteditorFirebaseSaveInFlight = true;
+            setTexteditorSaveBtnAutosaving(true);
+            if (opts.autosave && typeof showStatus === 'function') {
+                showStatus('loading', 'Autosaving');
+            }
+
+            try {
+                var homeSpec = homeSnippetFirestoreSpecForKey(key);
+                if (homeSpec) {
+                    if (homeSpec.target === 'event' && !selectedevent) {
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', 'Select an event before saving this snippet to Firestore.');
+                        }
+                        return false;
+                    }
+                    var dbHome = getFirestore();
+                    var homePayload = {};
+                    homePayload[homeSpec.field] = html;
+                    if (homeSpec.target === 'tbs-snippets') {
+                        await tbsPresetsZermattDocRef(dbHome).set(homePayload, { merge: true });
+                    } else {
+                        await dbHome.collection('events').doc(selectedevent).set(homePayload, { merge: true });
+                    }
+                    if (String(ta.dataset.storageKey || '') === key) {
+                        texteditorLastSavedSnapshot = html;
+                    }
+                    if (!opts.autosave && typeof showStatus === 'function') {
+                        showStatus('success', homeSpec.saveOk);
+                    }
+                    return true;
+                }
+                var ep = parseEventProgrammeKey(key);
+                if (ep && ep.eventId === selectedevent) {
+                    if (programmeState) {
+                        programmeState.htmlDateByDay[ep.dateStr] = html;
+                        programmeState.eventId = ep.eventId;
+                    }
+                    var dbProg = getFirestore();
+                    var nameVal =
+                        programmeState &&
+                        programmeState.nameDateByDay &&
+                        programmeState.nameDateByDay[ep.dateStr] != null &&
+                        String(programmeState.nameDateByDay[ep.dateStr]).trim() !== ''
+                            ? String(programmeState.nameDateByDay[ep.dateStr])
+                            : ep.dateStr;
+                    await tbsProgrammeDayDocRef(dbProg, ep.dateStr).set(
+                        { html: html, name: nameVal },
+                        { merge: true }
+                    );
+                    if (String(ta.dataset.storageKey || '') === key) {
+                        texteditorLastSavedSnapshot = html;
+                        texteditorProgrammeFirebaseSavedUi = true;
+                    }
+                    if (!opts.autosave && typeof showStatus === 'function') {
+                        showStatus('success', 'Programme HTML saved to Firestore.');
+                    }
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error('saveTexteditorSourceToFirebase:', err);
+                if (typeof showStatus === 'function') {
+                    var specErr = homeSnippetFirestoreSpecForKey(key);
+                    showStatus(
+                        'error',
+                        err && err.message
+                            ? err.message
+                            : specErr
+                              ? specErr.saveErr
+                              : 'Failed to save pre-set to Firestore.'
+                    );
+                }
+                return false;
+            } finally {
+                texteditorFirebaseSaveInFlight = false;
+                setTexteditorSaveBtnAutosaving(false);
+                var pending = texteditorFirebaseSavePending;
+                texteditorFirebaseSavePending = null;
+                if (pending && pending.key) {
+                    void saveTexteditorSourceToFirebase(pending);
+                }
             }
         }
 
@@ -25731,6 +25925,7 @@
             var ta = document.getElementById('texteditor-code');
             if (!ta) return;
             texteditorProgrammeFirebaseSavedUi = false;
+            flushTexteditorFirebaseIfDirty();
             if (!opts.forceHtml) {
                 flushTexteditorStorageNow();
             }
@@ -25897,6 +26092,7 @@
                 } catch (err) {
                     console.warn('Text editor save:', err);
                 }
+                scheduleTexteditorFirebaseAutosave();
             });
         }
 
@@ -27455,6 +27651,14 @@
             const isProgramme = panel === 'programme';
             const isLodging = panel === 'lodging';
             const isEmailer = panel === 'emailer';
+            const texteditorSection = document.getElementById('texteditor');
+            const leavingPresets =
+                texteditorSection &&
+                texteditorSection.classList.contains('is-open') &&
+                !isEditor;
+            if (leavingPresets) {
+                flushTexteditorFirebaseIfDirty();
+            }
             const isSpeakers =
                 panel === 'speakers' ||
                 (!isEditor &&
@@ -27466,7 +27670,6 @@
                     !isProgramme &&
                     !isLodging &&
                     !isEmailer);
-            const texteditorSection = document.getElementById('texteditor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
             const teamEditorSection = document.getElementById('team-editor');
@@ -32069,6 +32272,14 @@
                 }
             });
             initTexteditorCodeInputPersistence();
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden') {
+                    flushTexteditorFirebaseIfDirty();
+                }
+            });
+            window.addEventListener('pagehide', function () {
+                flushTexteditorFirebaseIfDirty();
+            });
             var texteditorPadlockBtn = document.getElementById('texteditor-padlock-btn');
             if (texteditorPadlockBtn) {
                 texteditorPadlockBtn.addEventListener('click', function(ev) {
@@ -32089,82 +32300,31 @@
                     var ta = document.getElementById('texteditor-code');
                     var key = ta && ta.dataset.storageKey;
                     if (!ta || !key || texteditorSaveBtn.disabled || !texteditorPadlockIsOpen) return;
-                    if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
-                        ta.value = texteditorPreviewHtmlForProgrammeInfo(ta.value);
-                    }
-                    try {
-                        localStorage.setItem(key, ta.value);
-                    } catch (err) {
-                        console.warn('Text editor save:', err);
+                    if (texteditorSaveBtn.classList.contains('is-autosaving')) return;
+                    cancelTexteditorFirebaseAutosaveTimer();
+                    var saved = await saveTexteditorSourceToFirebase({ autosave: false });
+                    if (saved) {
+                        updateTexteditorSaveButtonState();
                         return;
                     }
-                    var homeSpec = homeSnippetFirestoreSpecForKey(key);
-                    if (homeSpec) {
-                        if (homeSpec.target === 'event' && !selectedevent) {
-                            if (typeof showStatus === 'function') {
-                                showStatus('error', 'Select an event before saving this snippet to Firestore.');
-                            }
-                            return;
-                        }
+                    if (!texteditorKeyHasFirebaseTarget(key)) {
                         try {
-                            const db = getFirestore();
-                            var homePayload = {};
-                            homePayload[homeSpec.field] = ta.value;
-                            if (homeSpec.target === 'tbs-snippets') {
-                                await tbsPresetsZermattDocRef(db).set(homePayload, { merge: true });
-                            } else {
-                                await db.collection('events').doc(selectedevent).set(homePayload, { merge: true });
-                            }
-                        } catch (eHome) {
-                            console.error(eHome);
-                            if (typeof showStatus === 'function') {
-                                showStatus('error', eHome.message || homeSpec.saveErr);
-                            }
+                            localStorage.setItem(key, ta.value);
+                        } catch (err) {
+                            console.warn('Text editor save:', err);
                             return;
                         }
                         texteditorLastSavedSnapshot = ta.value;
                         updateTexteditorSaveButtonState();
-                        if (typeof showStatus === 'function') {
-                            showStatus('success', homeSpec.saveOk);
+                        var day = programmeDayFromTexteditorKey(key);
+                        if (day) {
+                            invalidateIndexProgrammeCache();
+                            if (typeof showStatus === 'function') {
+                                showStatus('success', 'Saved for this site. Reload the homepage to see the programme slider use your HTML.');
+                            }
+                        } else if (typeof showStatus === 'function') {
+                            showStatus('info', 'Saved to browser storage for this activity.');
                         }
-                        return;
-                    }
-                    var ep = parseEventProgrammeKey(key);
-                    if (ep && ep.eventId === selectedevent) {
-                        if (programmeState) {
-                            programmeState.htmlDateByDay[ep.dateStr] = ta.value;
-                            programmeState.eventId = ep.eventId;
-                        }
-                        try {
-                            const db = getFirestore();
-                            var nameVal = (programmeState && programmeState.nameDateByDay && programmeState.nameDateByDay[ep.dateStr] != null && String(programmeState.nameDateByDay[ep.dateStr]).trim() !== '')
-                                ? String(programmeState.nameDateByDay[ep.dateStr])
-                                : ep.dateStr;
-                            await tbsProgrammeDayDocRef(db, ep.dateStr).set({
-                                html: ta.value,
-                                name: nameVal
-                            }, { merge: true });
-                        } catch (e2) {
-                            console.error(e2);
-                            if (typeof showStatus === 'function') showStatus('error', e2.message || 'Failed to save programme HTML.');
-                            return;
-                        }
-                        texteditorLastSavedSnapshot = ta.value;
-                        texteditorProgrammeFirebaseSavedUi = true;
-                        updateTexteditorSaveButtonState();
-                        if (typeof showStatus === 'function') showStatus('success', 'Programme HTML saved to Firestore.');
-                        return;
-                    }
-                    texteditorLastSavedSnapshot = ta.value;
-                    updateTexteditorSaveButtonState();
-                    var day = programmeDayFromTexteditorKey(key);
-                    if (day) {
-                        invalidateIndexProgrammeCache();
-                        if (typeof showStatus === 'function') {
-                            showStatus('success', 'Saved for this site. Reload the homepage to see the programme slider use your HTML.');
-                        }
-                    } else if (typeof showStatus === 'function') {
-                        showStatus('info', 'Saved to browser storage for this activity.');
                     }
                 });
             }
