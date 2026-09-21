@@ -2479,6 +2479,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+            gap: 0.75rem;
             flex: 0 0 auto;
             margin: 0;
             padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
@@ -2495,6 +2496,31 @@
             letter-spacing: 0;
             border-bottom: 1px solid #cbd5e1;
             background: #ffffff;
+        }
+
+        #guest-editor .guest-overwatch-heading {
+            margin: 0;
+            font: inherit;
+            color: inherit;
+            text-transform: inherit;
+            letter-spacing: inherit;
+        }
+
+        #guest-editor .guest-overwatch-bulk-count {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #000000;
+            text-transform: none;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        #guest-editor .guest-overwatch-bulk-count[hidden],
+        #guest-editor .guest-overwatch-body[hidden] {
+            display: none !important;
         }
 
         #guest-editor .guest-overwatch-body {
@@ -4654,7 +4680,7 @@
         }
 
         #content-editor .content-editor-badge-dropdown .content-editor-topic-option.is-selected {
-            background: #fc70d7;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
         }
 
@@ -5260,6 +5286,36 @@
             display: inline-block;
         }
 
+        #guest-editor .guests-list-table .guests-roster-toggle-btn,
+        #guest-editor .guests-list-table .guests-roster-toggle-btn:hover,
+        #guest-editor .guests-list-table .guests-roster-toggle-btn[aria-pressed='false'],
+        #guest-editor .guests-list-table .guests-roster-toggle-btn[aria-pressed='false']:hover {
+            border: none;
+            background: var(--backend-roster-status-no-bg);
+            color: var(--backend-roster-status-no-color);
+        }
+
+        #guest-editor .guests-list-table .guests-roster-toggle-btn[aria-pressed='true'],
+        #guest-editor .guests-list-table .guests-roster-toggle-btn[aria-pressed='true']:hover {
+            border: none;
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
+        }
+
+        #guest-editor .guests-list-table .guests-roster-toggle-btn .content-roster-published-square,
+        #guest-editor .guests-list-table .guests-roster-toggle-btn[aria-pressed='false'] .content-roster-published-square,
+        #guest-editor .guests-list-table .guests-roster-toggle-btn[aria-pressed='true'] .content-roster-published-square {
+            width: auto;
+            height: auto;
+            background: transparent;
+            border: none;
+        }
+
+        #guest-editor .guests-list-table .guests-roster-toggle-btn .content-roster-published-check,
+        #guest-editor .guests-list-table .guests-roster-toggle-btn .content-roster-published-x {
+            color: #ffffff;
+        }
+
         #content-editor .content-edit-date-published-row {
             display: flex;
             flex-direction: row;
@@ -5456,7 +5512,7 @@
 
         /* Topic / Type / Event share `#content-editor .content-badge` chrome; modifiers only set colours. */
         #content-editor .content-badge.content-badge--topic {
-            background: #fc70d7;
+            background: var(--backend-roster-pill-black);
             color: #ffffff;
             white-space: nowrap;
         }
@@ -5467,7 +5523,7 @@
         }
 
         #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic.is-selected {
-            background: #fc70d7 !important;
+            background: var(--backend-roster-pill-black) !important;
             color: #ffffff !important;
         }
 
@@ -5770,16 +5826,113 @@
             min-width: 100%;
         }
 
+        #emailer-editor .contacts-list-table {
+            width: max-content;
+            min-width: max-content;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            table-layout: auto;
+        }
+
+        #emailer-editor .contacts-list-table thead th {
+            text-align: center;
+            padding: 0.25rem var(--backend-table-cell-pad-x);
+            background: #ffffff;
+            color: #000000;
+            font-weight: 500;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            border-bottom: none;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        #emailer-editor .contacts-list-table thead th:nth-child(1) {
+            text-align: left;
+            left: 0;
+            z-index: 3;
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+            box-sizing: border-box;
+        }
+
+        #emailer-editor .contacts-list-table tbody td {
+            padding: var(--backend-roster-row-pad-y) var(--backend-table-cell-pad-x);
+            vertical-align: middle;
+            border-bottom: 1px solid #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        #emailer-editor .contacts-list-table tbody td.guests-roster-name-cell {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background: #ffffff;
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.6;
+        }
+
+        #emailer-editor .contacts-list-table thead th:not(:first-child),
+        #emailer-editor .contacts-list-table tbody td.guests-roster-tag-cell {
+            text-align: center;
+            width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
+            min-width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
+            max-width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #emailer-editor .contacts-roster-row {
+            cursor: pointer;
+            background: #fff;
+        }
+
+        #emailer-editor .contacts-list-table tbody tr:hover td,
+        #emailer-editor .contacts-list-table tbody tr.is-selected td {
+            background: #71C7FE;
+        }
+
+        #emailer-editor .contacts-list-table tbody tr:hover td.guests-roster-name-cell,
+        #emailer-editor .contacts-list-table tbody tr.is-selected td.guests-roster-name-cell {
+            background: #71C7FE;
+        }
+
+        #emailer-editor .contacts-roster-empty {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+
         /* Pack guest columns to the left; headers + pills stay centered in each column. */
         #guest-editor .guests-roster-items,
-        #team-editor .team-roster-items {
+        #team-editor .team-roster-items,
+        #emailer-editor .contacts-roster-items {
             width: max-content;
             min-width: max-content;
             margin-right: auto;
         }
 
         #guest-editor .guests-list-table,
-        #team-editor .team-list-table {
+        #team-editor .team-list-table,
+        #emailer-editor .contacts-list-table {
             width: max-content;
             min-width: max-content;
         }
@@ -5917,6 +6070,87 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        #guest-editor .guests-list-table tbody td.guests-roster-name-cell,
+        #speaker-editor .speakers-roster-table tbody td.speaker-roster-name-cell,
+        #team-editor .team-list-table tbody td.team-roster-name-cell,
+        #emailer-editor .contacts-list-table tbody td.guests-roster-name-cell {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #guest-editor .guests-list-table tbody td.guests-roster-name-cell .roster-name-label,
+        #speaker-editor .speakers-roster-table tbody td.speaker-roster-name-cell .roster-name-label,
+        #team-editor .team-list-table tbody td.team-roster-name-cell .roster-name-label,
+        #emailer-editor .contacts-list-table tbody td.guests-roster-name-cell .roster-name-label {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        body.backend-page #guest-editor .guests-list-table button.roster-name-check-btn,
+        body.backend-page #speaker-editor .speakers-roster-table button.roster-name-check-btn,
+        body.backend-page #team-editor .team-list-table button.roster-name-check-btn,
+        body.backend-page #emailer-editor .contacts-list-table button.roster-name-check-btn {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.125rem;
+            height: 1.125rem;
+            margin: 0;
+            padding: 0;
+            border: 1px solid #4b5568;
+            border-radius: 3px;
+            background: #ffffff;
+            box-shadow: none;
+            color: inherit;
+            font-size: 0;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        body.backend-page #guest-editor .guests-list-table button.roster-name-check-btn:hover,
+        body.backend-page #guest-editor .guests-list-table button.roster-name-check-btn:focus-visible,
+        body.backend-page #speaker-editor .speakers-roster-table button.roster-name-check-btn:hover,
+        body.backend-page #speaker-editor .speakers-roster-table button.roster-name-check-btn:focus-visible,
+        body.backend-page #team-editor .team-list-table button.roster-name-check-btn:hover,
+        body.backend-page #team-editor .team-list-table button.roster-name-check-btn:focus-visible,
+        body.backend-page #emailer-editor .contacts-list-table button.roster-name-check-btn:hover,
+        body.backend-page #emailer-editor .contacts-list-table button.roster-name-check-btn:focus-visible {
+            background: #ffffff;
+            box-shadow: none;
+        }
+
+        body.backend-page #guest-editor .guests-list-table button.roster-name-check-btn:focus-visible,
+        body.backend-page #speaker-editor .speakers-roster-table button.roster-name-check-btn:focus-visible,
+        body.backend-page #team-editor .team-list-table button.roster-name-check-btn:focus-visible,
+        body.backend-page #emailer-editor .contacts-list-table button.roster-name-check-btn:focus-visible {
+            outline: 2px solid #71C7FE;
+            outline-offset: 2px;
+        }
+
+        #guest-editor .guests-list-table .roster-name-check-mark,
+        #speaker-editor .speakers-roster-table .roster-name-check-mark,
+        #team-editor .team-list-table .roster-name-check-mark,
+        #emailer-editor .contacts-list-table .roster-name-check-mark {
+            display: none;
+            color: var(--backend-roster-status-yes-bg);
+            font-size: 0.85rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        body.backend-page #guest-editor .guests-list-table button.roster-name-check-btn[aria-pressed='true'] .roster-name-check-mark,
+        body.backend-page #speaker-editor .speakers-roster-table button.roster-name-check-btn[aria-pressed='true'] .roster-name-check-mark,
+        body.backend-page #team-editor .team-list-table button.roster-name-check-btn[aria-pressed='true'] .roster-name-check-mark,
+        body.backend-page #emailer-editor .contacts-list-table button.roster-name-check-btn[aria-pressed='true'] .roster-name-check-mark {
+            display: block;
         }
 
         #guest-editor .guests-list-table tbody td.guests-roster-name-cell.is-cancelled,
@@ -7624,7 +7858,8 @@
         #emailer-editor .emailer-editor-bio > .add-speaker-form-field > input,
         #emailer-editor .emailer-editor-bio > .add-speaker-form-field > select,
         #emailer-editor .emailer-editor-bio > .add-speaker-form-field > textarea,
-        #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field > input {
+        #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field > input,
+        #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field > select {
             flex: 0 1 auto;
             min-width: 0;
             width: 100%;
@@ -11432,7 +11667,10 @@
                             </div>
                             <p class="guest-editor-empty" id="guest-editor-empty" role="status">Select guest</p>
                             <div class="guest-overwatch" id="guest-overwatch-panel" hidden aria-hidden="true" aria-label="Guest overview">
-                                <h2 class="guest-overwatch-title" id="guest-overwatch-title">Overview</h2>
+                                <div class="guest-overwatch-title" id="guest-overwatch-header">
+                                    <h2 class="guest-overwatch-heading" id="guest-overwatch-title">Overview</h2>
+                                    <p class="guest-overwatch-bulk-count" id="guest-overwatch-bulk-count" hidden aria-hidden="true"></p>
+                                </div>
                                 <div class="guest-overwatch-body" id="guest-overwatch-body">
                                     <div class="guests-registered" id="guests-registered" data-name="guests.registered" aria-label="Registered guests">
                                         <div class="guests-registered-label">Registered:</div>
@@ -12215,15 +12453,23 @@
                                             spellcheck="false"
                                         />
                                     </div>
-                                    <div class="add-speaker-form-field">
-                                        <label for="add-emailer-contact-category">Category</label>
-                                        <select id="add-emailer-contact-category" name="category" aria-label="Category">
-                                            <option value="">—</option>
-                                            <option value="Potential speaker">Potential speaker</option>
-                                            <option value="Speaker">Speaker</option>
-                                            <option value="Guest">Guest</option>
-                                            <option value="N/A">N/A</option>
-                                        </select>
+                                    <div class="guest-viewer-name-row" role="group" aria-label="Contact category and event">
+                                        <div class="add-speaker-form-field">
+                                            <label for="add-emailer-contact-category">Category</label>
+                                            <select id="add-emailer-contact-category" name="category" aria-label="Category">
+                                                <option value="">—</option>
+                                                <option value="Potential speaker">Potential speaker</option>
+                                                <option value="Speaker">Speaker</option>
+                                                <option value="Guest">Guest</option>
+                                                <option value="N/A">N/A</option>
+                                            </select>
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="add-emailer-contact-event">Event</label>
+                                            <select id="add-emailer-contact-event" name="event" aria-label="Event">
+                                                <option value="None">None</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="add-speaker-form-field">
                                         <label for="add-emailer-contact-notes">Notes</label>
@@ -12728,6 +12974,17 @@
         let emailerDraftFormActive = false;
         let emailerPadlockIsOpen = false;
         let emailerEditorBottomPane = 'bio';
+        /** Selected contact id for `#emailer-contact-viewer` (from `tbs/Contacts`). */
+        let emailerFormEditingDocId = '';
+        var contactsRosterInMemory = [];
+        var contactsMemoryLoaded = false;
+        var contactsDirtyDocIds = Object.create(null);
+        var contactsFirebaseAutosaveTimer = null;
+        var contactsFirebaseSaveInFlight = false;
+        var contactsFirebaseSavePending = false;
+        var EMAILER_FIREBASE_AUTOSAVE_MS = 2000;
+        var emailerContactFormBaseline = null;
+        var emailerContactAllevents = [];
         var teamFormBaseline = null;
         var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary'];
         var TEAM_LODGING_OPTIONS = ['A', 'B', 'TBD', 'Own'];
@@ -12781,7 +13038,12 @@
         var teamDirtyDocIds = Object.create(null);
         var teamIdsPendingDelete = Object.create(null);
         var teamSyncTimer = null;
+        var teamPeriodicSyncTimer = null;
         var teamSyncInFlight = false;
+        var TEAM_FIREBASE_DEBOUNCE_MS = 2000;
+        var TEAM_FIREBASE_PERIODIC_MS = 12000;
+        var teamMemoryLoaded = false;
+        var teamMemoryEventName = '';
         var guestDirtyDocIds = Object.create(null);
         var guestSyncTimer = null;
         var guestPeriodicSyncTimer = null;
@@ -12790,6 +13052,8 @@
         var GUEST_FIREBASE_PERIODIC_MS = 12000;
         /** Guests Overwatch overview panel is open in the guest viewer. */
         var guestsOverwatchOpen = false;
+        /** True when overview was opened automatically for two-or-more Selected guests. */
+        var guestsOverwatchOpenedForBulk = false;
         /** Speakers Overwatch overview panel is open in the speaker viewer. */
         var speakersOverwatchOpen = false;
         /** After prev/next guest: open **Guest management** strip if it was visible before navigation. */
@@ -12798,6 +13062,11 @@
         /** Invited column: first click arms badge (pink ring); second opens value dropdown. */
         var guestsInvitedArmedDocId = '';
         var guestsInvitedDropdownOpenDocId = '';
+        /** Session-only name-column checkboxes on the guests roster (not saved). */
+        var guestsRosterNameCheckedIds = Object.create(null);
+        var speakersRosterNameCheckedIds = Object.create(null);
+        var teamRosterNameCheckedIds = Object.create(null);
+        var contactsRosterNameCheckedIds = Object.create(null);
         /** Read column: same two-step interaction as Invited. */
         var guestsReadArmedDocId = '';
         var guestsReadDropdownOpenDocId = '';
@@ -13185,6 +13454,7 @@
             if (Array.isArray(s.speakerLog) && s.speakerLog.length) {
                 payload['Speaker log'] = s.speakerLog.slice();
             }
+            payload.Selected = guestSelectedFieldIsYes(s && s.selected) ? 'Yes' : 'No';
             return payload;
         }
 
@@ -14403,6 +14673,17 @@
             return db.collection('tbs').doc('Team').collection(id).doc('item');
         }
 
+        /** Document `tbs/Contacts` (parent). Each subcollection is one contact. */
+        function tbsContactsParentDocRef(db) {
+            return db.collection('tbs').doc('Contacts');
+        }
+
+        /** Global contact row: `tbs/Contacts/{first last}/item`. */
+        function tbsContactItemRef(db, rowId) {
+            var id = String(rowId || '').trim();
+            return db.collection('tbs').doc('Contacts').collection(id).doc('item');
+        }
+
         function guestPayloadFromRecord(g) {
             if (!g) return {};
             var payload = {
@@ -14422,6 +14703,7 @@
                 Paid: g.paid != null ? String(g.paid) : '',
                 Briefed: g.briefed != null ? String(g.briefed) : '',
                 Attended: g.attended != null ? String(g.attended) : '',
+                Selected: guestSelectedFieldIsYes(g && g.selected) ? 'Yes' : 'No',
                 Log: Array.isArray(g.log) ? g.log.slice() : [],
             };
             if (g.cancelled != null && String(g.cancelled).trim() !== '') {
@@ -16171,7 +16453,8 @@
                     overwatch.classList.add('is-open');
                     overwatch.setAttribute('aria-hidden', 'false');
                 }
-                updateGuestsOverwatchRegisteredCount();
+                applyGuestsBulkActionsChrome();
+                if (!guestsBulkActionsShouldShow()) updateGuestsOverwatchRegisteredCount();
                 var actions = document.getElementById('guest-editor-actions');
                 if (actions) {
                     actions.hidden = true;
@@ -16183,6 +16466,9 @@
                     panel.hidden = false;
                     panel.removeAttribute('hidden');
                     panel.removeAttribute('aria-hidden');
+                    if (String(guestFormEditingDocId || '').trim()) {
+                        panel.classList.remove('is-empty');
+                    }
                 }
                 if (overwatch) {
                     overwatch.hidden = true;
@@ -16197,6 +16483,89 @@
             if (!guestsOverwatchOpen) return;
             guestsOverwatchOpen = false;
             applyGuestsOverwatchUi();
+        }
+
+        function countDisplayedSelectedGuests() {
+            var rows = guestsRosterRowsAfterFilter();
+            var n = 0;
+            for (var i = 0; i < rows.length; i++) {
+                if (guestSelectedFieldIsYes(rows[i] && rows[i].selected)) n += 1;
+            }
+            return n;
+        }
+
+        function guestsBulkActionsShouldShow() {
+            return countDisplayedSelectedGuests() >= 2;
+        }
+
+        function applyGuestsBulkActionsChrome() {
+            var bulk = guestsBulkActionsShouldShow();
+            var n = countDisplayedSelectedGuests();
+            var panel = document.getElementById('guest-overwatch-panel');
+            var titleEl = document.getElementById('guest-overwatch-title');
+            var countEl = document.getElementById('guest-overwatch-bulk-count');
+            var statsBody = document.getElementById('guest-overwatch-body');
+            if (panel) {
+                panel.classList.toggle('is-bulk', bulk);
+                panel.setAttribute('aria-label', bulk ? 'Bulk actions' : 'Guest overview');
+            }
+            if (titleEl) titleEl.textContent = bulk ? 'BULK ACTIONS' : 'Overview';
+            if (countEl) {
+                countEl.hidden = !bulk;
+                countEl.setAttribute('aria-hidden', bulk ? 'false' : 'true');
+                countEl.textContent = bulk ? 'n=' + n : '';
+            }
+            if (statsBody) {
+                statsBody.hidden = bulk;
+                statsBody.setAttribute('aria-hidden', bulk ? 'true' : 'false');
+            }
+        }
+
+        function restoreGuestEditorAfterBulkOverwatch() {
+            var id = String(guestFormEditingDocId || '').trim();
+            var rec = id ? findGuestInMemory(id) : null;
+            if (!rec) {
+                setGuestEditorEmptyState(true);
+                return;
+            }
+            var pane = guestEditorBottomPane || 'management';
+            setGuestEditorEmptyState(false);
+            updateEditGuestNameHeading();
+            updateGuestEditorProfileFields(rec);
+            syncGuestRosterSelectionHighlight();
+            updateGuestNavButtons();
+            syncGuestSendInviteButton();
+            syncGuestPadlockButtonUi();
+            syncGuestEditabilityFromPadlock();
+            syncGuestWorkflowAppliedButton();
+            refreshGuestWorkflowButtonsForPadlock();
+            syncGuestApplicationActionButtons();
+            syncGuestInvoicedisnoBlock();
+            syncGuestManagementLogPanel();
+            updateAddGuestDeleteButtonState();
+            setGuestEditorBottomPane(pane);
+        }
+
+        function syncGuestsBulkActionsView() {
+            var bulk = guestsBulkActionsShouldShow();
+            if (bulk) {
+                if (!guestsOverwatchOpen) {
+                    guestsOverwatchOpenedForBulk = true;
+                    guestsOverwatchOpen = true;
+                    applyGuestsOverwatchUi();
+                    return;
+                }
+                applyGuestsBulkActionsChrome();
+                return;
+            }
+            applyGuestsBulkActionsChrome();
+            if (guestsOverwatchOpenedForBulk) {
+                guestsOverwatchOpenedForBulk = false;
+                closeGuestsOverwatch();
+                restoreGuestEditorAfterBulkOverwatch();
+                return;
+            }
+            if (guestsOverwatchOpen) updateGuestsOverwatchRegisteredCount();
         }
 
         /** Count of guests in memory for Current event (roster is already event-filtered). */
@@ -16360,6 +16729,7 @@
                 }
             }
             guestsOverwatchOpen = true;
+            guestsOverwatchOpenedForBulk = false;
             clearGuestRosterItemSelection();
             clearGuestEditorForm();
             applyGuestsOverwatchUi();
@@ -16559,7 +16929,8 @@
                 travel: 'No',
                 cme: 'No',
                 refunded: 'No',
-                speakerLog: []
+                speakerLog: [],
+                selected: 'No'
             };
         }
 
@@ -17308,6 +17679,7 @@
                     speakerCoalesceStringField(d, ['Expenses', 'refunded', 'Refunded']) || 'No'
                 ),
                 speakerLog: speakerLogFromDoc(d),
+                selected: guestSelectedFromDoc(d),
             };
         }
 
@@ -17886,6 +18258,7 @@
                         coalesceFirestoreFieldValue(d, ['lodging', 'Lodging'])
                     )
                 ),
+                selected: guestSelectedFromDoc(d),
             };
         }
 
@@ -18026,7 +18399,10 @@
                             escapeHtml(m.id) +
                             '">' +
                             '<td class="team-roster-name-cell">' +
+                            teamRosterNameCheckHtml(m.id) +
+                            '<span class="roster-name-label">' +
                             (nameLabel ? escapeHtml(nameLabel) : '&nbsp;') +
+                            '</span>' +
                             '</td>' +
                             '<td class="team-roster-tag-cell">' +
                             teamRosterGreenPillHtml(eventLabel) +
@@ -18211,8 +18587,8 @@
             }
             teamSyncTimer = setTimeout(function () {
                 teamSyncTimer = null;
-                void flushTeamToFirebase();
-            }, 0);
+                void flushTeamToFirebase({ silent: true });
+            }, TEAM_FIREBASE_DEBOUNCE_MS);
         }
 
         async function waitWhileTeamSyncInFlight() {
@@ -18225,8 +18601,18 @@
             }
         }
 
-        async function flushTeamToFirebase() {
+        async function flushTeamToFirebase(opts) {
             if (backenduserIsReadonly) return false;
+            opts = opts || {};
+            if (teamSyncTimer) {
+                clearTimeout(teamSyncTimer);
+                teamSyncTimer = null;
+            }
+            var editingId = String(teamFormEditingDocId || '').trim();
+            if (editingId) {
+                var editingRec = findTeamInMemory(editingId);
+                if (editingRec) readTeamFormIntoRecord(editingRec);
+            }
             var ids = Object.keys(teamDirtyDocIds);
             if (!ids.length) return true;
             if (teamSyncInFlight) {
@@ -18234,7 +18620,12 @@
                 return true;
             }
             teamSyncInFlight = true;
+            var syncedIds = [];
             try {
+                var db = getFirestore();
+                var batch = db.batch();
+                var FV = firebase.firestore.FieldValue;
+                var createdCount = 0;
                 for (var i = 0; i < ids.length; i++) {
                     var id = ids[i];
                     if (teamIdsPendingDelete[id]) {
@@ -18246,24 +18637,41 @@
                         delete teamDirtyDocIds[id];
                         continue;
                     }
-                    var saved = await saveTeamMemberToFirebase(rec);
-                    if (!saved) continue;
-                    delete teamDirtyDocIds[id];
-                    var created = !!rec.pendingNewTeamCreatedNotice;
-                    rec.pendingNewTeamCreatedNotice = false;
-                    teamDraftFormActive = false;
-                    if (String(teamFormEditingDocId || '') === String(rec.id || '')) {
+                    batch.set(tbsTeamItemRef(db, id), teamPayloadFromRecord(rec), { merge: true });
+                    syncedIds.push(id);
+                    if (rec.pendingNewTeamCreatedNotice) createdCount += 1;
+                }
+                if (!syncedIds.length) return true;
+                batch.set(
+                    tbsTeamParentDocRef(db),
+                    { teamIds: FV.arrayUnion.apply(FV, syncedIds) },
+                    { merge: true }
+                );
+                await batch.commit();
+                for (var w = 0; w < syncedIds.length; w++) {
+                    var sid = syncedIds[w];
+                    delete teamDirtyDocIds[sid];
+                    var savedRec = findTeamInMemory(sid);
+                    if (savedRec) savedRec.pendingNewTeamCreatedNotice = false;
+                    if (String(teamFormEditingDocId || '') === String(sid)) {
+                        teamDraftFormActive = false;
                         captureTeamFormBaseline();
                     }
-                    if (created && typeof showStatus === 'function') {
-                        showStatus('success', 'New team member created');
-                    }
+                }
+                if (createdCount && typeof showStatus === 'function') {
+                    showStatus(
+                        'success',
+                        createdCount === 1 ? 'New team member created' : 'New team members created'
+                    );
+                } else if (typeof showStatus === 'function' && !opts.silent) {
+                    showStatus('success', 'Team saved to Firebase.');
                 }
                 updateSaveTeamToolbarButtonState();
                 updateAddTeamDeleteButtonState();
                 return true;
             } catch (err) {
                 console.error('flushTeamToFirebase:', err);
+                for (var j = 0; j < syncedIds.length; j++) markTeamDocDirty(syncedIds[j]);
                 if (typeof showStatus === 'function') {
                     showStatus('error', err.message || 'Failed to save team member.');
                 }
@@ -18272,6 +18680,47 @@
                 teamSyncInFlight = false;
                 if (Object.keys(teamDirtyDocIds).length) scheduleTeamFirebaseSync();
             }
+        }
+
+        function flushTeamFirebaseIfDirty() {
+            if (teamSyncTimer) {
+                clearTimeout(teamSyncTimer);
+                teamSyncTimer = null;
+            }
+            var id = String(teamFormEditingDocId || '').trim();
+            if (id) {
+                var rec = findTeamInMemory(id);
+                if (rec) {
+                    readTeamFormIntoRecord(rec);
+                    markTeamDocDirty(id);
+                }
+            }
+            void flushTeamToFirebase({ silent: true });
+        }
+
+        function syncTeamFormToMemoryIfEditing() {
+            if (teamDraftFormActive && teamEditorRequiredFieldsMet()) {
+                ensureTeamDraftRecordReadyForAutosave();
+                var draftId = String(teamFormEditingDocId || '').trim();
+                if (draftId) {
+                    markTeamDocDirty(draftId);
+                    scheduleTeamFirebaseSync();
+                }
+                return;
+            }
+            var id = String(teamFormEditingDocId || '').trim();
+            if (!id) return;
+            var rec = findTeamInMemory(id);
+            if (!rec) return;
+            var changed = teamFormChangedFromBaseline();
+            readTeamFormIntoRecord(rec);
+            if (!changed) return;
+            markTeamDocDirty(id);
+            teamRosterInMemory.sort(compareTeamMembers);
+            renderTeamTable(teamRosterInMemory, teamRosterRenderRowCount(), '');
+            scheduleTeamFirebaseSync();
+            updateSaveTeamToolbarButtonState();
+            updateAddTeamDeleteButtonState();
         }
 
         function readTeamFormSnapshot() {
@@ -18522,6 +18971,7 @@
                 lodging: rec.lodging != null ? String(rec.lodging) : '',
                 email: rec.email != null ? String(rec.email) : '',
                 event: String(current_event || '').trim(),
+                Selected: guestSelectedFieldIsYes(rec && rec.selected) ? 'Yes' : 'No',
             };
         }
 
@@ -18536,6 +18986,7 @@
                 nationality: snap.nationality,
                 lodging: snap.lodging,
                 event: String(current_event || '').trim(),
+                selected: 'No',
                 pendingNewTeamCreatedNotice: true,
             };
         }
@@ -18656,30 +19107,7 @@
         }
 
         async function persistOpenTeamToFirebaseIfNeeded() {
-            var editingId = String(teamFormEditingDocId || '').trim();
-            if (!editingId) {
-                if (
-                    teamDraftFormActive &&
-                    teamEditorRequiredFieldsMet() &&
-                    teamFormChangedFromBaseline()
-                ) {
-                    await saveTeamFromEditor();
-                }
-                return true;
-            }
-            if (!teamEditorRequiredFieldsMet() || !teamFormChangedFromBaseline()) return true;
-            var rec = findTeamInMemory(editingId);
-            if (!rec) return true;
-            readTeamFormIntoRecord(rec);
-            var saved = await saveTeamMemberToFirebase(rec);
-            if (!saved) return false;
-            delete teamDirtyDocIds[editingId];
-            rec.pendingNewTeamCreatedNotice = false;
-            teamDraftFormActive = false;
-            captureTeamFormBaseline();
-            if (typeof showStatus === 'function') {
-                showStatus('success', 'Saved selected team member to Firebase.');
-            }
+            syncTeamFormToMemoryIfEditing();
             return true;
         }
 
@@ -18708,10 +19136,10 @@
                 }
                 readTeamFormIntoRecord(rec);
                 rec.event = String(current_event || '').trim();
-                var saved = await saveTeamMemberToFirebase(rec);
-                if (!saved) throw new Error('Could not save team member to Firebase.');
-                delete teamDirtyDocIds[String(rec.id || '').trim()];
                 var created = !!rec.pendingNewTeamCreatedNotice;
+                markTeamDocDirty(rec.id);
+                var saved = await flushTeamToFirebase({ silent: true });
+                if (!saved) throw new Error('Could not save team member to Firebase.');
                 rec.pendingNewTeamCreatedNotice = false;
                 teamDraftFormActive = false;
                 teamRosterInMemory.sort(compareTeamMembers);
@@ -18949,11 +19377,13 @@
             var last = document.getElementById('add-emailer-contact-last-name');
             var email = document.getElementById('add-emailer-contact-email');
             var category = document.getElementById('add-emailer-contact-category');
+            var eventEl = document.getElementById('add-emailer-contact-event');
             var notes = document.getElementById('add-emailer-contact-notes');
             if (first) first.value = '';
             if (last) last.value = '';
             if (email) email.value = '';
             if (category) category.value = '';
+            fillEmailerContactEventSelect('None');
             if (notes) notes.value = '';
             updateEditEmailerContactNameHeading();
         }
@@ -19084,22 +19514,676 @@
 
         function showEmailerDraftForm() {
             emailerDraftFormActive = true;
+            emailerFormEditingDocId = '';
             clearEmailerEditorFormFields();
+            captureEmailerContactFormBaseline();
             emailerPadlockIsOpen = true;
             setEmailerViewerEmptyState(false);
             setEmailerEditorBottomPane('bio');
             syncEmailerPadlockButtonUi();
             syncEmailerEditabilityFromPadlock();
             syncEmailerEditorToolbar();
+            updateSaveEmailerContactButtonState();
+            void refreshEmailerContactEventOptions('None');
             var first = document.getElementById('add-emailer-contact-first-name');
             if (first) first.focus();
         }
 
         function closeEmailerDraftForm() {
             emailerDraftFormActive = false;
+            emailerFormEditingDocId = '';
             emailerPadlockIsOpen = false;
             clearEmailerEditorFormFields();
+            captureEmailerContactFormBaseline();
             setEmailerViewerEmptyState(true);
+            updateSaveEmailerContactButtonState();
+            renderContactsTable();
+        }
+
+        function emailerContactEventSelectValue() {
+            var el = document.getElementById('add-emailer-contact-event');
+            var v = el ? String(el.value || '').trim() : '';
+            return v || 'None';
+        }
+
+        function fillEmailerContactEventSelect(selected) {
+            var el = document.getElementById('add-emailer-contact-event');
+            if (!el) return;
+            var want = String(selected != null ? selected : '').trim() || 'None';
+            var seen = Object.create(null);
+            var opts = ['None'];
+            seen.none = true;
+            (emailerContactAllevents || []).forEach(function (raw) {
+                var label = String(raw || '').trim();
+                if (!label) return;
+                var key = label.toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                opts.push(label);
+            });
+            if (want && !seen[want.toLowerCase()]) opts.push(want);
+            var html = '';
+            for (var i = 0; i < opts.length; i++) {
+                html +=
+                    '<option value="' +
+                    escapeHtml(opts[i]) +
+                    '">' +
+                    escapeHtml(opts[i]) +
+                    '</option>';
+            }
+            el.innerHTML = html;
+            el.value = want;
+            if (el.value !== want) el.value = 'None';
+        }
+
+        async function refreshEmailerContactEventOptions(selected) {
+            var keep = selected != null ? selected : emailerContactEventSelectValue();
+            try {
+                var db = getFirestore();
+                emailerContactAllevents = await loadAlleventsFromTbsSettings(db);
+            } catch (err) {
+                console.warn('refreshEmailerContactEventOptions:', err);
+            }
+            fillEmailerContactEventSelect(keep);
+        }
+
+        function contactSubcollectionIdFromNames(first, last) {
+            var a = String(first || '').trim().replace(/\s+/g, ' ');
+            var b = String(last || '').trim().replace(/\s+/g, ' ');
+            var id = (a + ' ' + b).trim().replace(/\s+/g, ' ').replace(/\//g, '-');
+            if (id === '.' || id === '..') return '';
+            return id;
+        }
+
+        function emailerContactRequiredFieldsMet() {
+            var first = document.getElementById('add-emailer-contact-first-name');
+            var last = document.getElementById('add-emailer-contact-last-name');
+            var email = document.getElementById('add-emailer-contact-email');
+            return Boolean(
+                first &&
+                    last &&
+                    email &&
+                    String(first.value || '').trim() &&
+                    String(last.value || '').trim() &&
+                    String(email.value || '').trim()
+            );
+        }
+
+        function readEmailerContactFormSnapshot() {
+            var first = document.getElementById('add-emailer-contact-first-name');
+            var last = document.getElementById('add-emailer-contact-last-name');
+            var email = document.getElementById('add-emailer-contact-email');
+            var category = document.getElementById('add-emailer-contact-category');
+            var notes = document.getElementById('add-emailer-contact-notes');
+            return {
+                firstName: first ? String(first.value || '') : '',
+                lastName: last ? String(last.value || '') : '',
+                email: email ? String(email.value || '') : '',
+                category: category ? String(category.value || '') : '',
+                event: emailerContactEventSelectValue(),
+                notes: notes ? String(notes.value || '') : '',
+            };
+        }
+
+        function captureEmailerContactFormBaseline() {
+            emailerContactFormBaseline = readEmailerContactFormSnapshot();
+        }
+
+        function emailerContactFormChangedFromBaseline() {
+            if (!emailerContactFormBaseline) return false;
+            var current = readEmailerContactFormSnapshot();
+            return (
+                current.firstName !== emailerContactFormBaseline.firstName ||
+                current.lastName !== emailerContactFormBaseline.lastName ||
+                current.email !== emailerContactFormBaseline.email ||
+                current.category !== emailerContactFormBaseline.category ||
+                current.event !== emailerContactFormBaseline.event ||
+                current.notes !== emailerContactFormBaseline.notes
+            );
+        }
+
+        function readEmailerFormIntoRecord(rec) {
+            if (!rec) return;
+            var snap = readEmailerContactFormSnapshot();
+            rec.firstName = snap.firstName;
+            rec.lastName = snap.lastName;
+            rec.email = snap.email;
+            rec.category = snap.category;
+            rec.event = snap.event;
+            rec.notes = snap.notes;
+        }
+
+        function contactPayloadFromRecord(rec) {
+            rec = rec || {};
+            return {
+                first_name: rec.firstName != null ? String(rec.firstName) : '',
+                last_name: rec.lastName != null ? String(rec.lastName) : '',
+                'e-mail': rec.email != null ? String(rec.email) : '',
+                category: rec.category != null ? String(rec.category) : '',
+                event: rec.event != null && String(rec.event).trim() ? String(rec.event).trim() : 'None',
+                notes: rec.notes != null ? String(rec.notes) : '',
+                Selected: guestSelectedFieldIsYes(rec && rec.selected) ? 'Yes' : 'No',
+            };
+        }
+
+        function contactRecordFromDoc(docId, d) {
+            d = d || {};
+            return {
+                id: String(docId || '').trim(),
+                firstName: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['first_name', 'firstName', 'First name', 'firstname'])
+                ),
+                lastName: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['last_name', 'lastName', 'Last name', 'lastname'])
+                ),
+                email: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['e-mail', 'E-mail', 'email', 'Email'])
+                ),
+                category: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['category', 'Category'])
+                ),
+                event: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['event', 'Event'])
+                ) || 'None',
+                notes: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['notes', 'Notes'])
+                ),
+                selected: guestSelectedFromDoc(d),
+            };
+        }
+
+        function compareContacts(a, b) {
+            var fa = String(a && a.firstName ? a.firstName : '').trim().toLowerCase();
+            var fb = String(b && b.firstName ? b.firstName : '').trim().toLowerCase();
+            var c = fa.localeCompare(fb);
+            if (c !== 0) return c;
+            var la = String(a && a.lastName ? a.lastName : '').trim().toLowerCase();
+            var lb = String(b && b.lastName ? b.lastName : '').trim().toLowerCase();
+            c = la.localeCompare(lb);
+            if (c !== 0) return c;
+            return String(a && a.id ? a.id : '').localeCompare(String(b && b.id ? b.id : ''));
+        }
+
+        function findContactInMemory(docId) {
+            var id = String(docId || '').trim();
+            if (!id) return null;
+            for (var i = 0; i < contactsRosterInMemory.length; i++) {
+                if (String(contactsRosterInMemory[i].id || '') === id) return contactsRosterInMemory[i];
+            }
+            return null;
+        }
+
+        function markContactDocDirty(docId) {
+            var id = String(docId || '').trim();
+            if (id) contactsDirtyDocIds[id] = true;
+        }
+
+        function cancelEmailerFirebaseAutosaveTimer() {
+            if (contactsFirebaseAutosaveTimer) {
+                clearTimeout(contactsFirebaseAutosaveTimer);
+                contactsFirebaseAutosaveTimer = null;
+            }
+        }
+
+        function scheduleEmailerFirebaseAutosave() {
+            if (backenduserIsReadonly) return;
+            cancelEmailerFirebaseAutosaveTimer();
+            contactsFirebaseAutosaveTimer = setTimeout(function () {
+                contactsFirebaseAutosaveTimer = null;
+                void flushEmailerContactsToFirebase();
+            }, EMAILER_FIREBASE_AUTOSAVE_MS);
+        }
+
+        function updateSaveEmailerContactButtonState() {
+            var btn = document.getElementById('emailer-save-contact-button');
+            if (!btn) return;
+            var hasEditorContext =
+                emailerDraftFormActive || String(emailerFormEditingDocId || '').trim() !== '';
+            var active =
+                !isEmailerViewerSelectionEmpty() &&
+                hasEditorContext &&
+                emailerContactRequiredFieldsMet() &&
+                emailerContactFormChangedFromBaseline();
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+        }
+
+        function clearEmailerRosterItemSelection() {
+            var root = document.getElementById('contacts-roster-items');
+            if (!root) return;
+            root.querySelectorAll('.contacts-roster-row.is-selected').forEach(function (n) {
+                n.classList.remove('is-selected');
+            });
+        }
+
+        function syncEmailerRosterSelectionHighlight() {
+            var root = document.getElementById('contacts-roster-items');
+            if (!root) return;
+            clearEmailerRosterItemSelection();
+            var selId = String(emailerFormEditingDocId || '').trim();
+            if (!selId) return;
+            var rows = root.querySelectorAll('.contacts-roster-row');
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].getAttribute('data-contact-id') === selId) {
+                    rows[i].classList.add('is-selected');
+                    break;
+                }
+            }
+        }
+
+        function renderContactsTable() {
+            var itemsEl = document.getElementById('contacts-roster-items');
+            if (!itemsEl) return;
+            contactsRosterInMemory = (contactsRosterInMemory || []).filter(function (m) {
+                return m && String(m.id || '').trim();
+            });
+            contactsRosterInMemory.sort(compareContacts);
+            var html =
+                '<table class="contacts-list-table" role="grid" aria-label="Contacts">' +
+                '<thead><tr>' +
+                '<th scope="col">Name</th>' +
+                '<th scope="col">Category</th>' +
+                '<th scope="col">Event</th>' +
+                '<th scope="col">E-mail</th>' +
+                '</tr></thead><tbody>';
+            if (!contactsRosterInMemory.length) {
+                html +=
+                    '<tr class="contacts-roster-row">' +
+                    '<td class="contacts-roster-empty" colspan="4">No contacts yet.</td></tr>';
+            } else {
+                for (var i = 0; i < contactsRosterInMemory.length; i++) {
+                    var m = contactsRosterInMemory[i];
+                    var nameLabel = (
+                        String(m.firstName || '').trim() +
+                        ' ' +
+                        String(m.lastName || '').trim()
+                    ).trim();
+                    html +=
+                        '<tr class="contacts-roster-row" data-contact-id="' +
+                        escapeHtml(m.id) +
+                        '">' +
+                        '<td class="guests-roster-name-cell">' +
+                        contactRosterNameCheckHtml(m.id) +
+                        '<span class="roster-name-label">' +
+                        (nameLabel ? escapeHtml(nameLabel) : '&nbsp;') +
+                        '</span>' +
+                        '</td>' +
+                        '<td class="guests-roster-tag-cell">' +
+                        (String(m.category || '').trim() ? escapeHtml(m.category) : '&nbsp;') +
+                        '</td>' +
+                        '<td class="guests-roster-tag-cell">' +
+                        (String(m.event || '').trim() ? escapeHtml(m.event) : 'None') +
+                        '</td>' +
+                        '<td class="guests-roster-tag-cell">' +
+                        (String(m.email || '').trim() ? escapeHtml(m.email) : '&nbsp;') +
+                        '</td></tr>';
+                }
+            }
+            html += '</tbody></table>';
+            itemsEl.innerHTML = html;
+            syncEmailerRosterSelectionHighlight();
+        }
+
+        function populateEmailerViewerFromRecord(rec) {
+            if (!rec || !String(rec.id || '').trim()) {
+                closeEmailerDraftForm();
+                return;
+            }
+            var prevId = String(emailerFormEditingDocId || '').trim();
+            var nextId = String(rec.id || '').trim();
+            if (prevId && prevId !== nextId) emailerPadlockIsOpen = false;
+            emailerDraftFormActive = false;
+            emailerFormEditingDocId = nextId;
+            var fn = document.getElementById('add-emailer-contact-first-name');
+            var ln = document.getElementById('add-emailer-contact-last-name');
+            var em = document.getElementById('add-emailer-contact-email');
+            var cat = document.getElementById('add-emailer-contact-category');
+            var notes = document.getElementById('add-emailer-contact-notes');
+            if (fn) fn.value = rec.firstName != null ? String(rec.firstName) : '';
+            if (ln) ln.value = rec.lastName != null ? String(rec.lastName) : '';
+            if (em) em.value = rec.email != null ? String(rec.email) : '';
+            if (cat) cat.value = rec.category != null ? String(rec.category) : '';
+            fillEmailerContactEventSelect(rec.event || 'None');
+            if (notes) notes.value = rec.notes != null ? String(rec.notes) : '';
+            updateEditEmailerContactNameHeading();
+            captureEmailerContactFormBaseline();
+            setEmailerViewerEmptyState(false);
+            setEmailerEditorBottomPane('bio');
+            syncEmailerRosterSelectionHighlight();
+            syncEmailerPadlockButtonUi();
+            syncEmailerEditabilityFromPadlock();
+            updateSaveEmailerContactButtonState();
+        }
+
+        function ensureEmailerDraftRecordReadyForAutosave() {
+            var existingId = String(emailerFormEditingDocId || '').trim();
+            if (existingId) {
+                var existing = findContactInMemory(existingId);
+                if (existing) readEmailerFormIntoRecord(existing);
+                return existing;
+            }
+            if (!emailerDraftFormActive || !emailerContactRequiredFieldsMet()) return null;
+            var snap = readEmailerContactFormSnapshot();
+            var docId = contactSubcollectionIdFromNames(snap.firstName, snap.lastName);
+            if (!docId) return null;
+            var found = findContactInMemory(docId);
+            if (found) {
+                emailerFormEditingDocId = docId;
+                emailerDraftFormActive = false;
+                readEmailerFormIntoRecord(found);
+                return found;
+            }
+            var rec = {
+                id: docId,
+                firstName: snap.firstName,
+                lastName: snap.lastName,
+                email: snap.email,
+                category: snap.category,
+                event: snap.event,
+                notes: snap.notes,
+                selected: 'No',
+                pendingNewContactCreatedNotice: true,
+            };
+            contactsRosterInMemory.push(rec);
+            emailerFormEditingDocId = docId;
+            markContactDocDirty(docId);
+            renderContactsTable();
+            syncEmailerRosterSelectionHighlight();
+            void saveEmailerContactToFirebase(rec).then(function (ok) {
+                if (!ok) return;
+                rec.pendingNewContactCreatedNotice = false;
+                delete contactsDirtyDocIds[docId];
+                captureEmailerContactFormBaseline();
+                updateSaveEmailerContactButtonState();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'New contact created');
+                }
+            });
+            return rec;
+        }
+
+        function onEmailerFormInput() {
+            updateEditEmailerContactNameHeading();
+            if (emailerDraftFormActive && emailerContactRequiredFieldsMet()) {
+                ensureEmailerDraftRecordReadyForAutosave();
+            }
+            var id = String(emailerFormEditingDocId || '').trim();
+            if (id) {
+                var rec = findContactInMemory(id);
+                if (rec) {
+                    readEmailerFormIntoRecord(rec);
+                    markContactDocDirty(id);
+                    renderContactsTable();
+                    scheduleEmailerFirebaseAutosave();
+                }
+            }
+            updateSaveEmailerContactButtonState();
+        }
+
+        async function saveEmailerContactToFirebase(rec) {
+            if (backenduserIsReadonly) return false;
+            var id = String(rec && rec.id ? rec.id : '').trim();
+            if (!id) return false;
+            var db = getFirestore();
+            var FV = firebase.firestore.FieldValue;
+            var batch = db.batch();
+            batch.set(tbsContactItemRef(db, id), contactPayloadFromRecord(rec), { merge: true });
+            batch.set(
+                tbsContactsParentDocRef(db),
+                { contactIds: FV.arrayUnion(id) },
+                { merge: true }
+            );
+            await batch.commit();
+            return true;
+        }
+
+        async function flushEmailerContactsToFirebase() {
+            if (backenduserIsReadonly) return false;
+            var ids = Object.keys(contactsDirtyDocIds);
+            if (!ids.length) return true;
+            if (contactsFirebaseSaveInFlight) {
+                contactsFirebaseSavePending = true;
+                return true;
+            }
+            contactsFirebaseSaveInFlight = true;
+            try {
+                for (var i = 0; i < ids.length; i++) {
+                    var id = ids[i];
+                    var rec = findContactInMemory(id);
+                    if (!rec) {
+                        delete contactsDirtyDocIds[id];
+                        continue;
+                    }
+                    var saved = await saveEmailerContactToFirebase(rec);
+                    if (!saved) continue;
+                    delete contactsDirtyDocIds[id];
+                    var created = !!rec.pendingNewContactCreatedNotice;
+                    rec.pendingNewContactCreatedNotice = false;
+                    if (String(emailerFormEditingDocId || '') === String(rec.id || '')) {
+                        emailerDraftFormActive = false;
+                        captureEmailerContactFormBaseline();
+                    }
+                    if (created && typeof showStatus === 'function') {
+                        showStatus('success', 'New contact created');
+                    }
+                }
+                updateSaveEmailerContactButtonState();
+                return true;
+            } catch (err) {
+                console.error('flushEmailerContactsToFirebase:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to save contact.');
+                }
+                return false;
+            } finally {
+                contactsFirebaseSaveInFlight = false;
+                if (contactsFirebaseSavePending || Object.keys(contactsDirtyDocIds).length) {
+                    contactsFirebaseSavePending = false;
+                    scheduleEmailerFirebaseAutosave();
+                }
+            }
+        }
+
+        function flushEmailerContactsFirebaseIfDirty() {
+            cancelEmailerFirebaseAutosaveTimer();
+            var id = String(emailerFormEditingDocId || '').trim();
+            if (id) {
+                var rec = findContactInMemory(id);
+                if (rec) {
+                    readEmailerFormIntoRecord(rec);
+                    markContactDocDirty(id);
+                }
+            }
+            void flushEmailerContactsToFirebase();
+        }
+
+        function syncEmailerFormToMemoryIfEditing() {
+            if (emailerDraftFormActive && emailerContactRequiredFieldsMet()) {
+                ensureEmailerDraftRecordReadyForAutosave();
+                return;
+            }
+            var id = String(emailerFormEditingDocId || '').trim();
+            if (!id) return;
+            var rec = findContactInMemory(id);
+            if (!rec) return;
+            var changed = emailerContactFormChangedFromBaseline();
+            readEmailerFormIntoRecord(rec);
+            if (!changed) return;
+            markContactDocDirty(id);
+            renderContactsTable();
+            scheduleEmailerFirebaseAutosave();
+            updateSaveEmailerContactButtonState();
+        }
+
+        async function persistOpenEmailerContactIfNeeded() {
+            syncEmailerFormToMemoryIfEditing();
+            return true;
+        }
+
+        async function saveEmailerContactFromEditor() {
+            if (!emailerContactRequiredFieldsMet()) {
+                updateSaveEmailerContactButtonState();
+                return;
+            }
+            try {
+                var rec = ensureEmailerDraftRecordReadyForAutosave();
+                if (!rec) {
+                    var snap = readEmailerContactFormSnapshot();
+                    var docId = contactSubcollectionIdFromNames(snap.firstName, snap.lastName);
+                    rec = findContactInMemory(docId);
+                }
+                if (!rec) throw new Error('Could not save contact.');
+                readEmailerFormIntoRecord(rec);
+                markContactDocDirty(rec.id);
+                var saved = await saveEmailerContactToFirebase(rec);
+                if (!saved) throw new Error('Could not save contact to Firebase.');
+                delete contactsDirtyDocIds[String(rec.id || '').trim()];
+                rec.pendingNewContactCreatedNotice = false;
+                emailerDraftFormActive = false;
+                captureEmailerContactFormBaseline();
+                renderContactsTable();
+                populateEmailerViewerFromRecord(rec);
+                emailerPadlockIsOpen = true;
+                syncEmailerPadlockButtonUi();
+                syncEmailerEditabilityFromPadlock();
+                updateSaveEmailerContactButtonState();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Contact saved.');
+                }
+            } catch (err) {
+                console.error('saveEmailerContactFromEditor:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to save contact.');
+                }
+            }
+        }
+
+        async function listContactIdsViaCloudFunction() {
+            var projectId = String((firebaseConfig && firebaseConfig.projectId) || '').trim();
+            if (!projectId) return [];
+            var fnUrl =
+                'https://us-central1-' +
+                projectId +
+                '.cloudfunctions.net/listTbsContactsCollectionIdsHttp';
+            var resp = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}',
+            });
+            var data = {};
+            try {
+                data = await resp.json();
+            } catch (_) {}
+            if (!resp.ok) return [];
+            return Array.isArray(data.collectionIds) ? data.collectionIds : [];
+        }
+
+        function contactIdsFromParentData(data) {
+            if (!data || typeof data !== 'object') return [];
+            var arrayKeys = ['contactIds', 'ids', 'order', 'collectionIds', 'subcollections'];
+            for (var i = 0; i < arrayKeys.length; i++) {
+                var v = data[arrayKeys[i]];
+                if (Array.isArray(v) && v.length) {
+                    var out = v
+                        .map(function (x) {
+                            return String(x != null ? x : '').trim();
+                        })
+                        .filter(Boolean);
+                    if (out.length) return out;
+                }
+            }
+            return [];
+        }
+
+        async function listContactIdsUnderTbsContacts(db) {
+            var seen = Object.create(null);
+            var ids = [];
+            function addId(raw) {
+                var id = String(raw != null ? raw : '').trim();
+                if (!id || seen[id]) return;
+                seen[id] = true;
+                ids.push(id);
+            }
+            try {
+                (await listContactIdsViaCloudFunction()).forEach(addId);
+            } catch (fnErr) {
+                console.warn('listContactIdsUnderTbsContacts function', fnErr);
+            }
+            if (ids.length) return ids;
+            try {
+                var idToken = await ensureFirebaseAuthForFirestoreRest();
+                var restIds = await firestoreRestListCollectionIdsUnderDocumentPath(
+                    'tbs/Contacts',
+                    idToken
+                );
+                if (Array.isArray(restIds)) restIds.forEach(addId);
+            } catch (restErr) {
+                console.warn('listContactIdsUnderTbsContacts REST', restErr);
+            }
+            try {
+                var sdkIds = await firestoreSdkListCollectionIdsUnderParent(db, 'Contacts');
+                if (Array.isArray(sdkIds)) sdkIds.forEach(addId);
+            } catch (sdkErr) {
+                console.warn('listContactIdsUnderTbsContacts SDK', sdkErr);
+            }
+            try {
+                var parentSnap = await tbsContactsParentDocRef(db).get();
+                if (parentSnap && parentSnap.exists) {
+                    contactIdsFromParentData(parentSnap.data() || {}).forEach(addId);
+                }
+            } catch (parentErr) {
+                console.warn('listContactIdsUnderTbsContacts parent', parentErr);
+            }
+            return ids;
+        }
+
+        async function fetchContactsFromFirestore() {
+            var db = getFirestore();
+            var ids = await listContactIdsUnderTbsContacts(db);
+            if (!ids.length) return [];
+            var list = [];
+            var chunkSize = 20;
+            for (var i = 0; i < ids.length; i += chunkSize) {
+                var chunk = ids.slice(i, i + chunkSize);
+                var snaps = await Promise.all(
+                    chunk.map(function (rowId) {
+                        return tbsContactItemRef(db, rowId).get();
+                    })
+                );
+                for (var j = 0; j < chunk.length; j++) {
+                    var snap = snaps[j];
+                    if (snap && snap.exists) {
+                        list.push(contactRecordFromDoc(chunk[j], snap.data() || {}));
+                    }
+                }
+            }
+            list.sort(compareContacts);
+            return list;
+        }
+
+        async function loadAndRenderContactsTable(opts) {
+            opts = opts || {};
+            updateGuestsListHeadingDisplay();
+            if (emailerContactAllevents && emailerContactAllevents.length) {
+                fillEmailerContactEventSelect(emailerContactEventSelectValue());
+            } else {
+                void refreshEmailerContactEventOptions();
+            }
+            if (contactsMemoryLoaded && !opts.force) {
+                renderContactsTable();
+                return;
+            }
+            try {
+                contactsRosterInMemory = await fetchContactsFromFirestore();
+                contactsMemoryLoaded = true;
+                renderContactsTable();
+            } catch (err) {
+                console.error('loadAndRenderContactsTable:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to load contacts.');
+                }
+                renderContactsTable();
+            }
         }
 
         async function fetchTeamMembersFromFirestore(eventName) {
@@ -19165,19 +20249,29 @@
             return { nteam: n, eventName: eventName };
         }
 
-        async function loadAndRenderTeamTable() {
+        async function loadAndRenderTeamTable(opts) {
+            opts = opts || {};
             updateGuestsListHeadingDisplay();
             var eventName = String(current_event || '').trim();
+            if (!eventName) {
+                teamTableGoalRows = 0;
+                teamMemoryLoaded = false;
+                teamMemoryEventName = '';
+                renderTeamTable([], 0, 'Set a current event to load the team table.');
+                return;
+            }
+            if (teamMemoryLoaded && teamMemoryEventName === eventName && !opts.force) {
+                renderTeamTable(teamRosterInMemory, teamRosterRenderRowCount(), '');
+                return;
+            }
+            if (Object.keys(teamDirtyDocIds).length) {
+                await flushTeamToFirebase({ silent: true });
+            }
             teamDirtyDocIds = Object.create(null);
             teamIdsPendingDelete = Object.create(null);
             if (teamSyncTimer) {
                 clearTimeout(teamSyncTimer);
                 teamSyncTimer = null;
-            }
-            if (!eventName) {
-                teamTableGoalRows = 0;
-                renderTeamTable([], 0, 'Set a current event to load the team table.');
-                return;
             }
             try {
                 var result = await fetchTeamRowCountFromFirestore();
@@ -19187,6 +20281,8 @@
                     showStatus('error', 'Team: missing nteam for ' + eventName + '.');
                 }
                 var members = await fetchTeamMembersFromFirestore(eventName);
+                teamMemoryLoaded = true;
+                teamMemoryEventName = eventName;
                 if (!members.length && nteam < 1) {
                     renderTeamTable(
                         [],
@@ -19200,6 +20296,8 @@
                 renderTeamTable(members, nteam, '');
             } catch (err) {
                 console.error('loadAndRenderTeamTable:', err);
+                teamMemoryLoaded = false;
+                teamMemoryEventName = '';
                 renderTeamTable(
                     [],
                     0,
@@ -19840,7 +20938,7 @@
                 ]);
                 var teamEditorEl = document.getElementById('team-editor');
                 if (teamEditorEl && teamEditorEl.classList.contains('is-open')) {
-                    void loadAndRenderTeamTable().catch(function (err) {
+                    void loadAndRenderTeamTable({ force: true }).catch(function (err) {
                         console.error('loadAndRenderTeamTable:', err);
                     });
                 }
@@ -20123,6 +21221,16 @@
             return false;
         }
 
+        /** Firestore `tbs/Guests/{guestId}/item` field **Selected** (Yes/No). Missing means No. */
+        function guestSelectedFieldIsYes(val) {
+            return String(val != null ? val : '').trim().toLowerCase() === 'yes';
+        }
+
+        function guestSelectedFromDoc(d) {
+            var s = guestCoalesceGuestItemFieldFromKeys(d, ['Selected', 'selected', 'SELECTED']);
+            return guestSelectedFieldIsYes(s) ? 'Yes' : 'No';
+        }
+
         /** Firestore `tbs/Guests/{guestId}/item` field **Attended** (Yes/No). */
         function guestAttendedFromDoc(d) {
             if (!d || typeof d !== 'object') return false;
@@ -20395,6 +21503,7 @@
                     'Cancelled',
                     'CANCELLED',
                 ]),
+                selected: guestSelectedFromDoc(d),
             };
         }
 
@@ -21043,6 +22152,7 @@
                     scrollGuestEditorBottomToBio();
                 }
             });
+            syncGuestsBulkActionsView();
         }
 
         function updateGuestEditorProfileFields(g) {
@@ -22425,12 +23535,12 @@
         }
 
         /**
-         * Invite allowed when Invited is Reserve, or when Read is Yes and Invited is No.
+         * Invite allowed only when Read is Yes, and Invited is still No or Reserve.
          */
         function guestInviteAllowedByRosterFields(g) {
-            if (!g) return false;
+            if (!g || !guestReadIsYes(g.read)) return false;
             if (guestInvitedFieldIsReserve(g.invited)) return true;
-            return guestReadIsYes(g.read) && guestInvitedFieldIsNo(g.invited);
+            return guestInvitedFieldIsNo(g.invited);
         }
 
         /** Read is the literal select value “No” (case-insensitive). */
@@ -22672,9 +23782,10 @@
             var g = id ? findGuestInMemory(id) : null;
             var invitedNo = Boolean(g && guestInvitedFieldIsNo(g.invited));
             var invitedReserve = Boolean(g && guestInvitedFieldIsReserve(g.invited));
+            var readYes = Boolean(g && guestReadIsYes(g.read));
             var show = Boolean(g && siteWaitingListIsYes && (invitedNo || invitedReserve));
             var stacked = Boolean(show && invitedReserve);
-            var canSend = Boolean(show && invitedNo);
+            var canSend = Boolean(show && invitedNo && readYes);
             var canRun = canSend && guestPadlockIsOpen;
             if (row) row.classList.toggle('is-stacked', stacked);
             if (btn) {
@@ -22701,7 +23812,7 @@
                 return;
             }
             var rec = findGuestInMemory(id);
-            if (!rec || !siteWaitingListIsYes || !guestInvitedFieldIsNo(rec.invited)) return;
+            if (!rec || !siteWaitingListIsYes || !guestInvitedFieldIsNo(rec.invited) || !guestReadIsYes(rec.read)) return;
             var toRaw = rec.email != null ? String(rec.email).trim() : '';
             var emailEl = document.getElementById('edit-guest-email');
             if (!toRaw && emailEl) toRaw = String(emailEl.value || '').trim();
@@ -23794,6 +24905,148 @@
             );
         }
 
+        function rosterNameCheckHtml(store, docId, noun) {
+            var id = String(docId || '').trim();
+            var on = !!(store && id && store[id]);
+            var n = noun || 'row';
+            return (
+                '<button type="button" class="roster-name-check-btn" aria-pressed="' +
+                (on ? 'true' : 'false') +
+                '" aria-label="' +
+                (on ? 'Uncheck ' + n : 'Check ' + n) +
+                '" title="' +
+                (on ? 'Checked' : 'Check') +
+                '">' +
+                '<span class="roster-name-check-mark" aria-hidden="true">✓</span>' +
+                '</button>'
+            );
+        }
+
+        function handleRosterNameCheckClick(ev, root, store, idAttr) {
+            var btn = ev.target.closest('.roster-name-check-btn');
+            if (!btn || !root || !root.contains(btn)) return false;
+            ev.preventDefault();
+            ev.stopPropagation();
+            var row = btn.closest('tr');
+            var id = row && row.getAttribute(idAttr);
+            if (!id || !store) return true;
+            var nextOn = !store[id];
+            if (nextOn) store[id] = true;
+            else delete store[id];
+            var noun = String(btn.getAttribute('aria-label') || 'row')
+                .replace(/^Uncheck\s+/i, '')
+                .replace(/^Check\s+/i, '')
+                .trim() || 'row';
+            btn.setAttribute('aria-pressed', nextOn ? 'true' : 'false');
+            btn.setAttribute('aria-label', nextOn ? 'Uncheck ' + noun : 'Check ' + noun);
+            btn.setAttribute('title', nextOn ? 'Checked' : 'Check');
+            return true;
+        }
+
+        function guestRosterNameCheckHtml(docId) {
+            var rec = findGuestInMemory(docId);
+            var store = Object.create(null);
+            var id = String(docId || '').trim();
+            if (id && guestSelectedFieldIsYes(rec && rec.selected)) store[id] = true;
+            return rosterNameCheckHtml(store, docId, 'guest');
+        }
+
+        function toggleGuestRosterSelected(docId, btn) {
+            var id = String(docId || '').trim();
+            if (!id || backenduserIsReadonly) return;
+            var rec = findGuestInMemory(id);
+            if (!rec) return;
+            var nextOn = !guestSelectedFieldIsYes(rec.selected);
+            rec.selected = nextOn ? 'Yes' : 'No';
+            if (nextOn) guestsRosterNameCheckedIds[id] = true;
+            else delete guestsRosterNameCheckedIds[id];
+            if (btn) {
+                btn.setAttribute('aria-pressed', nextOn ? 'true' : 'false');
+                btn.setAttribute('aria-label', nextOn ? 'Uncheck guest' : 'Check guest');
+                btn.setAttribute('title', nextOn ? 'Checked' : 'Check');
+            }
+            markGuestDocDirty(id);
+            scheduleGuestFirebaseSync();
+            syncGuestsBulkActionsView();
+        }
+
+        function rosterNameCheckHtmlFromSelected(docId, rec, noun) {
+            var store = Object.create(null);
+            var id = String(docId || '').trim();
+            if (id && guestSelectedFieldIsYes(rec && rec.selected)) store[id] = true;
+            return rosterNameCheckHtml(store, docId, noun);
+        }
+
+        function toggleRosterSelectedOnRecord(docId, rec, store, btn, noun, markDirty, schedule) {
+            var id = String(docId || '').trim();
+            if (!id || backenduserIsReadonly || !rec) return;
+            var nextOn = !guestSelectedFieldIsYes(rec.selected);
+            rec.selected = nextOn ? 'Yes' : 'No';
+            if (store) {
+                if (nextOn) store[id] = true;
+                else delete store[id];
+            }
+            var n = noun || 'row';
+            if (btn) {
+                btn.setAttribute('aria-pressed', nextOn ? 'true' : 'false');
+                btn.setAttribute('aria-label', nextOn ? 'Uncheck ' + n : 'Check ' + n);
+                btn.setAttribute('title', nextOn ? 'Checked' : 'Check');
+            }
+            if (typeof markDirty === 'function') markDirty(id);
+            if (typeof schedule === 'function') schedule();
+        }
+
+        function speakerRosterNameCheckHtml(docId) {
+            return rosterNameCheckHtmlFromSelected(docId, findSpeakerInMemory(docId), 'speaker');
+        }
+
+        function toggleSpeakerRosterSelected(docId, btn) {
+            var id = String(docId || '').trim();
+            toggleRosterSelectedOnRecord(
+                id,
+                findSpeakerInMemory(id),
+                speakersRosterNameCheckedIds,
+                btn,
+                'speaker',
+                markSpeakerDocDirty,
+                scheduleSpeakerFirebaseSync
+            );
+        }
+
+        function teamRosterNameCheckHtml(docId) {
+            return rosterNameCheckHtmlFromSelected(docId, findTeamInMemory(docId), 'team member');
+        }
+
+        function toggleTeamRosterSelected(docId, btn) {
+            var id = String(docId || '').trim();
+            toggleRosterSelectedOnRecord(
+                id,
+                findTeamInMemory(id),
+                teamRosterNameCheckedIds,
+                btn,
+                'team member',
+                markTeamDocDirty,
+                scheduleTeamFirebaseSync
+            );
+        }
+
+        function contactRosterNameCheckHtml(docId) {
+            return rosterNameCheckHtmlFromSelected(docId, findContactInMemory(docId), 'contact');
+        }
+
+        function toggleContactRosterSelected(docId, btn) {
+            var id = String(docId || '').trim();
+            toggleRosterSelectedOnRecord(
+                id,
+                findContactInMemory(id),
+                contactsRosterNameCheckedIds,
+                btn,
+                'contact',
+                markContactDocDirty,
+                scheduleEmailerFirebaseAutosave
+            );
+        }
+
         function guestRosterSquareToggleHtml(fieldKey, label, isOn) {
             var ariaLabel = label + ': ' + (isOn ? 'yes' : 'no');
             var title = isOn ? label + ' — click to set no' : label + ' — click to set yes';
@@ -23960,7 +25213,10 @@
                             '<td class="guests-roster-name-cell' +
                             (isCancelled ? ' is-cancelled' : '') +
                             '">' +
+                            guestRosterNameCheckHtml(g.id) +
+                            '<span class="roster-name-label">' +
                             escapeHtml(guestLabel) +
+                            '</span>' +
                             '</td>' +
                             '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>';
                         if (isCancelled) {
@@ -23999,7 +25255,7 @@
             syncGuestManagementLogPanel();
             updateGuestsListHeadingDisplay();
             syncFilterGuestsButtonBadge();
-            if (guestsOverwatchOpen) updateGuestsOverwatchRegisteredCount();
+            syncGuestsBulkActionsView();
         }
 
         /**
@@ -24368,7 +25624,12 @@
                     '</button>' +
                     '</td>';
                 html += '<tr class="speaker-roster-row" data-speaker-id="' + escapeHtml(s.id) + '">' +
-                    '<td class="speaker-roster-name-cell">' + escapeHtml(label) + '</td>' +
+                    '<td class="speaker-roster-name-cell">' +
+                    speakerRosterNameCheckHtml(s.id) +
+                    '<span class="roster-name-label">' +
+                    escapeHtml(label) +
+                    '</span>' +
+                    '</td>' +
                     '<td class="speaker-roster-tag-cell">' + eventBadge + '</td>' +
                     speakerRosterStatusCellHtml(s.id, inv) +
                     speakerRosterLodgingCellHtml(s.id, lod) +
@@ -26242,7 +27503,7 @@
                 btn.classList.toggle('is-selected', on);
                 btn.setAttribute('aria-pressed', on ? 'true' : 'false');
                 btn.setAttribute('title', on ? 'Selected' : 'Not selected');
-                btn.style.background = on ? '#fc70d7' : '#e2e8f0';
+                btn.style.background = on ? 'var(--backend-roster-pill-black)' : '#e2e8f0';
                 btn.style.color = on ? '#ffffff' : '#334155';
             });
         }
@@ -27319,7 +28580,7 @@
             }
             if (!guestInviteAllowedByRosterFields(g)) {
                 if (typeof showStatus === 'function') {
-                    showStatus('error', 'Invite is only available when Invited is Reserve, or when Read is Yes and Invited is No.');
+                    showStatus('error', 'Invite is only available when Read is Yes.');
                 }
                 return;
             }
@@ -27677,6 +28938,20 @@
             const lodgingEditorSection = document.getElementById('lodging-editor');
             const contentEditorSection = document.getElementById('content-editor');
             const emailerEditorSection = document.getElementById('emailer-editor');
+            if (
+                emailerEditorSection &&
+                emailerEditorSection.classList.contains('is-open') &&
+                !isEmailer
+            ) {
+                flushEmailerContactsFirebaseIfDirty();
+            }
+            if (
+                teamEditorSection &&
+                teamEditorSection.classList.contains('is-open') &&
+                !isTeam
+            ) {
+                flushTeamFirebaseIfDirty();
+            }
             const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const editorToggle = document.getElementById('texteditor-toggle');
@@ -27836,6 +29111,11 @@
             if (isTeam) {
                 void loadAndRenderTeamTable().catch(function (err) {
                     console.error('loadAndRenderTeamTable:', err);
+                });
+            }
+            if (isEmailer) {
+                void loadAndRenderContactsTable().catch(function (err) {
+                    console.error('loadAndRenderContactsTable:', err);
                 });
             }
             if (isSettings) {
@@ -30331,6 +31611,15 @@
             var rosterItemsEl = document.getElementById('speaker-roster-items');
             if (rosterItemsEl) {
                 rosterItemsEl.addEventListener('click', function(e) {
+                    var nameCheckBtn = e.target.closest('.roster-name-check-btn');
+                    if (nameCheckBtn && rosterItemsEl.contains(nameCheckBtn)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var checkRow = nameCheckBtn.closest('.speaker-roster-row');
+                        var checkId = checkRow && checkRow.getAttribute('data-speaker-id');
+                        if (checkId) toggleSpeakerRosterSelected(checkId, nameCheckBtn);
+                        return;
+                    }
                     var presentedBtn = e.target.closest('.speaker-roster-presented-btn');
                     if (presentedBtn && rosterItemsEl.contains(presentedBtn)) {
                         e.preventDefault();
@@ -31257,12 +32546,22 @@
             var teamRosterItemsEl = document.getElementById('team-roster-items');
             if (teamRosterItemsEl) {
                 teamRosterItemsEl.addEventListener('click', function (ev) {
+                    var nameCheckBtn = ev.target.closest('.roster-name-check-btn');
+                    if (nameCheckBtn && teamRosterItemsEl.contains(nameCheckBtn)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var checkRow = nameCheckBtn.closest('.team-roster-row');
+                        var checkId = checkRow && checkRow.getAttribute('data-team-id');
+                        if (checkId) toggleTeamRosterSelected(checkId, nameCheckBtn);
+                        return;
+                    }
                     var teamRow = ev.target.closest('.team-roster-row');
                     if (!teamRow || !teamRosterItemsEl.contains(teamRow)) return;
                     var teamId = String(teamRow.getAttribute('data-team-id') || '').trim();
                     if (!teamId) return;
                     ev.preventDefault();
                     ev.stopPropagation();
+                    syncTeamFormToMemoryIfEditing();
                     var found = findTeamInMemory(teamId);
                     if (found) {
                         teamPadlockIsOpen = false;
@@ -31272,7 +32571,7 @@
             }
             var addTeamBtn = document.getElementById('add-team-button');
             if (addTeamBtn) {
-                addTeamBtn.addEventListener('click', async function () {
+                addTeamBtn.addEventListener('click', function () {
                     if (addTeamBtn.disabled) return;
                     if (backendBlockIfReadonly()) return;
                     if (!String(current_event || '').trim()) {
@@ -31281,19 +32580,8 @@
                         }
                         return;
                     }
-                    try {
-                        var saved = await persistOpenTeamToFirebaseIfNeeded();
-                        if (!saved) return;
-                        showTeamDraftForm();
-                    } catch (err) {
-                        console.error('add-team-button:', err);
-                        if (typeof showStatus === 'function') {
-                            showStatus(
-                                'error',
-                                err && err.message ? err.message : 'Failed to save team member.'
-                            );
-                        }
-                    }
+                    syncTeamFormToMemoryIfEditing();
+                    showTeamDraftForm();
                 });
             }
             var addEmailerContactBtn = document.getElementById('emailer-add-contact-button');
@@ -31301,14 +32589,53 @@
                 addEmailerContactBtn.addEventListener('click', function () {
                     if (addEmailerContactBtn.disabled) return;
                     if (backendBlockIfReadonly()) return;
-                    showEmailerDraftForm();
+                    void persistOpenEmailerContactIfNeeded().then(function (ok) {
+                        if (ok !== false) showEmailerDraftForm();
+                    });
                 });
             }
             var emailerFormRoot = document.getElementById('emailer-editor-bio');
             if (emailerFormRoot) {
                 emailerFormRoot.querySelectorAll('input, textarea, select').forEach(function (el) {
-                    el.addEventListener('input', updateEditEmailerContactNameHeading);
-                    el.addEventListener('change', updateEditEmailerContactNameHeading);
+                    el.addEventListener('input', onEmailerFormInput);
+                    el.addEventListener('change', onEmailerFormInput);
+                });
+            }
+            var emailerSaveBtn = document.getElementById('emailer-save-contact-button');
+            if (emailerSaveBtn) {
+                emailerSaveBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    if (emailerSaveBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
+                    saveEmailerContactFromEditor().catch(function (err) {
+                        console.error('emailer-save-contact-button:', err);
+                    });
+                });
+            }
+            var contactsRosterItemsEl = document.getElementById('contacts-roster-items');
+            if (contactsRosterItemsEl) {
+                contactsRosterItemsEl.addEventListener('click', function (ev) {
+                    var nameCheckBtn = ev.target.closest('.roster-name-check-btn');
+                    if (nameCheckBtn && contactsRosterItemsEl.contains(nameCheckBtn)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var checkRow = nameCheckBtn.closest('.contacts-roster-row');
+                        var checkId = checkRow && checkRow.getAttribute('data-contact-id');
+                        if (checkId) toggleContactRosterSelected(checkId, nameCheckBtn);
+                        return;
+                    }
+                    var row = ev.target.closest('.contacts-roster-row');
+                    if (!row || !contactsRosterItemsEl.contains(row)) return;
+                    var contactId = String(row.getAttribute('data-contact-id') || '').trim();
+                    if (!contactId) return;
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    syncEmailerFormToMemoryIfEditing();
+                    var found = findContactInMemory(contactId);
+                    if (found) {
+                        emailerPadlockIsOpen = false;
+                        populateEmailerViewerFromRecord(found);
+                    }
                 });
             }
             var emailerContactBioBtn = document.getElementById('emailer-contact-bio-btn');
@@ -31550,6 +32877,15 @@
             var guestsRosterItemsEl = document.getElementById('guests-roster-items');
             if (guestsRosterItemsEl) {
                 guestsRosterItemsEl.addEventListener('click', function(ev) {
+                    var nameCheckBtn = ev.target.closest('.roster-name-check-btn');
+                    if (nameCheckBtn && guestsRosterItemsEl.contains(nameCheckBtn)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var checkRow = nameCheckBtn.closest('.guests-roster-row');
+                        var checkId = checkRow && checkRow.getAttribute('data-guests-id');
+                        if (checkId) toggleGuestRosterSelected(checkId, nameCheckBtn);
+                        return;
+                    }
                     var toggleBtn = ev.target.closest('.guests-roster-toggle-btn');
                     if (toggleBtn && guestsRosterItemsEl.contains(toggleBtn)) {
                         ev.preventDefault();
@@ -31970,7 +33306,7 @@
                         }
                         btn.classList.toggle('is-selected', !isOn);
                         btn.setAttribute('aria-pressed', !isOn ? 'true' : 'false');
-                        btn.style.background = !isOn ? '#fc70d7' : '#e2e8f0';
+                        btn.style.background = !isOn ? 'var(--backend-roster-pill-black)' : '#e2e8f0';
                         btn.style.color = !isOn ? '#ffffff' : '#334155';
                         var selectedVals = [];
                         topicDropdown.querySelectorAll('.content-editor-topic-option.is-selected').forEach(function (opt) {
@@ -32252,6 +33588,10 @@
             guestPeriodicSyncTimer = setInterval(function () {
                 if (Object.keys(guestDirtyDocIds).length) flushGuestsToFirebase({ silent: true });
             }, GUEST_FIREBASE_PERIODIC_MS);
+            if (teamPeriodicSyncTimer) clearInterval(teamPeriodicSyncTimer);
+            teamPeriodicSyncTimer = setInterval(function () {
+                if (Object.keys(teamDirtyDocIds).length) flushTeamToFirebase({ silent: true });
+            }, TEAM_FIREBASE_PERIODIC_MS);
             if (contentPeriodicSyncTimer) clearInterval(contentPeriodicSyncTimer);
             contentPeriodicSyncTimer = setInterval(function () {
                 if (Object.keys(contentDirtyDocIds).length) flushContentToFirebase();
@@ -32267,6 +33607,11 @@
                 }
             });
             document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden' && Object.keys(teamDirtyDocIds).length) {
+                    flushTeamToFirebase({ silent: true });
+                }
+            });
+            document.addEventListener('visibilitychange', function () {
                 if (document.visibilityState === 'hidden' && Object.keys(contentDirtyDocIds).length) {
                     flushContentToFirebase({ silent: true });
                 }
@@ -32275,10 +33620,14 @@
             document.addEventListener('visibilitychange', function () {
                 if (document.visibilityState === 'hidden') {
                     flushTexteditorFirebaseIfDirty();
+                    flushEmailerContactsFirebaseIfDirty();
+                    flushTeamFirebaseIfDirty();
                 }
             });
             window.addEventListener('pagehide', function () {
                 flushTexteditorFirebaseIfDirty();
+                flushEmailerContactsFirebaseIfDirty();
+                flushTeamFirebaseIfDirty();
             });
             var texteditorPadlockBtn = document.getElementById('texteditor-padlock-btn');
             if (texteditorPadlockBtn) {
