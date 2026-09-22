@@ -301,6 +301,7 @@
         body.backend-page.backend-readonly #save-guest-button,
         body.backend-page.backend-readonly #save-speaker-button,
         body.backend-page.backend-readonly #save-team-button,
+        body.backend-page.backend-readonly #emailer-save-contact-button,
         body.backend-page.backend-readonly #texteditor-save-btn,
         body.backend-page.backend-readonly #save-programme-btn,
         body.backend-page.backend-readonly #programme-add-session-btn,
@@ -3437,7 +3438,7 @@
         #emailer-editor .emailer-editor-toolbar .add-speaker-button,
         #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn,
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button,
-        #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn,
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-compose-email-btn,
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn {
             display: inline-flex;
             align-items: center;
@@ -3509,6 +3510,15 @@
             color: #003153;
             font-size: 0;
             line-height: 0;
+            cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button:not(:disabled) {
+            cursor: pointer;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button:hover:not(:disabled) {
+            filter: brightness(0.92);
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button svg {
@@ -3516,23 +3526,46 @@
             display: block;
         }
 
-        #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn {
-            background: #000000 !important;
-            color: #ffffff !important;
-            font-size: 1.125rem;
-            font-weight: 700;
-            line-height: 1;
-            cursor: not-allowed;
-            opacity: 0.45;
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button.is-autosaving,
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button.is-autosaving:disabled {
+            opacity: 1;
+            cursor: wait;
+            pointer-events: none;
             filter: none;
         }
 
-        #emailer-editor .emailer-editor-toolbar-trailing #emailer-cancel-contact-btn span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            color: #ffffff;
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-save-contact-button.is-autosaving > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.85s linear infinite;
+            will-change: transform;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-compose-email-btn {
+            background: var(--backend-button-yellow);
+            color: #003153;
+            font-size: 0;
+            line-height: 0;
+            cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-compose-email-btn:not(:disabled) {
+            cursor: pointer;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-compose-email-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-compose-email-btn svg {
+            flex-shrink: 0;
+            display: block;
+        }
+
+        #emailer-editor .contacts-list-table button.contacts-roster-email-pill {
+            cursor: pointer;
+            box-shadow: none;
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn {
@@ -6317,7 +6350,8 @@
         .speakers-overview .content-badge,
         .guest-overview-section .content-badge,
         #guest-editor .guests-list-table .content-badge,
-        #team-editor .team-list-table .content-badge {
+        #team-editor .team-list-table .content-badge,
+        #emailer-editor .contacts-list-table .content-badge {
             margin: 0;
             padding: 2px 5px;
             background: #ffffff;
@@ -6365,6 +6399,7 @@
         #guest-editor .guests-list-table .content-roster-published-btn,
         #guest-editor .guests-list-table .content-badge,
         #team-editor .team-list-table .content-badge,
+        #emailer-editor .contacts-list-table .content-badge,
         #content-editor .content-list-table .content-roster-published-btn,
         #content-editor .content-roster-table .content-roster-published-btn,
         #programme-editor .programme-speakers-table button.speaker-roster-tag {
@@ -7060,6 +7095,7 @@
         #emailer-editor .emailer-actions .add-speaker-button:disabled,
         #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn:disabled,
         #emailer-editor .emailer-editor-toolbar #emailer-save-contact-button:disabled,
+        #emailer-editor .emailer-editor-toolbar #emailer-compose-email-btn:disabled,
         #team-editor .team-actions .add-speaker-button:disabled,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled,
         #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved),
@@ -7089,6 +7125,7 @@
         #emailer-editor .emailer-actions .add-speaker-button:disabled:hover,
         #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn:disabled:hover,
         #emailer-editor .emailer-editor-toolbar #emailer-save-contact-button:disabled:hover,
+        #emailer-editor .emailer-editor-toolbar #emailer-compose-email-btn:disabled:hover,
         #team-editor .team-actions .add-speaker-button:disabled:hover,
         #lodging-editor .lodging-actions .add-lodging-btn:disabled:hover,
         #programme-editor .programme-toolbar #save-programme-btn:disabled:not(.texteditor-save-btn--saved):hover,
@@ -8093,9 +8130,15 @@
 
         /* Guests roster: Read / Invited / Invoiced cells */
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-yes,
-        #team-editor .team-list-table .content-badge.content-badge--guest-status-yes {
+        #team-editor .team-list-table .content-badge.content-badge--guest-status-yes,
+        #emailer-editor .contacts-list-table .content-badge.content-badge--guest-status-yes {
             background: var(--backend-roster-status-yes-bg);
             color: var(--backend-roster-status-yes-color);
+        }
+
+        #emailer-editor .contacts-list-table .content-badge.content-badge--emailer-email {
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-no,
@@ -12370,8 +12413,10 @@
                                             <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
                                         </svg>
                                     </button>
-                                    <button type="button" class="emailer-cancel-contact-btn" id="emailer-cancel-contact-btn" disabled aria-disabled="true" title="Cancel contact" aria-label="Cancel contact">
-                                        <span aria-hidden="true">✗</span>
+                                    <button type="button" class="add-speaker-button" id="emailer-compose-email-btn" disabled aria-disabled="true" title="E-mail" aria-label="E-mail contact">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                        </svg>
                                     </button>
                                     <button type="button" class="emailer-delete-contact-btn" id="emailer-delete-contact-btn" disabled aria-disabled="true" title="Delete contact" aria-label="Delete contact">
                                         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -12458,7 +12503,7 @@
                                             <label for="add-emailer-contact-category">Category</label>
                                             <select id="add-emailer-contact-category" name="category" aria-label="Category">
                                                 <option value="">—</option>
-                                                <option value="Potential speaker">Potential speaker</option>
+                                                <option value="Potential">Potential</option>
                                                 <option value="Speaker">Speaker</option>
                                                 <option value="Guest">Guest</option>
                                                 <option value="N/A">N/A</option>
@@ -13044,6 +13089,7 @@
         var TEAM_FIREBASE_PERIODIC_MS = 12000;
         var teamMemoryLoaded = false;
         var teamMemoryEventName = '';
+        var teamTableLoadPromise = null;
         var guestDirtyDocIds = Object.create(null);
         var guestSyncTimer = null;
         var guestPeriodicSyncTimer = null;
@@ -19451,7 +19497,6 @@
             var logBtn = document.getElementById('emailer-contact-log-btn');
             var workflowBtn = document.getElementById('emailer-display-contact-actions');
             var padlock = document.getElementById('emailer-editor-padlock-btn');
-            var cancelBtn = document.getElementById('emailer-cancel-contact-btn');
             var pane = emailerEditorBottomPane;
             var selectionEmpty = isEmailerViewerSelectionEmpty();
 
@@ -19482,10 +19527,7 @@
                 padlock.disabled = selectionEmpty;
                 padlock.setAttribute('aria-disabled', selectionEmpty ? 'true' : 'false');
             }
-            if (cancelBtn) {
-                cancelBtn.disabled = selectionEmpty;
-                cancelBtn.setAttribute('aria-disabled', selectionEmpty ? 'true' : 'false');
-            }
+            updateEmailerComposeButtonState();
             syncEmailerPadlockButtonUi();
         }
 
@@ -19734,16 +19776,36 @@
             }, EMAILER_FIREBASE_AUTOSAVE_MS);
         }
 
+        function setEmailerSaveBtnAutosaving(on) {
+            var btn = document.getElementById('emailer-save-contact-button');
+            if (!btn) return;
+            btn.classList.toggle('is-autosaving', !!on);
+            if (on) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('title', 'Autosaving');
+                btn.setAttribute('aria-label', 'Autosaving');
+                return;
+            }
+            btn.setAttribute('title', 'Save contact');
+            btn.setAttribute('aria-label', 'Save contact');
+            updateSaveEmailerContactButtonState();
+        }
+
         function updateSaveEmailerContactButtonState() {
             var btn = document.getElementById('emailer-save-contact-button');
             if (!btn) return;
+            if (btn.classList.contains('is-autosaving')) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                return;
+            }
             var hasEditorContext =
                 emailerDraftFormActive || String(emailerFormEditingDocId || '').trim() !== '';
             var active =
                 !isEmailerViewerSelectionEmpty() &&
                 hasEditorContext &&
-                emailerContactRequiredFieldsMet() &&
-                emailerContactFormChangedFromBaseline();
+                emailerContactRequiredFieldsMet();
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
         }
@@ -19769,6 +19831,80 @@
                     break;
                 }
             }
+        }
+
+        function contactCategoryDisplayLabel(raw) {
+            var t = String(raw != null ? raw : '').trim();
+            if (/^potential(\s+speakers?)?$/i.test(t)) return 'Potential';
+            return t;
+        }
+
+        function contactRosterGreenPillHtml(label) {
+            var t = String(label != null ? label : '').trim();
+            return (
+                '<span class="content-badge content-badge--guest-status-yes">' +
+                escapeHtml(t || '—') +
+                '</span>'
+            );
+        }
+
+        function contactRosterEmailPillHtml(rec) {
+            var email = String(rec && rec.email ? rec.email : '').trim();
+            var title = email ? 'E-mail ' + email : 'No e-mail address';
+            return (
+                '<button type="button" class="content-badge content-badge--emailer-email contacts-roster-email-pill" title="' +
+                escapeHtml(title) +
+                '" aria-label="' +
+                escapeHtml(title) +
+                '">E-mail</button>'
+            );
+        }
+
+        function emailerComposeAddressFromFormOrRecord(rec) {
+            var fromForm = '';
+            var em = document.getElementById('add-emailer-contact-email');
+            if (
+                em &&
+                rec &&
+                String(rec.id || '').trim() &&
+                String(rec.id || '').trim() === String(emailerFormEditingDocId || '').trim()
+            ) {
+                fromForm = String(em.value || '').trim();
+            } else if (em && !rec) {
+                fromForm = String(em.value || '').trim();
+            }
+            if (fromForm) return fromForm;
+            return rec ? String(rec.email || '').trim() : '';
+        }
+
+        function openEmailerMailtoForAddress(rawEmail) {
+            var email = String(rawEmail || '').trim();
+            if (!email) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'No e-mail address for this contact.');
+                }
+                return false;
+            }
+            window.location.href = 'mailto:' + encodeURIComponent(email);
+            return true;
+        }
+
+        function updateEmailerComposeButtonState() {
+            var btn = document.getElementById('emailer-compose-email-btn');
+            if (!btn) return;
+            var selectionEmpty = isEmailerViewerSelectionEmpty();
+            var rec = findContactInMemory(emailerFormEditingDocId);
+            var email = '';
+            if (!selectionEmpty) {
+                var em = document.getElementById('add-emailer-contact-email');
+                if (em) email = String(em.value || '').trim();
+                if (!email && rec) email = String(rec.email || '').trim();
+            }
+            var active = !selectionEmpty && !!email;
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.setAttribute('title', active ? 'E-mail ' + email : 'E-mail');
+            btn.setAttribute('aria-label', active ? 'E-mail ' + email : 'E-mail contact');
         }
 
         function renderContactsTable() {
@@ -19809,13 +19945,13 @@
                         '</span>' +
                         '</td>' +
                         '<td class="guests-roster-tag-cell">' +
-                        (String(m.category || '').trim() ? escapeHtml(m.category) : '&nbsp;') +
+                        contactRosterGreenPillHtml(contactCategoryDisplayLabel(m.category)) +
                         '</td>' +
                         '<td class="guests-roster-tag-cell">' +
-                        (String(m.event || '').trim() ? escapeHtml(m.event) : 'None') +
+                        contactRosterGreenPillHtml(String(m.event || '').trim() || 'None') +
                         '</td>' +
                         '<td class="guests-roster-tag-cell">' +
-                        (String(m.email || '').trim() ? escapeHtml(m.email) : '&nbsp;') +
+                        contactRosterEmailPillHtml(m) +
                         '</td></tr>';
                 }
             }
@@ -19842,7 +19978,7 @@
             if (fn) fn.value = rec.firstName != null ? String(rec.firstName) : '';
             if (ln) ln.value = rec.lastName != null ? String(rec.lastName) : '';
             if (em) em.value = rec.email != null ? String(rec.email) : '';
-            if (cat) cat.value = rec.category != null ? String(rec.category) : '';
+            if (cat) cat.value = contactCategoryDisplayLabel(rec.category);
             fillEmailerContactEventSelect(rec.event || 'None');
             if (notes) notes.value = rec.notes != null ? String(rec.notes) : '';
             updateEditEmailerContactNameHeading();
@@ -19889,16 +20025,8 @@
             markContactDocDirty(docId);
             renderContactsTable();
             syncEmailerRosterSelectionHighlight();
-            void saveEmailerContactToFirebase(rec).then(function (ok) {
-                if (!ok) return;
-                rec.pendingNewContactCreatedNotice = false;
-                delete contactsDirtyDocIds[docId];
-                captureEmailerContactFormBaseline();
-                updateSaveEmailerContactButtonState();
-                if (typeof showStatus === 'function') {
-                    showStatus('success', 'New contact created');
-                }
-            });
+            scheduleEmailerFirebaseAutosave();
+            updateSaveEmailerContactButtonState();
             return rec;
         }
 
@@ -19918,6 +20046,7 @@
                 }
             }
             updateSaveEmailerContactButtonState();
+            updateEmailerComposeButtonState();
         }
 
         async function saveEmailerContactToFirebase(rec) {
@@ -19946,6 +20075,7 @@
                 return true;
             }
             contactsFirebaseSaveInFlight = true;
+            setEmailerSaveBtnAutosaving(true);
             try {
                 for (var i = 0; i < ids.length; i++) {
                     var id = ids[i];
@@ -19967,7 +20097,6 @@
                         showStatus('success', 'New contact created');
                     }
                 }
-                updateSaveEmailerContactButtonState();
                 return true;
             } catch (err) {
                 console.error('flushEmailerContactsToFirebase:', err);
@@ -19981,6 +20110,7 @@
                     contactsFirebaseSavePending = false;
                     scheduleEmailerFirebaseAutosave();
                 }
+                if (!contactsFirebaseSaveInFlight) setEmailerSaveBtnAutosaving(false);
             }
         }
 
@@ -20021,9 +20151,10 @@
         }
 
         async function saveEmailerContactFromEditor() {
+            if (backendBlockIfReadonly()) return false;
             if (!emailerContactRequiredFieldsMet()) {
                 updateSaveEmailerContactButtonState();
-                return;
+                return false;
             }
             try {
                 var rec = ensureEmailerDraftRecordReadyForAutosave();
@@ -20033,14 +20164,13 @@
                     rec = findContactInMemory(docId);
                 }
                 if (!rec) throw new Error('Could not save contact.');
+                var created = !!rec.pendingNewContactCreatedNotice;
                 readEmailerFormIntoRecord(rec);
                 markContactDocDirty(rec.id);
-                var saved = await saveEmailerContactToFirebase(rec);
+                cancelEmailerFirebaseAutosaveTimer();
+                var saved = await flushEmailerContactsToFirebase();
                 if (!saved) throw new Error('Could not save contact to Firebase.');
-                delete contactsDirtyDocIds[String(rec.id || '').trim()];
-                rec.pendingNewContactCreatedNotice = false;
                 emailerDraftFormActive = false;
-                captureEmailerContactFormBaseline();
                 renderContactsTable();
                 populateEmailerViewerFromRecord(rec);
                 emailerPadlockIsOpen = true;
@@ -20048,13 +20178,15 @@
                 syncEmailerEditabilityFromPadlock();
                 updateSaveEmailerContactButtonState();
                 if (typeof showStatus === 'function') {
-                    showStatus('success', 'Contact saved.');
+                    if (!created) showStatus('success', 'Contact saved.');
                 }
+                return true;
             } catch (err) {
                 console.error('saveEmailerContactFromEditor:', err);
                 if (typeof showStatus === 'function') {
                     showStatus('error', err.message || 'Failed to save contact.');
                 }
+                return false;
             }
         }
 
@@ -20251,6 +20383,7 @@
 
         async function loadAndRenderTeamTable(opts) {
             opts = opts || {};
+            var silent = !!opts.silent;
             updateGuestsListHeadingDisplay();
             var eventName = String(current_event || '').trim();
             if (!eventName) {
@@ -20264,20 +20397,44 @@
                 renderTeamTable(teamRosterInMemory, teamRosterRenderRowCount(), '');
                 return;
             }
-            if (Object.keys(teamDirtyDocIds).length) {
-                await flushTeamToFirebase({ silent: true });
+            if (teamTableLoadPromise) {
+                try {
+                    await teamTableLoadPromise;
+                } catch (waitErr) {
+                    /* in-flight load failed; continue if a refetch is still needed */
+                }
+                eventName = String(current_event || '').trim();
+                if (
+                    !opts.force &&
+                    eventName &&
+                    teamMemoryLoaded &&
+                    teamMemoryEventName === eventName
+                ) {
+                    renderTeamTable(teamRosterInMemory, teamRosterRenderRowCount(), '');
+                    return;
+                }
+                if (!eventName) {
+                    teamTableGoalRows = 0;
+                    teamMemoryLoaded = false;
+                    teamMemoryEventName = '';
+                    renderTeamTable([], 0, 'Set a current event to load the team table.');
+                    return;
+                }
             }
-            teamDirtyDocIds = Object.create(null);
-            teamIdsPendingDelete = Object.create(null);
-            if (teamSyncTimer) {
-                clearTimeout(teamSyncTimer);
-                teamSyncTimer = null;
-            }
-            try {
+            teamTableLoadPromise = (async function () {
+                if (Object.keys(teamDirtyDocIds).length) {
+                    await flushTeamToFirebase({ silent: true });
+                }
+                teamDirtyDocIds = Object.create(null);
+                teamIdsPendingDelete = Object.create(null);
+                if (teamSyncTimer) {
+                    clearTimeout(teamSyncTimer);
+                    teamSyncTimer = null;
+                }
                 var result = await fetchTeamRowCountFromFirestore();
                 var nteam = result.error === 'no-nteam' ? 0 : result.nteam;
                 teamTableGoalRows = nteam;
-                if (result.error === 'no-nteam' && typeof showStatus === 'function') {
+                if (!silent && result.error === 'no-nteam' && typeof showStatus === 'function') {
                     showStatus('error', 'Team: missing nteam for ' + eventName + '.');
                 }
                 var members = await fetchTeamMembersFromFirestore(eventName);
@@ -20294,6 +20451,9 @@
                     return;
                 }
                 renderTeamTable(members, nteam, '');
+            })();
+            try {
+                await teamTableLoadPromise;
             } catch (err) {
                 console.error('loadAndRenderTeamTable:', err);
                 teamMemoryLoaded = false;
@@ -20303,12 +20463,14 @@
                     0,
                     err && err.message ? err.message : 'Failed to load team table.'
                 );
-                if (typeof showStatus === 'function') {
+                if (!silent && typeof showStatus === 'function') {
                     showStatus(
                         'error',
                         err && err.message ? err.message : 'Failed to load team table.'
                     );
                 }
+            } finally {
+                teamTableLoadPromise = null;
             }
         }
 
@@ -20936,12 +21098,9 @@
                     fetchSpeakersForSelectedEvent(),
                     loadProgrammeFromFirestore(next),
                 ]);
-                var teamEditorEl = document.getElementById('team-editor');
-                if (teamEditorEl && teamEditorEl.classList.contains('is-open')) {
-                    void loadAndRenderTeamTable({ force: true }).catch(function (err) {
-                        console.error('loadAndRenderTeamTable:', err);
-                    });
-                }
+                void loadAndRenderTeamTable({ force: true, silent: true }).catch(function (err) {
+                    console.error('loadAndRenderTeamTable:', err);
+                });
                 var selectedGuestId = String(guestFormEditingDocId || '').trim();
                 if (selectedGuestId && !findGuestInMemory(selectedGuestId)) {
                     clearGuestEditorForm();
@@ -32604,12 +32763,23 @@
             var emailerSaveBtn = document.getElementById('emailer-save-contact-button');
             if (emailerSaveBtn) {
                 emailerSaveBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
                     ev.stopPropagation();
-                    if (emailerSaveBtn.disabled) return;
+                    if (emailerSaveBtn.disabled || emailerSaveBtn.classList.contains('is-autosaving')) return;
                     if (backendBlockIfReadonly()) return;
                     saveEmailerContactFromEditor().catch(function (err) {
                         console.error('emailer-save-contact-button:', err);
                     });
+                });
+            }
+            var emailerComposeBtn = document.getElementById('emailer-compose-email-btn');
+            if (emailerComposeBtn) {
+                emailerComposeBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (emailerComposeBtn.disabled) return;
+                    var rec = findContactInMemory(emailerFormEditingDocId);
+                    openEmailerMailtoForAddress(emailerComposeAddressFromFormOrRecord(rec));
                 });
             }
             var contactsRosterItemsEl = document.getElementById('contacts-roster-items');
@@ -32622,6 +32792,22 @@
                         var checkRow = nameCheckBtn.closest('.contacts-roster-row');
                         var checkId = checkRow && checkRow.getAttribute('data-contact-id');
                         if (checkId) toggleContactRosterSelected(checkId, nameCheckBtn);
+                        return;
+                    }
+                    var emailPill = ev.target.closest('.contacts-roster-email-pill');
+                    if (emailPill && contactsRosterItemsEl.contains(emailPill)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var pillRow = emailPill.closest('.contacts-roster-row');
+                        var pillId = pillRow && pillRow.getAttribute('data-contact-id');
+                        if (!pillId) return;
+                        syncEmailerFormToMemoryIfEditing();
+                        var pillRec = findContactInMemory(pillId);
+                        if (pillRec) {
+                            emailerPadlockIsOpen = false;
+                            populateEmailerViewerFromRecord(pillRec);
+                            openEmailerMailtoForAddress(emailerComposeAddressFromFormOrRecord(pillRec));
+                        }
                         return;
                     }
                     var row = ev.target.closest('.contacts-roster-row');
@@ -32656,15 +32842,6 @@
                     emailerPadlockIsOpen = !emailerPadlockIsOpen;
                     syncEmailerPadlockButtonUi();
                     syncEmailerEditabilityFromPadlock();
-                });
-            }
-            var emailerCancelBtn = document.getElementById('emailer-cancel-contact-btn');
-            if (emailerCancelBtn) {
-                emailerCancelBtn.addEventListener('click', function (ev) {
-                    ev.stopPropagation();
-                    if (emailerCancelBtn.disabled) return;
-                    if (backendBlockIfReadonly()) return;
-                    closeEmailerDraftForm();
                 });
             }
             setEmailerViewerEmptyState(true);
@@ -33812,6 +33989,11 @@
             } finally {
                 setBackendPageLoading(false);
             }
+            window.setTimeout(function () {
+                void loadAndRenderTeamTable({ silent: true }).catch(function (err) {
+                    console.error('Team table background load:', err);
+                });
+            }, 0);
             syncGuestEditorToolbarForBottomScroll();
             syncSpeakerEditorToolbarForBottomScroll();
             setBackendPanel('speakers');
