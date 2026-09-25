@@ -302,6 +302,7 @@
         body.backend-page.backend-readonly #save-speaker-button,
         body.backend-page.backend-readonly #save-team-button,
         body.backend-page.backend-readonly #emailer-save-contact-button,
+        body.backend-page.backend-readonly #emailer-delete-contact-btn,
         body.backend-page.backend-readonly #texteditor-save-btn,
         body.backend-page.backend-readonly #save-programme-btn,
         body.backend-page.backend-readonly #programme-add-session-btn,
@@ -3573,8 +3574,22 @@
             color: #ffffff !important;
             font-size: 0;
             line-height: 0;
+            cursor: pointer;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn:disabled {
             opacity: 0.45;
             cursor: not-allowed;
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn.is-armed {
+            outline: 2px solid #F71941;
+            outline-offset: 0;
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
         #emailer-editor .emailer-editor-toolbar-trailing #emailer-delete-contact-btn svg,
@@ -6247,13 +6262,22 @@
         #guest-editor .guests-list-table tbody tr.guests-roster-section-row,
         #guest-editor .guests-list-table tbody tr.guests-roster-section-row:hover,
         #guest-editor .guests-list-table tbody tr.guests-roster-section-row td,
-        #guest-editor .guests-list-table tbody tr.guests-roster-section-row:hover td {
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row:hover td,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-blank-row,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-blank-row:hover,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-blank-row td,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-blank-row:hover td,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-section-row,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-section-row:hover,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-section-row td,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-section-row:hover td {
             background: #ffffff;
             cursor: default;
             pointer-events: none;
         }
 
-        #guest-editor .guests-list-table tbody tr.guests-roster-section-row td.guests-roster-section-title-cell {
+        #guest-editor .guests-list-table tbody tr.guests-roster-section-row td.guests-roster-section-title-cell,
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-section-row td.speaker-roster-section-title-cell {
             height: var(--backend-panel-header-height);
             min-height: var(--backend-panel-header-height);
             max-height: var(--backend-panel-header-height);
@@ -6418,6 +6442,44 @@
             letter-spacing: 0.01875em;
             line-height: 1.2;
             flex-shrink: 0;
+        }
+
+        #speaker-editor .speakers-roster-table tr.is-potential button.speaker-roster-tag,
+        #speaker-editor .speakers-roster-table tr.is-potential button.speaker-roster-tag:hover,
+        #speaker-editor .speakers-roster-table tr.is-potential button.speaker-roster-tag:disabled,
+        #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-btn,
+        #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-btn:hover,
+        #speaker-editor .speakers-roster-table tr.is-potential .content-badge {
+            background: #94a3b8 !important;
+            color: #ffffff !important;
+            cursor: default;
+            pointer-events: none;
+            box-shadow: none;
+            opacity: 1 !important;
+            border-color: #94a3b8;
+        }
+
+        #speaker-editor .speakers-roster-table tr.is-potential .speakers-status-wrap,
+        #speaker-editor .speakers-roster-table tr.is-potential .speakers-lodging-wrap,
+        #speaker-editor .speakers-roster-table tr.is-potential .speakers-bio-wrap,
+        #speaker-editor .speakers-roster-table tr.is-potential .speakers-programmed-wrap {
+            pointer-events: none;
+        }
+
+        #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-check,
+        #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-x {
+            color: #ffffff;
+        }
+
+        #speaker-editor .speakers-roster-table td.speaker-roster-potential-topic-cell {
+            text-align: left;
+            white-space: normal;
+        }
+
+        #speaker-editor .speakers-roster-table .speaker-roster-potential-topic {
+            font-weight: 500;
+            color: #0f172a;
+            vertical-align: middle;
         }
 
         #speaker-editor .speakers-roster-table button.speaker-roster-tag--presented-no,
@@ -8564,6 +8626,83 @@
             min-width: 0;
         }
 
+        #speaker-editor .speaker-potential-field {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            min-width: 7.5rem;
+        }
+
+        #speaker-editor .speaker-potential-field > span {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #003153;
+            text-align: center;
+        }
+
+        #speaker-editor .speaker-potential-check {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        #speaker-editor .speaker-potential-check input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+            appearance: auto;
+            -webkit-appearance: auto;
+            background: transparent;
+            padding: 0;
+        }
+
+        #speaker-editor .speaker-potential-mark {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            box-sizing: border-box;
+            border: 2px solid #003153;
+            border-radius: 8px;
+            background: #ffffff;
+            color: transparent;
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        #speaker-editor .speaker-potential-check input:checked + .speaker-potential-mark {
+            color: var(--backend-roster-status-yes-bg);
+        }
+
+        #speaker-editor .speaker-potential-check input:focus-visible + .speaker-potential-mark {
+            outline: 2px solid #003153;
+            outline-offset: 2px;
+        }
+
+        #speaker-editor .speaker-potential-check input:disabled {
+            cursor: not-allowed;
+        }
+
+        #speaker-editor .speaker-potential-check input:disabled + .speaker-potential-mark {
+            opacity: 0.45;
+        }
+
         #team-editor .team-name-row {
             display: flex;
             flex-direction: row;
@@ -10441,6 +10580,22 @@
             filter: brightness(0.92);
         }
 
+        #programme-editor .programme-toolbar #save-programme-btn.is-saving,
+        #programme-editor .programme-toolbar #save-programme-btn.is-saving:disabled {
+            opacity: 1;
+            cursor: wait;
+            pointer-events: none;
+            filter: none;
+        }
+
+        #programme-editor .programme-toolbar #save-programme-btn.is-saving > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.85s linear infinite;
+            will-change: transform;
+        }
+
         #programme-editor .programme-toolbar .programme-toolbar-create-btn {
             flex: 0 0 auto;
             width: auto;
@@ -11216,6 +11371,13 @@
                                     <label for="add-speaker-last-name">Last name</label>
                                     <input type="text" id="add-speaker-last-name" name="lastName" autocomplete="family-name" spellcheck="false">
                                 </div>
+                                <label class="speaker-potential-field" for="add-speaker-potential">
+                                    <span>Speaker idea</span>
+                                    <span class="speaker-potential-check">
+                                        <input type="checkbox" id="add-speaker-potential" name="potentialSpeaker">
+                                        <span class="speaker-potential-mark" aria-hidden="true">✓</span>
+                                    </span>
+                                </label>
                             </div>
                             <div class="add-speaker-form-field">
                                 <label for="add-speaker-email">E-mail</label>
@@ -11248,6 +11410,18 @@
                                     </div>
                                     <textarea id="add-speaker-long-bio" name="longBio" class="add-speaker-form-field--long-bio" rows="8" spellcheck="true"></textarea>
                                 </div>
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-link-one">Link 1</label>
+                                <input type="url" id="add-speaker-link-one" name="link_one" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://">
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-link-two">Link 2</label>
+                                <input type="url" id="add-speaker-link-two" name="link_two" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://">
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-link-three">Link 3</label>
+                                <input type="url" id="add-speaker-link-three" name="link_three" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://">
                             </div>
                             <div class="speaker-editor-meta" aria-live="polite">
                                 <p class="speaker-editor-meta-line" id="speaker-editor-collection" hidden aria-hidden="true">Collection: tbs/Speakers/{speakerId}/item</p>
@@ -12525,6 +12699,42 @@
                                             spellcheck="true"
                                         ></textarea>
                                     </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="add-emailer-contact-link-one">Link 1</label>
+                                        <input
+                                            type="url"
+                                            id="add-emailer-contact-link-one"
+                                            name="link_one"
+                                            inputmode="url"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="https://"
+                                        />
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="add-emailer-contact-link-two">Link 2</label>
+                                        <input
+                                            type="url"
+                                            id="add-emailer-contact-link-two"
+                                            name="link_two"
+                                            inputmode="url"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="https://"
+                                        />
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="add-emailer-contact-link-three">Link 3</label>
+                                        <input
+                                            type="url"
+                                            id="add-emailer-contact-link-three"
+                                            name="link_three"
+                                            inputmode="url"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="https://"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             </div>
@@ -12863,6 +13073,17 @@
         </div>
     </div>
 
+    <div id="contact-delete-confirm" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="contact-delete-confirm-title">
+        <div class="guest-delete-confirm__backdrop" id="contact-delete-confirm-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <p id="contact-delete-confirm-title">Delete contact?</p>
+            <div class="guest-delete-confirm__actions">
+                <button type="button" class="speaker-delete-cancel-btn" id="contact-delete-cancel">Cancel</button>
+                <button type="button" class="speaker-delete-yes-btn" id="contact-delete-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
     <div id="team-delete-confirm" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="team-delete-confirm-title">
         <div class="guest-delete-confirm__backdrop" id="team-delete-confirm-backdrop"></div>
         <div class="guest-delete-confirm__box">
@@ -12963,7 +13184,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script src="auth-common.js?v=20260902-backend-users-login"></script>
     <script src="backend-auth.js?v=20260902-backend-users-login"></script>
@@ -12980,7 +13200,6 @@
         };
         const eventdates = ['2027-02-09', '2027-02-10', '2027-02-11', '2027-02-12'];
         let firestoreDb = null;
-        let functionsApp = null;
         let selectedevent = '';
         /** In-memory roster (+ inviteStatus, titlesStatus, travel, cme, refunded) */
         let speakerRosterInMemory = [];
@@ -13024,6 +13243,7 @@
         var contactsRosterInMemory = [];
         var contactsMemoryLoaded = false;
         var contactsDirtyDocIds = Object.create(null);
+        var contactIdsPendingDelete = Object.create(null);
         var contactsFirebaseAutosaveTimer = null;
         var contactsFirebaseSaveInFlight = false;
         var contactsFirebaseSavePending = false;
@@ -13311,6 +13531,7 @@
             if (low === 'confirmed' || low === 'accepted') return 'Confirmed';
             if (low === 'invited') return 'Invited';
             if (low === 'cancel' || low === 'cancelled' || low === 'canceled') return 'Cancel';
+            if (low === 'not approached') return 'Not approached';
             if (SPEAKER_INVITE_STATUS_VALUES.indexOf(s) >= 0) return s;
             return 'Preliminary';
         }
@@ -13379,11 +13600,6 @@
             return 'speaker-roster-tag--brief-final';
         }
 
-        function speakerRosterPresentedTagClass(presented) {
-            return normalizeSpeakerPresented(presented) === 'Yes'
-                ? 'speaker-roster-tag--presented-yes'
-                : 'speaker-roster-tag--presented-no';
-        }
 
         function speakerRosterInviteTagClass(inviteStatus) {
             var I = normalizeSpeakerInviteStatus(inviteStatus);
@@ -13424,7 +13640,42 @@
             refunded: { order: SPEAKER_REFUNDED_VALUES, norm: normalizeSpeakerRefunded }
         };
 
+        function speakerEventIsPotential(rec) {
+            return String(rec && rec.event != null ? rec.event : '').trim().toLowerCase() === 'potential';
+        }
+
+        function speakerPotentialCheckboxIsChecked() {
+            var box = document.getElementById('add-speaker-potential');
+            return !!(box && box.checked);
+        }
+
+        function applySpeakerPotentialEvent(rec) {
+            if (!rec) return;
+            if (speakerPotentialCheckboxIsChecked()) {
+                rec.event = 'Potential';
+                rec.inviteStatus = 'Not approached';
+            } else {
+                rec.event = String(current_event || '').trim();
+            }
+        }
+
+        function persistSpeakerPotentialEventChange() {
+            var id = String(speakerFormEditingDocId || '').trim();
+            if (!id || id === '_init') return;
+            var rec = findSpeakerInMemory(id);
+            if (!rec) return;
+            applySpeakerPotentialEvent(rec);
+            markSpeakerDocDirty(id);
+            speakerRosterSortInPlace();
+            renderSpeakerRoster();
+            scheduleSpeakerFirebaseSync();
+            updateAddSpeakerSaveButtonState();
+        }
+
         function compareSpeakersInRoster(a, b) {
+            var aPotential = speakerEventIsPotential(a);
+            var bPotential = speakerEventIsPotential(b);
+            if (aPotential !== bPotential) return aPotential ? 1 : -1;
             var fa = String(a.firstName || '').trim().toLowerCase();
             var fb = String(b.firstName || '').trim().toLowerCase();
             var c = fa.localeCompare(fb);
@@ -13474,6 +13725,9 @@
                 topic3: s.topic3 != null ? String(s.topic3) : '',
                 shortBio: s.shortBio != null ? String(s.shortBio) : '',
                 Bio_long: s.longBio != null ? String(s.longBio) : '',
+                link_one: s.linkOne != null ? String(s.linkOne) : '',
+                link_two: s.linkTwo != null ? String(s.linkTwo) : '',
+                link_three: s.linkThree != null ? String(s.linkThree) : '',
                 lodging: normalizeSpeakerLodging(s.lodging),
                 bioStatus: normalizeSpeakerBioStatus(s.bioStatus),
                 biopublish: normalizeSpeakerBioPublish(s.bioPublish),
@@ -13532,13 +13786,6 @@
             return guestLogYyMmDdPrefix() + ': Speaker confirmed';
         }
 
-        function speakerFormalInviteWasSent(s) {
-            var log = Array.isArray(s && s.speakerLog) ? s.speakerLog : [];
-            for (var i = 0; i < log.length; i++) {
-                if (/Formal invite sent/i.test(String(log[i] != null ? log[i] : ''))) return true;
-            }
-            return false;
-        }
 
         function speakerConfirmedDateLabelFromRecord(s) {
             if (!s) return '';
@@ -13961,6 +14208,13 @@
             s.topic3 = t3El ? String(t3El.value || '') : '';
             s.shortBio = sbEl ? String(sbEl.value || '') : '';
             s.longBio = lbEl ? String(lbEl.value || '') : '';
+            var linkOneEl = document.getElementById('add-speaker-link-one');
+            var linkTwoEl = document.getElementById('add-speaker-link-two');
+            var linkThreeEl = document.getElementById('add-speaker-link-three');
+            s.linkOne = linkOneEl ? String(linkOneEl.value || '') : '';
+            s.linkTwo = linkTwoEl ? String(linkTwoEl.value || '') : '';
+            s.linkThree = linkThreeEl ? String(linkThreeEl.value || '') : '';
+            applySpeakerPotentialEvent(s);
             speakerRosterSortInPlace();
             markSpeakerDocDirty(id);
             renderSpeakerRoster();
@@ -13978,8 +14232,6 @@
         var speakerSyncInFlight = false;
         var SPEAKER_FIREBASE_DEBOUNCE_MS = 2000;
         var SPEAKER_FIREBASE_PERIODIC_MS = 12000;
-        let dragState = null;
-        let justDragged = false;
         let selectedProgrammeEditorDayDate = null;
         let selectedProgrammeEditorSessionId = null;
         let selectedProgrammeEditorSlotId = null;
@@ -14428,14 +14680,6 @@
             ]);
         }
 
-        function getFunctions() {
-            if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded.');
-            if (!functionsApp) {
-                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-                functionsApp = firebase.app().functions('us-central1');
-            }
-            return functionsApp;
-        }
 
         /** One content row: `tbs/Content/{rowId}/item` (document `item` holds all fields). */
         function contentItemDocRef(db, rowId) {
@@ -14920,16 +15164,9 @@
             return Promise.resolve(url);
         }
 
-        function contentImageStoragePathForDoc(docId, fileName) {
-            var id = String(docId || '').trim();
-            var base = String(fileName || 'image').replace(/[^a-zA-Z0-9._-]+/g, '-');
-            var safe = base || 'image';
-            return 'tbs/Content/' + id + '/images/' + Date.now() + '-' + safe;
-        }
 
         async function uploadContentImageFile(file, docId, meta) {
             if (backenduserIsReadonly) throw backendReadonlyError();
-            var id = String(docId || '').trim();
             var id = String(docId || '').trim();
             if (!id) throw new Error('Select content before uploading image.');
             if (!file) throw new Error('No image selected.');
@@ -15025,11 +15262,6 @@
             return db.collection('events').doc(eventId).collection('items');
         }
 
-        /** Programme day metadata under events (doc ids per ISO date). Day card HTML is `tbs/Programme/{Current event}/days/{ISO}/Programme`; intro is `tbs/Pre-sets/Zermatt/Zermatt.Programmeinfo`. */
-        function eventProgrammeHtmlCollection(db, eventId) {
-            if (!eventId) return null;
-            return db.collection('events').doc(eventId).collection('programme');
-        }
 
         /** Subcollection under `tbs/Programme` named like `tbs/Settings` → `Current event` (e.g. TBS27). */
         function tbsProgrammeEventKey() {
@@ -15417,9 +15649,6 @@
             return String(h).padStart(2, '0') + String(m).padStart(2, '0');
         }
 
-        function formatProgrammeSlotTimeRange(starttime, endtime) {
-            return formatProgrammeSlotTimestampToHhmm(starttime) + '-' + formatProgrammeSlotTimestampToHhmm(endtime);
-        }
 
         function parseProgrammeSlotHhmmInput(raw) {
             var s = String(raw != null ? raw : '').trim();
@@ -15440,9 +15669,6 @@
             return { hours: hh, minutes: mm };
         }
 
-        function formatProgrammeSlotHhmm(hours, minutes) {
-            return String(hours).padStart(2, '0') + String(minutes).padStart(2, '0');
-        }
 
         function programmeSlotTimestampFromHhmm(isoDate, rawHhmm, existingTs) {
             var parsed = parseProgrammeSlotHhmmInput(rawHhmm);
@@ -15564,14 +15790,6 @@
             }
         }
 
-        function syncProgrammeSlotInState(dateStr, sessionId, slotId, patch) {
-            var slot = getProgrammeSlotFromState(dateStr, sessionId, slotId);
-            if (!slot || !patch) return;
-            if (patch.name != null) slot.name = normalizeProgrammeSlotName(patch.name);
-            if (patch.starttime != null) slot.starttime = patch.starttime;
-            if (patch.endtime != null) slot.endtime = patch.endtime;
-            sortProgrammeSlotsInState(dateStr, sessionId);
-        }
 
         function swapProgrammeSlotTimestampsBetween(slotA, slotB) {
             if (!slotA || !slotB) return false;
@@ -15702,60 +15920,9 @@
             }
         }
 
-        async function saveProgrammeSlotFieldToFirestore(dateStr, sessionId, slotId, field, rawValue) {
-            var slot = getProgrammeSlotFromState(dateStr, sessionId, slotId);
-            if (!slot) throw new Error('Slot not found.');
-            var update = {};
-            if (field === 'name') {
-                update.name = normalizeProgrammeSlotName(rawValue);
-            } else if (field === 'starttime') {
-                var startTs = programmeSlotTimestampFromHhmm(dateStr, rawValue, slot.starttime);
-                if (!startTs) throw new Error('Invalid start time. Use HHMM (e.g. 0900).');
-                update.starttime = startTs;
-            } else if (field === 'endtime') {
-                var endTs = programmeSlotTimestampFromHhmm(dateStr, rawValue, slot.endtime);
-                if (!endTs) throw new Error('Invalid end time. Use HHMM (e.g. 0930).');
-                update.endtime = endTs;
-            } else {
-                throw new Error('Unknown slot field.');
-            }
-            var db = getFirestore();
-            await tbsProgrammeSessionSlotsCollection(db, dateStr, sessionId).doc(slotId).set(update, { merge: true });
-            syncProgrammeSlotInState(dateStr, sessionId, slotId, update);
-        }
 
-        async function saveProgrammeSlotEditableEl(el) {
-            var dateStr = el.getAttribute('data-programme-date') || '';
-            var sessionId = el.getAttribute('data-session-id') || '';
-            var slotId = el.getAttribute('data-slot-id') || '';
-            var field = slotFieldFromEditableEl(el);
-            if (!dateStr || !sessionId || !slotId || !field) return;
-            var rawValue = readProgrammeSlotEditableText(el);
-            await saveProgrammeSlotFieldToFirestore(dateStr, sessionId, slotId, field, rawValue);
-            normalizeProgrammeSlotEditableDom(el);
-            recomputeProgrammeSlotsDirty();
-        }
 
-        function programmeSlotEditableElIsDirty(el) {
-            if (!el) return false;
-            var dateStr = el.getAttribute('data-programme-date') || '';
-            var sessionId = el.getAttribute('data-session-id') || '';
-            var slotId = el.getAttribute('data-slot-id') || '';
-            var field = slotFieldFromEditableEl(el);
-            if (!dateStr || !sessionId || !slotId || !field) return false;
-            var current = readProgrammeSlotEditableText(el);
-            var saved = field === 'name'
-                ? getProgrammeSlotNameFromState(dateStr, sessionId, slotId)
-                : (field === 'starttime'
-                    ? getProgrammeSlotStartHhmmFromState(dateStr, sessionId, slotId)
-                    : getProgrammeSlotEndHhmmFromState(dateStr, sessionId, slotId));
-            return current !== saved;
-        }
 
-        async function saveProgrammeSlotEditableElIfDirty(el) {
-            if (!programmePadlockIsOpen) return false;
-            return applyProgrammeSlotEditableElToLocal(el);
-        }
 
         function buildProgrammeSlotPatchFromEditable(dateStr, sessionId, slotId, field, rawValue) {
             var slot = getProgrammeSlotFromState(dateStr, sessionId, slotId);
@@ -16030,14 +16197,6 @@
             return sessions;
         }
 
-        async function refreshProgrammeDaySessionsFromFirestore(dateStr) {
-            if (!dateStr) return;
-            var db = getFirestore();
-            programmeState.sessionsByDay = programmeState.sessionsByDay || {};
-            programmeState.sessionsByDay[dateStr] = await loadProgrammeSessionsForDay(db, dateStr);
-            syncProgrammePersistedSnapshotFromState();
-            recomputeProgrammeEditDirtyFlags();
-        }
 
         async function loadProgrammeSessionsByDay(db, dates) {
             programmeState.sessionsByDay = {};
@@ -16087,39 +16246,9 @@
             recomputeProgrammeEditDirtyFlags();
         }
 
-        function programmeSessionTitleElIsDirty(el) {
-            if (!el || !el.classList || !el.classList.contains('programme-day-session')) return false;
-            var dateStr = el.getAttribute('data-programme-date') || '';
-            var sessionId = el.getAttribute('data-session-id') || '';
-            if (!dateStr || !sessionId) return false;
-            return readProgrammeSessionTitleEl(el) !== getProgrammeSessionNameFromState(dateStr, sessionId);
-        }
 
-        async function persistProgrammeSessionName(dateStr, sessionId, name) {
-            var db = getFirestore();
-            var normalized = normalizeProgrammeSessionName(name);
-            await tbsProgrammeDayCollection(db, dateStr).doc(sessionId).set({ name: normalized }, { merge: true });
-            syncProgrammeSessionNameInState(dateStr, sessionId, normalized);
-            return normalized;
-        }
 
-        async function saveProgrammeSessionEditableElIfDirty(el) {
-            if (!programmePadlockIsOpen) return false;
-            return applyProgrammeSessionEditableElToLocal(el);
-        }
 
-        async function saveProgrammeSessionNameToFirestore(dateStr, sessionId, name) {
-            var normalized = await persistProgrammeSessionName(dateStr, sessionId, name);
-            var titleEls = document.querySelectorAll('#programme-editor .programme-day-session[data-session-id][data-programme-date]');
-            for (var ti = 0; ti < titleEls.length; ti++) {
-                var titleEl = titleEls[ti];
-                if (titleEl.getAttribute('data-session-id') === sessionId && titleEl.getAttribute('data-programme-date') === dateStr) {
-                    titleEl.textContent = normalized;
-                    break;
-                }
-            }
-            recomputeProgrammeSessionNamesDirty();
-        }
 
         async function saveProgrammeSessionNamesFromDom(options) {
             options = options || {};
@@ -16220,24 +16349,20 @@
             }).join('') + '</div>';
         }
 
-        /** Legacy per-event speakers path (still used when creating a new event). Main roster uses `tbs/Speakers`. */
-        function eventSpeakersCollection(db, eventId) {
-            if (!eventId) return null;
-            return db.collection('events').doc(eventId).collection('speakers');
-        }
 
         function speakerEditorRequiredFieldsMet() {
             var fn = document.getElementById('add-speaker-first-name');
             var ln = document.getElementById('add-speaker-last-name');
             var em = document.getElementById('add-speaker-email');
-            return !!(
+            var namesOk = !!(
                 fn &&
                 ln &&
-                em &&
                 String(fn.value || '').trim() !== '' &&
-                String(ln.value || '').trim() !== '' &&
-                String(em.value || '').trim() !== ''
+                String(ln.value || '').trim() !== ''
             );
+            if (!namesOk) return false;
+            if (speakerPotentialCheckboxIsChecked()) return true;
+            return !!(em && String(em.value || '').trim() !== '');
         }
 
         var speakerBioFormBaseline = null;
@@ -16251,6 +16376,9 @@
             var t3El = document.getElementById('add-speaker-topic3');
             var sbEl = document.getElementById('add-speaker-short-bio');
             var lbEl = document.getElementById('add-speaker-long-bio');
+            var linkOneEl = document.getElementById('add-speaker-link-one');
+            var linkTwoEl = document.getElementById('add-speaker-link-two');
+            var linkThreeEl = document.getElementById('add-speaker-link-three');
             return {
                 firstName: fnEl ? String(fnEl.value || '') : '',
                 lastName: lnEl ? String(lnEl.value || '') : '',
@@ -16259,7 +16387,10 @@
                 topic2: t2El ? String(t2El.value || '') : '',
                 topic3: t3El ? String(t3El.value || '') : '',
                 shortBio: sbEl ? String(sbEl.value || '') : '',
-                longBio: lbEl ? String(lbEl.value || '') : ''
+                longBio: lbEl ? String(lbEl.value || '') : '',
+                linkOne: linkOneEl ? String(linkOneEl.value || '') : '',
+                linkTwo: linkTwoEl ? String(linkTwoEl.value || '') : '',
+                linkThree: linkThreeEl ? String(linkThreeEl.value || '') : ''
             };
         }
 
@@ -16278,7 +16409,10 @@
                 current.topic2 !== speakerBioFormBaseline.topic2 ||
                 current.topic3 !== speakerBioFormBaseline.topic3 ||
                 current.shortBio !== speakerBioFormBaseline.shortBio ||
-                current.longBio !== speakerBioFormBaseline.longBio
+                current.longBio !== speakerBioFormBaseline.longBio ||
+                current.linkOne !== speakerBioFormBaseline.linkOne ||
+                current.linkTwo !== speakerBioFormBaseline.linkTwo ||
+                current.linkThree !== speakerBioFormBaseline.linkThree
             );
         }
 
@@ -16962,6 +17096,9 @@
                 topic3: '',
                 shortBio: '',
                 longBio: '',
+                linkOne: '',
+                linkTwo: '',
+                linkThree: '',
                 event: String(current_event || '').trim(),
                 inviteStatus: 'Preliminary',
                 confirmedDate: '',
@@ -16998,6 +17135,13 @@
             rec.topic3 = t3El ? String(t3El.value || '') : '';
             rec.shortBio = sbEl ? String(sbEl.value || '') : '';
             rec.longBio = lbEl ? String(lbEl.value || '') : '';
+            var linkOneEl = document.getElementById('add-speaker-link-one');
+            var linkTwoEl = document.getElementById('add-speaker-link-two');
+            var linkThreeEl = document.getElementById('add-speaker-link-three');
+            rec.linkOne = linkOneEl ? String(linkOneEl.value || '') : '';
+            rec.linkTwo = linkTwoEl ? String(linkTwoEl.value || '') : '';
+            rec.linkThree = linkThreeEl ? String(linkThreeEl.value || '') : '';
+            applySpeakerPotentialEvent(rec);
         }
 
         function ensureSpeakerDraftRecordReadyForAutosave() {
@@ -17092,7 +17236,8 @@
             var addSpeakerForm = document.getElementById('speaker-editor-panel');
             if (!addSpeakerForm) return;
             addSpeakerForm.querySelectorAll('input, textarea').forEach(function(el) {
-                el.value = '';
+                if (el.type === 'checkbox') el.checked = false;
+                else el.value = '';
             });
             updateEditSpeakerNameHeading();
             updateLongBioLetterCounter();
@@ -17564,9 +17709,6 @@
             }
         }
 
-        function htmlFieldNameForDate(dateStr) {
-            return 'html-' + String(dateStr || '');
-        }
 
         var escapeHtmlDiv = null;
         function escapeHtml(text) {
@@ -17672,8 +17814,11 @@
             var t3 = speakerCoalesceStringField(d, ['topic3', 'Topic 3', 'Topic3']);
             var sb = speakerShortBioFromDoc(d);
             var lb = speakerCoalesceLongField(d, ['Bio_long', 'longBio', 'Bio text', 'Long']);
+            var linkOne = speakerCoalesceStringField(d, ['link_one', 'linkOne']);
+            var linkTwo = speakerCoalesceStringField(d, ['link_two', 'linkTwo']);
+            var linkThree = speakerCoalesceStringField(d, ['link_three', 'linkThree']);
             var ev = speakerCoalesceStringField(d, ['event', 'Event', 'Events']);
-            return {
+            var rec = {
                 id: docId,
                 firstName: fn,
                 lastName: ln,
@@ -17683,6 +17828,9 @@
                 topic3: t3,
                 shortBio: sb,
                 longBio: lb,
+                linkOne: linkOne,
+                linkTwo: linkTwo,
+                linkThree: linkThree,
                 event: ev,
                 lodging: normalizeSpeakerLodging(
                     speakerCoalesceStringField(d, ['lodging', 'Lodging']) || 'No'
@@ -17727,6 +17875,8 @@
                 speakerLog: speakerLogFromDoc(d),
                 selected: guestSelectedFromDoc(d),
             };
+            if (speakerEventIsPotential(rec)) rec.inviteStatus = 'Not approached';
+            return rec;
         }
 
         function guestIdsFromTbsGuestsParentData(data) {
@@ -18256,9 +18406,6 @@
             return null;
         }
 
-        function renderTeamTableRows(count, emptyMessage) {
-            renderTeamTable([], count, emptyMessage);
-        }
 
         function teamMemberRecordFromDoc(docId, d) {
             d = d || {};
@@ -19135,27 +19282,7 @@
             if (first) first.focus();
         }
 
-        async function saveTeamMemberToFirebase(rec) {
-            if (backenduserIsReadonly) return false;
-            var id = String(rec && rec.id ? rec.id : '').trim();
-            if (!id || teamIdsPendingDelete[id]) return false;
-            var db = getFirestore();
-            var FV = firebase.firestore.FieldValue;
-            var batch = db.batch();
-            batch.set(tbsTeamItemRef(db, id), teamPayloadFromRecord(rec), { merge: true });
-            batch.set(
-                tbsTeamParentDocRef(db),
-                { teamIds: FV.arrayUnion(id) },
-                { merge: true }
-            );
-            await batch.commit();
-            return true;
-        }
 
-        async function persistOpenTeamToFirebaseIfNeeded() {
-            syncTeamFormToMemoryIfEditing();
-            return true;
-        }
 
         async function saveTeamFromEditor() {
             if (!teamEditorRequiredFieldsMet()) {
@@ -19425,12 +19552,18 @@
             var category = document.getElementById('add-emailer-contact-category');
             var eventEl = document.getElementById('add-emailer-contact-event');
             var notes = document.getElementById('add-emailer-contact-notes');
+            var linkOne = document.getElementById('add-emailer-contact-link-one');
+            var linkTwo = document.getElementById('add-emailer-contact-link-two');
+            var linkThree = document.getElementById('add-emailer-contact-link-three');
             if (first) first.value = '';
             if (last) last.value = '';
             if (email) email.value = '';
             if (category) category.value = '';
             fillEmailerContactEventSelect('None');
             if (notes) notes.value = '';
+            if (linkOne) linkOne.value = '';
+            if (linkTwo) linkTwo.value = '';
+            if (linkThree) linkThree.value = '';
             updateEditEmailerContactNameHeading();
         }
 
@@ -19489,6 +19622,7 @@
             bio.querySelectorAll('select').forEach(function (el) {
                 el.disabled = !canEdit;
             });
+            updateEmailerDeleteButtonState();
         }
 
         function syncEmailerEditorToolbar() {
@@ -19528,6 +19662,7 @@
                 padlock.setAttribute('aria-disabled', selectionEmpty ? 'true' : 'false');
             }
             updateEmailerComposeButtonState();
+            updateEmailerDeleteButtonState();
             syncEmailerPadlockButtonUi();
         }
 
@@ -19657,6 +19792,9 @@
             var email = document.getElementById('add-emailer-contact-email');
             var category = document.getElementById('add-emailer-contact-category');
             var notes = document.getElementById('add-emailer-contact-notes');
+            var linkOne = document.getElementById('add-emailer-contact-link-one');
+            var linkTwo = document.getElementById('add-emailer-contact-link-two');
+            var linkThree = document.getElementById('add-emailer-contact-link-three');
             return {
                 firstName: first ? String(first.value || '') : '',
                 lastName: last ? String(last.value || '') : '',
@@ -19664,6 +19802,9 @@
                 category: category ? String(category.value || '') : '',
                 event: emailerContactEventSelectValue(),
                 notes: notes ? String(notes.value || '') : '',
+                linkOne: linkOne ? String(linkOne.value || '') : '',
+                linkTwo: linkTwo ? String(linkTwo.value || '') : '',
+                linkThree: linkThree ? String(linkThree.value || '') : '',
             };
         }
 
@@ -19680,7 +19821,10 @@
                 current.email !== emailerContactFormBaseline.email ||
                 current.category !== emailerContactFormBaseline.category ||
                 current.event !== emailerContactFormBaseline.event ||
-                current.notes !== emailerContactFormBaseline.notes
+                current.notes !== emailerContactFormBaseline.notes ||
+                current.linkOne !== emailerContactFormBaseline.linkOne ||
+                current.linkTwo !== emailerContactFormBaseline.linkTwo ||
+                current.linkThree !== emailerContactFormBaseline.linkThree
             );
         }
 
@@ -19693,6 +19837,9 @@
             rec.category = snap.category;
             rec.event = snap.event;
             rec.notes = snap.notes;
+            rec.linkOne = snap.linkOne;
+            rec.linkTwo = snap.linkTwo;
+            rec.linkThree = snap.linkThree;
         }
 
         function contactPayloadFromRecord(rec) {
@@ -19704,6 +19851,9 @@
                 category: rec.category != null ? String(rec.category) : '',
                 event: rec.event != null && String(rec.event).trim() ? String(rec.event).trim() : 'None',
                 notes: rec.notes != null ? String(rec.notes) : '',
+                link_one: rec.linkOne != null ? String(rec.linkOne) : '',
+                link_two: rec.linkTwo != null ? String(rec.linkTwo) : '',
+                link_three: rec.linkThree != null ? String(rec.linkThree) : '',
                 Selected: guestSelectedFieldIsYes(rec && rec.selected) ? 'Yes' : 'No',
             };
         }
@@ -19729,6 +19879,15 @@
                 ) || 'None',
                 notes: guestStringFromFirestoreValue(
                     coalesceFirestoreFieldValue(d, ['notes', 'Notes'])
+                ),
+                linkOne: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['link_one', 'linkOne'])
+                ),
+                linkTwo: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['link_two', 'linkTwo'])
+                ),
+                linkThree: guestStringFromFirestoreValue(
+                    coalesceFirestoreFieldValue(d, ['link_three', 'linkThree'])
                 ),
                 selected: guestSelectedFromDoc(d),
             };
@@ -19757,7 +19916,8 @@
 
         function markContactDocDirty(docId) {
             var id = String(docId || '').trim();
-            if (id) contactsDirtyDocIds[id] = true;
+            if (!id || contactIdsPendingDelete[id]) return;
+            contactsDirtyDocIds[id] = true;
         }
 
         function cancelEmailerFirebaseAutosaveTimer() {
@@ -19798,6 +19958,7 @@
             if (btn.classList.contains('is-autosaving')) {
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
+                updateEmailerDeleteButtonState();
                 return;
             }
             var hasEditorContext =
@@ -19808,6 +19969,7 @@
                 emailerContactRequiredFieldsMet();
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            updateEmailerDeleteButtonState();
         }
 
         function clearEmailerRosterItemSelection() {
@@ -19981,6 +20143,12 @@
             if (cat) cat.value = contactCategoryDisplayLabel(rec.category);
             fillEmailerContactEventSelect(rec.event || 'None');
             if (notes) notes.value = rec.notes != null ? String(rec.notes) : '';
+            var linkOne = document.getElementById('add-emailer-contact-link-one');
+            var linkTwo = document.getElementById('add-emailer-contact-link-two');
+            var linkThree = document.getElementById('add-emailer-contact-link-three');
+            if (linkOne) linkOne.value = rec.linkOne != null ? String(rec.linkOne) : '';
+            if (linkTwo) linkTwo.value = rec.linkTwo != null ? String(rec.linkTwo) : '';
+            if (linkThree) linkThree.value = rec.linkThree != null ? String(rec.linkThree) : '';
             updateEditEmailerContactNameHeading();
             captureEmailerContactFormBaseline();
             setEmailerViewerEmptyState(false);
@@ -20017,6 +20185,9 @@
                 category: snap.category,
                 event: snap.event,
                 notes: snap.notes,
+                linkOne: snap.linkOne,
+                linkTwo: snap.linkTwo,
+                linkThree: snap.linkThree,
                 selected: 'No',
                 pendingNewContactCreatedNotice: true,
             };
@@ -20079,8 +20250,12 @@
             try {
                 for (var i = 0; i < ids.length; i++) {
                     var id = ids[i];
+                    if (contactIdsPendingDelete[id]) {
+                        delete contactsDirtyDocIds[id];
+                        continue;
+                    }
                     var rec = findContactInMemory(id);
-                    if (!rec) {
+                    if (!rec || contactIdsPendingDelete[id]) {
                         delete contactsDirtyDocIds[id];
                         continue;
                     }
@@ -20187,6 +20362,114 @@
                     showStatus('error', err.message || 'Failed to save contact.');
                 }
                 return false;
+            }
+        }
+
+        function updateEmailerDeleteButtonState() {
+            var delBtn = document.getElementById('emailer-delete-contact-btn');
+            if (!delBtn) return;
+            var id = String(emailerFormEditingDocId || '').trim();
+            var canDelete = !!id && emailerPadlockIsOpen && !isEmailerViewerSelectionEmpty();
+            delBtn.disabled = !canDelete;
+            delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
+            if (!canDelete) delBtn.classList.remove('is-armed');
+        }
+
+        function emailerContactDisplayName(rec) {
+            if (!rec) return 'contact';
+            var label = (
+                String(rec.firstName || '').trim() +
+                ' ' +
+                String(rec.lastName || '').trim()
+            ).trim();
+            return label || String(rec.id || '').trim() || 'contact';
+        }
+
+        function openContactDeleteConfirmModal() {
+            var dlg = document.getElementById('contact-delete-confirm');
+            if (!dlg) return;
+            var titleEl = document.getElementById('contact-delete-confirm-title');
+            var rec = findContactInMemory(emailerFormEditingDocId);
+            if (titleEl) titleEl.textContent = 'Delete ' + emailerContactDisplayName(rec) + '?';
+            var delBtn = document.getElementById('emailer-delete-contact-btn');
+            if (delBtn) delBtn.classList.add('is-armed');
+            dlg.hidden = false;
+            dlg.setAttribute('aria-hidden', 'false');
+            var cancel = document.getElementById('contact-delete-cancel');
+            if (cancel) cancel.focus();
+        }
+
+        function closeContactDeleteConfirmModal() {
+            var dlg = document.getElementById('contact-delete-confirm');
+            if (!dlg) return;
+            dlg.hidden = true;
+            dlg.setAttribute('aria-hidden', 'true');
+            var delBtn = document.getElementById('emailer-delete-contact-btn');
+            if (delBtn) delBtn.classList.remove('is-armed');
+        }
+
+        async function waitWhileEmailerSaveInFlight() {
+            var n = 0;
+            while (contactsFirebaseSaveInFlight && n < 80) {
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, 25);
+                });
+                n++;
+            }
+        }
+
+        async function performDeleteContactFromFirebase() {
+            closeContactDeleteConfirmModal();
+            if (backendBlockIfReadonly()) return;
+            var docId = String(emailerFormEditingDocId || '').trim();
+            if (!docId) return;
+            contactIdsPendingDelete[docId] = true;
+            cancelEmailerFirebaseAutosaveTimer();
+            delete contactsDirtyDocIds[docId];
+            try {
+                await waitWhileEmailerSaveInFlight();
+                var db = getFirestore();
+                var col = tbsContactsParentDocRef(db).collection(docId);
+                var colSnap = await col.get();
+                var batch = db.batch();
+                var seen = Object.create(null);
+                function addDelete(ref) {
+                    var path = String(ref && ref.path ? ref.path : '').trim();
+                    if (!path || seen[path]) return;
+                    seen[path] = true;
+                    batch.delete(ref);
+                }
+                if (colSnap && !colSnap.empty) {
+                    colSnap.forEach(function (doc) {
+                        addDelete(doc.ref);
+                    });
+                }
+                addDelete(col.doc('item'));
+                addDelete(col.doc(docId));
+                var FV = firebase.firestore.FieldValue;
+                batch.set(
+                    tbsContactsParentDocRef(db),
+                    { contactIds: FV.arrayRemove(docId) },
+                    { merge: true }
+                );
+                await batch.commit();
+                for (var i = 0; i < contactsRosterInMemory.length; i++) {
+                    if (String(contactsRosterInMemory[i].id || '') === docId) {
+                        contactsRosterInMemory.splice(i, 1);
+                        break;
+                    }
+                }
+                closeEmailerDraftForm();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Contact deleted from Firebase.');
+                }
+            } catch (err) {
+                console.error('Delete contact failed:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err.message || 'Failed to delete contact.');
+                }
+            } finally {
+                delete contactIdsPendingDelete[docId];
             }
         }
 
@@ -20481,7 +20764,6 @@
                     String(current_event || '').trim() + ' is not an upcoming event.'
                 );
             }
-            var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
             var field = tbsSettingsFirestoreFieldForSettingKey(settingKey);
             if (!field) throw new Error('Unknown site setting.');
             var db = getFirestore();
@@ -21702,9 +21984,6 @@
             return rosterFindRecordById(guestsRosterInMemory, docId);
         }
 
-        function findGuestRosterIndexById(docId) {
-            return rosterIndexOfId(guestsRosterInMemory, docId);
-        }
 
         function clearGuestRosterItemSelection() {
             var guestRoot = document.getElementById('guests-roster-items');
@@ -21714,15 +21993,6 @@
             });
         }
 
-        function setGuestRosterItemSelection(itemEl) {
-            if (itemEl) {
-                var fromRow = String(itemEl.getAttribute('data-guests-id') || '').trim();
-                if (fromRow && !String(guestFormEditingDocId || '').trim()) {
-                    guestFormEditingDocId = fromRow;
-                }
-            }
-            syncGuestRosterSelectionHighlight();
-        }
 
         function syncGuestRosterSelectionHighlight() {
             var guestRoot = document.getElementById('guests-roster-items');
@@ -22150,9 +22420,6 @@
             }
         }
 
-        function isSpeakerEditorBottomShowingManagement() {
-            return speakerEditorBottomPane === 'management';
-        }
 
         function isSpeakerEditorSelectionEmpty() {
             var panel = document.getElementById('speaker-editor-panel');
@@ -22393,20 +22660,6 @@
             syncGuestRosterSelectionHighlight();
         }
 
-        function guestRosterBadgeHtmlForScalar(value) {
-            var t = String(value != null ? value : '').trim();
-            if (!t) {
-                return '<span class="content-badge content-badge--guest-field-empty">—</span>';
-            }
-            var low = t.toLowerCase();
-            var mod = ' content-badge--guest-status-neutral';
-            if (low === 'yes' || low === 'y' || low === 'true') {
-                mod = ' content-badge--guest-status-yes';
-            } else if (low === 'no' || low === 'n' || low === 'false') {
-                mod = ' content-badge--guest-status-no';
-            }
-            return '<span class="content-badge' + mod + '">' + escapeHtml(t) + '</span>';
-        }
 
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
@@ -22807,17 +23060,8 @@
             hideAllGuestsRosterDropdowns('guests-cme-dropdown');
         }
 
-        function unplaceGuestsInvoicedDropdown(dropdown) {
-            unplaceGuestsRosterDropdown(dropdown);
-        }
 
-        function placeGuestsInvoicedDropdown(anchorBtn, dropdown) {
-            placeGuestsRosterDropdown(anchorBtn, dropdown);
-        }
 
-        function findGuestsInvoicedDropdown(wrap) {
-            return findGuestsRosterDropdown(wrap, 'guests-invoiced-dropdown');
-        }
 
         function hideAllGuestsInvoicedDropdowns() {
             hideAllGuestsRosterDropdowns('guests-invoiced-dropdown');
@@ -23740,11 +23984,6 @@
             return String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase() === 'direct';
         }
 
-        /** Invoiced is Cancel / Cancelled (case-insensitive). */
-        function guestInvoicedFieldIsCancel(invoicedVal) {
-            var t = String(invoicedVal != null ? invoicedVal : '').trim().toLowerCase();
-            return t === 'cancel' || t === 'cancelled' || t === 'canceled';
-        }
 
         function guestCancelledFieldIsYes(cancelledVal) {
             return String(cancelledVal != null ? cancelledVal : '').trim().toLowerCase() === 'yes';
@@ -23760,11 +23999,6 @@
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'yes';
         }
 
-        /** Paid is Cancelled / Canceled (case-insensitive). */
-        function guestPaidFieldIsCancelled(paidVal) {
-            var t = String(paidVal != null ? paidVal : '').trim().toLowerCase();
-            return t === 'cancelled' || t === 'canceled';
-        }
 
         /** Invited is the literal “Yes” (case-insensitive). */
         function guestInvitedFieldIsYes(invitedVal) {
@@ -24151,7 +24385,6 @@
         function reconcileGuestStripePaymentsFromUi(opts) {
             if (backendBlockIfReadonly()) return Promise.resolve();
             opts = opts || {};
-            opts = opts || {};
             var guestId = opts.guestId != null ? String(opts.guestId).trim() : '';
             var fnUrl =
                 'https://us-central1-' +
@@ -24360,7 +24593,6 @@
             if (backendBlockIfReadonly()) {
                 return Promise.reject(backendReadonlyError());
             }
-            opts = opts || {};
             opts = opts || {};
             if (financesInvoicesLoaded && !opts.force && financesInvoicesInMemory.length) {
                 renderFinancesInvoicesTable();
@@ -25046,23 +25278,6 @@
             btn.setAttribute('aria-hidden', show ? 'false' : 'true');
         }
 
-        function guestRosterCmeBadgeHtml(status) {
-            var label =
-                status === 'Sent' || status === 'Ready' || status === 'No CME'
-                    ? status
-                    : normalizeGuestCmeStatusDisplay(status);
-            var mod = ' content-badge--guest-status-neutral';
-            if (label === 'Sent') mod = ' content-badge--guest-status-yes';
-            else if (label === 'No CME') mod = ' content-badge--guest-status-no';
-            else if (label === 'Ready') mod = ' content-badge--guest-cme-ready';
-            return (
-                '<span class="content-badge' +
-                mod +
-                '" role="listitem">' +
-                escapeHtml(label) +
-                '</span>'
-            );
-        }
 
         function rosterNameCheckHtml(store, docId, noun) {
             var id = String(docId || '').trim();
@@ -25081,26 +25296,6 @@
             );
         }
 
-        function handleRosterNameCheckClick(ev, root, store, idAttr) {
-            var btn = ev.target.closest('.roster-name-check-btn');
-            if (!btn || !root || !root.contains(btn)) return false;
-            ev.preventDefault();
-            ev.stopPropagation();
-            var row = btn.closest('tr');
-            var id = row && row.getAttribute(idAttr);
-            if (!id || !store) return true;
-            var nextOn = !store[id];
-            if (nextOn) store[id] = true;
-            else delete store[id];
-            var noun = String(btn.getAttribute('aria-label') || 'row')
-                .replace(/^Uncheck\s+/i, '')
-                .replace(/^Check\s+/i, '')
-                .trim() || 'row';
-            btn.setAttribute('aria-pressed', nextOn ? 'true' : 'false');
-            btn.setAttribute('aria-label', nextOn ? 'Uncheck ' + noun : 'Check ' + noun);
-            btn.setAttribute('title', nextOn ? 'Checked' : 'Check');
-            return true;
-        }
 
         function guestRosterNameCheckHtml(docId) {
             var rec = findGuestInMemory(docId);
@@ -25554,7 +25749,7 @@
                         var snap = snaps[j];
                         if (snap && snap.exists) {
                             var rec = speakerRecordFromTbsItemDoc(rowId, snap.data() || {});
-                            if (rosterRecordEventMatchesCurrentEvent(rec)) {
+                            if (rosterRecordEventMatchesCurrentEvent(rec) || speakerEventIsPotential(rec)) {
                                 list.push(rec);
                             }
                         }
@@ -25672,6 +25867,7 @@
                 '</tr></thead><tbody>';
             for (var i = 0; i < speakerRosterInMemory.length; i++) {
                 var s = speakerRosterInMemory[i];
+                if (speakerEventIsPotential(s)) continue;
                 var label = (String(s.firstName || '').trim() + ' ' + String(s.lastName || '').trim()).trim();
                 if (!label) label = s.id;
                 var bioPub = normalizeSpeakerBioPublish(s.bioPublish);
@@ -25744,10 +25940,35 @@
                     '</td>' +
                     '</tr>';
             } else {
+            var speakerIdeasHeaderInserted = false;
             for (var i = 0; i < speakerRosterInMemory.length; i++) {
                 var s = speakerRosterInMemory[i];
+                if (speakerEventIsPotential(s) && !speakerIdeasHeaderInserted) {
+                    html +=
+                        '<tr class="speaker-roster-row speaker-roster-blank-row">' +
+                        '<td colspan="' + colCount + '">&nbsp;</td></tr>' +
+                        '<tr class="speaker-roster-row speaker-roster-blank-row speaker-roster-section-row">' +
+                        '<td class="speaker-roster-section-title-cell" colspan="' + colCount + '">SPEAKER IDEAS</td></tr>';
+                    speakerIdeasHeaderInserted = true;
+                }
                 var label = (String(s.firstName || '').trim() + ' ' + String(s.lastName || '').trim()).trim();
                 if (!label) label = s.id;
+                if (speakerEventIsPotential(s)) {
+                    var topic1Label = String(s.topic1 != null ? s.topic1 : '').trim();
+                    html += '<tr class="speaker-roster-row is-potential" data-speaker-id="' + escapeHtml(s.id) + '">' +
+                        '<td class="speaker-roster-name-cell">' +
+                        speakerRosterNameCheckHtml(s.id) +
+                        '<span class="roster-name-label">' +
+                        escapeHtml(label) +
+                        '</span>' +
+                        '</td>' +
+                        '<td class="speaker-roster-tag-cell">' + speakerEventBadgeHtml(s.event) + '</td>' +
+                        speakerRosterStatusCellHtml(s.id, 'Not approached', true) +
+                        '<td class="speaker-roster-potential-topic-cell" colspan="' + (colCount - 3) + '">' +
+                        '<span class="speaker-roster-potential-topic">' + escapeHtml(topic1Label) + '</span>' +
+                        '</td></tr>';
+                    continue;
+                }
                 var lod = normalizeSpeakerLodging(s.lodging);
                 var bioSt = normalizeSpeakerBioStatus(s.bioStatus);
                 var bioPub = normalizeSpeakerBioPublish(s.bioPublish);
@@ -25764,12 +25985,16 @@
                 var cmeCls = speakerRosterCmeTagClass(cme);
                 var rfdCls = speakerRosterRefundedTagClass(rfd);
                 var eventBadge = speakerEventBadgeHtml(s.event);
+                var isPotentialSpeaker = speakerEventIsPotential(s);
+                var pillLock = isPotentialSpeaker ? ' disabled' : '';
                 var presentedOn = prs === 'Yes';
                 var presentedLabel = presentedOn ? 'Presented: yes' : 'Presented: no';
-                var presentedTitle = presentedOn ? 'Presented — click to mark as not presented' : 'Not presented — click to mark as presented';
+                var presentedTitle = isPotentialSpeaker
+                    ? presentedLabel
+                    : (presentedOn ? 'Presented — click to mark as not presented' : 'Not presented — click to mark as presented');
                 var presentedCell =
                     '<td class="content-roster-published-cell">' +
-                    '<button type="button" class="content-roster-published-btn speaker-roster-presented-btn" aria-pressed="' +
+                    '<button type="button"' + pillLock + ' class="content-roster-published-btn speaker-roster-presented-btn" aria-pressed="' +
                     (presentedOn ? 'true' : 'false') +
                     '" aria-label="' +
                     escapeHtml(presentedLabel) +
@@ -25782,7 +26007,7 @@
                     '</span>' +
                     '</button>' +
                     '</td>';
-                html += '<tr class="speaker-roster-row" data-speaker-id="' + escapeHtml(s.id) + '">' +
+                html += '<tr class="speaker-roster-row' + (isPotentialSpeaker ? ' is-potential' : '') + '" data-speaker-id="' + escapeHtml(s.id) + '">' +
                     '<td class="speaker-roster-name-cell">' +
                     speakerRosterNameCheckHtml(s.id) +
                     '<span class="roster-name-label">' +
@@ -25790,25 +26015,25 @@
                     '</span>' +
                     '</td>' +
                     '<td class="speaker-roster-tag-cell">' + eventBadge + '</td>' +
-                    speakerRosterStatusCellHtml(s.id, inv) +
-                    speakerRosterLodgingCellHtml(s.id, lod) +
-                    speakerRosterBioCellHtml(s.id, bioSt) +
-                    speakerRosterProgrammedCellHtml(s.id, bioPub) +
+                    speakerRosterStatusCellHtml(s.id, inv, isPotentialSpeaker) +
+                    speakerRosterLodgingCellHtml(s.id, lod, isPotentialSpeaker) +
+                    speakerRosterBioCellHtml(s.id, bioSt, isPotentialSpeaker) +
+                    speakerRosterProgrammedCellHtml(s.id, bioPub, isPotentialSpeaker) +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button" class="speaker-roster-tag ' + ttlCls + '" data-field="titlesStatus" title="Titles (click to change)" aria-label="Titles: ' + escapeHtml(ttl) + '">' + escapeHtml(ttl) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + ttlCls + '" data-field="titlesStatus" title="' + (isPotentialSpeaker ? 'Titles' : 'Titles (click to change)') + '" aria-label="Titles: ' + escapeHtml(ttl) + '">' + escapeHtml(ttl) + '</button>' +
                     '</td>' +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button" class="speaker-roster-tag ' + brfCls + '" data-field="brief" title="Brief (click to change)" aria-label="Brief: ' + escapeHtml(brf) + '">' + escapeHtml(brf) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + brfCls + '" data-field="brief" title="' + (isPotentialSpeaker ? 'Brief' : 'Brief (click to change)') + '" aria-label="Brief: ' + escapeHtml(brf) + '">' + escapeHtml(brf) + '</button>' +
                     '</td>' +
                     presentedCell +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button" class="speaker-roster-tag ' + trvCls + '" data-field="travel" title="Travel (click to change)" aria-label="Travel: ' + escapeHtml(trv) + '">' + escapeHtml(trv) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + trvCls + '" data-field="travel" title="' + (isPotentialSpeaker ? 'Travel' : 'Travel (click to change)') + '" aria-label="Travel: ' + escapeHtml(trv) + '">' + escapeHtml(trv) + '</button>' +
                     '</td>' +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button" class="speaker-roster-tag ' + cmeCls + '" data-field="cme" title="CME sent (click to change)" aria-label="CME sent: ' + escapeHtml(cme) + '">' + escapeHtml(cme) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + cmeCls + '" data-field="cme" title="' + (isPotentialSpeaker ? 'CME sent' : 'CME sent (click to change)') + '" aria-label="CME sent: ' + escapeHtml(cme) + '">' + escapeHtml(cme) + '</button>' +
                     '</td>' +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button" class="speaker-roster-tag ' + rfdCls + '" data-field="refunded" title="Expenses (click to change)" aria-label="Expenses: ' + escapeHtml(rfd) + '">' + escapeHtml(rfd) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + rfdCls + '" data-field="refunded" title="' + (isPotentialSpeaker ? 'Expenses' : 'Expenses (click to change)') + '" aria-label="Expenses: ' + escapeHtml(rfd) + '">' + escapeHtml(rfd) + '</button>' +
                     '</td></tr>';
             }
             }
@@ -25825,7 +26050,7 @@
             var id = String(docId || '').trim();
             if (!id) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec) return;
+            if (!rec || speakerEventIsPotential(rec)) return;
             var current = normalizeSpeakerPresented(rec.presented);
             rec.presented = current === 'Yes' ? 'No' : 'Yes';
             markSpeakerDocDirty(id);
@@ -25841,7 +26066,7 @@
             var meta = speakerRosterTagFieldMeta[fieldKey];
             if (!meta) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec) return;
+            if (!rec || speakerEventIsPotential(rec)) return;
             var current = meta.norm(rec[fieldKey]);
             rec[fieldKey] = nextSpeakerSelectValue(meta.order, current);
             markSpeakerDocDirty(id);
@@ -25855,7 +26080,7 @@
             return label || String(rec.id || '').trim() || 'Speaker';
         }
 
-        function speakerRosterStatusCellHtml(docId, inviteStatus) {
+        function speakerRosterStatusCellHtml(docId, inviteStatus, locked) {
             var inv = normalizeSpeakerInviteStatus(inviteStatus);
             var invCls = speakerRosterInviteTagClass(inv);
             var opts = [];
@@ -25872,9 +26097,11 @@
             return (
                 '<td class="speaker-roster-tag-cell speakers-status-cell">' +
                 '<div class="speakers-status-wrap">' +
-                '<button type="button" class="speaker-roster-tag speaker-roster-status-btn ' +
+                '<button type="button"' + (locked ? ' disabled' : '') + ' class="speaker-roster-tag speaker-roster-status-btn ' +
                 invCls +
-                '" data-field="inviteStatus" aria-haspopup="menu" aria-expanded="false" title="Status: first click selects row, second opens values" aria-label="Status: ' +
+                '" data-field="inviteStatus" aria-haspopup="menu" aria-expanded="false" title="' +
+                (locked ? 'Status' : 'Status: first click selects row, second opens values') +
+                '" aria-label="Status: ' +
                 escapeHtml(inv) +
                 '">' +
                 escapeHtml(inv) +
@@ -25885,7 +26112,7 @@
             );
         }
 
-        function speakerRosterLodgingCellHtml(docId, lodgingStatus) {
+        function speakerRosterLodgingCellHtml(docId, lodgingStatus, locked) {
             var lod = normalizeSpeakerLodging(lodgingStatus);
             var lodCls = speakerRosterLodgingTagClass(lod);
             var opts = [];
@@ -25902,9 +26129,11 @@
             return (
                 '<td class="speaker-roster-tag-cell speakers-lodging-cell">' +
                 '<div class="speakers-lodging-wrap">' +
-                '<button type="button" class="speaker-roster-tag speaker-roster-lodging-btn ' +
+                '<button type="button"' + (locked ? ' disabled' : '') + ' class="speaker-roster-tag speaker-roster-lodging-btn ' +
                 lodCls +
-                '" data-field="lodging" aria-haspopup="menu" aria-expanded="false" title="Lodging: first click selects row, second opens values" aria-label="Lodging: ' +
+                '" data-field="lodging" aria-haspopup="menu" aria-expanded="false" title="' +
+                (locked ? 'Lodging' : 'Lodging: first click selects row, second opens values') +
+                '" aria-label="Lodging: ' +
                 escapeHtml(lod) +
                 '">' +
                 escapeHtml(lod) +
@@ -25915,7 +26144,7 @@
             );
         }
 
-        function speakerRosterBioCellHtml(docId, bioStatus) {
+        function speakerRosterBioCellHtml(docId, bioStatus, locked) {
             var bio = normalizeSpeakerBioStatus(bioStatus);
             var bioCls = speakerRosterBioTagClass(bio);
             var opts = [];
@@ -25932,9 +26161,11 @@
             return (
                 '<td class="speaker-roster-tag-cell speakers-bio-cell">' +
                 '<div class="speakers-bio-wrap">' +
-                '<button type="button" class="speaker-roster-tag speaker-roster-bio-btn ' +
+                '<button type="button"' + (locked ? ' disabled' : '') + ' class="speaker-roster-tag speaker-roster-bio-btn ' +
                 bioCls +
-                '" data-field="bioStatus" aria-haspopup="menu" aria-expanded="false" title="Bio: first click selects row, second opens values" aria-label="Bio: ' +
+                '" data-field="bioStatus" aria-haspopup="menu" aria-expanded="false" title="' +
+                (locked ? 'Bio' : 'Bio: first click selects row, second opens values') +
+                '" aria-label="Bio: ' +
                 escapeHtml(bio) +
                 '">' +
                 escapeHtml(bio) +
@@ -25945,7 +26176,7 @@
             );
         }
 
-        function speakerRosterProgrammedCellHtml(docId, bioPublish) {
+        function speakerRosterProgrammedCellHtml(docId, bioPublish, locked) {
             var programmed = normalizeSpeakerBioPublish(bioPublish);
             var programmedCls = speakerRosterProgrammedTagClass(programmed);
             var opts = [];
@@ -25962,9 +26193,11 @@
             return (
                 '<td class="speaker-roster-tag-cell speakers-programmed-cell">' +
                 '<div class="speakers-programmed-wrap">' +
-                '<button type="button" class="speaker-roster-tag speaker-roster-programmed-btn ' +
+                '<button type="button"' + (locked ? ' disabled' : '') + ' class="speaker-roster-tag speaker-roster-programmed-btn ' +
                 programmedCls +
-                '" data-field="bioPublish" aria-haspopup="menu" aria-expanded="false" title="Programmed: first click selects row, second opens values" aria-label="Programmed: ' +
+                '" data-field="bioPublish" aria-haspopup="menu" aria-expanded="false" title="' +
+                (locked ? 'Programmed' : 'Programmed: first click selects row, second opens values') +
+                '" aria-label="Programmed: ' +
                 escapeHtml(programmed) +
                 '">' +
                 escapeHtml(programmed) +
@@ -26040,7 +26273,7 @@
             }
             if (!allowed[value]) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec) return;
+            if (!rec || speakerEventIsPotential(rec)) return;
             var next = normalizeSpeakerInviteStatus(value);
             var prev = rec.inviteStatus;
             var prevConfirmedDate = rec.confirmedDate != null ? String(rec.confirmedDate) : '';
@@ -26142,7 +26375,7 @@
             }
             if (!allowed[value]) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec) return;
+            if (!rec || speakerEventIsPotential(rec)) return;
             var next = normalizeSpeakerLodging(value);
             var prev = rec.lodging;
             if (normalizeSpeakerLodging(prev) === next) {
@@ -26211,7 +26444,7 @@
             }
             if (!allowed[value]) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec) return;
+            if (!rec || speakerEventIsPotential(rec)) return;
             var next = normalizeSpeakerBioStatus(value);
             var prev = rec.bioStatus;
             if (normalizeSpeakerBioStatus(prev) === next) {
@@ -26277,7 +26510,7 @@
             }
             if (!allowed[value]) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec) return;
+            if (!rec || speakerEventIsPotential(rec)) return;
             var next = normalizeSpeakerBioPublish(value);
             var prev = rec.bioPublish;
             if (normalizeSpeakerBioPublish(prev) === next) {
@@ -26344,6 +26577,8 @@
             var t3 = document.getElementById('add-speaker-topic3');
             var sb = document.getElementById('add-speaker-short-bio');
             var lb = document.getElementById('add-speaker-long-bio');
+            var potential = document.getElementById('add-speaker-potential');
+            if (potential) potential.checked = speakerEventIsPotential(s);
             if (fn) fn.value = s.firstName != null ? String(s.firstName) : '';
             if (ln) ln.value = s.lastName != null ? String(s.lastName) : '';
             if (em) em.value = s.email != null ? String(s.email) : '';
@@ -26352,6 +26587,12 @@
             if (t3) t3.value = s.topic3 != null ? String(s.topic3) : '';
             if (sb) sb.value = s.shortBio != null ? String(s.shortBio) : '';
             if (lb) lb.value = s.longBio != null ? String(s.longBio) : '';
+            var linkOne = document.getElementById('add-speaker-link-one');
+            var linkTwo = document.getElementById('add-speaker-link-two');
+            var linkThree = document.getElementById('add-speaker-link-three');
+            if (linkOne) linkOne.value = s.linkOne != null ? String(s.linkOne) : '';
+            if (linkTwo) linkTwo.value = s.linkTwo != null ? String(s.linkTwo) : '';
+            if (linkThree) linkThree.value = s.linkThree != null ? String(s.linkThree) : '';
             captureSpeakerBioFormBaseline();
             updateEditSpeakerNameHeading();
             updateLongBioLetterCounter();
@@ -26366,15 +26607,6 @@
             scrollSpeakerEditorBottomToManagement();
         }
 
-        function texteditorMarkupFromElement(el) {
-            if (!el) return '';
-            var c = el.cloneNode(true);
-            c.classList.remove('activity-active');
-            c.querySelectorAll('.activity-active').forEach(function(n) {
-                n.classList.remove('activity-active');
-            });
-            return c.outerHTML;
-        }
 
         var TBS_TEXTEDITOR_LS_PREFIX = 'tbsBackend:texteditor:';
         var texteditorPreviewRaf = null;
@@ -26672,49 +26904,9 @@
             btn.setAttribute('aria-label', label);
         }
 
-        /** HTML body for tbs/Pre-sets/Zermatt/Zermatt field `Guest invitation` (same as Snippets preset). */
-        async function fetchGuestInvitationHtmlFromFirestore() {
-            var db = getFirestore();
-            var snap = await tbsPresetsZermattDocRef(db).get();
-            var d = snap.exists ? snap.data() || {} : {};
-            var raw = d[FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD];
-            return raw != null ? String(raw) : '';
-        }
 
-        function speakerInvitationFieldsFromSnippetsData(data) {
-            var d = data && typeof data === 'object' ? data : {};
-            var raw = d[FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD];
-            if (raw != null && typeof raw === 'object' && !Array.isArray(raw)) {
-                var html = '';
-                if (raw.html != null) html = String(raw.html);
-                else if (raw.body != null) html = String(raw.body);
-                else if (raw.HTML != null) html = String(raw.HTML);
-                var subject = raw.subject != null ? String(raw.subject) : raw.Subject != null ? String(raw.Subject) : '';
-                return { html: html, subject: subject };
-            }
-            return { html: raw != null ? String(raw) : '', subject: '' };
-        }
 
-        function applySpeakerInvitationTemplateTokens(text, eventLabel, firstName, eventDatesLabel) {
-            var eventEscaped = escapeHtml(String(eventLabel || '').trim());
-            var nameEscaped = escapeHtml(String(firstName || '').trim());
-            var datesEscaped = escapeHtml(String(eventDatesLabel || '').trim());
-            return String(text || '')
-                .split('{{Event}}')
-                .join(eventEscaped)
-                .split('{{Name}}')
-                .join(nameEscaped)
-                .split('{{Eventdates}}')
-                .join(datesEscaped);
-        }
 
-        /** HTML body and optional subject from tbs/Pre-sets/Zermatt/Zermatt field `Speakerinvitation`. */
-        async function fetchSpeakerInvitationFromFirestore() {
-            var db = getFirestore();
-            var snap = await tbsPresetsZermattDocRef(db).get();
-            var d = snap.exists ? snap.data() || {} : {};
-            return speakerInvitationFieldsFromSnippetsData(d);
-        }
 
         function parseEventProgrammeKey(key) {
             if (!key || typeof key !== 'string') return null;
@@ -27894,11 +28086,6 @@
             return tb - ta;
         }
 
-        /** @deprecated Use fetchContentRosterIntoMemory; kept for callers expecting the old name. */
-        async function fetchAllContentIntoMemory(opts) {
-            await fetchContentRosterIntoMemory(opts);
-            await startContentBackgroundHydration();
-        }
 
         function renderContentTableFromMemory() {
             var itemsEl = document.getElementById('content-list-items');
@@ -28003,10 +28190,6 @@
             });
         }
 
-        function setContentRosterItemSelection(itemEl) {
-            clearContentRosterItemSelection();
-            if (itemEl) itemEl.classList.add('is-selected');
-        }
 
         function syncContentRosterSelectionHighlight() {
             var root = document.getElementById('content-list-items');
@@ -28847,7 +29030,6 @@
         async function sendSpeakerFormalInvitationEmail() {
             if (backendBlockIfReadonly()) return;
             var btn = document.getElementById('speaker-send-formal-invite-btn');
-            var btn = document.getElementById('speaker-send-formal-invite-btn');
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') {
                 if (typeof showStatus === 'function') showStatus('error', 'Select a speaker first.');
@@ -28957,7 +29139,6 @@
          */
         async function sendSpeakerRequestLodgingEmail() {
             if (backendBlockIfReadonly()) return;
-            var btn = document.getElementById('speaker-request-lodging-btn');
             var btn = document.getElementById('speaker-request-lodging-btn');
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') {
@@ -29463,9 +29644,29 @@
             }
         }
 
+        function setProgrammeSaveBtnSaving(on) {
+            var btn = document.getElementById('save-programme-btn');
+            if (!btn) return;
+            btn.classList.toggle('is-saving', !!on);
+            if (on) {
+                btn.classList.remove('texteditor-save-btn--saved');
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('title', 'Saving');
+                btn.setAttribute('aria-label', 'Saving');
+                return;
+            }
+            updateSaveButtonState();
+        }
+
         function updateSaveButtonState() {
             const btn = document.getElementById('save-programme-btn');
             if (!btn) return;
+            if (btn.classList.contains('is-saving')) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                return;
+            }
             if (!btn.querySelector('svg')) {
                 btn.innerHTML =
                     '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
@@ -29564,9 +29765,16 @@
                 if (typeof showStatus === 'function') showStatus('info', 'Unlock programme to save edits.');
                 return;
             }
-            var saved = await flushProgrammeDirtyToFirestore({});
-            if (!saved && typeof showStatus === 'function') {
-                showStatus('info', 'Nothing to save.');
+            var saveBtn = document.getElementById('save-programme-btn');
+            if (saveBtn && saveBtn.classList.contains('is-saving')) return;
+            setProgrammeSaveBtnSaving(true);
+            try {
+                var saved = await flushProgrammeDirtyToFirestore({});
+                if (!saved && typeof showStatus === 'function') {
+                    showStatus('info', 'Nothing to save.');
+                }
+            } finally {
+                setProgrammeSaveBtnSaving(false);
             }
         }
 
@@ -29628,24 +29836,6 @@
             }
         }
 
-        function playDropSound() {
-            try {
-                var Ctx = window.AudioContext || window.webkitAudioContext;
-                if (!Ctx) return;
-                var ctx = new Ctx();
-                var osc = ctx.createOscillator();
-                var gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.setValueAtTime(320, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.06);
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.08);
-            } catch (e) {}
-        }
 
         function programmeEditorSlotsAreSame(dateStrA, sessionIdA, slotIdA, dateStrB, sessionIdB, slotIdB) {
             return String(dateStrA || '') === String(dateStrB || '') &&
@@ -30768,112 +30958,8 @@
             }
         }
 
-        async function loadGridColumns() {
-            const gridEl = document.querySelector('#programme-editor .programme-editor .grid');
-            const gridContentEl = gridEl ? gridEl.querySelector('.grid-content') : null;
-            if (!gridEl || !gridContentEl) return;
-            if (!selectedevent) {
-                gridContentEl.innerHTML = '';
-                return;
-            }
-            try {
-                const db = getFirestore();
-                const [snapshot, metaSnap] = await Promise.all([
-                    eventItemsCollection(db, selectedevent).get(),
-                    eventItemsCollection(db, selectedevent).doc('meta').get()
-                ]);
-                const docs = snapshot.docs.filter(d => (d.id || '').startsWith('Programme-'));
-                const meta = metaSnap.exists ? metaSnap.data() : {};
-                programmeState.eventId = selectedevent || null;
-                programmeState.meta = meta;
-                programmeState.dayDates = docs.map(d => (d.id || '').replace(/^Programme-/, '')).filter(Boolean);
-                programmeState.days = {};
-                programmeState.htmlDateByDay = {};
-                programmeState.nameDateByDay = {};
-                var tbsHtmlSnapsG = await Promise.all(docs.map(function(d) {
-                    var dateStr = (d.id || '').replace(/^Programme-/, '');
-                    return tbsProgrammeDayDocRef(db, dateStr).get();
-                }));
-                docs.forEach(function(d, idx) {
-                    var dateStr = (d.id || '').replace(/^Programme-/, '');
-                    var v = '';
-                    var nameVal = dateStr;
-                    var hs = tbsHtmlSnapsG[idx];
-                    if (hs && hs.exists) {
-                        var hdata = hs.data() || {};
-                        v = hdata.html != null ? String(hdata.html) : '';
-                        if (hdata.name != null && String(hdata.name).trim() !== '') {
-                            nameVal = String(hdata.name);
-                        }
-                    }
-                    programmeState.htmlDateByDay[dateStr] = v;
-                    programmeState.nameDateByDay[dateStr] = nameVal;
-                });
-                const dayduration = Number(meta.dayduration);
-                const heightPx = (typeof dayduration === 'number' && dayduration >= 0) ? dayduration : 0;
-                const programmeStyle = 'height:' + heightPx + 'px;';
-                const starttime = (meta.starttime != null && meta.starttime !== '') ? String(meta.starttime) : '09:00';
-                const startMinsCol = timeToMinutes(starttime) || 0;
-
-                const activitySnaps = await Promise.all(docs.map(d => eventItemsCollection(db, selectedevent).doc(d.id).collection('activity').get()));
-
-                const dayCols = docs.map((d, i) => {
-                    const dateStr = (d.id || '').replace(/^Programme-/, '');
-                    const activities = activitySnaps[i] ? activitySnaps[i].docs : [];
-                    programmeState.days[dateStr] = activities.map(function(doc) {
-                        const data = doc.data() || {};
-                        const grouping = (data.grouping != null && data.grouping !== undefined) ? String(data.grouping) : '';
-                        return Object.assign({ id: doc.id }, data, { grouping: grouping });
-                    });
-                    const timeToM = function(s) {
-                        var m = timeToMinutes(s);
-                        return m != null ? m : 0;
-                    };
-                    const sorted = activities.slice().sort(function(a, b) {
-                        return timeToM(a.data().starttime) - timeToM(b.data().starttime);
-                    });
-                    var activityHtml = '';
-                    sorted.forEach(function(actDoc) {
-                        var a = actDoc.data();
-                        var activitytype = (a.activitytype != null && a.activitytype !== '') ? String(a.activitytype) : 'activity';
-                        var sm = timeToM(a.starttime);
-                        var em = timeToM(a.endtime);
-                        if (dayduration <= 0) return;
-                        var topPx = ((sm - startMinsCol) / dayduration) * heightPx;
-                        var actHeight = Math.max(1, em - sm);
-                        if (topPx < 0) { actHeight += topPx; topPx = 0; }
-                        if (topPx + actHeight > heightPx) actHeight = heightPx - topPx;
-                        if (actHeight <= 0) return;
-                        var timeRange = (a.starttime && a.endtime) ? (escapeHtml(String(a.starttime)) + '-' + escapeHtml(String(a.endtime))) : '-';
-                        var name = (a.name != null && a.name !== '') ? String(a.name) : '<empty>';
-                        var title = (a.title != null && a.title !== '') ? String(a.title) : 'No title';
-                        var displayText = activitytype === 'title' ? title : name;
-                        var st = (a.starttime != null && a.starttime !== '') ? String(a.starttime) : '00:00';
-                        var en = (a.endtime != null && a.endtime !== '') ? String(a.endtime) : '00:30';
-                        activityHtml += '<div class="programme-activity" data-activity-id="' + escapeHtml(actDoc.id) + '" data-date="' + escapeHtml(dateStr) + '" data-starttime="' + escapeHtml(st) + '" data-endtime="' + escapeHtml(en) + '" style="top:' + topPx + 'px;height:' + actHeight + 'px;">';
-                        if (activitytype !== 'title') {
-                            activityHtml += '<span class="programme-activity-time">' + timeRange + '</span>';
-                        }
-                        activityHtml += '<span class="programme-activity-name">' + escapeHtml(displayText) + '</span>';
-                        activityHtml += '</div>';
-                    });
-                    return '<div class="grid-column"><div class="grid-top"><div class="grid-column-title">' + escapeHtml(dateStr) + '</div></div><div class="grid-column-programme" style="' + programmeStyle + '" data-starttime="' + escapeHtml(starttime) + '" data-dayduration="' + String(dayduration) + '" data-date="' + escapeHtml(dateStr) + '">' + activityHtml + '</div><div class="grid-bottom"></div></div>';
-                }).join('');
-
-                gridContentEl.innerHTML = '<div class="grid-row">' + dayCols + '</div>';
-            } catch (err) {
-                console.error('Failed to load grid columns:', err);
-                gridContentEl.innerHTML = '';
-            }
-        }
 
 
-        function minutesToTime(mins) {
-            const m = Math.round(mins);
-            const h = Math.floor(m / 60) % 24;
-            const min = ((m % 60) + 60) % 60;
-            return String(h).padStart(2, '0') + ':' + String(min).padStart(2, '0');
-        }
 
         function timeToMinutes(s) {
             if (s == null || s === '') return null;
@@ -30888,451 +30974,19 @@
 
         const MIN_ACTIVITY_DURATION_MINS = 15;
 
-        function enforceMinDuration(startMins, endMins, minDurationOverride) {
-            var minDur = (minDurationOverride != null && minDurationOverride >= 0) ? minDurationOverride : MIN_ACTIVITY_DURATION_MINS;
-            if (startMins == null) startMins = 0;
-            if (endMins == null || endMins <= startMins) endMins = startMins + minDur;
-            var duration = endMins - startMins;
-            if (duration < minDur) endMins = startMins + minDur;
-            return [startMins, endMins];
-        }
-
-        function clampStartMinsToDay(colStartMins, dayduration, slotduration, rawStartMins) {
-            var minStart = colStartMins;
-            var maxStart = colStartMins + dayduration - slotduration;
-            if (maxStart < minStart) maxStart = minStart;
-            return Math.max(minStart, Math.min(maxStart, rawStartMins));
-        }
-
-        function timeRangesOverlap(startMinsA, endMinsA, startMinsB, endMinsB) {
-            return startMinsA < endMinsB && endMinsA > startMinsB;
-        }
-
-        /** For groups: same start/end is allowed; only partial overlap is a conflict. Returns true if ranges overlap and are not exactly equal. */
-        function timeRangesOverlapExceptExact(startMinsA, endMinsA, startMinsB, endMinsB) {
-            if (!timeRangesOverlap(startMinsA, endMinsA, startMinsB, endMinsB)) return false;
-            if (startMinsA === startMinsB && endMinsA === endMinsB) return false;
-            return true;
-        }
-
-        /** Snaps desired [startMins, startMins+duration] so it does not overlap others. Returns { startMins, endMins }. */
-        function getDropPositionWithSnapFromState(dateStr, desiredStartMins, duration, colStartMins, dayduration, excludeActivityId) {
-            var dayEndMins = colStartMins + dayduration;
-            var desiredEndMins = desiredStartMins + duration;
-            var others = [];
-            var list = programmeState.days && programmeState.days[dateStr] ? programmeState.days[dateStr] : [];
-            for (var i = 0; i < list.length; i++) {
-                if (excludeActivityId && list[i].id === excludeActivityId) continue;
-                var s = timeToMinutes(list[i].starttime);
-                var e = timeToMinutes(list[i].endtime);
-                if (s == null || e == null) continue;
-                others.push({ startMins: s, endMins: e });
-            }
-            var overlapsAny = others.some(function(o) { return timeRangesOverlap(desiredStartMins, desiredEndMins, o.startMins, o.endMins); });
-            var result = !overlapsAny ? { startMins: desiredStartMins, endMins: desiredEndMins } : null;
-            if (overlapsAny) {
-                var candidates = [];
-                for (var j = 0; j < others.length; j++) {
-                    var o = others[j];
-                    if (!timeRangesOverlap(desiredStartMins, desiredEndMins, o.startMins, o.endMins)) continue;
-                    var tryStartAbove = o.startMins - duration;
-                    var tryEndAbove = o.startMins;
-                    if (tryStartAbove >= colStartMins && tryEndAbove <= dayEndMins) {
-                        var blockedAbove = others.some(function(x) { return timeRangesOverlap(tryStartAbove, tryEndAbove, x.startMins, x.endMins); });
-                        if (!blockedAbove) candidates.push({ startMins: tryStartAbove, endMins: tryEndAbove });
-                    }
-                    var tryStartBelow = o.endMins;
-                    var tryEndBelow = o.endMins + duration;
-                    if (tryEndBelow <= dayEndMins && tryStartBelow >= colStartMins) {
-                        var blockedBelow = others.some(function(x) { return timeRangesOverlap(tryStartBelow, tryEndBelow, x.startMins, x.endMins); });
-                        if (!blockedBelow) candidates.push({ startMins: tryStartBelow, endMins: tryEndBelow });
-                    }
-                }
-                if (candidates.length > 0) {
-                    var best = candidates[0];
-                    var bestDist = Math.abs(best.startMins - desiredStartMins);
-                    for (var k = 1; k < candidates.length; k++) {
-                        var dist = Math.abs(candidates[k].startMins - desiredStartMins);
-                        if (dist < bestDist) { best = candidates[k]; bestDist = dist; }
-                    }
-                    result = best;
-                } else {
-                    result = { startMins: desiredStartMins, endMins: desiredEndMins };
-                }
-            }
-            return result;
-        }
-
-        function optimisticAddActivityToColumn(colEl, activityId, startMins, endMins, name, title, colStartMins, dayduration) {
-            var heightPx = Number(colEl.getAttribute('data-dayduration')) || dayduration;
-            var topPx = Math.max(0, ((startMins - colStartMins) / dayduration) * heightPx);
-            var actHeight = endMins - startMins;
-            var actHeightPx = Math.max(1, (actHeight / dayduration) * heightPx);
-            if (topPx + actHeightPx > heightPx) actHeightPx = heightPx - topPx;
-            var st = minutesToTime(startMins);
-            var en = minutesToTime(endMins);
-            var timeRange = (st && en) ? (st + '-' + en) : '-';
-            var div = document.createElement('div');
-            div.className = 'programme-activity';
-            div.setAttribute('data-activity-id', activityId);
-            div.setAttribute('data-date', colEl.getAttribute('data-date') || '');
-            div.setAttribute('data-starttime', st);
-            div.setAttribute('data-endtime', en);
-            div.style.top = topPx + 'px';
-            div.style.height = actHeightPx + 'px';
-            var timeSpan = document.createElement('span');
-            timeSpan.className = 'programme-activity-time';
-            timeSpan.textContent = timeRange;
-            var nameSpan = document.createElement('span');
-            nameSpan.className = 'programme-activity-name';
-            nameSpan.textContent = (name != null && name !== '') ? String(name) : '<empty>';
-            div.appendChild(timeSpan);
-            div.appendChild(nameSpan);
-            colEl.appendChild(div);
-            return div;
-        }
-
-        function optimisticUpdateActivityInColumn(colEl, activityId, startMins, endMins, colStartMins, dayduration) {
-            var heightPx = Number(colEl.getAttribute('data-dayduration')) || dayduration;
-            var topPx = Math.max(0, ((startMins - colStartMins) / dayduration) * heightPx);
-            var actHeightPx = Math.max(1, ((endMins - startMins) / dayduration) * heightPx);
-            if (topPx + actHeightPx > heightPx) actHeightPx = heightPx - topPx;
-            var st = minutesToTime(startMins);
-            var en = minutesToTime(endMins);
-            var candidates = colEl.querySelectorAll('.programme-activity');
-            for (var i = 0; i < candidates.length; i++) {
-                if (candidates[i].getAttribute('data-activity-id') === activityId) {
-                    candidates[i].style.top = topPx + 'px';
-                    candidates[i].style.height = actHeightPx + 'px';
-                    candidates[i].setAttribute('data-starttime', st);
-                    candidates[i].setAttribute('data-endtime', en);
-                    var timeEl = candidates[i].querySelector('.programme-activity-time');
-                    if (timeEl) timeEl.textContent = (st && en) ? (st + '-' + en) : '-';
-                    return;
-                }
-            }
-        }
-
-        function optimisticRemoveActivityFromColumn(colEl, activityId) {
-            var candidates = colEl.querySelectorAll('.programme-activity');
-            for (var i = 0; i < candidates.length; i++) {
-                if (candidates[i].getAttribute('data-activity-id') === activityId) {
-                    candidates[i].parentNode.removeChild(candidates[i]);
-                    return;
-                }
-            }
-        }
 
 
-        async function wouldOverlapInDay(db, eventId, dateStr, newStartMins, newEndMins, excludeActivityId) {
-            if (!programmeState || !programmeState.meta) return false;
-            const snap = await eventItemsCollection(db, eventId).doc('Programme-' + dateStr).collection('activity').get();
-            for (const doc of snap.docs) {
-                if (excludeActivityId && doc.id === excludeActivityId) continue;
-                const d = doc.data();
-                const s = timeToMinutes(d.starttime);
-                const e = timeToMinutes(d.endtime);
-                if (s == null || e == null) continue;
-                if (timeRangesOverlap(newStartMins, newEndMins, s, e)) return true;
-            }
-            return false;
-        }
 
-        /** Returns { startMins, endMins } for a valid drop, or null if no valid position (fly back). Snaps above/below blocking activity when needed. */
-        async function getDropPositionWithSnap(db, eventId, dateStr, desiredStartMins, slotduration, colStartMins, dayduration, excludeActivityId) {
-            if (!programmeState || !programmeState.meta) return null;
-            const snap = await eventItemsCollection(db, eventId).doc('Programme-' + dateStr).collection('activity').get();
-            const others = [];
-            for (const doc of snap.docs) {
-                if (excludeActivityId && doc.id === excludeActivityId) continue;
-                const d = doc.data();
-                const s = timeToMinutes(d.starttime);
-                const e = timeToMinutes(d.endtime);
-                if (s == null || e == null) continue;
-                others.push({ startMins: s, endMins: e });
-            }
-            const desiredEndMins = desiredStartMins + slotduration;
-            const dayEndMins = colStartMins + dayduration;
-            const overlapsAny = others.some(function(o) { return timeRangesOverlap(desiredStartMins, desiredEndMins, o.startMins, o.endMins); });
-            if (!overlapsAny) return { startMins: desiredStartMins, endMins: desiredEndMins };
-            const candidates = [];
-            for (var i = 0; i < others.length; i++) {
-                var o = others[i];
-                if (!timeRangesOverlap(desiredStartMins, desiredEndMins, o.startMins, o.endMins)) continue;
-                var tryStartAbove = o.startMins - slotduration;
-                var tryEndAbove = o.startMins;
-                if (tryStartAbove >= colStartMins && tryEndAbove <= dayEndMins) {
-                    var blockedAbove = others.some(function(x) { return timeRangesOverlap(tryStartAbove, tryEndAbove, x.startMins, x.endMins); });
-                    if (!blockedAbove) candidates.push({ startMins: tryStartAbove, endMins: tryEndAbove });
-                }
-                var tryStartBelow = o.endMins;
-                var tryEndBelow = o.endMins + slotduration;
-                if (tryEndBelow <= dayEndMins && tryStartBelow >= colStartMins) {
-                    var blockedBelow = others.some(function(x) { return timeRangesOverlap(tryStartBelow, tryEndBelow, x.startMins, x.endMins); });
-                    if (!blockedBelow) candidates.push({ startMins: tryStartBelow, endMins: tryEndBelow });
-                }
-            }
-            if (candidates.length === 0) return null;
-            var best = candidates[0];
-            var bestDist = Math.abs(best.startMins - desiredStartMins);
-            for (var j = 1; j < candidates.length; j++) {
-                var dist = Math.abs(candidates[j].startMins - desiredStartMins);
-                if (dist < bestDist) { best = candidates[j]; bestDist = dist; }
-            }
-            return best;
-        }
 
-        function onActivityDragMove(e) {
-            if (!dragState && pendingDrag) {
-                var dist = Math.sqrt((e.clientX - pendingDrag.startX) * (e.clientX - pendingDrag.startX) + (e.clientY - pendingDrag.startY) * (e.clientY - pendingDrag.startY));
-                if (dist >= DRAG_THRESHOLD_PX) {
-                    e.preventDefault();
-                    commitPendingDrag(e);
-                } else {
-                    return;
-                }
-            }
-            if (!dragState || !dragState.ghost) return;
-            e.preventDefault();
-            var g = dragState.ghost;
-            var ghostLeftX = e.clientX - dragState.offsetX;
-            var cols = document.querySelectorAll('#programme-editor .programme-editor .grid .grid-column-programme');
-            if (cols.length > 0) {
-                var firstColRect = cols[0].getBoundingClientRect();
-                ghostLeftX = Math.max(firstColRect.left, ghostLeftX);
-            }
-            var leftPx = ghostLeftX + 'px';
-            var ghostTopY = e.clientY - dragState.offsetY;
-            var ghostHeight = (dragState.ghostHeight != null) ? Number(dragState.ghostHeight) : g.getBoundingClientRect().height;
-            var cursorX = e.clientX;
-            for (var ci = 0; ci < cols.length; ci++) {
-                var r = cols[ci].getBoundingClientRect();
-                if (cursorX >= r.left && cursorX <= r.right) {
-                    var colRect = cols[ci].getBoundingClientRect();
-                    var minTop = colRect.top;
-                    var maxTop = colRect.bottom - ghostHeight;
-                    if (maxTop < minTop) maxTop = minTop;
-                    ghostTopY = Math.max(minTop, Math.min(maxTop, ghostTopY));
-                    break;
-                }
-            }
-            var topPx = ghostTopY + 'px';
-            g.style.setProperty('position', 'fixed', 'important');
-            g.style.setProperty('left', leftPx, 'important');
-            g.style.setProperty('top', topPx, 'important');
-            cursorX = e.clientX;
-            for (var ci = 0; ci < cols.length; ci++) {
-                var r = cols[ci].getBoundingClientRect();
-                if (cursorX >= r.left && cursorX <= r.right) {
-                    var col = cols[ci];
-                    var starttime = col.getAttribute('data-starttime') || '09:00';
-                    var dayduration = Number(col.getAttribute('data-dayduration')) || 0;
-                    var startMins = timeToMinutes(starttime);
-                    if (dayduration > 0 && startMins != null) {
-                        var colRect = col.getBoundingClientRect();
-                        var ghostYInCol = ghostTopY;
-                        if (ghostYInCol < colRect.top) ghostYInCol = colRect.top;
-                        if (ghostYInCol > colRect.bottom) ghostYInCol = colRect.bottom;
-                        var fraction = (ghostYInCol - colRect.top) / colRect.height;
-                        var slotduration = dragState.slotduration || 30;
-                        var rawNewStartMins = startMins + fraction * dayduration;
-                        var newStartMins = clampStartMinsToDay(startMins, dayduration, slotduration, rawNewStartMins);
-                        var newEndMins = newStartMins + slotduration;
-                        var timeEl = g.querySelector('.programme-activity-time');
-                        if (timeEl) timeEl.textContent = minutesToTime(newStartMins) + '-' + minutesToTime(newEndMins);
-                    }
-                    break;
-                }
-            }
-        }
 
-        const DRAG_THRESHOLD_PX = 6;
-        var pendingDrag = null;
-        function commitPendingDrag(e) {
-            if (!pendingDrag) return;
-            var p = pendingDrag;
-            pendingDrag = null;
-            var draggedActivity = null;
-            if (p.source === 'programme' && programmeState && programmeState.eventId === selectedevent && programmeState.days && programmeState.days[p.sourceDate]) {
-                var list = programmeState.days[p.sourceDate];
-                if (p.activityRef && list.indexOf(p.activityRef) >= 0) {
-                    var idx = list.indexOf(p.activityRef);
-                    draggedActivity = list[idx];
-                    list.splice(idx, 1);
-                } else {
-                    var aid = String(p.activityId || '');
-                    var timeToM = function(s) { var m = timeToMinutes(s); return m != null ? m : 0; };
-                    for (var i = 0; i < list.length; i++) {
-                        if (String(list[i].id || '') === aid) {
-                            draggedActivity = list[i];
-                            list.splice(i, 1);
-                            break;
-                        }
-                    }
-                    if (!draggedActivity && typeof p.activityIndex === 'number' && p.activityIndex >= 0) {
-                        var sortedList = list.slice().sort(function(a, b) { return timeToM(a.starttime) - timeToM(b.starttime); });
-                        if (p.activityIndex < sortedList.length) {
-                            var toRemove = sortedList[p.activityIndex];
-                            var removeId = String(toRemove.id || '');
-                            for (var j = 0; j < list.length; j++) {
-                                if (String(list[j].id || '') === removeId) {
-                                    draggedActivity = list[j];
-                                    list.splice(j, 1);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (draggedActivity) {
-                    renderGridFromState();
-                } else if (p.item && p.item.parentNode) {
-                    p.item.classList.add('programme-activity-drag-source-hidden');
-                }
-            }
-            var ghostLeft = (e && e.clientX != null) ? (e.clientX - p.offsetX) : p.rect.left;
-            var ghostTop = (e && e.clientY != null) ? (e.clientY - p.offsetY) : p.rect.top;
-            var ghost = document.createElement('div');
-            var styleStr = 'position:fixed;left:' + ghostLeft + 'px;top:' + ghostTop + 'px;width:' + p.rect.width + 'px;height:' + p.rect.height + 'px;margin:0;padding:0.25rem 0.5rem;background:#FECB00;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;gap:0.5rem;font-size:0.75rem;z-index:10002;pointer-events:none;opacity:0.9;';
-            if (p.source === 'programme') {
-                styleStr = 'position:fixed;left:' + ghostLeft + 'px;top:' + ghostTop + 'px;width:' + p.rect.width + 'px;height:' + p.rect.height + 'px;margin:0;padding:0.25rem 0.4rem;background:#FECB00;box-sizing:border-box;font-size:0.75rem;color:#1e293b;line-height:1.3;z-index:10002;pointer-events:none;opacity:0.9;';
-            }
-            ghost.className = 'programme-activity-ghost';
-            ghost.setAttribute('style', styleStr);
-            var ghostTime = document.createElement('span');
-            ghostTime.className = 'programme-activity-time';
-            ghostTime.textContent = p.timeText;
-            ghost.appendChild(ghostTime);
-            var ghostTitle = document.createElement('span');
-            ghostTitle.className = 'programme-activity-name';
-            if (p.source === 'programme') ghostTitle.style.marginLeft = '0.35rem';
-            ghostTitle.textContent = p.nameText;
-            ghost.appendChild(ghostTitle);
-            document.body.appendChild(ghost);
-            dragState = { source: 'programme', activityId: p.activityId, sourceDate: p.sourceDate, starttime: p.starttime, endtime: p.endtime, slotduration: p.slotduration, ghost: ghost, offsetX: p.offsetX, offsetY: p.offsetY, ghostHeight: p.rect.height, lastUpdate: 0, startX: p.startX, startY: p.startY, sourceElement: p.item, draggedActivity: draggedActivity };
-        }
 
-        function onActivityDragEnd(e) {
-            if (!dragState && pendingDrag) {
-                document.removeEventListener('mousemove', onActivityDragMove, true);
-                document.removeEventListener('mouseup', onActivityDragEnd, true);
-                pendingDrag = null;
-                return;
-            }
-            if (!dragState) return;
-            const activityId = dragState.activityId;
-            const ghost = dragState.ghost;
-            const source = dragState.source || 'programme';
-            const sourceDate = dragState.sourceDate;
-            document.removeEventListener('mousemove', onActivityDragMove, true);
-            document.removeEventListener('mouseup', onActivityDragEnd, true);
-            var startX = dragState.startX != null ? dragState.startX : 0;
-            var startY = dragState.startY != null ? dragState.startY : 0;
-            var endX = (e && e.clientX != null) ? e.clientX : startX;
-            var endY = (e && e.clientY != null) ? e.clientY : startY;
-            var dist = Math.sqrt((endX - startX) * (endX - startX) + (endY - startY) * (endY - startY));
-            if (dist < DRAG_THRESHOLD_PX) {
-                if (source === 'programme' && dragState.draggedActivity && programmeState && programmeState.days) {
-                    if (!programmeState.days[sourceDate]) programmeState.days[sourceDate] = [];
-                    programmeState.days[sourceDate].push(dragState.draggedActivity);
-                    renderGridFromState();
-                }
-                if (dragState.sourceElement && dragState.sourceElement.parentNode) {
-                    dragState.sourceElement.classList.remove('programme-activity-drag-source-hidden');
-                    dragState.sourceElement.style.visibility = '';
-                }
-                dragState = null;
-                if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
-                return;
-            }
-            var dropCx = 0, dropCy = 0;
-            var ghostRect = null;
-            var programmeDraggedActivity = (source === 'programme' && dragState.draggedActivity) ? dragState.draggedActivity : null;
-            if (ghost) {
-                ghostRect = ghost.getBoundingClientRect();
-                dropCx = ghostRect.left + ghostRect.width / 2;
-                dropCy = ghostRect.top + ghostRect.height / 2;
-            }
-            dragState = null;
-            if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
-            var under = document.elementFromPoint(dropCx, dropCy);
-            var dropCol = under ? under.closest('.grid-column-programme') : null;
-            if (!dropCol) {
-                var cols = document.querySelectorAll('#programme-editor .programme-editor .grid .grid-column-programme');
-                for (var ci = 0; ci < cols.length; ci++) {
-                    var r = cols[ci].getBoundingClientRect();
-                    if (dropCx >= r.left && dropCx <= r.right && dropCy >= r.top && dropCy <= r.bottom) {
-                        dropCol = cols[ci];
-                        break;
-                    }
-                }
-            }
 
-            if (!programmeState || programmeState.eventId !== selectedevent) return;
 
-            function removeFromDay(dateStr, id) {
-                if (!programmeState.days || !programmeState.days[dateStr]) return null;
-                var list = programmeState.days[dateStr];
-                var sid = String(id || '');
-                for (var i = 0; i < list.length; i++) {
-                    if (String(list[i].id || '') === sid) {
-                        var item = list[i];
-                        list.splice(i, 1);
-                        return item;
-                    }
-                }
-                return null;
-            }
-            if (source === 'programme' && sourceDate) {
-                var wasFromDay = programmeDraggedActivity || removeFromDay(sourceDate, activityId);
-                if (!wasFromDay) return;
-                if (dropCol) {
-                    var dropDate = dropCol.getAttribute('data-date') || sourceDate;
-                    var dayduration = Number(dropCol.getAttribute('data-dayduration')) || 0;
-                    var colStart = dropCol.getAttribute('data-starttime') || '09:00';
-                    var colStartMins = timeToMinutes(colStart) || 0;
-                    var startMins = timeToMinutes(wasFromDay.starttime) || colStartMins;
-                    var endMins = timeToMinutes(wasFromDay.endtime) || (startMins + 30);
-                    var slotMins = Number(programmeState.meta && programmeState.meta.slotduration);
-                    if (isNaN(slotMins) || slotMins < 0) slotMins = MIN_ACTIVITY_DURATION_MINS;
-                    var minDurDrop = slotMins;
-                    var enforced = enforceMinDuration(startMins, endMins, minDurDrop);
-                    startMins = enforced[0];
-                    endMins = enforced[1];
-                    var duration = endMins - startMins;
-                    if (ghostRect && dayduration > 0) {
-                        var colRect = dropCol.getBoundingClientRect();
-                        var fraction = Math.max(0, Math.min(1, (ghostRect.top - colRect.top) / colRect.height));
-                        var rawNewStartMins = colStartMins + fraction * dayduration;
-                        startMins = clampStartMinsToDay(colStartMins, dayduration, duration, rawNewStartMins);
-                        endMins = startMins + duration;
-                    }
-                    var snapped = getDropPositionWithSnapFromState(dropDate, startMins, duration, colStartMins, dayduration, activityId);
-                    if (!snapped) {
-                        if (!programmeState.days[sourceDate]) programmeState.days[sourceDate] = [];
-                        programmeState.days[sourceDate].push(wasFromDay);
-                        renderGridFromState();
-                        return;
-                    }
-                    startMins = snapped.startMins;
-                    endMins = snapped.endMins;
-                    wasFromDay.starttime = minutesToTime(startMins);
-                    wasFromDay.endtime = minutesToTime(endMins);
-                    if (!programmeState.days[dropDate]) programmeState.days[dropDate] = [];
-                    programmeState.days[dropDate].push(wasFromDay);
-                } else {
-                    if (!programmeState.days[sourceDate]) programmeState.days[sourceDate] = [];
-                    programmeState.days[sourceDate].push(wasFromDay);
-                }
-            }
 
-            playDropSound();
-            justDragged = true;
-            programmeStateDirty = true;
-            updateSaveButtonState();
-            setTimeout(function() { justDragged = false; }, 200);
-            renderGridFromState();
-        }
+
+
+
+
 
         // ===== HELPER FUNCTIONS =====
 
@@ -31411,43 +31065,11 @@
 
         var indexProgrammeParsedDoc = null;
 
-        async function fetchIndexHtmlDocument() {
-            if (indexProgrammeParsedDoc) return indexProgrammeParsedDoc;
-            var res = await fetch('index.html', { cache: 'no-cache' });
-            if (!res.ok) throw new Error('Could not load index.html (' + res.status + ')');
-            var html = await res.text();
-            indexProgrammeParsedDoc = new DOMParser().parseFromString(html, 'text/html');
-            return indexProgrammeParsedDoc;
-        }
 
         function invalidateIndexProgrammeCache() {
             indexProgrammeParsedDoc = null;
         }
 
-        async function loadProgrammeDayBlockFromIndex(day) {
-            flushTexteditorStorageNow();
-            var out = document.getElementById('texteditor-render-html');
-            if (!out) return;
-            out.innerHTML = '<p class="texteditor-render-loading">Loading…</p>';
-            try {
-                var doc = await fetchIndexHtmlDocument();
-                var root = doc.getElementById('programme-index-source');
-                if (!root) {
-                    out.innerHTML = '<p class="texteditor-render-error">index.html has no element #programme-index-source.</p>';
-                    return;
-                }
-                var block = root.querySelector('.programme-' + day);
-                if (!block) {
-                    out.innerHTML = '<p class="texteditor-render-error">No .programme-' + day + ' in index source.</p>';
-                    return;
-                }
-                var progKey = TBS_TEXTEDITOR_LS_PREFIX + 'programme:' + day;
-                updateTexteditorCodeEditor(block.outerHTML, progKey, 'programme-' + day + ' (from index.html)');
-            } catch (err) {
-                console.error('loadProgrammeDayBlockFromIndex:', err);
-                out.innerHTML = '<p class="texteditor-render-error">' + (err && err.message ? err.message : 'Failed to load index page.') + '</p>';
-            }
-        }
 
         window.addEventListener('load', async function() {
             if (window.__backendAuthReady) {
@@ -31770,6 +31392,12 @@
             var rosterItemsEl = document.getElementById('speaker-roster-items');
             if (rosterItemsEl) {
                 rosterItemsEl.addEventListener('click', function(e) {
+                    var potentialRow = e.target.closest('.speaker-roster-row.is-potential');
+                    if (potentialRow && e.target.closest('.speaker-roster-tag, .content-roster-published-btn, .speakers-status-wrap, .speakers-lodging-wrap, .speakers-bio-wrap, .speakers-programmed-wrap')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                    }
                     var nameCheckBtn = e.target.closest('.roster-name-check-btn');
                     if (nameCheckBtn && rosterItemsEl.contains(nameCheckBtn)) {
                         e.preventDefault();
@@ -32274,7 +31902,6 @@
             function sendGuestStripeInvoiceFromUi() {
                 if (backendBlockIfReadonly()) return;
                 var iid = String(guestFormEditingDocId || '').trim();
-                var iid = String(guestFormEditingDocId || '').trim();
                 var ig = iid ? findGuestInMemory(iid) : null;
                 if (!iid || !ig || !guestInvoicedisnoBlockShouldShow(ig)) return;
                 if (guestSendInvoiceBtn) guestSendInvoiceBtn.disabled = true;
@@ -32772,6 +32399,32 @@
                     });
                 });
             }
+            var emailerDeleteBtn = document.getElementById('emailer-delete-contact-btn');
+            if (emailerDeleteBtn) {
+                emailerDeleteBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (emailerDeleteBtn.disabled) return;
+                    if (backendBlockIfReadonly()) return;
+                    var contactId = String(emailerFormEditingDocId || '').trim();
+                    if (!contactId) return;
+                    openContactDeleteConfirmModal();
+                });
+            }
+            var contactDeleteCancel = document.getElementById('contact-delete-cancel');
+            var contactDeleteYes = document.getElementById('contact-delete-yes');
+            var contactDeleteBackdrop = document.getElementById('contact-delete-confirm-backdrop');
+            if (contactDeleteCancel) {
+                contactDeleteCancel.addEventListener('click', closeContactDeleteConfirmModal);
+            }
+            if (contactDeleteBackdrop) {
+                contactDeleteBackdrop.addEventListener('click', closeContactDeleteConfirmModal);
+            }
+            if (contactDeleteYes) {
+                contactDeleteYes.addEventListener('click', function () {
+                    performDeleteContactFromFirebase();
+                });
+            }
             var emailerComposeBtn = document.getElementById('emailer-compose-email-btn');
             if (emailerComposeBtn) {
                 emailerComposeBtn.addEventListener('click', function (ev) {
@@ -33201,7 +32854,6 @@
             async function onAddContentToolbarClick() {
                 if (backendBlockIfReadonly()) return;
                 var editingId = String(contentFormEditingDocId || '').trim();
-                var editingId = String(contentFormEditingDocId || '').trim();
                 if (editingId) {
                     var editingRec = findContentInMemory(editingId);
                     syncContentFormToMemoryIfEditing();
@@ -33554,10 +33206,10 @@
             function onAddSpeakerFormInput() {
                 updateEditSpeakerNameHeading();
                 updateLongBioLetterCounter();
-                updateAddSpeakerSaveButtonState();
                 syncAddSpeakerFormToMemoryIfEditing();
+                updateAddSpeakerSaveButtonState();
             }
-            ['add-speaker-first-name', 'add-speaker-last-name', 'add-speaker-email', 'add-speaker-topic1', 'add-speaker-topic2', 'add-speaker-topic3', 'add-speaker-short-bio', 'add-speaker-long-bio'].forEach(function(id) {
+            ['add-speaker-first-name', 'add-speaker-last-name', 'add-speaker-email', 'add-speaker-topic1', 'add-speaker-topic2', 'add-speaker-topic3', 'add-speaker-short-bio', 'add-speaker-long-bio', 'add-speaker-link-one', 'add-speaker-link-two', 'add-speaker-link-three'].forEach(function(id) {
                 var el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('input', onAddSpeakerFormInput);
@@ -33567,6 +33219,26 @@
                     }
                 }
             });
+            var speakerPotentialBox = document.getElementById('add-speaker-potential');
+            if (speakerPotentialBox) {
+                speakerPotentialBox.addEventListener('change', function () {
+                    if (!speakerPotentialBox.checked) {
+                        var openId = String(speakerFormEditingDocId || '').trim();
+                        var openRec = openId ? findSpeakerInMemory(openId) : null;
+                        var emailEl = document.getElementById('add-speaker-email');
+                        var hasEmail = !!(emailEl && String(emailEl.value || '').trim());
+                        if (speakerEventIsPotential(openRec) && !hasEmail) {
+                            speakerPotentialBox.checked = true;
+                            if (typeof showStatus === 'function') {
+                                showStatus('error', 'Add an e-mail address before unchecking Speaker idea.');
+                            }
+                            return;
+                        }
+                    }
+                    persistSpeakerPotentialEventChange();
+                    onAddSpeakerFormInput();
+                });
+            }
             function onGuestBioFormInput() {
                 updateSaveGuestToolbarButtonState();
                 syncAddGuestFormToMemoryIfEditing();
@@ -33742,6 +33414,12 @@
                 if (teamDlg && !teamDlg.hidden) {
                     ev.preventDefault();
                     closeTeamDeleteConfirmModal();
+                    return;
+                }
+                var contactDlg = document.getElementById('contact-delete-confirm');
+                if (contactDlg && !contactDlg.hidden) {
+                    ev.preventDefault();
+                    closeContactDeleteConfirmModal();
                     return;
                 }
                 var programmeDlg = document.getElementById('programme-delete-confirm');
@@ -34040,7 +33718,8 @@
             const saveBtn = document.getElementById('save-programme-btn');
             if (saveBtn) {
                 saveBtn.addEventListener('click', function() {
-                    saveProgrammeEditorFromToolbar();
+                    if (saveBtn.classList.contains('is-saving')) return;
+                    void saveProgrammeEditorFromToolbar();
                 });
             }
             const restoreBtn = document.getElementById('restore-programme-btn');
