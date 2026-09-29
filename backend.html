@@ -3133,6 +3133,7 @@
         body.backend-page #guest-editor #guest-editor-actions #invitedisno[hidden],
         body.backend-page #guest-editor #guest-editor-actions #invoicedisno[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-cold-contact-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-speaker-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-confirm-speaker-arrow[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn[hidden],
@@ -8243,6 +8244,25 @@
             color: var(--backend-roster-status-ready-color);
         }
 
+        #guest-editor .guests-list-table tbody tr.is-waitlist .content-badge,
+        #guest-editor .guests-list-table tbody tr.is-waitlist .content-badge:hover,
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn,
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn:hover,
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn[aria-pressed='false'],
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn[aria-pressed='false']:hover,
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn[aria-pressed='true'],
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn[aria-pressed='true']:hover {
+            background: #94a3b8 !important;
+            color: #ffffff !important;
+            border-color: #94a3b8;
+            opacity: 1 !important;
+        }
+
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn .content-roster-published-check,
+        #guest-editor .guests-list-table tbody tr.is-waitlist .guests-roster-toggle-btn .content-roster-published-x {
+            color: #ffffff !important;
+        }
+
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invited-soldout {
             background: var(--backend-roster-pill-black);
             color: #ffffff;
@@ -11431,6 +11451,7 @@
                             <div class="speaker-editor-actions" id="speaker-editor-actions" hidden aria-hidden="true">
                                 <div class="speaker-workflow-block">
                                 <div id="speaker-workflow-actions" class="speaker-workflow-actions">
+                                    <button type="button" class="speaker-workflow-phase-btn" id="speaker-cold-contact-btn" hidden aria-hidden="true">Cold contact</button>
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-confirm-speaker-btn" disabled aria-disabled="true" hidden aria-hidden="true">
                                         <span class="speaker-confirm-speaker-label">Confirm speaker</span>
                                     </button>
@@ -24806,6 +24827,7 @@
 
         function syncSpeakerWorkflowActionsPanel() {
             var wrap = document.getElementById('speaker-workflow-actions');
+            var coldContactBtn = document.getElementById('speaker-cold-contact-btn');
             var confirmSpeakerBtn = document.getElementById('speaker-confirm-speaker-btn');
             var confirmSpeakerArrow = document.getElementById('speaker-workflow-confirm-speaker-arrow');
             var inviteBtn = document.getElementById('speaker-send-formal-invite-btn');
@@ -24863,7 +24885,13 @@
             }
             if (!wrap) return;
             var id = String(speakerFormEditingDocId || '').trim();
+            function setColdContactVisible(show) {
+                if (!coldContactBtn) return;
+                coldContactBtn.hidden = !show;
+                coldContactBtn.setAttribute('aria-hidden', show ? 'false' : 'true');
+            }
             if (!id || id === '_init') {
+                setColdContactVisible(false);
                 resetConfirmSpeakerBtn();
                 if (confirmSpeakerArrow) {
                     confirmSpeakerArrow.hidden = true;
@@ -24945,6 +24973,7 @@
                 return;
             }
             var s = findSpeakerInMemory(id);
+            setColdContactVisible(speakerEventIsPotential(s));
             var inviteStatus = normalizeSpeakerInviteStatus(s && s.inviteStatus);
             var lodgingSt = normalizeSpeakerLodging(s && s.lodging);
             var bioSt = normalizeSpeakerBioStatus(s && s.bioStatus);
@@ -25561,6 +25590,7 @@
                         html +=
                             '<tr class="guests-roster-row' +
                             (guestSelected ? ' is-selected' : '') +
+                            (isWaitList ? ' is-waitlist' : '') +
                             '" data-guests-id="' +
                             escapeHtml(g.id) +
                             '">' +
