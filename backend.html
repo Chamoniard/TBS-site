@@ -6125,10 +6125,19 @@
         #speaker-editor .speakers-roster-table tbody td.speaker-roster-name-cell,
         #team-editor .team-list-table tbody td.team-roster-name-cell,
         #emailer-editor .contacts-list-table tbody td.guests-roster-name-cell {
+            vertical-align: middle;
+        }
+
+        #guest-editor .guests-list-table tbody td.guests-roster-name-cell .roster-name-inner,
+        #speaker-editor .speakers-roster-table tbody td.speaker-roster-name-cell .roster-name-inner,
+        #team-editor .team-list-table tbody td.team-roster-name-cell .roster-name-inner,
+        #emailer-editor .contacts-list-table tbody td.guests-roster-name-cell .roster-name-inner {
             display: flex;
             flex-direction: row;
             align-items: center;
             gap: 6px;
+            min-width: 0;
+            max-width: 100%;
         }
 
         #guest-editor .guests-list-table tbody td.guests-roster-name-cell .roster-name-label,
@@ -6295,6 +6304,19 @@
             text-transform: uppercase;
         }
 
+        #speaker-editor .speakers-roster-table tbody tr.speaker-roster-section-row td.speaker-roster-section-title-cell {
+            overflow: visible;
+        }
+
+        #speaker-editor .speakers-roster-table .speaker-roster-section-title-label {
+            position: sticky;
+            left: var(--backend-panel-header-pad-x);
+            display: inline-block;
+            z-index: 2;
+            background: #ffffff;
+            white-space: nowrap;
+        }
+
         .speakers-roster-table tbody td,
         .guests-list-table tbody td,
         .team-list-table tbody td,
@@ -6450,26 +6472,50 @@
         #speaker-editor .speakers-roster-table tr.is-potential button.speaker-roster-tag:disabled,
         #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-btn,
         #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-btn:hover,
-        #speaker-editor .speakers-roster-table tr.is-potential .content-badge {
+        #speaker-editor .speakers-roster-table tr.is-potential .content-badge,
+        #speaker-editor .speakers-roster-table tr.is-potential .content-badge:hover,
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-event-btn,
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-event-btn:hover,
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-status-btn,
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-status-btn:hover {
             background: #94a3b8 !important;
             color: #ffffff !important;
-            cursor: default;
-            pointer-events: none;
             box-shadow: none;
             opacity: 1 !important;
             border-color: #94a3b8;
         }
 
-        #speaker-editor .speakers-roster-table tr.is-potential .speakers-status-wrap,
+        #speaker-editor .speakers-roster-table tr.is-potential button.speaker-roster-tag:not(.speaker-roster-status-btn),
+        #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-btn {
+            cursor: default;
+            pointer-events: none;
+        }
+
         #speaker-editor .speakers-roster-table tr.is-potential .speakers-lodging-wrap,
         #speaker-editor .speakers-roster-table tr.is-potential .speakers-bio-wrap,
         #speaker-editor .speakers-roster-table tr.is-potential .speakers-programmed-wrap {
             pointer-events: none;
         }
 
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-event-btn,
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-status-btn {
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-status-btn.is-armed,
+        #speaker-editor .speakers-roster-table tr.is-potential .speaker-roster-event-btn.is-armed {
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
+        }
+
         #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-check,
         #speaker-editor .speakers-roster-table tr.is-potential .content-roster-published-x {
             color: #ffffff;
+        }
+
+        #speaker-editor .speakers-roster-table td.speakers-event-cell,
+        #speaker-editor .speakers-roster-table td.speakers-status-cell {
+            overflow: visible;
         }
 
         #speaker-editor .speakers-roster-table td.speaker-roster-potential-topic-cell {
@@ -8460,6 +8506,7 @@
         }
 
         #speaker-editor .speakers-status-wrap,
+        #speaker-editor .speakers-event-wrap,
         #speaker-editor .speakers-lodging-wrap,
         #speaker-editor .speakers-bio-wrap,
         #speaker-editor .speakers-programmed-wrap {
@@ -8468,7 +8515,16 @@
             max-width: 100%;
         }
 
+        #speaker-editor .speakers-roster-table button.speaker-roster-event-btn {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            margin: 0.18rem auto;
+        }
+
         #speaker-editor .speakers-status-dropdown,
+        #speaker-editor .speakers-event-dropdown,
         #speaker-editor .speakers-lodging-dropdown,
         #speaker-editor .speakers-bio-dropdown,
         #speaker-editor .speakers-programmed-dropdown {
@@ -8488,6 +8544,7 @@
         }
 
         #speaker-editor .speakers-status-dropdown > li,
+        #speaker-editor .speakers-event-dropdown > li,
         #speaker-editor .speakers-lodging-dropdown > li,
         #speaker-editor .speakers-bio-dropdown > li,
         #speaker-editor .speakers-programmed-dropdown > li {
@@ -8496,6 +8553,7 @@
         }
 
         #speaker-editor .speakers-status-dropdown .speakers-status-option,
+        #speaker-editor .speakers-event-dropdown .speakers-event-option,
         #speaker-editor .speakers-lodging-dropdown .speakers-lodging-option,
         #speaker-editor .speakers-bio-dropdown .speakers-bio-option,
         #speaker-editor .speakers-programmed-dropdown .speakers-programmed-option {
@@ -8519,6 +8577,7 @@
         }
 
         #speaker-editor .speakers-status-dropdown .speakers-status-option:hover,
+        #speaker-editor .speakers-event-dropdown .speakers-event-option:hover,
         #speaker-editor .speakers-lodging-dropdown .speakers-lodging-option:hover,
         #speaker-editor .speakers-bio-dropdown .speakers-bio-option:hover,
         #speaker-editor .speakers-programmed-dropdown .speakers-programmed-option:hover {
@@ -8526,6 +8585,7 @@
         }
 
         #speaker-editor .speakers-roster-table .speaker-roster-status-btn.is-armed,
+        #speaker-editor .speakers-roster-table .speaker-roster-event-btn.is-armed,
         #speaker-editor .speakers-roster-table .speaker-roster-lodging-btn.is-armed,
         #speaker-editor .speakers-roster-table .speaker-roster-bio-btn.is-armed,
         #speaker-editor .speakers-roster-table .speaker-roster-programmed-btn.is-armed {
@@ -13271,6 +13331,7 @@
         var EMAILER_FIREBASE_AUTOSAVE_MS = 2000;
         var emailerContactFormBaseline = null;
         var emailerContactAllevents = [];
+        var speakerRosterAllevents = [];
         var teamFormBaseline = null;
         var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary'];
         var TEAM_LODGING_OPTIONS = ['A', 'B', 'TBD', 'Own'];
@@ -13372,6 +13433,8 @@
         /** Speaker Status / Lodging / Bio columns: first click arms badge; second opens value dropdown. */
         var speakersStatusArmedDocId = '';
         var speakersStatusDropdownOpenDocId = '';
+        var speakersEventArmedDocId = '';
+        var speakersEventDropdownOpenDocId = '';
         var speakersLodgingArmedDocId = '';
         var speakersLodgingDropdownOpenDocId = '';
         var speakersBioArmedDocId = '';
@@ -13432,7 +13495,7 @@
         var SPEAKER_BIO_STATUS_VALUES = ['No', 'Received', 'Uploaded'];
         var SPEAKER_BRIEF_VALUES = ['No', 'First brief', 'Final brief'];
         var SPEAKER_PRESENTED_VALUES = ['No', 'Yes'];
-        var SPEAKER_INVITE_STATUS_VALUES = ['Preliminary', 'Confirmed', 'Invited', 'Cancel'];
+        var SPEAKER_INVITE_STATUS_VALUES = ['Approached', 'Confirmed', 'Invited', 'Cancel'];
         var SPEAKER_TITLES_VALUES = ['No', 'Yes'];
         var SPEAKER_TRAVEL_VALUES = ['No', 'Yes'];
         var SPEAKER_CME_VALUES = ['No', 'Ready', 'Sent'];
@@ -13546,15 +13609,15 @@
 
         function normalizeSpeakerInviteStatus(v) {
             var s = v != null ? String(v).trim() : '';
-            if (!s) return 'Preliminary';
+            if (!s) return 'Approached';
             var low = s.toLowerCase();
-            if (low === 'none' || low === 'no' || low === 'n' || low === 'preliminary') return 'Preliminary';
+            if (low === 'none' || low === 'no' || low === 'n' || low === 'preliminary' || low === 'approached') return 'Approached';
             if (low === 'confirmed' || low === 'accepted') return 'Confirmed';
             if (low === 'invited') return 'Invited';
             if (low === 'cancel' || low === 'cancelled' || low === 'canceled') return 'Cancel';
             if (low === 'not approached') return 'Not approached';
             if (SPEAKER_INVITE_STATUS_VALUES.indexOf(s) >= 0) return s;
-            return 'Preliminary';
+            return 'Approached';
         }
 
         function normalizeSpeakerTitlesStatus(v) {
@@ -13663,6 +13726,35 @@
 
         function speakerEventIsPotential(rec) {
             return String(rec && rec.event != null ? rec.event : '').trim().toLowerCase() === 'potential';
+        }
+
+        function speakerRosterEventChoices() {
+            var seen = Object.create(null);
+            var out = [];
+            function add(raw) {
+                var label = String(raw != null ? raw : '').trim();
+                if (!label || label === '-') return;
+                var key = label.toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push(label);
+            }
+            add('Potential');
+            add(current_event);
+            (speakerRosterAllevents || []).forEach(add);
+            (backenduserAllowedEvents || []).forEach(add);
+            (speakerRosterInMemory || []).forEach(function (s) {
+                add(s && s.event);
+            });
+            return out;
+        }
+
+        function syncSpeakerPotentialCheckboxFromRecord(rec) {
+            if (!rec) return;
+            var id = String(rec.id || '').trim();
+            if (!id || id !== String(speakerFormEditingDocId || '').trim()) return;
+            var box = document.getElementById('add-speaker-potential');
+            if (box) box.checked = speakerEventIsPotential(rec);
         }
 
         function speakerPotentialCheckboxIsChecked() {
@@ -17121,7 +17213,7 @@
                 linkTwo: '',
                 linkThree: '',
                 event: String(current_event || '').trim(),
-                inviteStatus: 'Preliminary',
+                inviteStatus: 'Approached',
                 confirmedDate: '',
                 invitedDate: '',
                 lodging: 'No',
@@ -17896,7 +17988,6 @@
                 speakerLog: speakerLogFromDoc(d),
                 selected: guestSelectedFromDoc(d),
             };
-            if (speakerEventIsPotential(rec)) rec.inviteStatus = 'Not approached';
             return rec;
         }
 
@@ -18613,10 +18704,10 @@
                             escapeHtml(m.id) +
                             '">' +
                             '<td class="team-roster-name-cell">' +
-                            teamRosterNameCheckHtml(m.id) +
-                            '<span class="roster-name-label">' +
-                            (nameLabel ? escapeHtml(nameLabel) : '&nbsp;') +
-                            '</span>' +
+                            rosterNameInnerHtml(
+                                teamRosterNameCheckHtml(m.id),
+                                nameLabel ? escapeHtml(nameLabel) : '&nbsp;'
+                            ) +
                             '</td>' +
                             '<td class="team-roster-tag-cell">' +
                             teamRosterGreenPillHtml(eventLabel) +
@@ -20122,10 +20213,10 @@
                         escapeHtml(m.id) +
                         '">' +
                         '<td class="guests-roster-name-cell">' +
-                        contactRosterNameCheckHtml(m.id) +
-                        '<span class="roster-name-label">' +
-                        (nameLabel ? escapeHtml(nameLabel) : '&nbsp;') +
-                        '</span>' +
+                        rosterNameInnerHtml(
+                            contactRosterNameCheckHtml(m.id),
+                            nameLabel ? escapeHtml(nameLabel) : '&nbsp;'
+                        ) +
                         '</td>' +
                         '<td class="guests-roster-tag-cell">' +
                         contactRosterGreenPillHtml(contactCategoryDisplayLabel(m.category)) +
@@ -24978,7 +25069,7 @@
             var lodgingSt = normalizeSpeakerLodging(s && s.lodging);
             var bioSt = normalizeSpeakerBioStatus(s && s.bioStatus);
             var formalInviteSent = inviteStatus === 'Invited';
-            var canConfirmSpeaker = inviteStatus === 'Preliminary';
+            var canConfirmSpeaker = inviteStatus === 'Approached';
             var speakerPastConfirm = inviteStatus === 'Confirmed' || inviteStatus === 'Invited';
             var workflowPastInvite = inviteStatus === 'Invited';
             var showConfirmSpeaker = canConfirmSpeaker || speakerPastConfirm;
@@ -25308,6 +25399,16 @@
         }
 
 
+        function rosterNameInnerHtml(checkHtml, labelHtml) {
+            return (
+                '<div class="roster-name-inner">' +
+                (checkHtml || '') +
+                '<span class="roster-name-label">' +
+                labelHtml +
+                '</span></div>'
+            );
+        }
+
         function rosterNameCheckHtml(store, docId, noun) {
             var id = String(docId || '').trim();
             var on = !!(store && id && store[id]);
@@ -25597,10 +25698,10 @@
                             '<td class="guests-roster-name-cell' +
                             (isCancelled ? ' is-cancelled' : '') +
                             '">' +
-                            guestRosterNameCheckHtml(g.id) +
-                            '<span class="roster-name-label">' +
-                            escapeHtml(guestLabel) +
-                            '</span>' +
+                            rosterNameInnerHtml(
+                                guestRosterNameCheckHtml(g.id),
+                                escapeHtml(guestLabel)
+                            ) +
                             '</td>' +
                             '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>';
                         if (isCancelled) {
@@ -25756,6 +25857,11 @@
                     backenduserHasAllEventAccess ? await loadCurrentEventFromTbsSettings(db) : ''
                 );
                 await syncEventLocationAndSiteSettings(current_event);
+                try {
+                    speakerRosterAllevents = await loadEventsForCurrentEventDropdown(db);
+                } catch (evErr) {
+                    console.warn('fetchSpeakersForSelectedEvent events:', evErr);
+                }
                 if (!String(current_event || '').trim()) {
                     renderSpeakerRoster();
                     return;
@@ -25918,6 +26024,8 @@
             var addBtn = document.getElementById('add-speaker-button');
             speakersStatusArmedDocId = '';
             speakersStatusDropdownOpenDocId = '';
+            speakersEventArmedDocId = '';
+            speakersEventDropdownOpenDocId = '';
             speakersLodgingArmedDocId = '';
             speakersLodgingDropdownOpenDocId = '';
             speakersBioArmedDocId = '';
@@ -25935,12 +26043,6 @@
                 addBtn.setAttribute('aria-disabled', 'false');
             }
             speakerRosterSortInPlace();
-            function speakerEventBadgeHtml(rawEvent) {
-                var label = String(rawEvent != null ? rawEvent : '').trim();
-                if (!label) label = '-';
-                var cls = contentEventBadgeClassForLabel(label === '-' ? '' : label);
-                return '<span class="' + cls + '">' + escapeHtml(label) + '</span>';
-            }
             var colCount = 12;
             var html = '<table class="speakers-roster-table" role="grid" aria-label="Speaker roster">' +
                 '<thead><tr>' +
@@ -25978,7 +26080,9 @@
                         '<tr class="speaker-roster-row speaker-roster-blank-row">' +
                         '<td colspan="' + colCount + '">&nbsp;</td></tr>' +
                         '<tr class="speaker-roster-row speaker-roster-blank-row speaker-roster-section-row">' +
-                        '<td class="speaker-roster-section-title-cell" colspan="' + colCount + '">SPEAKER IDEAS</td></tr>';
+                        '<td class="speaker-roster-section-title-cell" colspan="' + colCount + '">' +
+                        '<span class="speaker-roster-section-title-label">SPEAKER IDEAS</span>' +
+                        '</td></tr>';
                     speakerIdeasHeaderInserted = true;
                 }
                 var label = (String(s.firstName || '').trim() + ' ' + String(s.lastName || '').trim()).trim();
@@ -25987,13 +26091,13 @@
                     var topic1Label = String(s.topic1 != null ? s.topic1 : '').trim();
                     html += '<tr class="speaker-roster-row is-potential" data-speaker-id="' + escapeHtml(s.id) + '">' +
                         '<td class="speaker-roster-name-cell">' +
-                        speakerRosterNameCheckHtml(s.id) +
-                        '<span class="roster-name-label">' +
-                        escapeHtml(label) +
-                        '</span>' +
+                        rosterNameInnerHtml(
+                            speakerRosterNameCheckHtml(s.id),
+                            escapeHtml(label)
+                        ) +
                         '</td>' +
-                        '<td class="speaker-roster-tag-cell">' + speakerEventBadgeHtml(s.event) + '</td>' +
-                        speakerRosterStatusCellHtml(s.id, 'Not approached', true) +
+                        speakerRosterEventCellHtml(s.id, s.event) +
+                        speakerRosterStatusCellHtml(s.id, s.inviteStatus, false) +
                         '<td class="speaker-roster-potential-topic-cell" colspan="' + (colCount - 3) + '">' +
                         '<span class="speaker-roster-potential-topic">' + escapeHtml(topic1Label) + '</span>' +
                         '</td></tr>';
@@ -26014,7 +26118,6 @@
                 var trvCls = speakerRosterTravelTagClass(trv);
                 var cmeCls = speakerRosterCmeTagClass(cme);
                 var rfdCls = speakerRosterRefundedTagClass(rfd);
-                var eventBadge = speakerEventBadgeHtml(s.event);
                 var isPotentialSpeaker = speakerEventIsPotential(s);
                 var pillLock = isPotentialSpeaker ? ' disabled' : '';
                 var presentedOn = prs === 'Yes';
@@ -26039,13 +26142,13 @@
                     '</td>';
                 html += '<tr class="speaker-roster-row' + (isPotentialSpeaker ? ' is-potential' : '') + '" data-speaker-id="' + escapeHtml(s.id) + '">' +
                     '<td class="speaker-roster-name-cell">' +
-                    speakerRosterNameCheckHtml(s.id) +
-                    '<span class="roster-name-label">' +
-                    escapeHtml(label) +
-                    '</span>' +
+                    rosterNameInnerHtml(
+                        speakerRosterNameCheckHtml(s.id),
+                        escapeHtml(label)
+                    ) +
                     '</td>' +
-                    '<td class="speaker-roster-tag-cell">' + eventBadge + '</td>' +
-                    speakerRosterStatusCellHtml(s.id, inv, isPotentialSpeaker) +
+                    speakerRosterEventCellHtml(s.id, s.event) +
+                    speakerRosterStatusCellHtml(s.id, inv, false) +
                     speakerRosterLodgingCellHtml(s.id, lod, isPotentialSpeaker) +
                     speakerRosterBioCellHtml(s.id, bioSt, isPotentialSpeaker) +
                     speakerRosterProgrammedCellHtml(s.id, bioPub, isPotentialSpeaker) +
@@ -26110,12 +26213,49 @@
             return label || String(rec.id || '').trim() || 'Speaker';
         }
 
+        function speakerRosterEventCellHtml(docId, rawEvent) {
+            var label = String(rawEvent != null ? rawEvent : '').trim();
+            if (!label) label = '-';
+            var cls = contentEventBadgeClassForLabel(label === '-' ? '' : label);
+            var opts = [];
+            var choices = speakerRosterEventChoices();
+            for (var ei = 0; ei < choices.length; ei++) {
+                var eventValue = choices[ei];
+                opts.push(
+                    '<li role="none"><button type="button" class="speakers-event-option" role="menuitem" data-event-value="' +
+                    escapeHtml(eventValue) +
+                    '">' +
+                    escapeHtml(eventValue) +
+                    '</button></li>'
+                );
+            }
+            return (
+                '<td class="speaker-roster-tag-cell speakers-event-cell">' +
+                '<div class="speakers-event-wrap">' +
+                '<button type="button" class="' +
+                cls +
+                ' speaker-roster-event-btn" data-field="event" aria-haspopup="menu" aria-expanded="false" title="Event: first click selects row, second opens values" aria-label="Event: ' +
+                escapeHtml(label) +
+                '">' +
+                escapeHtml(label) +
+                '</button>' +
+                '<ul class="speakers-event-dropdown" hidden role="menu">' +
+                opts.join('') +
+                '</ul></div></td>'
+            );
+        }
+
         function speakerRosterStatusCellHtml(docId, inviteStatus, locked) {
             var inv = normalizeSpeakerInviteStatus(inviteStatus);
             var invCls = speakerRosterInviteTagClass(inv);
+            var recForStatus = findSpeakerInMemory(docId);
+            var statusValues = SPEAKER_INVITE_STATUS_VALUES.slice();
+            if (inv === 'Not approached' || speakerEventIsPotential(recForStatus)) {
+                if (statusValues.indexOf('Not approached') < 0) statusValues.unshift('Not approached');
+            }
             var opts = [];
-            for (var si = 0; si < SPEAKER_INVITE_STATUS_VALUES.length; si++) {
-                var statusValue = SPEAKER_INVITE_STATUS_VALUES[si];
+            for (var si = 0; si < statusValues.length; si++) {
+                var statusValue = statusValues[si];
                 opts.push(
                     '<li role="none"><button type="button" class="speakers-status-option" role="menuitem" data-status-value="' +
                     escapeHtml(statusValue) +
@@ -26238,6 +26378,20 @@
             );
         }
 
+        function clearSpeakerEventUiState() {
+            speakersEventArmedDocId = '';
+            speakersEventDropdownOpenDocId = '';
+            document.querySelectorAll('#speaker-editor .speaker-roster-event-btn.is-armed').forEach(function(btn) {
+                btn.classList.remove('is-armed');
+            });
+            document.querySelectorAll('#speaker-editor .speakers-event-dropdown').forEach(function(el) {
+                el.hidden = true;
+            });
+            document.querySelectorAll('#speaker-editor .speaker-roster-event-btn').forEach(function(btn) {
+                btn.setAttribute('aria-expanded', 'false');
+            });
+        }
+
         function clearSpeakerStatusUiState() {
             speakersStatusArmedDocId = '';
             speakersStatusDropdownOpenDocId = '';
@@ -26301,9 +26455,10 @@
             for (var ai = 0; ai < SPEAKER_INVITE_STATUS_VALUES.length; ai++) {
                 allowed[SPEAKER_INVITE_STATUS_VALUES[ai]] = true;
             }
+            allowed['Not approached'] = true;
             if (!allowed[value]) return;
             var rec = findSpeakerInMemory(id);
-            if (!rec || speakerEventIsPotential(rec)) return;
+            if (!rec) return;
             var next = normalizeSpeakerInviteStatus(value);
             var prev = rec.inviteStatus;
             var prevConfirmedDate = rec.confirmedDate != null ? String(rec.confirmedDate) : '';
@@ -26312,6 +26467,7 @@
                 clearSpeakerLodgingUiState();
                 clearSpeakerBioUiState();
                 clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                 return;
             }
             rec.inviteStatus = next;
@@ -26319,13 +26475,14 @@
                 if (!(rec.confirmedDate != null && String(rec.confirmedDate).trim())) {
                     rec.confirmedDate = guestPaidDateYyyyMmDd();
                 }
-            } else if (next === 'Preliminary') {
+            } else if (next === 'Approached') {
                 rec.confirmedDate = '';
             }
             clearSpeakerStatusUiState();
             clearSpeakerLodgingUiState();
             clearSpeakerBioUiState();
             clearSpeakerProgrammedUiState();
+            clearSpeakerEventUiState();
             markSpeakerDocDirty(id);
             renderSpeakerRoster();
             syncSpeakerWorkflowActionsPanel();
@@ -26349,6 +26506,68 @@
             }
         }
 
+        async function setSpeakerRosterEventField(docId, value) {
+            var id = String(docId || '').trim();
+            var next = String(value != null ? value : '').trim();
+            if (!id || !next || next === '-') return;
+            var rec = findSpeakerInMemory(id);
+            if (!rec) return;
+            var allowed = speakerRosterEventChoices();
+            var matched = '';
+            for (var ai = 0; ai < allowed.length; ai++) {
+                if (String(allowed[ai] || '').trim().toLowerCase() === next.toLowerCase()) {
+                    matched = String(allowed[ai] || '').trim();
+                    break;
+                }
+            }
+            if (!matched) return;
+            next = matched;
+            var prev = rec.event != null ? String(rec.event) : '';
+            var prevStatus = rec.inviteStatus;
+            if (String(prev).trim().toLowerCase() === next.toLowerCase()) {
+                clearSpeakerStatusUiState();
+                clearSpeakerEventUiState();
+                clearSpeakerLodgingUiState();
+                clearSpeakerBioUiState();
+                clearSpeakerProgrammedUiState();
+                return;
+            }
+            rec.event = next;
+            if (speakerEventIsPotential(rec) && !speakerEventIsPotential({ event: prev })) {
+                rec.inviteStatus = 'Not approached';
+            }
+            clearSpeakerStatusUiState();
+            clearSpeakerEventUiState();
+            clearSpeakerLodgingUiState();
+            clearSpeakerBioUiState();
+            clearSpeakerProgrammedUiState();
+            markSpeakerDocDirty(id);
+            syncSpeakerPotentialCheckboxFromRecord(rec);
+            speakerRosterSortInPlace();
+            renderSpeakerRoster();
+            syncSpeakerWorkflowActionsPanel();
+            var name = speakerRosterDisplayName(rec);
+            try {
+                var saved = await flushSpeakersToFirebase({ silent: true });
+                if (!saved) throw new Error('Failed to update Event.');
+                if (typeof showStatus === 'function') {
+                    showStatus('success', name + ': Event updated');
+                }
+            } catch (err) {
+                console.error('setSpeakerRosterEventField:', err);
+                rec.event = prev;
+                rec.inviteStatus = prevStatus;
+                markSpeakerDocDirty(id);
+                syncSpeakerPotentialCheckboxFromRecord(rec);
+                speakerRosterSortInPlace();
+                renderSpeakerRoster();
+                syncSpeakerWorkflowActionsPanel();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to update Event.');
+                }
+            }
+        }
+
         async function confirmSpeakerFromWorkflow() {
             if (!speakerPadlockIsOpen) return;
             var id = String(speakerFormEditingDocId || '').trim();
@@ -26361,7 +26580,7 @@
                 if (typeof showStatus === 'function') showStatus('error', 'Speaker not found.');
                 return;
             }
-            if (normalizeSpeakerInviteStatus(rec.inviteStatus) !== 'Preliminary') return;
+            if (normalizeSpeakerInviteStatus(rec.inviteStatus) !== 'Approached') return;
             var prevStatus = rec.inviteStatus;
             var prevConfirmedDate = rec.confirmedDate != null ? String(rec.confirmedDate) : '';
             var prevSpeakerLog = Array.isArray(rec.speakerLog) ? rec.speakerLog.slice() : [];
@@ -26413,6 +26632,7 @@
                 clearSpeakerLodgingUiState();
                 clearSpeakerBioUiState();
                 clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                 return;
             }
             var prevSpeakerLog = Array.isArray(rec.speakerLog) ? rec.speakerLog.slice() : [];
@@ -26431,6 +26651,7 @@
             clearSpeakerLodgingUiState();
             clearSpeakerBioUiState();
             clearSpeakerProgrammedUiState();
+            clearSpeakerEventUiState();
             markSpeakerDocDirty(id);
             renderSpeakerRoster();
             syncSpeakerWorkflowActionsPanel();
@@ -26482,6 +26703,7 @@
                 clearSpeakerLodgingUiState();
                 clearSpeakerBioUiState();
                 clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                 return;
             }
             var prevSpeakerLog = Array.isArray(rec.speakerLog) ? rec.speakerLog.slice() : [];
@@ -26496,6 +26718,7 @@
             clearSpeakerLodgingUiState();
             clearSpeakerBioUiState();
             clearSpeakerProgrammedUiState();
+            clearSpeakerEventUiState();
             markSpeakerDocDirty(id);
             renderSpeakerRoster();
             syncSpeakerWorkflowActionsPanel();
@@ -26548,6 +26771,7 @@
                 clearSpeakerLodgingUiState();
                 clearSpeakerBioUiState();
                 clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                 return;
             }
             rec.bioPublish = next;
@@ -26555,6 +26779,7 @@
             clearSpeakerLodgingUiState();
             clearSpeakerBioUiState();
             clearSpeakerProgrammedUiState();
+            clearSpeakerEventUiState();
             markSpeakerDocDirty(id);
             renderSpeakerRoster();
             var name = speakerRosterDisplayName(rec);
@@ -31423,10 +31648,20 @@
             if (rosterItemsEl) {
                 rosterItemsEl.addEventListener('click', function(e) {
                     var potentialRow = e.target.closest('.speaker-roster-row.is-potential');
-                    if (potentialRow && e.target.closest('.speaker-roster-tag, .content-roster-published-btn, .speakers-status-wrap, .speakers-lodging-wrap, .speakers-bio-wrap, .speakers-programmed-wrap')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return;
+                    if (potentialRow) {
+                        var potentialInteractive = e.target.closest(
+                            '.speakers-status-wrap, .speakers-event-wrap, .speaker-roster-status-btn, .speaker-roster-event-btn, .speakers-status-option, .speakers-event-option'
+                        );
+                        if (
+                            !potentialInteractive &&
+                            e.target.closest(
+                                '.speaker-roster-tag, .content-roster-published-btn, .speakers-lodging-wrap, .speakers-bio-wrap, .speakers-programmed-wrap'
+                            )
+                        ) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return;
+                        }
                     }
                     var nameCheckBtn = e.target.closest('.roster-name-check-btn');
                     if (nameCheckBtn && rosterItemsEl.contains(nameCheckBtn)) {
@@ -31466,6 +31701,16 @@
                         if (programmedId && programmedVal) void setSpeakerRosterProgrammedField(programmedId, programmedVal);
                         return;
                     }
+                    var eventOpt = e.target.closest('.speakers-event-option');
+                    if (eventOpt && rosterItemsEl.contains(eventOpt)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var eventVal = eventOpt.getAttribute('data-event-value');
+                        var eventRow = eventOpt.closest('.speaker-roster-row');
+                        var eventId = eventRow && eventRow.getAttribute('data-speaker-id');
+                        if (eventId && eventVal) void setSpeakerRosterEventField(eventId, eventVal);
+                        return;
+                    }
                     var statusOpt = e.target.closest('.speakers-status-option');
                     if (statusOpt && rosterItemsEl.contains(statusOpt)) {
                         e.preventDefault();
@@ -31484,6 +31729,43 @@
                         var lodgingRow = lodgingOpt.closest('.speaker-roster-row');
                         var lodgingId = lodgingRow && lodgingRow.getAttribute('data-speaker-id');
                         if (lodgingId && lodgingVal) void setSpeakerRosterLodgingField(lodgingId, lodgingVal);
+                        return;
+                    }
+                    var eventBtn = e.target.closest('.speaker-roster-event-btn');
+                    if (eventBtn && rosterItemsEl.contains(eventBtn)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var eventBtnRow = eventBtn.closest('.speaker-roster-row');
+                        var eventBtnId = eventBtnRow && eventBtnRow.getAttribute('data-speaker-id');
+                        var eventWrap = eventBtn.closest('.speakers-event-wrap');
+                        var eventDropdown = eventWrap && eventWrap.querySelector('.speakers-event-dropdown');
+                        if (eventBtnId && eventDropdown) {
+                            if (speakersEventArmedDocId === eventBtnId) {
+                                if (!eventDropdown.hidden) {
+                                    eventDropdown.hidden = true;
+                                    eventBtn.setAttribute('aria-expanded', 'false');
+                                    speakersEventDropdownOpenDocId = '';
+                                } else {
+                                    document.querySelectorAll('#speaker-editor .speakers-event-dropdown').forEach(function(el) {
+                                        el.hidden = true;
+                                    });
+                                    document.querySelectorAll('#speaker-editor .speaker-roster-event-btn').forEach(function(btn) {
+                                        btn.setAttribute('aria-expanded', 'false');
+                                    });
+                                    eventDropdown.hidden = false;
+                                    eventBtn.setAttribute('aria-expanded', 'true');
+                                    speakersEventDropdownOpenDocId = eventBtnId;
+                                }
+                            } else {
+                                clearSpeakerStatusUiState();
+                                clearSpeakerLodgingUiState();
+                                clearSpeakerBioUiState();
+                clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
+                                speakersEventArmedDocId = eventBtnId;
+                                eventBtn.classList.add('is-armed');
+                            }
+                        }
                         return;
                     }
                     var statusBtn = e.target.closest('.speaker-roster-status-btn');
@@ -31515,7 +31797,8 @@
                                 clearSpeakerStatusUiState();
                                 clearSpeakerLodgingUiState();
                                 clearSpeakerBioUiState();
-                                clearSpeakerProgrammedUiState();
+                clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                                 speakersStatusArmedDocId = statusBtnId;
                                 statusBtn.classList.add('is-armed');
                             }
@@ -31551,7 +31834,8 @@
                                 clearSpeakerStatusUiState();
                                 clearSpeakerLodgingUiState();
                                 clearSpeakerBioUiState();
-                                clearSpeakerProgrammedUiState();
+                clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                                 speakersLodgingArmedDocId = lodgingBtnId;
                                 lodgingBtn.classList.add('is-armed');
                             }
@@ -31587,7 +31871,8 @@
                                 clearSpeakerStatusUiState();
                                 clearSpeakerLodgingUiState();
                                 clearSpeakerBioUiState();
-                                clearSpeakerProgrammedUiState();
+                clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                                 speakersBioArmedDocId = bioBtnId;
                                 bioBtn.classList.add('is-armed');
                             }
@@ -31623,7 +31908,8 @@
                                 clearSpeakerStatusUiState();
                                 clearSpeakerLodgingUiState();
                                 clearSpeakerBioUiState();
-                                clearSpeakerProgrammedUiState();
+                clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
                                 speakersProgrammedArmedDocId = programmedBtnId;
                                 programmedBtn.classList.add('is-armed');
                             }
@@ -31642,7 +31928,7 @@
                     }
                     var row = e.target.closest('.speaker-roster-row');
                     if (!row) return;
-                    if (e.target.closest('.speakers-status-wrap') || e.target.closest('.speakers-lodging-wrap') || e.target.closest('.speakers-bio-wrap') || e.target.closest('.speakers-programmed-wrap')) {
+                    if (e.target.closest('.speakers-status-wrap') || e.target.closest('.speakers-event-wrap') || e.target.closest('.speakers-lodging-wrap') || e.target.closest('.speakers-bio-wrap') || e.target.closest('.speakers-programmed-wrap')) {
                         return;
                     }
                     var sid = row.getAttribute('data-speaker-id');
@@ -32838,6 +33124,7 @@
                 if (ev.target.closest('.guests-briefed-wrap')) return;
                 if (ev.target.closest('.guests-cme-wrap')) return;
                 if (ev.target.closest('.speakers-status-wrap')) return;
+                if (ev.target.closest('.speakers-event-wrap')) return;
                 if (ev.target.closest('.speakers-lodging-wrap')) return;
                 if (ev.target.closest('.speakers-bio-wrap')) return;
                 if (ev.target.closest('.speakers-programmed-wrap')) return;
@@ -32851,6 +33138,7 @@
                 clearSpeakerLodgingUiState();
                 clearSpeakerBioUiState();
                 clearSpeakerProgrammedUiState();
+                clearSpeakerEventUiState();
             });
             clearGuestEditorForm();
             var contentRosterItemsEl = document.getElementById('content-list-items');

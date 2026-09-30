@@ -549,16 +549,22 @@ function pickSpeakerLastName(data: Record<string, unknown>): string {
 /**
  * Normalize speaker Status / inviteStatus for workflow gates.
  * @param {Record<string, unknown>} data Speaker item data.
- * @return {string} Preliminary | Confirmed | Invited | Cancel | other.
+ * @return {string} Approached | Confirmed | Invited | Cancel | other.
  */
 function normalizeSpeakerStatus(data: Record<string, unknown>): string {
   const raw = String(
     data.Status ?? data.inviteStatus ?? data["Invite status"] ?? "",
   ).trim();
-  if (!raw) return "Preliminary";
+  if (!raw) return "Approached";
   const low = raw.toLowerCase();
-  if (low === "none" || low === "no" || low === "n" || low === "preliminary") {
-    return "Preliminary";
+  if (
+    low === "none" ||
+    low === "no" ||
+    low === "n" ||
+    low === "preliminary" ||
+    low === "approached"
+  ) {
+    return "Approached";
   }
   if (low === "confirmed" || low === "accepted") return "Confirmed";
   if (low === "invited") return "Invited";
