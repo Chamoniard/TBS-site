@@ -3134,6 +3134,7 @@
         body.backend-page #guest-editor #guest-editor-actions #invoicedisno[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-actions[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-cold-contact-btn[hidden],
+        body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-cold-contact-arrow[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-confirm-speaker-btn[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-workflow-confirm-speaker-arrow[hidden],
         body.backend-page #speaker-editor #speaker-editor-actions #speaker-send-formal-invite-btn[hidden],
@@ -11512,6 +11513,7 @@
                                 <div class="speaker-workflow-block">
                                 <div id="speaker-workflow-actions" class="speaker-workflow-actions">
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-cold-contact-btn" hidden aria-hidden="true">Cold contact</button>
+                                    <div class="speaker-workflow-actions-arrow" id="speaker-workflow-cold-contact-arrow" hidden aria-hidden="true" aria-label="Next step">⬇</div>
                                     <button type="button" class="speaker-workflow-phase-btn" id="speaker-confirm-speaker-btn" disabled aria-disabled="true" hidden aria-hidden="true">
                                         <span class="speaker-confirm-speaker-label">Confirm speaker</span>
                                     </button>
@@ -24919,6 +24921,7 @@
         function syncSpeakerWorkflowActionsPanel() {
             var wrap = document.getElementById('speaker-workflow-actions');
             var coldContactBtn = document.getElementById('speaker-cold-contact-btn');
+            var coldContactArrow = document.getElementById('speaker-workflow-cold-contact-arrow');
             var confirmSpeakerBtn = document.getElementById('speaker-confirm-speaker-btn');
             var confirmSpeakerArrow = document.getElementById('speaker-workflow-confirm-speaker-arrow');
             var inviteBtn = document.getElementById('speaker-send-formal-invite-btn');
@@ -24977,9 +24980,14 @@
             if (!wrap) return;
             var id = String(speakerFormEditingDocId || '').trim();
             function setColdContactVisible(show) {
-                if (!coldContactBtn) return;
-                coldContactBtn.hidden = !show;
-                coldContactBtn.setAttribute('aria-hidden', show ? 'false' : 'true');
+                if (coldContactBtn) {
+                    coldContactBtn.hidden = !show;
+                    coldContactBtn.setAttribute('aria-hidden', show ? 'false' : 'true');
+                }
+                if (coldContactArrow) {
+                    coldContactArrow.hidden = !show;
+                    coldContactArrow.setAttribute('aria-hidden', show ? 'false' : 'true');
+                }
             }
             if (!id || id === '_init') {
                 setColdContactVisible(false);
