@@ -7085,6 +7085,14 @@
             display: block;
         }
 
+        #speaker-editor .speaker-editor-toolbar-trailing #save-speaker-button.is-saved-spin > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.7s linear 1;
+            will-change: transform;
+        }
+
         #speaker-editor .speaker-editor-toolbar-trailing .add-speaker-delete-btn,
         #guest-editor .guest-editor-toolbar-trailing .add-speaker-delete-btn {
             height: 35px;
@@ -13973,6 +13981,21 @@
             if (id && id !== '_init') speakerDirtyDocIds[id] = true;
         }
 
+        function spinSpeakerSaveButton() {
+            var btn = document.getElementById('save-speaker-button');
+            if (!btn) return;
+            var svg = btn.querySelector('svg');
+            if (!svg) return;
+            btn.classList.remove('is-saved-spin');
+            void btn.offsetWidth;
+            btn.classList.add('is-saved-spin');
+            function done() {
+                btn.classList.remove('is-saved-spin');
+                svg.removeEventListener('animationend', done);
+            }
+            svg.addEventListener('animationend', done);
+        }
+
         function scheduleSpeakerFirebaseSync() {
             if (speakerSyncTimer) clearTimeout(speakerSyncTimer);
             speakerSyncTimer = setTimeout(function() {
@@ -14017,6 +14040,7 @@
                 }
                 batch.set(manifestRef, { speakerIds: FV.arrayUnion.apply(FV, syncedIds) }, { merge: true });
                 await batch.commit();
+                spinSpeakerSaveButton();
                 var showNewSpeakerCreatedNotice = false;
                 for (var w = 0; w < syncedIds.length; w++) {
                     delete speakerDirtyDocIds[syncedIds[w]];
