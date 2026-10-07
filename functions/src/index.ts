@@ -1969,7 +1969,7 @@ export const sendGuestToReservesHttp = onRequest({
  * tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation as info@…
  * using server-side Gmail OAuth
  * (GMAIL_SPEAKER_SEND_* secrets).
- * Sets Status/inviteStatus to Invited + Speaker log line.
+ * Sets Status/inviteStatus to Invited, Bio to Requested, and a Speaker log line.
  * Expects JSON: { speakerId }.
  * Guest invite path (sendGuestInviteHttp) is unchanged.
  */
@@ -2084,6 +2084,7 @@ export const sendSpeakerInviteHttp = onRequest({
     await itemRef.set({
       "Status": "Invited",
       "inviteStatus": "Invited",
+      "bioStatus": "Requested",
       "invitedDate": invitedDate,
       "Invited date": invitedDate,
       "Speaker log": FieldValue.arrayUnion(inviteLogLine),

@@ -6576,6 +6576,7 @@
         }
 
         body.backend-page button.speaker-roster-tag--lodging-requested,
+        body.backend-page button.speaker-roster-tag--bio-requested,
         body.backend-page button.speaker-roster-tag--bio-received,
         body.backend-page button.speaker-roster-tag--brief-first,
         body.backend-page button.speaker-roster-tag--invite-confirmed,
@@ -6613,9 +6614,18 @@
             color: var(--backend-roster-status-no-color);
         }
 
+        body.backend-page button.speaker-roster-tag--bio-requested,
         body.backend-page button.speaker-roster-tag--bio-received {
             background: var(--backend-roster-status-ready-bg);
             color: var(--backend-roster-status-ready-color);
+        }
+
+        #speaker-editor .speakers-roster-table button.speaker-roster-tag.speaker-roster-tag--bio-requested,
+        #speaker-editor .speakers-roster-table tr.is-potential button.speaker-roster-tag.speaker-roster-tag--bio-requested,
+        #programme-editor .programme-speakers-table button.speaker-roster-tag.speaker-roster-tag--bio-requested {
+            background: #FECB00 !important;
+            color: #000000 !important;
+            border-color: transparent;
         }
 
         .speaker-roster-row:hover,
@@ -13494,7 +13504,7 @@
         var CONTENT_FIREBASE_DEBOUNCE_MS = 2000;
         var CONTENT_FIREBASE_PERIODIC_MS = 12000;
         var SPEAKER_LODGING_VALUES = ['No', 'Requested', 'Own lodging', 'Confirmed'];
-        var SPEAKER_BIO_STATUS_VALUES = ['No', 'Received', 'Uploaded'];
+        var SPEAKER_BIO_STATUS_VALUES = ['No', 'Requested', 'Received', 'Uploaded'];
         var SPEAKER_BRIEF_VALUES = ['No', 'First brief', 'Final brief'];
         var SPEAKER_PRESENTED_VALUES = ['No', 'Yes'];
         var SPEAKER_INVITE_STATUS_VALUES = ['Approached', 'Confirmed', 'Invited', 'Cancel'];
@@ -13521,6 +13531,7 @@
             if (!s) return 'No';
             var low = s.toLowerCase();
             if (low === 'no') return 'No';
+            if (low === 'requested') return 'Requested';
             if (low === 'received') return 'Received';
             if (low === 'uploaded') return 'Uploaded';
             // Preserve non-standard Firebase values instead of collapsing to "No".
@@ -13669,6 +13680,7 @@
         function speakerRosterBioTagClass(bioStatus) {
             var B = normalizeSpeakerBioStatus(bioStatus);
             if (B === 'No') return 'speaker-roster-tag--bio-no';
+            if (B === 'Requested') return 'speaker-roster-tag--bio-requested';
             if (B === 'Received') return 'speaker-roster-tag--bio-received';
             return 'speaker-roster-tag--bio-uploaded';
         }
@@ -25230,7 +25242,8 @@
                 setSpeakerWorkflowStepState(btn, { active: !!statusEnabled, done: !!done });
             }
 
-            // Bio received / Program speaker stay gray inactive while Lodging is No.
+            // Program speaker stays gray inactive while Lodging is No.
+            // Bio received is the next step once Bio is Requested.
             var lodgingPastNo = lodgingSt !== 'No';
 
             showWorkflowPhaseButton(
@@ -25240,8 +25253,8 @@
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-bio-received-btn'),
-                workflowPastInvite && lodgingPastNo && bioSt === 'No',
-                workflowPastInvite && lodgingPastNo && (bioSt === 'Received' || bioSt === 'Uploaded')
+                bioSt === 'Requested',
+                bioSt === 'Received' || bioSt === 'Uploaded'
             );
             showWorkflowPhaseButton(
                 document.getElementById('speaker-program-speaker-btn'),
@@ -29365,6 +29378,7 @@
                           ? 'Formal invite sent to ' + firstName
                           : 'Formal invite sent.';
                 s.inviteStatus = 'Invited';
+                s.bioStatus = 'Requested';
                 if (payload && payload.invitedDate) {
                     s.invitedDate = String(payload.invitedDate);
                 } else {
@@ -29378,6 +29392,8 @@
                     if (!Array.isArray(s.speakerLog)) s.speakerLog = [];
                     s.speakerLog.push(speakerLogFormalInviteSentLine());
                 }
+                markSpeakerDocDirty(id);
+                await flushSpeakersToFirebase({ silent: true });
                 renderSpeakerRoster();
                 syncSpeakerManagementLogPanel();
                 syncSpeakerWorkflowActionsPanel();
@@ -32197,12 +32213,7 @@
                     var docId = String(speakerFormEditingDocId || '').trim();
                     if (!docId) return;
                     var sp = findSpeakerInMemory(docId);
-                    if (
-                        !sp ||
-                        normalizeSpeakerInviteStatus(sp.inviteStatus) !== 'Invited' ||
-                        normalizeSpeakerLodging(sp.lodging) === 'No' ||
-                        normalizeSpeakerBioStatus(sp.bioStatus) !== 'No'
-                    ) {
+                    if (!sp || normalizeSpeakerBioStatus(sp.bioStatus) !== 'Requested') {
                         return;
                     }
                     void setSpeakerRosterBioField(docId, 'Received', { workflowBioReceived: true });
