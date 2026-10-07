@@ -17333,8 +17333,7 @@
             var btn = document.getElementById('save-speaker-button');
             if (!btn) return;
             var hasEditorContext = speakerDraftFormActive || String(speakerFormEditingDocId || '').trim() !== '';
-            var active =
-                speakerEditorRequiredFieldsMet() && hasEditorContext && speakerBioFormChangedFromBaseline();
+            var active = speakerEditorRequiredFieldsMet() && hasEditorContext;
             btn.disabled = !active;
             btn.setAttribute('aria-disabled', active ? 'false' : 'true');
         }
@@ -17353,6 +17352,7 @@
                     return;
                 }
                 syncAddSpeakerFormToMemoryIfEditing();
+                markSpeakerDocDirty(existingId);
                 var saved = await flushSpeakersToFirebase();
                 if (!saved) throw new Error('Could not save speaker to Firebase.');
                 speakerDraftFormActive = false;
