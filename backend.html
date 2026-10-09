@@ -6657,6 +6657,7 @@
 
         .edit-speaker-top,
         .edit-guest-top,
+        .edit-preset-top,
         .edit-contact-top,
         .edit-team-top {
             display: flex;
@@ -6844,8 +6845,8 @@
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname-wrap,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname-wrap {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap {
             flex: 0 1 auto;
             min-width: 0;
             display: flex;
@@ -7955,8 +7956,8 @@
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-last,
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-name-first,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-name-first {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-name-first,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-name-first {
             font-size: 1.2rem;
             display: inline;
             min-width: 0;
@@ -9549,8 +9550,8 @@
             gap: 0;
         }
 
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading {
             flex: 0 0 auto;
             width: 100%;
             background-color: #ffffff;
@@ -9568,23 +9569,23 @@
             padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
         }
 
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-top-spacer,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-top-spacer {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-top-spacer,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-top-spacer {
             flex: 0 0 0;
             width: 0;
             min-width: 0;
             overflow: hidden;
         }
 
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname-wrap,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname-wrap {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap {
             flex: 0 1 auto;
             min-width: 0;
             justify-content: flex-start;
         }
 
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-top-trailing,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-top-trailing {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-top-trailing,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-top-trailing {
             flex: 1 1 0;
             min-width: 0;
             display: flex;
@@ -9594,10 +9595,10 @@
             margin-left: auto;
         }
 
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname,
-        #texteditor .html-editor > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-name-first,
-        #texteditor .renderbox > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-name-first {
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname,
+        #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-name-first,
+        #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-name-first {
             color: #000000;
             justify-content: flex-start;
             text-align: left;
@@ -9758,7 +9759,7 @@
             background: transparent;
         }
 
-        #texteditor .select-pre-set > .edit-guest-top.guests-list-heading.texteditor-pane-heading {
+        #texteditor .select-pre-set > .edit-preset-top.presets-list-heading.texteditor-pane-heading {
             flex: 0 0 auto;
             width: 100%;
             background-color: #ffffff;
@@ -9776,20 +9777,20 @@
             padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
         }
 
-        #texteditor .select-pre-set > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-top-spacer {
+        #texteditor .select-pre-set > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-top-spacer {
             flex: 0 0 0;
             width: 0;
             min-width: 0;
             overflow: hidden;
         }
 
-        #texteditor .select-pre-set > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-top-trailing {
+        #texteditor .select-pre-set > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-top-trailing {
             flex: 1 1 0;
             min-width: 0;
             margin-left: auto;
         }
 
-        #texteditor .select-pre-set > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname-wrap {
+        #texteditor .select-pre-set > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap {
             flex: 0 1 auto;
             min-width: 0;
             display: flex;
@@ -9798,8 +9799,8 @@
             align-items: center;
         }
 
-        #texteditor .select-pre-set > .edit-guest-top.guests-list-heading.texteditor-pane-heading .selected-guestname,
-        #texteditor .select-pre-set > .edit-guest-top.guests-list-heading.texteditor-pane-heading .edit-guest-name-first {
+        #texteditor .select-pre-set > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname,
+        #texteditor .select-pre-set > .edit-preset-top.presets-list-heading.texteditor-pane-heading .edit-guest-name-first {
             color: #000000;
             justify-content: flex-start;
             text-align: left;
@@ -11184,7 +11185,7 @@
             <section class="texteditor" id="texteditor" aria-hidden="true" data-name="texteditor">
                 <div class="texteditor-main">
                 <div class="select-pre-set">
-                    <div class="edit-guest-top guests-list-heading texteditor-pane-heading" id="texteditor-presets-heading">
+                    <div class="edit-preset-top presets-list-heading texteditor-pane-heading" id="texteditor-presets-heading">
                         <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                         <div class="selected-guestname-wrap">
                             <div class="selected-guestname" role="group" aria-label="Pre-sets">
@@ -11287,7 +11288,7 @@
                     </div>
                 </div>
                 <div class="html-editor">
-                    <div class="edit-guest-top guests-list-heading texteditor-pane-heading" id="texteditor-source-heading">
+                    <div class="edit-preset-top presets-list-heading texteditor-pane-heading" id="texteditor-source-heading">
                         <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                         <div class="selected-guestname-wrap">
                             <div class="selected-guestname" role="group" aria-label="Source">
@@ -11320,7 +11321,7 @@
                     <textarea id="texteditor-code" class="texteditor-code-area" rows="18" spellcheck="false" autocomplete="off" wrap="off" readonly aria-readonly="true" aria-label="HTML source editor"></textarea>
                 </div>
                 <div class="renderbox renderbox--idle">
-                    <div class="edit-guest-top guests-list-heading texteditor-pane-heading" id="texteditor-render-heading">
+                    <div class="edit-preset-top presets-list-heading texteditor-pane-heading" id="texteditor-render-heading">
                         <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                         <div class="selected-guestname-wrap">
                             <div class="selected-guestname" role="group" aria-label="Render">
@@ -12621,35 +12622,9 @@
                                         readonly
                                         tabindex="-1"
                                     />
-                                    <button type="button" class="add-speaker-button" id="emailer-previous-contact" aria-label="Previous contact" title="Previous contact" disabled aria-disabled="true">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M14 6L8 12l6 6z" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="add-speaker-button" id="emailer-next-contact" aria-label="Next contact" title="Next contact" disabled aria-disabled="true">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M10 6l6 6-6 6z" />
-                                        </svg>
-                                    </button>
                                     <button type="button" class="add-speaker-button" id="emailer-add-contact-button" aria-label="Add contact" title="Add contact">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="add-speaker-button emailer-filter-contacts-btn" id="emailer-filter-contacts" aria-label="Filter contacts" title="Filter contacts" disabled aria-disabled="true">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                        </svg>
-                                        <span class="emailer-filter-contacts-active-mark" id="emailer-filter-contacts-active-mark" hidden aria-hidden="true">!</span>
-                                    </button>
-                                    <button type="button" class="add-speaker-button" id="emailer-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false" disabled aria-disabled="true">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="add-speaker-button" id="emailer-sync-payments-btn" aria-label="Sync Stripe payments" title="Sync Stripe payments" disabled aria-disabled="true">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
                                         </svg>
                                     </button>
                                 </div>
