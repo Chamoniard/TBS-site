@@ -7213,6 +7213,7 @@
         #speaker-editor .speaker-editor-toolbar #save-speaker-button:disabled,
         #speaker-editor .speaker-editor-toolbar #speaker-bio-preview:disabled,
         #guest-editor .guest-editor-toolbar #save-guest-button:disabled,
+        #guest-editor .guest-editor-toolbar #guest-email-btn:disabled,
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:disabled,
         #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:disabled,
         #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled,
@@ -7243,6 +7244,7 @@
         #speaker-editor .speaker-editor-toolbar #save-speaker-button:disabled:hover,
         #speaker-editor .speaker-editor-toolbar #speaker-bio-preview:disabled:hover,
         #guest-editor .guest-editor-toolbar #save-guest-button:disabled:hover,
+        #guest-editor .guest-editor-toolbar #guest-email-btn:disabled:hover,
         #guest-editor .guest-editor-toolbar .guest-editor-actions-btn:disabled:hover,
         #guest-editor .guest-editor-toolbar .guest-editor-bio-btn:disabled:hover,
         #content-editor .content-editor-toolbar #content-editor-padlock-btn:disabled:hover,
@@ -11742,6 +11744,11 @@
                                     <button type="button" class="texteditor-save-btn" id="save-guest-button" disabled aria-disabled="true" title="Save guest" aria-label="Save guest">
                                         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                                             <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="guest-email-btn" disabled aria-disabled="true" title="E-mail" aria-label="E-mail guest">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                                         </svg>
                                     </button>
                                     <button type="button" class="cancel-guest-btn" id="cancel-guest-btn" disabled aria-disabled="true" title="Cancel guest" aria-label="Cancel guest">
@@ -17522,6 +17529,7 @@
                 cancelBtn.setAttribute('aria-disabled', canCancel ? 'false' : 'true');
                 if (!canCancel) cancelBtn.classList.remove('is-armed');
             }
+            updateGuestEmailToolbarButtonState();
         }
 
         function openGuestDeleteConfirmModal() {
@@ -20164,16 +20172,37 @@
             return rec ? String(rec.email || '').trim() : '';
         }
 
-        function openEmailerMailtoForAddress(rawEmail) {
+        function openEmailerMailtoForAddress(rawEmail, emptyMessage) {
             var email = String(rawEmail || '').trim();
             if (!email) {
                 if (typeof showStatus === 'function') {
-                    showStatus('error', 'No e-mail address for this contact.');
+                    showStatus('error', emptyMessage || 'No e-mail address for this contact.');
                 }
                 return false;
             }
             window.location.href = 'mailto:' + encodeURIComponent(email);
             return true;
+        }
+
+        function guestEmailFromOpenEditor() {
+            var id = String(guestFormEditingDocId || '').trim();
+            if (!id) return '';
+            var emailEl = document.getElementById('edit-guest-email');
+            var fromForm = emailEl ? String(emailEl.value || '').trim() : '';
+            if (fromForm) return fromForm;
+            var rec = findGuestInMemory(id);
+            return rec ? String(rec.email || '').trim() : '';
+        }
+
+        function updateGuestEmailToolbarButtonState() {
+            var btn = document.getElementById('guest-email-btn');
+            if (!btn) return;
+            var email = guestEmailFromOpenEditor();
+            var active = !!email;
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            btn.setAttribute('title', active ? 'E-mail ' + email : 'E-mail');
+            btn.setAttribute('aria-label', active ? 'E-mail ' + email : 'E-mail guest');
         }
 
         function updateEmailerComposeButtonState() {
@@ -32913,6 +32942,18 @@
                 });
                 updateSaveGuestToolbarButtonState();
             }
+            var guestEmailBtn = document.getElementById('guest-email-btn');
+            if (guestEmailBtn) {
+                guestEmailBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (guestEmailBtn.disabled) return;
+                    openEmailerMailtoForAddress(
+                        guestEmailFromOpenEditor(),
+                        'No e-mail address for this guest.'
+                    );
+                });
+            }
             updateAddGuestDeleteButtonState();
             var guestEditorBottomEl = document.querySelector('#guest-editor #guest-editor-panel .guest-editor-bottom');
             if (guestEditorBottomEl) {
@@ -33577,6 +33618,7 @@
             }
             function onGuestBioFormInput() {
                 updateSaveGuestToolbarButtonState();
+                updateGuestEmailToolbarButtonState();
                 syncAddGuestFormToMemoryIfEditing();
             }
             [
