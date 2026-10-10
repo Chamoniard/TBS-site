@@ -971,12 +971,20 @@ export const createGuestStripeInvoiceHttp = onRequest({
     const sentLogLine = `${guestLogPrefixYyMmDd()}: ` +
       `Stripe invoice finalized and sent (${finalizedInvoice.id}).`;
     const invoicedDate = formatGuestInvoicedDateDisplay(new Date());
-    const alreadyPaid = String(refreshedData["Paid"] || "")
+    const paidLow = String(refreshedData["Paid"] || "")
       .trim()
-      .toLowerCase() === "yes";
-    const paidPatch: Record<string, unknown> = alreadyPaid ?
-      {} :
-      {"Paid": "No"};
+      .toLowerCase();
+    const paidPatch: Record<string, unknown> =
+      guestPaidLabelIsLocked(paidLow) ?
+        {} :
+        {
+          "Paid": paidLabelForOpenSendInvoice({
+            status: finalizedInvoice.status || "open",
+            collection_method:
+              finalizedInvoice.collection_method || "send_invoice",
+            due_date: finalizedInvoice.due_date,
+          }) || "Pending",
+        };
     await itemRef.set({
       "Invoiced": "Yes",
       ...paidPatch,
@@ -1026,6 +1034,8 @@ type StripePaidInvoiceFields = {
   status?: string | null;
   paid?: boolean | null;
   amount_remaining?: number | null;
+  collection_method?: string | null;
+  due_date?: number | null;
   customer?: unknown;
   customer_email?: string | null;
   metadata?: Record<string, string> | null;
@@ -1040,17 +1050,108 @@ type StripePaidInvoiceFields = {
  */
 function isStripeInvoicePaid(invoice: StripePaidInvoiceFields): boolean {
   if (!invoice) return false;
-  if (String(invoice.status || "").trim().toLowerCase() === "paid") return true;
+  const status = String(invoice.status || "").trim().toLowerCase();
+  // Overdue stays status "open". Remaining balance does not change that.
+  if (
+    status === "open" ||
+    status === "draft" ||
+    status === "void" ||
+    status === "uncollectible"
+  ) {
+    return false;
+  }
+  if (status === "paid") return true;
   if (invoice.paid === true) return true;
   if (
     typeof invoice.amount_remaining === "number" &&
-    invoice.amount_remaining === 0 &&
-    String(invoice.status || "").trim().toLowerCase() !== "draft" &&
-    String(invoice.status || "").trim().toLowerCase() !== "void"
+    invoice.amount_remaining === 0
   ) {
     return true;
   }
   return false;
+}
+
+/**
+ * Stripe overdue badge: status stays open, collection_method is
+ * send_invoice, and due_date is in the past.
+ * @param {StripePaidInvoiceFields} invoice Stripe invoice.
+ * @return {boolean} True when Stripe shows the invoice as overdue.
+ */
+function isStripeInvoiceOverdue(invoice: StripePaidInvoiceFields): boolean {
+  if (!invoice) return false;
+  const status = String(invoice.status || "").trim().toLowerCase();
+  if (status !== "open") return false;
+  const method = String(invoice.collection_method || "")
+    .trim()
+    .toLowerCase();
+  if (method !== "send_invoice") return false;
+  const due = invoice.due_date;
+  if (due == null || !Number.isFinite(due) || due <= 0) return false;
+  return due < Math.floor(Date.now() / 1000);
+}
+
+/**
+ * Paid label for an open send_invoice. Null for any other invoice.
+ * Past due is Overdue 30 or Overdue 60. Not yet due is Pending.
+ * @param {StripePaidInvoiceFields} invoice Stripe invoice.
+ * @return {string | null} Paid label, or null when this invoice
+ * should not set Paid.
+ */
+function paidLabelForOpenSendInvoice(
+  invoice: StripePaidInvoiceFields,
+): string | null {
+  const status = String(invoice.status || "").trim().toLowerCase();
+  if (status !== "open") return null;
+  const method = String(invoice.collection_method || "")
+    .trim()
+    .toLowerCase();
+  if (method !== "send_invoice") return null;
+  if (!isStripeInvoiceOverdue(invoice)) return "Pending";
+  return unpaidGuestPaidLabel(invoice.due_date);
+}
+
+/**
+ * Paid labels that must not be rewritten from an open invoice.
+ * @param {string} paid Stored Paid value.
+ * @return {boolean} True for Yes or Cancelled.
+ */
+function guestPaidLabelIsLocked(paid: string): boolean {
+  const low = String(paid || "").trim().toLowerCase();
+  return low === "yes" || low === "cancelled" || low === "canceled";
+}
+
+/**
+ * Unpaid Paid label from a Stripe due_date (unix seconds).
+ * Pending means the invoice is not yet due. Any past due date is
+ * Overdue 30 until 60 days, then Overdue 60, matching Stripe overdue.
+ * @param {number | null | undefined} dueDate Stripe due_date.
+ * @return {string} Pending, Overdue 30, or Overdue 60.
+ */
+function unpaidGuestPaidLabel(
+  dueDate: number | null | undefined,
+): string {
+  if (dueDate == null || !Number.isFinite(dueDate) || dueDate <= 0) {
+    return "Pending";
+  }
+  const now = Math.floor(Date.now() / 1000);
+  if (dueDate >= now) return "Pending";
+  const days = Math.floor((now - dueDate) / 86400);
+  if (days >= 60) return "Overdue 60";
+  return "Overdue 30";
+}
+
+/**
+ * Higher means more overdue. Pending is the mildest open-invoice label.
+ * @param {string} label Paid label.
+ * @return {number} Severity rank.
+ */
+function unpaidPaidLabelSeverity(label: string): number {
+  const low = String(label || "").trim().toLowerCase();
+  if (low === "overdue 60") return 3;
+  if (low === "overdue 30") return 2;
+  if (low === "overdue") return 1;
+  if (low === "pending") return 0;
+  return -1;
 }
 
 type GuestItemIndexEntry = {
@@ -1143,6 +1244,62 @@ async function findGuestItemRefForStripeInvoice(
 }
 
 /**
+ * Guests an open send_invoice may relabel.
+ * Metadata guest id and a stored invoice id win. A past-due invoice
+ * still updates one matching guest when the stored invoice id differs,
+ * so Stripe's overdue invoice is not dropped.
+ * @param {GuestItemIndexEntry[]} entries Guest items.
+ * @param {StripePaidInvoiceFields} invoice Open invoice.
+ * @return {GuestItemIndexEntry[]} Matching guests.
+ */
+function guestEntriesForOpenInvoice(
+  entries: GuestItemIndexEntry[],
+  invoice: StripePaidInvoiceFields,
+): GuestItemIndexEntry[] {
+  const invoiceId = String(invoice.id || "").trim();
+  const metaGuestId = String(
+    (invoice.metadata && invoice.metadata.guestId) || "",
+  ).trim();
+  const sameInvoice = (entry: GuestItemIndexEntry): boolean => {
+    const stored = String(entry.data["Stripe Invoice Id"] || "").trim();
+    return !stored || stored === invoiceId;
+  };
+
+  if (metaGuestId) {
+    const byMeta = entries.filter((entry) => entry.guestId === metaGuestId);
+    if (byMeta.length) return byMeta;
+  }
+
+  if (invoiceId) {
+    const byInvoice = entries.filter((entry) => {
+      return String(entry.data["Stripe Invoice Id"] || "").trim() === invoiceId;
+    });
+    if (byInvoice.length) return byInvoice;
+  }
+
+  const customerId = typeof invoice.customer === "string" ?
+    String(invoice.customer).trim() :
+    "";
+  const invoiceEmail = String(invoice.customer_email || "")
+    .trim()
+    .toLowerCase();
+  const candidates = entries.filter((entry) => {
+    if (customerId) {
+      const storedCustomer = String(
+        entry.data["Stripe Customer Id"] || "",
+      ).trim();
+      if (storedCustomer && storedCustomer === customerId) return true;
+    }
+    if (!invoiceEmail) return false;
+    return pickGuestEmail(entry.data).toLowerCase() === invoiceEmail;
+  });
+  const openSlot = candidates.filter(sameInvoice);
+  if (openSlot.length) return openSlot;
+  if (candidates.length) return [candidates[0]];
+  return [];
+}
+
+/**
  * Mark a guest Paid=Yes from a Stripe paid invoice (idempotent log).
  * @param {DocumentReference} itemRef Guest item ref.
  * @param {StripePaidInvoiceFields} invoice Paid invoice.
@@ -1158,6 +1315,11 @@ async function applyStripePaidInvoiceToGuest(
   }
   const data = snap.data() || {};
   const alreadyPaid = String(data["Paid"] || "").trim().toLowerCase() === "yes";
+  const storedInvoiceId = String(data["Stripe Invoice Id"] || "").trim();
+  const incomingId = String(invoice.id || "").trim();
+  if (storedInvoiceId && incomingId && storedInvoiceId !== incomingId) {
+    return {updated: false, alreadyPaid: false};
+  }
   const paidDate = alreadyPaid && String(data["Paid date"] || "").trim() ?
     String(data["Paid date"]).trim() :
     formatGuestInvoicedDateDisplay(
@@ -1299,7 +1461,8 @@ export const stripeWebhookHttp = onRequest({
 /**
  * Backfill Paid=Yes for guests whose Stripe invoices are already paid.
  * POST JSON: { guestId?: string, lookbackDays?: number }
- * Checks each unpaid invoiced guest's Stripe Invoice Id, then also scans
+ * Checks each unpaid invoiced guest's Stripe Invoice Id, scans open
+ * Stripe invoices (past due is Overdue, not Pending), then scans
  * recent Stripe paid invoices for unmatched guests.
  */
 export const reconcileStripePaidInvoicesHttp = onRequest({
@@ -1374,17 +1537,10 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
       stillUnpaidIds.add(guestId);
     };
 
-    const unpaidWithInvoice = scoped.filter((entry) => {
-      const paidYes = String(entry.data["Paid"] || "")
-        .trim()
-        .toLowerCase() === "yes";
+    const withInvoice = scoped.filter((entry) => {
       const invoiceId = String(entry.data["Stripe Invoice Id"] || "").trim();
       if (!invoiceId) return false;
       checkedIds.add(entry.guestId);
-      if (paidYes) {
-        noteAlreadyPaid(entry.guestId);
-        return false;
-      }
       return true;
     });
 
@@ -1398,25 +1554,42 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           number: invoice.number,
           status: invoice.status,
           amount_remaining: invoice.amount_remaining,
+          collection_method: invoice.collection_method,
+          due_date: invoice.due_date,
           customer: invoice.customer,
           customer_email: invoice.customer_email,
           metadata: invoice.metadata as Record<string, string> | null,
           hosted_invoice_url: invoice.hosted_invoice_url,
           created: invoice.created,
         };
-        if (!isStripeInvoicePaid(invoiceFields)) {
-          noteStillUnpaid(entry.guestId);
+        const currentPaid = String(entry.data["Paid"] || "");
+        if (isStripeInvoicePaid(invoiceFields)) {
+          const result = await applyStripePaidInvoiceToGuest(
+            entry.ref,
+            invoiceFields,
+          );
+          if (result.updated) {
+            noteUpdated(entry.guestId);
+          } else if (result.alreadyPaid) {
+            noteAlreadyPaid(entry.guestId);
+          }
           return;
         }
-        const result = await applyStripePaidInvoiceToGuest(
-          entry.ref,
-          invoiceFields,
-        );
-        if (result.updated) {
-          noteUpdated(entry.guestId);
-        } else if (result.alreadyPaid) {
+        const label = paidLabelForOpenSendInvoice(invoiceFields);
+        if (!label) return;
+        const cancelled = guestPaidLabelIsLocked(currentPaid) &&
+          currentPaid.trim().toLowerCase() !== "yes";
+        if (cancelled) return;
+        const overdue = label === "Overdue 30" || label === "Overdue 60";
+        if (!overdue && guestPaidLabelIsLocked(currentPaid)) {
           noteAlreadyPaid(entry.guestId);
+          return;
         }
+        if (currentPaid.trim() !== label) {
+          await entry.ref.set({"Paid": label}, {merge: true});
+          entry.data["Paid"] = label;
+        }
+        noteStillUnpaid(entry.guestId);
       } catch (err) {
         logger.warn("reconcileStripePaidInvoicesHttp retrieve failed", {
           guestId: entry.guestId,
@@ -1427,9 +1600,150 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
     };
 
     const concurrency = 8;
-    for (let i = 0; i < unpaidWithInvoice.length; i += concurrency) {
-      const batch = unpaidWithInvoice.slice(i, i + concurrency);
+    for (let i = 0; i < withInvoice.length; i += concurrency) {
+      const batch = withInvoice.slice(i, i + concurrency);
       await Promise.all(batch.map((entry) => retrieveOne(entry)));
+    }
+
+    // Open invoices: Stripe counts these as overdue once due_date has passed,
+    // including guests whose record does not yet store an invoice id.
+    type OpenInvoiceChoice = {
+      entry: GuestItemIndexEntry;
+      label: string;
+      invoiceId: string;
+      invoiceNumber: string;
+      invoiceStatus: string;
+      invoiceUrl: string;
+      severity: number;
+      dueDate: number;
+    };
+    const openChoiceByGuest = new Map<string, OpenInvoiceChoice>();
+    let openStartingAfter: string | undefined;
+    for (let page = 0; page < 20; page++) {
+      const openParams: {
+        status: "open";
+        collection_method: "send_invoice";
+        limit: number;
+        starting_after?: string;
+      } = {
+        status: "open",
+        collection_method: "send_invoice",
+        limit: 100,
+      };
+      if (openStartingAfter) openParams.starting_after = openStartingAfter;
+      const openList = await stripe.invoices.list(openParams);
+      for (const invoice of openList.data) {
+        const invoiceFields: StripePaidInvoiceFields = {
+          id: invoice.id,
+          number: invoice.number,
+          status: invoice.status,
+          amount_remaining: invoice.amount_remaining,
+          collection_method: invoice.collection_method,
+          due_date: invoice.due_date,
+          customer: invoice.customer,
+          customer_email: invoice.customer_email,
+          metadata: invoice.metadata as Record<string, string> | null,
+          hosted_invoice_url: invoice.hosted_invoice_url,
+          created: invoice.created,
+        };
+        const label = paidLabelForOpenSendInvoice(invoiceFields);
+        if (!label) continue;
+        const severity = unpaidPaidLabelSeverity(label);
+        const dueDate = typeof invoice.due_date === "number" ?
+          invoice.due_date :
+          Number.MAX_SAFE_INTEGER;
+        const targets = guestEntriesForOpenInvoice(entries, invoiceFields);
+        if (!targets.length) {
+          if (severity > 0) {
+            summary.unmatchedStripe++;
+            if (summary.unmatchedInvoiceIds.length < 40 && invoice.id) {
+              summary.unmatchedInvoiceIds.push(invoice.id);
+            }
+          }
+          continue;
+        }
+        for (const entry of targets) {
+          if (filterGuestId && entry.guestId !== filterGuestId) continue;
+          const currentPaid = String(entry.data["Paid"] || "")
+            .trim()
+            .toLowerCase();
+          const cancelled = currentPaid === "cancelled" ||
+            currentPaid === "canceled";
+          if (cancelled) continue;
+          const locked = guestPaidLabelIsLocked(
+            String(entry.data["Paid"] || ""),
+          );
+          if (severity <= 0 && locked) continue;
+          const prev = openChoiceByGuest.get(entry.guestId);
+          const milder = prev && (
+            prev.severity > severity ||
+            (prev.severity === severity && prev.dueDate <= dueDate)
+          );
+          if (milder) continue;
+          openChoiceByGuest.set(entry.guestId, {
+            entry,
+            label,
+            invoiceId: String(invoice.id || ""),
+            invoiceNumber: String(invoice.number || ""),
+            invoiceStatus: String(invoice.status || "open"),
+            invoiceUrl: String(invoice.hosted_invoice_url || ""),
+            severity,
+            dueDate,
+          });
+        }
+      }
+      if (!openList.has_more || openList.data.length === 0) break;
+      const lastOpen = openList.data[openList.data.length - 1];
+      if (!lastOpen || !lastOpen.id) break;
+      openStartingAfter = lastOpen.id;
+    }
+
+    const openChoices = Array.from(openChoiceByGuest.values());
+    for (let i = 0; i < openChoices.length; i += concurrency) {
+      const batch = openChoices.slice(i, i + concurrency);
+      await Promise.all(batch.map(async (choice) => {
+        const currentPaid = String(choice.entry.data["Paid"] || "");
+        const storedInvoiceId = String(
+          choice.entry.data["Stripe Invoice Id"] || "",
+        ).trim();
+        checkedIds.add(choice.entry.guestId);
+        const overdueChoice = choice.severity > 0;
+        const lowPaid = currentPaid.trim().toLowerCase();
+        if (lowPaid === "cancelled" || lowPaid === "canceled") return;
+        if (!overdueChoice && guestPaidLabelIsLocked(currentPaid)) {
+          noteAlreadyPaid(choice.entry.guestId);
+          return;
+        }
+        if (
+          currentPaid.trim() === choice.label &&
+          (!choice.invoiceId || storedInvoiceId === choice.invoiceId)
+        ) {
+          noteStillUnpaid(choice.entry.guestId);
+          return;
+        }
+        const patch: Record<string, unknown> = {"Paid": choice.label};
+        const invoicedNow = String(
+          choice.entry.data["Invoiced"] || choice.entry.data["invoiced"] || "",
+        ).trim().toLowerCase();
+        if (!invoicedNow || invoicedNow === "no") {
+          patch["Invoiced"] = "Yes";
+          choice.entry.data["Invoiced"] = "Yes";
+        }
+        if (choice.invoiceId && (overdueChoice || !storedInvoiceId)) {
+          patch["Stripe Invoice Id"] = choice.invoiceId;
+          patch["Stripe Invoice Status"] = choice.invoiceStatus;
+          if (choice.invoiceNumber) {
+            patch["Stripe Invoice Number"] = choice.invoiceNumber;
+          }
+          if (choice.invoiceUrl) {
+            patch["Stripe Invoice Url"] = choice.invoiceUrl;
+          }
+          choice.entry.data["Stripe Invoice Id"] = choice.invoiceId;
+        }
+        await choice.entry.ref.set(patch, {merge: true});
+        choice.entry.data["Paid"] = choice.label;
+        noteStillUnpaid(choice.entry.guestId);
+      }));
     }
 
     // Second pass: recent paid Stripe invoices for unpaid / unlinked guests.

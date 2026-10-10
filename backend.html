@@ -2511,12 +2511,13 @@
         #guest-editor .guest-overwatch-bulk-count {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            font-size: 1rem;
+            font-size: 0.75rem;
             font-weight: 400;
-            line-height: 1.2;
-            color: #000000;
+            font-style: normal;
+            line-height: normal;
+            letter-spacing: normal;
             text-transform: none;
-            letter-spacing: 0;
+            color: #94a3b8;
             white-space: nowrap;
         }
 
@@ -6839,6 +6840,20 @@
             justify-content: flex-end;
         }
 
+        #guest-editor .guests-list-heading .guests-roster-filter-note {
+            margin-left: 0.65rem;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        #guest-editor .guests-list-heading .guests-roster-filter-note[hidden] {
+            display: none !important;
+        }
+
         #guest-editor .edit-guest-top .selected-guestname-wrap,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
@@ -8616,6 +8631,11 @@
             box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-pending {
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
+        }
+
         #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-cancelled,
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invoiced-cancel,
         body.backend-page > ul.guests-invoiced-dropdown .content-badge--guest-invoiced-cancel {
@@ -9255,7 +9275,9 @@
 
         .guests-filter-popup__box {
             position: relative;
-            width: min(22rem, 100%);
+            width: min(28rem, 100%);
+            max-height: min(90vh, 40rem);
+            overflow: auto;
             background: #d9effc;
             border: 1px solid #71C7FE;
             border-radius: 10px;
@@ -9263,7 +9285,6 @@
             box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
-            overflow: visible;
         }
 
         .guests-filter-popup__title {
@@ -9286,23 +9307,38 @@
             gap: 0.25rem;
         }
 
-        .guests-filter-popup__field label {
+        .guests-filter-popup__field-title {
             font-size: 0.75rem;
             font-weight: 600;
             letter-spacing: 0.02em;
             color: #003153;
         }
 
-        .guests-filter-popup__field select {
-            width: 100%;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-            color: #0f172a;
+        .guests-filter-popup__checks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem 0.75rem;
             background: #ffffff;
             border: 1px solid #71C7FE;
             border-radius: 6px;
-            padding: 0.4rem 0.5rem;
+            padding: 0.45rem 0.55rem;
+        }
+
+        .guests-filter-popup__check {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin: 0;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            letter-spacing: normal;
+            color: #0f172a;
+            cursor: pointer;
+        }
+
+        .guests-filter-popup__check input {
+            margin: 0;
+            accent-color: #003153;
         }
 
         .guests-filter-popup__actions {
@@ -11668,6 +11704,7 @@
                                         <span class="edit-guest-name-first" id="guests-list-heading-event" aria-live="polite">—</span>
                                         <span class="edit-guest-name-last" id="guests-list-heading-suffix">guests</span>
                                     </div>
+                                    <span class="guests-roster-filter-note" id="guests-roster-filter-note" hidden aria-hidden="true"></span>
                                 </div>
                                 <div class="edit-guest-top-trailing">
                                 <div id="guests-actions" class="guests-actions" aria-label="Guests actions">
@@ -13184,32 +13221,32 @@
             <h2 class="guests-filter-popup__title" id="guests-filter-popup-title">Filter guests</h2>
             <div class="guests-filter-popup__fields">
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-read">Read</label>
-                    <select id="guests-filter-read" data-filter-key="read"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-read-label">Read</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-read" role="group" aria-labelledby="guests-filter-read-label" data-filter-key="read"></div>
                 </div>
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-invited">Invited</label>
-                    <select id="guests-filter-invited" data-filter-key="invited"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-invited-label">Invited</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-invited" role="group" aria-labelledby="guests-filter-invited-label" data-filter-key="invited"></div>
                 </div>
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-invoiced">Invoiced</label>
-                    <select id="guests-filter-invoiced" data-filter-key="invoiced"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-invoiced-label">Invoiced</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-invoiced" role="group" aria-labelledby="guests-filter-invoiced-label" data-filter-key="invoiced"></div>
                 </div>
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-paid">Paid</label>
-                    <select id="guests-filter-paid" data-filter-key="paid"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-paid-label">Paid</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-paid" role="group" aria-labelledby="guests-filter-paid-label" data-filter-key="paid"></div>
                 </div>
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-briefed">Briefed</label>
-                    <select id="guests-filter-briefed" data-filter-key="briefed"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-briefed-label">Briefed</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-briefed" role="group" aria-labelledby="guests-filter-briefed-label" data-filter-key="briefed"></div>
                 </div>
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-attended">Attended</label>
-                    <select id="guests-filter-attended" data-filter-key="attended"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-attended-label">Attended</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-attended" role="group" aria-labelledby="guests-filter-attended-label" data-filter-key="attended"></div>
                 </div>
                 <div class="guests-filter-popup__field">
-                    <label for="guests-filter-cme">CME sent</label>
-                    <select id="guests-filter-cme" data-filter-key="cme"></select>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-cme-label">CME sent</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-cme" role="group" aria-labelledby="guests-filter-cme-label" data-filter-key="cme"></div>
                 </div>
             </div>
             <div class="guests-filter-popup__actions">
@@ -13288,6 +13325,7 @@
         let speakerRosterInMemory = [];
         /** In-memory roster for Guests tab. */
         let guestsRosterInMemory = [];
+        let guestsRosterAllInMemory = [];
         /** From `tbs/Settings` field `Current event` (and aliases); guests roster only includes rows whose `Event` matches. */
         var current_event = '';
         /**
@@ -13450,13 +13488,13 @@
         var backendGuestsPreloadPromise = null;
         /** Active guests roster filters from Firestore `tbs/Settings/Zermatt/Zermatt.filterguests`. */
         var guestsFilterSettings = {
-            read: '',
-            invited: '',
-            invoiced: '',
-            paid: '',
-            briefed: '',
-            attended: '',
-            cme: '',
+            read: [],
+            invited: [],
+            invoiced: [],
+            paid: [],
+            briefed: [],
+            attended: [],
+            cme: [],
         };
         /** Live case-insensitive guests roster name search (local only). */
         var guestsRosterSearchQuery = '';
@@ -16932,9 +16970,7 @@
             var n = 0;
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
-                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
-                if (guestCancelledFieldIsYes(g.cancelled)) continue;
-                if (!guestHasIssuedInvoice(g)) continue;
+                if (!guestBelongsOnPaidStatusBar(g)) continue;
                 if (guestPaidFieldIsYes(g.paid)) n++;
             }
             return n;
@@ -16982,6 +17018,51 @@
             return n;
         }
 
+        function guestPaidLabelLow(paidVal) {
+            return String(paidVal != null ? paidVal : '').trim().toLowerCase();
+        }
+
+        /** Pending, Overdue, Overdue 30, or Overdue 60 — labels written from Stripe. */
+        function guestPaidIsStripeOpenLabel(paidVal) {
+            var low = guestPaidLabelLow(paidVal);
+            return (
+                low === 'pending' ||
+                low === 'overdue' ||
+                low === 'overdue 30' ||
+                low === 'overdue 60'
+            );
+        }
+
+        function guestPaidIsCancelledPill(paidVal) {
+            var low = guestPaidLabelLow(paidVal);
+            return low === 'cancelled' || low === 'canceled';
+        }
+
+        /**
+         * Guests the Paid / Not paid bar should split.
+         * Issued invoices, plus anyone sync has already labeled from an open Stripe invoice.
+         */
+        function guestBelongsOnPaidStatusBar(g) {
+            if (!g || !guestRecordEventMatchesCurrentEvent(g)) return false;
+            if (guestCancelledFieldIsYes(g.cancelled)) return false;
+            if (guestPaidIsCancelledPill(g.paid)) return false;
+            if (guestHasIssuedInvoice(g)) return true;
+            return guestPaidIsStripeOpenLabel(g.paid);
+        }
+
+        function countGuestsWithPaidLabelForCurrentEvent(label) {
+            if (!String(current_event || '').trim()) return 0;
+            if (!Array.isArray(guestsRosterInMemory)) return 0;
+            var want = guestPaidLabelLow(label);
+            var n = 0;
+            for (var i = 0; i < guestsRosterInMemory.length; i++) {
+                var g = guestsRosterInMemory[i];
+                if (!guestBelongsOnPaidStatusBar(g)) continue;
+                if (guestPaidLabelLow(g.paid) === want) n++;
+            }
+            return n;
+        }
+
         /** Invoiced / direct-bank guests who are not Paid=Yes for Current event. */
         function countGuestsNotPaidForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
@@ -16989,12 +17070,43 @@
             var n = 0;
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
-                if (!guestRecordEventMatchesCurrentEvent(g)) continue;
-                if (guestCancelledFieldIsYes(g.cancelled)) continue;
-                if (!guestHasIssuedInvoice(g)) continue;
-                if (!guestPaidFieldIsYes(g.paid)) n++;
+                if (!guestBelongsOnPaidStatusBar(g)) continue;
+                if (guestPaidFieldIsYes(g.paid)) continue;
+                var low = guestPaidLabelLow(g.paid);
+                if (
+                    low === 'no' ||
+                    low === 'n' ||
+                    low === 'false' ||
+                    low === '' ||
+                    guestPaidIsStripeOpenLabel(g.paid)
+                ) {
+                    n++;
+                }
             }
             return n;
+        }
+
+        function guestsStripeSyncStatusMessage() {
+            var eventName = String(current_event || '').trim() || 'This event';
+            var paidN = countGuestsPaidForCurrentEvent();
+            var notPaidN = countGuestsNotPaidForCurrentEvent();
+            var pendingN = countGuestsWithPaidLabelForCurrentEvent('Pending');
+            var overdueN =
+                countGuestsWithPaidLabelForCurrentEvent('Overdue') +
+                countGuestsWithPaidLabelForCurrentEvent('Overdue 30') +
+                countGuestsWithPaidLabelForCurrentEvent('Overdue 60');
+            return (
+                eventName +
+                ': ' +
+                paidN +
+                ' paid, ' +
+                notPaidN +
+                ' not paid (' +
+                pendingN +
+                ' pending, ' +
+                overdueN +
+                ' overdue)'
+            );
         }
 
         /** cancelled=Yes for Current event. */
@@ -22081,6 +22193,16 @@
                     'Payment date',
                     'Payment Date',
                 ]),
+                stripeInvoiceId: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'Stripe Invoice Id',
+                    'Stripe invoice id',
+                    'stripeInvoiceId',
+                ]),
+                stripeCustomerId: guestCoalesceGuestItemFieldFromKeys(d, [
+                    'Stripe Customer Id',
+                    'Stripe customer id',
+                    'stripeCustomerId',
+                ]),
                 briefed: guestBriefedFieldFromDoc(d),
                 attended: guestAttendedFromDoc(d),
                 cmeStatus: guestCmeStatusFromDoc(d),
@@ -22109,7 +22231,7 @@
         }
 
         function guestsRosterSortInPlace() {
-            guestsRosterInMemory.sort(function(a, b) {
+            var cmp = function(a, b) {
                 var aCancelled = guestCancelledFieldIsYes(a && a.cancelled);
                 var bCancelled = guestCancelledFieldIsYes(b && b.cancelled);
                 if (aCancelled !== bCancelled) return aCancelled ? 1 : -1;
@@ -22131,11 +22253,16 @@
                 var byLast = aLast.localeCompare(bLast, undefined, { sensitivity: 'base' });
                 if (byLast !== 0) return byLast;
                 return String(a.id || '').localeCompare(String(b.id || ''));
-            });
+            };
+            if (Array.isArray(guestsRosterInMemory)) guestsRosterInMemory.sort(cmp);
+            if (Array.isArray(guestsRosterAllInMemory)) guestsRosterAllInMemory.sort(cmp);
         }
 
         function findGuestInMemory(docId) {
-            return rosterFindRecordById(guestsRosterInMemory, docId);
+            return (
+                rosterFindRecordById(guestsRosterAllInMemory, docId) ||
+                rosterFindRecordById(guestsRosterInMemory, docId)
+            );
         }
 
 
@@ -22818,7 +22945,7 @@
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
-        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Cancelled'];
+        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue 30', 'Overdue 60', 'Cancelled'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_BRIEFED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -22827,14 +22954,35 @@
 
         function emptyGuestsFilterSettings() {
             return {
-                read: '',
-                invited: '',
-                invoiced: '',
-                paid: '',
-                briefed: '',
-                attended: '',
-                cme: '',
+                read: [],
+                invited: [],
+                invoiced: [],
+                paid: [],
+                briefed: [],
+                attended: [],
+                cme: [],
             };
+        }
+
+        function guestsFilterSelectedList(raw) {
+            if (Array.isArray(raw)) {
+                var out = [];
+                for (var i = 0; i < raw.length; i++) {
+                    var item = String(raw[i] != null ? raw[i] : '').trim();
+                    if (!item) continue;
+                    var exists = false;
+                    for (var j = 0; j < out.length; j++) {
+                        if (guestsFilterValuesEqual(out[j], item)) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) out.push(item);
+                }
+                return out;
+            }
+            var single = String(raw != null ? raw : '').trim();
+            return single ? [single] : [];
         }
 
         function normalizeGuestsFilterSettings(raw) {
@@ -22854,8 +23002,7 @@
             for (var i = 0; i < keys.length; i++) {
                 var k = keys[i];
                 if (src[k] == null) continue;
-                var v = String(src[k]).trim();
-                if (v) out[k] = v;
+                out[k] = guestsFilterSelectedList(src[k]);
             }
             return out;
         }
@@ -22865,7 +23012,7 @@
             if (!f || typeof f !== 'object') return false;
             var keys = Object.keys(emptyGuestsFilterSettings());
             for (var i = 0; i < keys.length; i++) {
-                if (String(f[keys[i]] || '').trim()) return true;
+                if (guestsFilterSelectedList(f[keys[i]]).length) return true;
             }
             return false;
         }
@@ -22888,22 +23035,40 @@
             return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
         }
 
+        function guestFilterValueInList(actual, selected) {
+            var list = guestsFilterSelectedList(selected);
+            if (!list.length) return true;
+            for (var i = 0; i < list.length; i++) {
+                if (guestsFilterValuesEqual(actual, list[i])) return true;
+            }
+            return false;
+        }
+
         function guestMatchesFilterSettings(g, filter) {
             var f = filter || guestsFilterSettings;
             if (!guestsFilterIsActive(f)) return true;
             if (!g) return false;
-            if (f.read && !guestsFilterValuesEqual(g.read, f.read)) return false;
-            if (f.invited && !guestsFilterValuesEqual(g.invited, f.invited)) return false;
-            if (f.invoiced && !guestsFilterValuesEqual(g.invoiced, f.invoiced)) return false;
-            if (f.paid && !guestsFilterValuesEqual(g.paid, f.paid)) return false;
-            if (f.briefed && !guestsFilterValuesEqual(g.briefed, f.briefed)) return false;
-            if (f.attended) {
-                var wantAttended = guestsFilterValuesEqual(f.attended, 'Yes');
-                if (!!g.attended !== wantAttended) return false;
+            if (!guestFilterValueInList(g.read, f.read)) return false;
+            if (!guestFilterValueInList(g.invited, f.invited)) return false;
+            if (!guestFilterValueInList(g.invoiced, f.invoiced)) return false;
+            if (!guestPaidMatchesFilter(g.paid, f.paid)) return false;
+            if (!guestFilterValueInList(g.briefed, f.briefed)) return false;
+            var attendedSelected = guestsFilterSelectedList(f.attended);
+            if (attendedSelected.length) {
+                var attendedMatch = false;
+                for (var ai = 0; ai < attendedSelected.length; ai++) {
+                    var wantAttended = guestsFilterValuesEqual(attendedSelected[ai], 'Yes');
+                    if (!!g.attended === wantAttended) {
+                        attendedMatch = true;
+                        break;
+                    }
+                }
+                if (!attendedMatch) return false;
             }
-            if (f.cme) {
+            var cmeSelected = guestsFilterSelectedList(f.cme);
+            if (cmeSelected.length) {
                 var cmeLabel = normalizeGuestCmeStatusDisplay(g.cmeStatus);
-                if (!guestsFilterValuesEqual(cmeLabel, f.cme)) return false;
+                if (!guestFilterValueInList(cmeLabel, cmeSelected)) return false;
             }
             return true;
         }
@@ -22929,8 +23094,40 @@
             return false;
         }
 
+        function guestPaidMatchesFilter(actual, selected) {
+            if (guestFilterValueInList(actual, selected)) return true;
+            var list = guestsFilterSelectedList(selected);
+            if (!list.length) return true;
+            var low = String(actual != null ? actual : '').trim().toLowerCase();
+            if (low !== 'overdue') return false;
+            for (var i = 0; i < list.length; i++) {
+                if (guestsFilterValuesEqual(list[i], 'Overdue 30')) return true;
+            }
+            return false;
+        }
+
+        function guestsPaidFilterIncludesOverdue(filter) {
+            var list = guestsFilterSelectedList((filter || guestsFilterSettings).paid);
+            for (var i = 0; i < list.length; i++) {
+                var low = String(list[i] || '').trim().toLowerCase();
+                if (low === 'overdue' || low === 'overdue 30' || low === 'overdue 60') return true;
+            }
+            return false;
+        }
+
+        function guestsRosterSourceForFilter() {
+            if (
+                guestsPaidFilterIncludesOverdue(guestsFilterSettings) &&
+                Array.isArray(guestsRosterAllInMemory) &&
+                guestsRosterAllInMemory.length
+            ) {
+                return guestsRosterAllInMemory;
+            }
+            return Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory : [];
+        }
+
         function guestsRosterRowsAfterFilter() {
-            var src = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory : [];
+            var src = guestsRosterSourceForFilter();
             var filterActive = guestsFilterIsActive(guestsFilterSettings);
             var searchActive = String(guestsRosterSearchQuery || '').trim() !== '';
             if (!filterActive && !searchActive) return src.slice();
@@ -22941,24 +23138,33 @@
             });
         }
 
-        function fillGuestsFilterSelect(selectEl, values, selected) {
-            if (!selectEl) return;
-            var html = '<option value="">Any</option>';
+        function fillGuestsFilterChecks(container, values, selected) {
+            if (!container) return;
             var list = Array.isArray(values) ? values : [];
-            var sel = String(selected || '').trim();
+            var chosen = guestsFilterSelectedList(selected);
+            var html = '';
             for (var i = 0; i < list.length; i++) {
                 var v = String(list[i] || '').trim();
                 if (!v) continue;
+                var checked = false;
+                for (var c = 0; c < chosen.length; c++) {
+                    if (guestsFilterValuesEqual(v, chosen[c])) {
+                        checked = true;
+                        break;
+                    }
+                }
                 html +=
-                    '<option value="' +
+                    '<label class="guests-filter-popup__check">' +
+                    '<input type="checkbox" value="' +
                     escapeHtml(v) +
                     '"' +
-                    (guestsFilterValuesEqual(v, sel) ? ' selected' : '') +
+                    (checked ? ' checked' : '') +
                     '>' +
+                    '<span>' +
                     escapeHtml(v) +
-                    '</option>';
+                    '</span></label>';
             }
-            selectEl.innerHTML = html;
+            container.innerHTML = html;
         }
 
         function readGuestsFilterFormValues() {
@@ -22968,44 +23174,49 @@
                 var k = keys[i];
                 var el = document.getElementById('guests-filter-' + k);
                 if (!el) continue;
-                var v = String(el.value || '').trim();
-                if (v) out[k] = v;
+                var boxes = el.querySelectorAll('input[type="checkbox"]:checked');
+                var picked = [];
+                for (var b = 0; b < boxes.length; b++) {
+                    var v = String(boxes[b].value || '').trim();
+                    if (v) picked.push(v);
+                }
+                out[k] = picked;
             }
             return out;
         }
 
         function populateGuestsFilterPopupForm() {
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-read'),
                 GUEST_READ_MENU_VALUES,
                 guestsFilterSettings.read
             );
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-invited'),
                 GUEST_INVITED_MENU_VALUES,
                 guestsFilterSettings.invited
             );
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-invoiced'),
                 GUEST_INVOICED_MENU_VALUES,
                 guestsFilterSettings.invoiced
             );
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-paid'),
                 GUEST_PAID_MENU_VALUES,
                 guestsFilterSettings.paid
             );
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-briefed'),
                 GUEST_BRIEFED_FILTER_VALUES,
                 guestsFilterSettings.briefed
             );
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-attended'),
                 GUEST_ATTENDED_FILTER_VALUES,
                 guestsFilterSettings.attended
             );
-            fillGuestsFilterSelect(
+            fillGuestsFilterChecks(
                 document.getElementById('guests-filter-cme'),
                 GUEST_CME_FILTER_VALUES,
                 guestsFilterSettings.cme
@@ -23027,10 +23238,216 @@
             popup.setAttribute('aria-hidden', 'false');
         }
 
+        var stripeInvoiceListCache = null;
+        var stripeOverdueAlignPromise = null;
+
+        function stripeInvoiceRaw(inv) {
+            return inv && inv.stripe && typeof inv.stripe === 'object' ? inv.stripe : {};
+        }
+
+        /** Stripe overdue badge: status stays open and due_date is in the past. */
+        function stripeInvoiceOverdueLabel(inv) {
+            if (!inv) return '';
+            var raw = stripeInvoiceRaw(inv);
+            var status = String(inv.status || raw.status || '').trim().toLowerCase();
+            if (status !== 'open') return '';
+            var method = String(raw.collection_method || inv.collection_method || '')
+                .trim()
+                .toLowerCase();
+            if (method && method !== 'send_invoice') return '';
+            var due = Number(inv.due_date != null ? inv.due_date : raw.due_date);
+            if (!isFinite(due) || due <= 0) return '';
+            var now = Math.floor(Date.now() / 1000);
+            if (due >= now) return '';
+            var days = Math.floor((now - due) / 86400);
+            return days >= 60 ? 'Overdue 60' : 'Overdue 30';
+        }
+
+        function stripeInvoiceGuestId(inv) {
+            var raw = stripeInvoiceRaw(inv);
+            var meta = raw.metadata && typeof raw.metadata === 'object' ? raw.metadata : {};
+            return String(inv.guestId || meta.guestId || '').trim();
+        }
+
+        function stripeInvoiceCustomerId(inv) {
+            var raw = stripeInvoiceRaw(inv);
+            var customer = inv.customer != null ? inv.customer : raw.customer;
+            if (customer && typeof customer === 'object') {
+                return String(customer.id || '').trim();
+            }
+            return String(customer || '').trim();
+        }
+
+        function stripeInvoiceEmail(inv) {
+            var raw = stripeInvoiceRaw(inv);
+            return String(inv.customer_email || raw.customer_email || '')
+                .trim()
+                .toLowerCase();
+        }
+
+        function findGuestForStripeOverdueInvoice(inv) {
+            var all = Array.isArray(guestsRosterAllInMemory) ? guestsRosterAllInMemory : [];
+            var guestId = stripeInvoiceGuestId(inv);
+            var invoiceId = String(inv.id || '').trim();
+            var customerId = stripeInvoiceCustomerId(inv);
+            var email = stripeInvoiceEmail(inv);
+            var i;
+            if (guestId) {
+                for (i = 0; i < all.length; i++) {
+                    if (String(all[i].id || '') === guestId) return all[i];
+                }
+            }
+            if (invoiceId) {
+                for (i = 0; i < all.length; i++) {
+                    if (String(all[i].stripeInvoiceId || '').trim() === invoiceId) return all[i];
+                }
+            }
+            if (customerId) {
+                for (i = 0; i < all.length; i++) {
+                    if (String(all[i].stripeCustomerId || '').trim() === customerId) return all[i];
+                }
+            }
+            if (!email) return null;
+            var emailHits = [];
+            for (i = 0; i < all.length; i++) {
+                if (String(all[i].email || '').trim().toLowerCase() === email) emailHits.push(all[i]);
+            }
+            return emailHits.length === 1 ? emailHits[0] : null;
+        }
+
+        function fetchAllStripeInvoices(force) {
+            if (!force && Array.isArray(stripeInvoiceListCache)) {
+                return Promise.resolve(stripeInvoiceListCache);
+            }
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/importStripeInvoicesHttp';
+            return fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lookbackDays: 0 }),
+            })
+                .then(function (res) {
+                    if (!res.ok) {
+                        return res.json()
+                            .catch(function () { return {}; })
+                            .then(function (payload) {
+                                var msg = payload && payload.error
+                                    ? String(payload.error)
+                                    : ('Stripe invoice list failed (' + res.status + ')');
+                                throw new Error(msg);
+                            });
+                    }
+                    return res.json();
+                })
+                .then(function (data) {
+                    var list = data && Array.isArray(data.invoices) ? data.invoices : [];
+                    stripeInvoiceListCache = list;
+                    return list;
+                });
+        }
+
+        function persistGuestPaidLabels(changes) {
+            if (!changes.length || backenduserIsReadonly) return Promise.resolve();
+            var db = getFirestore();
+            var chain = Promise.resolve();
+            var size = 400;
+            for (var start = 0; start < changes.length; start += size) {
+                (function (slice) {
+                    chain = chain.then(function () {
+                        var batch = db.batch();
+                        for (var i = 0; i < slice.length; i++) {
+                            batch.set(
+                                tbsGuestItemRef(db, slice[i].id),
+                                { Paid: slice[i].paid },
+                                { merge: true }
+                            );
+                        }
+                        return batch.commit();
+                    });
+                })(changes.slice(start, start + size));
+            }
+            return chain;
+        }
+
+        /**
+         * Label guests from Stripe's overdue rule so Overdue 30 + Overdue 60
+         * is every open invoice whose due date has passed.
+         */
+        function alignGuestRosterWithStripeOverdue(opts) {
+            opts = opts || {};
+            if (stripeOverdueAlignPromise) return stripeOverdueAlignPromise;
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Matching Stripe overdue invoices…');
+            }
+            stripeOverdueAlignPromise = fetchAllStripeInvoices(!!opts.force)
+                .then(function (invoices) {
+                    var overdueCount = 0;
+                    var unmatched = 0;
+                    var best = Object.create(null);
+                    for (var i = 0; i < invoices.length; i++) {
+                        var label = stripeInvoiceOverdueLabel(invoices[i]);
+                        if (!label) continue;
+                        overdueCount++;
+                        var guest = findGuestForStripeOverdueInvoice(invoices[i]);
+                        if (!guest || !guest.id) {
+                            unmatched++;
+                            continue;
+                        }
+                        var due = Number(invoices[i].due_date);
+                        var prev = best[guest.id];
+                        if (!prev || due < prev.due) {
+                            best[guest.id] = { guest: guest, label: label, due: due };
+                        }
+                    }
+                    var changes = [];
+                    var ids = Object.keys(best);
+                    for (var c = 0; c < ids.length; c++) {
+                        var choice = best[ids[c]];
+                        if (String(choice.guest.paid || '').trim() === choice.label) continue;
+                        choice.guest.paid = choice.label;
+                        changes.push(choice.guest);
+                    }
+                    return persistGuestPaidLabels(changes).then(function () {
+                        renderGuestsRoster();
+                        updateGuestsOverwatchRegisteredCount();
+                        var shown = 0;
+                        if (guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
+                            shown = guestsRosterRowsAfterFilter().length;
+                        } else {
+                            shown = ids.length;
+                        }
+                        var msg = 'Stripe overdue invoices: ' + overdueCount + '. Filter shows ' + shown + '.';
+                        if (unmatched) {
+                            msg += ' ' + unmatched + ' are not linked to a guest.';
+                        }
+                        if (typeof showStatus === 'function') showStatus('success', msg);
+                        return { overdueCount: overdueCount, shown: shown, unmatched: unmatched };
+                    });
+                })
+                .catch(function (err) {
+                    console.error('alignGuestRosterWithStripeOverdue:', err);
+                    if (typeof showStatus === 'function') {
+                        showStatus(
+                            'error',
+                            err && err.message ? err.message : 'Could not match Stripe overdue invoices.'
+                        );
+                    }
+                })
+                .finally(function () {
+                    stripeOverdueAlignPromise = null;
+                });
+            return stripeOverdueAlignPromise;
+        }
+
         function applyGuestsFilterSettingsLocal(next) {
             guestsFilterSettings = normalizeGuestsFilterSettings(next);
             syncFilterGuestsButtonBadge();
             renderGuestsRoster();
+            if (guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
+                alignGuestRosterWithStripeOverdue();
+            }
         }
 
         async function saveGuestsFilterSettingsToFirestore(next) {
@@ -23098,7 +23515,15 @@
             if (low === 'yes' || low === 'y' || low === 'true') {
                 return ' content-badge--guest-status-yes';
             }
-            if (low === 'no' || low === 'n' || low === 'false') {
+            if (low === 'pending') return ' content-badge--guest-paid-pending';
+            if (
+                low === 'no' ||
+                low === 'n' ||
+                low === 'false' ||
+                low === 'overdue' ||
+                low === 'overdue 30' ||
+                low === 'overdue 60'
+            ) {
                 return ' content-badge--guest-status-no';
             }
             if (low === 'cancelled' || low === 'canceled') {
@@ -24143,9 +24568,16 @@
             return String(cancelledVal != null ? cancelledVal : '').trim().toLowerCase() === 'yes';
         }
 
-        /** Paid is the literal “No” (case-insensitive). */
+        /** Paid is unpaid: literal No, or Pending / Overdue / Overdue 30 / Overdue 60. */
         function guestPaidFieldIsNo(paidVal) {
-            return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'no';
+            var low = String(paidVal != null ? paidVal : '').trim().toLowerCase();
+            return (
+                low === 'no' ||
+                low === 'pending' ||
+                low === 'overdue' ||
+                low === 'overdue 30' ||
+                low === 'overdue 60'
+            );
         }
 
         /** Paid is the literal “Yes” (case-insensitive). */
@@ -24580,23 +25012,7 @@
                 })
                 .then(function(data) {
                     var updated = data && data.updated != null ? Number(data.updated) : 0;
-                    var checked = data && data.checked != null ? Number(data.checked) : 0;
-                    var alreadyPaid = data && data.alreadyPaid != null ? Number(data.alreadyPaid) : 0;
                     var openOrUnpaid = data && data.openOrUnpaid != null ? Number(data.openOrUnpaid) : 0;
-                    var msg;
-                    if (updated > 0) {
-                        msg = 'Marked ' + updated + ' guest' + (updated === 1 ? '' : 's') + ' paid';
-                    } else if (guestId) {
-                        msg = openOrUnpaid > 0
-                            ? 'Invoice still unpaid in Stripe for this guest'
-                            : 'No paid invoice found yet for this guest';
-                    } else {
-                        msg = 'Stripe sync done — ' +
-                            checked + ' guests with invoices, ' +
-                            alreadyPaid + ' already paid, ' +
-                            openOrUnpaid + ' still unpaid, ' +
-                            updated + ' newly marked paid';
-                    }
                     if (typeof showStatus === 'function') {
                         showStatus('loading', 'Checking database for payment changes…');
                     }
@@ -24604,12 +25020,28 @@
                     return fetchAllGuestsIntoMemory({ force: true, showLoading: false })
                         .then(function() {
                             renderGuestsRoster();
-                            syncGuestWorkflowPaymentReceivedButton();
-                            syncGuestWorkflowSendInvoiceButton();
-                            syncGuestManagementLogPanel();
-                            syncGuestInvoicedisnoBlock();
-                            if (typeof showStatus === 'function') showStatus('success', msg);
-                            return data;
+                            updateGuestsOverwatchRegisteredCount();
+                            return alignGuestRosterWithStripeOverdue({ force: true }).then(function () {
+                                syncGuestWorkflowPaymentReceivedButton();
+                                syncGuestWorkflowSendInvoiceButton();
+                                syncGuestManagementLogPanel();
+                                syncGuestInvoicedisnoBlock();
+                                var msg;
+                                if (guestId) {
+                                    msg = openOrUnpaid > 0
+                                        ? 'Invoice still unpaid in Stripe for this guest'
+                                        : (updated > 0
+                                            ? 'Marked this guest paid'
+                                            : 'No paid invoice found yet for this guest');
+                                } else {
+                                    msg = 'Stripe sync done — ' + guestsStripeSyncStatusMessage();
+                                    if (updated > 0) {
+                                        msg += '. Marked ' + updated + ' newly paid';
+                                    }
+                                }
+                                if (typeof showStatus === 'function') showStatus('success', msg);
+                                return data;
+                            });
                         })
                         .catch(function(reloadErr) {
                             console.error('reconcileGuestStripePaymentsFromUi reload:', reloadErr);
@@ -25651,7 +26083,28 @@
             return guestRosterSectionRowHtml('');
         }
 
+        function syncGuestsRosterFilterNote() {
+            var note = document.getElementById('guests-roster-filter-note');
+            if (!note) return;
+            if (!guestsFilterIsActive(guestsFilterSettings)) {
+                note.hidden = true;
+                note.textContent = '';
+                note.setAttribute('aria-hidden', 'true');
+                return;
+            }
+            var shown = guestsRosterRowsAfterFilter().length;
+            var total = guestsPaidFilterIncludesOverdue(guestsFilterSettings) &&
+                Array.isArray(guestsRosterAllInMemory) &&
+                guestsRosterAllInMemory.length
+                ? guestsRosterAllInMemory.length
+                : countGuestsRegisteredForCurrentEvent();
+            note.hidden = false;
+            note.setAttribute('aria-hidden', 'false');
+            note.textContent = '(Filtered ' + shown + ' out of ' + total + ')';
+        }
+
         function renderGuestsRoster() {
+            syncGuestsRosterFilterNote();
             var itemsEl = document.getElementById('guests-roster-items');
             if (!itemsEl) {
                 updateGuestsListHeadingDisplay();
@@ -25805,6 +26258,7 @@
                 itemsEl.innerHTML = '<p class="guests-roster-empty">Loading guests...</p>';
             }
             guestsRosterInMemory = [];
+            guestsRosterAllInMemory = [];
             try {
                 var db = getFirestore();
                 var guestsParentSnap = await db.collection('tbs').doc('Guests').get();
@@ -25821,6 +26275,7 @@
                 applyGuestsFilterSettingsFromSettingsData(settingsData);
                 if (!String(current_event || '').trim()) {
                     guestsRosterInMemory = [];
+                    guestsRosterAllInMemory = [];
                     guestsMemoryLoaded = true;
                     renderGuestsRoster();
                     return;
@@ -25828,11 +26283,13 @@
                 var ids = await listGuestIdsUnderTbsGuests(db, guestsParentSnap);
                 if (!ids.length) {
                     guestsRosterInMemory = [];
+                    guestsRosterAllInMemory = [];
                     guestsMemoryLoaded = true;
                     renderGuestsRoster();
                     return;
                 }
                 var list = [];
+                var allList = [];
                 var chunkSize = 50;
                 for (var i = 0; i < ids.length; i += chunkSize) {
                     var chunk = ids.slice(i, i + chunkSize);
@@ -25846,6 +26303,7 @@
                         var snap = snaps[j];
                         if (snap && snap.exists) {
                             var rec = guestRecordFromTbsItemDoc(rowId, snap.data() || {});
+                            allList.push(rec);
                             if (guestRecordEventMatchesCurrentEvent(rec)) {
                                 list.push(rec);
                             }
@@ -25853,16 +26311,21 @@
                     }
                 }
                 guestsRosterInMemory = list;
+                guestsRosterAllInMemory = allList;
                 guestsRosterSortInPlace();
                 guestsMemoryLoaded = true;
             } catch (err) {
                 console.error('fetchAllGuestsIntoMemory:', err);
                 guestsRosterLoadError = err && err.message ? String(err.message) : 'Unknown Firestore error';
                 guestsRosterInMemory = [];
+                guestsRosterAllInMemory = [];
                 guestsMemoryLoaded = false;
                 updateBackendCurrentEventDisplay();
             }
             renderGuestsRoster();
+            if (guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
+                alignGuestRosterWithStripeOverdue();
+            }
         }
 
         /**
@@ -32300,7 +32763,7 @@
                     .then(function(data) {
                         if (ig) {
                             ig.invoiced = 'Yes';
-                            ig.paid = 'No';
+                            ig.paid = 'Pending';
                             if (data && data.invoicedDate) {
                                 ig.invoicedDate = String(data.invoicedDate);
                             } else {
