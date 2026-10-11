@@ -10734,6 +10734,14 @@
             will-change: transform;
         }
 
+        #programme-editor .programme-toolbar #save-programme-btn.is-saved-spin > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.7s linear 1;
+            will-change: transform;
+        }
+
         #programme-editor .programme-toolbar .programme-toolbar-create-btn {
             flex: 0 0 auto;
             width: auto;
@@ -30429,6 +30437,21 @@
             updateSaveButtonState();
         }
 
+        function spinProgrammeSaveButton() {
+            var btn = document.getElementById('save-programme-btn');
+            if (!btn) return;
+            var svg = btn.querySelector('svg');
+            if (!svg) return;
+            btn.classList.remove('is-saved-spin');
+            void btn.offsetWidth;
+            btn.classList.add('is-saved-spin');
+            function done() {
+                btn.classList.remove('is-saved-spin');
+                svg.removeEventListener('animationend', done);
+            }
+            svg.addEventListener('animationend', done);
+        }
+
         function updateSaveButtonState() {
             const btn = document.getElementById('save-programme-btn');
             if (!btn) return;
@@ -30537,14 +30560,16 @@
             }
             var saveBtn = document.getElementById('save-programme-btn');
             if (saveBtn && saveBtn.classList.contains('is-saving')) return;
+            var saved = false;
             setProgrammeSaveBtnSaving(true);
             try {
-                var saved = await flushProgrammeDirtyToFirestore({});
+                saved = await flushProgrammeDirtyToFirestore({});
                 if (!saved && typeof showStatus === 'function') {
                     showStatus('info', 'Nothing to save.');
                 }
             } finally {
                 setProgrammeSaveBtnSaving(false);
+                if (saved) spinProgrammeSaveButton();
             }
         }
 
