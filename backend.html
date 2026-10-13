@@ -8309,6 +8309,11 @@
             color: var(--backend-roster-status-ready-color);
         }
 
+        #team-editor .team-list-table .content-badge.content-badge--team-corpuls {
+            background: var(--backend-roster-status-no-bg);
+            color: var(--backend-roster-status-no-color);
+        }
+
         #guest-editor .guests-list-table .content-badge.content-badge--guest-field-empty,
         #team-editor .team-list-table .content-badge.content-badge--guest-field-empty {
             background: #f1f5f9;
@@ -13381,7 +13386,7 @@
         var emailerContactAllevents = [];
         var speakerRosterAllevents = [];
         var teamFormBaseline = null;
-        var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary'];
+        var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary', 'Corpuls'];
         var TEAM_LODGING_OPTIONS = ['A', 'B', 'TBD', 'Own'];
         var TEAM_COUNTRY_OPTIONS = [
             'Other (Enter into bio below.)',
@@ -18794,6 +18799,7 @@
             var mod = ' content-badge--guest-status-yes';
             if (low === 'logistics') mod = ' content-badge--team-logistics';
             else if (low === 'auxillary') mod = ' content-badge--team-auxillary';
+            else if (low === 'corpuls') mod = ' content-badge--team-corpuls';
             return '<span class="content-badge' + mod + '">' + escapeHtml(t || '—') + '</span>';
         }
 
