@@ -23130,13 +23130,6 @@
         }
 
         function guestsRosterSourceForFilter() {
-            if (
-                guestsPaidFilterIncludesOverdue(guestsFilterSettings) &&
-                Array.isArray(guestsRosterAllInMemory) &&
-                guestsRosterAllInMemory.length
-            ) {
-                return guestsRosterAllInMemory;
-            }
             return Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory : [];
         }
 
@@ -23300,7 +23293,7 @@
         }
 
         function findGuestForStripeOverdueInvoice(inv) {
-            var all = Array.isArray(guestsRosterAllInMemory) ? guestsRosterAllInMemory : [];
+            var all = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory : [];
             var guestId = stripeInvoiceGuestId(inv);
             var invoiceId = String(inv.id || '').trim();
             var customerId = stripeInvoiceCustomerId(inv);
@@ -26107,11 +26100,7 @@
                 return;
             }
             var shown = guestsRosterRowsAfterFilter().length;
-            var total = guestsPaidFilterIncludesOverdue(guestsFilterSettings) &&
-                Array.isArray(guestsRosterAllInMemory) &&
-                guestsRosterAllInMemory.length
-                ? guestsRosterAllInMemory.length
-                : countGuestsRegisteredForCurrentEvent();
+            var total = countGuestsRegisteredForCurrentEvent();
             note.hidden = false;
             note.setAttribute('aria-hidden', 'false');
             note.textContent = '(Filtered ' + shown + ' out of ' + total + ')';
@@ -26259,8 +26248,81 @@
             syncGuestsBulkActionsView();
         }
 
+        function guestRowIdFromGuestsItemDoc(doc) {
+            var parts = String((doc && doc.ref && doc.ref.path) || '').split('/');
+            if (parts.length === 4 && parts[0] === 'tbs' && parts[1] === 'Guests' && parts[3] === 'item') {
+                return String(parts[2] || '').trim();
+            }
+            return '';
+        }
+
+        function pushCurrentEventGuestFromItemDoc(doc, seen, list) {
+            var rowId = guestRowIdFromGuestsItemDoc(doc);
+            if (!rowId || seen[rowId]) return;
+            var rec = guestRecordFromTbsItemDoc(rowId, doc.data() || {});
+            if (!guestRecordEventMatchesCurrentEvent(rec)) return;
+            seen[rowId] = true;
+            list.push(rec);
+        }
+
         /**
-         * Load all guest rows from Firestore into guestsRosterInMemory (global tbs/Guests).
+         * Guests whose Event field is exactly current_event, or an array that contains it.
+         * Returns null when every query fails so the caller can fall back.
+         */
+        async function queryCurrentEventGuestRecords(db) {
+            var want = String(current_event || '').trim();
+            if (!want) return [];
+            var seen = Object.create(null);
+            var list = [];
+            var specs = [
+                ['Event', '=='],
+                ['event', '=='],
+                ['Events', '=='],
+                ['events', '=='],
+                ['EVENT', '=='],
+                ['Event', 'array-contains'],
+                ['event', 'array-contains'],
+            ];
+            var anyOk = false;
+            for (var i = 0; i < specs.length; i++) {
+                try {
+                    var snap = await db
+                        .collectionGroup('item')
+                        .where(specs[i][0], specs[i][1], want)
+                        .get();
+                    anyOk = true;
+                    snap.forEach(function (doc) {
+                        pushCurrentEventGuestFromItemDoc(doc, seen, list);
+                    });
+                } catch (err) {
+                    console.warn('queryCurrentEventGuestRecords:', specs[i][0], specs[i][1], err);
+                }
+            }
+            return anyOk ? list : null;
+        }
+
+        async function fetchCurrentEventGuestsByKnownIds(db, guestsParentSnap) {
+            var ids = await listGuestIdsUnderTbsGuests(db, guestsParentSnap);
+            var list = [];
+            var seen = Object.create(null);
+            var chunkSize = 50;
+            for (var i = 0; i < ids.length; i += chunkSize) {
+                var chunk = ids.slice(i, i + chunkSize);
+                var snaps = await Promise.all(
+                    chunk.map(function (rowId) {
+                        return db.collection('tbs').doc('Guests').collection(rowId).doc('item').get();
+                    })
+                );
+                for (var j = 0; j < chunk.length; j++) {
+                    var snap = snaps[j];
+                    if (snap && snap.exists) pushCurrentEventGuestFromItemDoc(snap, seen, list);
+                }
+            }
+            return list;
+        }
+
+        /**
+         * Load guest rows for current_event into guestsRosterInMemory.
          * @param {{ force?: boolean, showLoading?: boolean }} opts
          */
         async function fetchAllGuestsIntoMemory(opts) {
@@ -26294,38 +26356,12 @@
                     renderGuestsRoster();
                     return;
                 }
-                var ids = await listGuestIdsUnderTbsGuests(db, guestsParentSnap);
-                if (!ids.length) {
-                    guestsRosterInMemory = [];
-                    guestsRosterAllInMemory = [];
-                    guestsMemoryLoaded = true;
-                    renderGuestsRoster();
-                    return;
-                }
-                var list = [];
-                var allList = [];
-                var chunkSize = 50;
-                for (var i = 0; i < ids.length; i += chunkSize) {
-                    var chunk = ids.slice(i, i + chunkSize);
-                    var snaps = await Promise.all(
-                        chunk.map(function (rowId) {
-                            return db.collection('tbs').doc('Guests').collection(rowId).doc('item').get();
-                        })
-                    );
-                    for (var j = 0; j < chunk.length; j++) {
-                        var rowId = chunk[j];
-                        var snap = snaps[j];
-                        if (snap && snap.exists) {
-                            var rec = guestRecordFromTbsItemDoc(rowId, snap.data() || {});
-                            allList.push(rec);
-                            if (guestRecordEventMatchesCurrentEvent(rec)) {
-                                list.push(rec);
-                            }
-                        }
-                    }
+                var list = await queryCurrentEventGuestRecords(db);
+                if (!list || !list.length) {
+                    list = await fetchCurrentEventGuestsByKnownIds(db, guestsParentSnap);
                 }
                 guestsRosterInMemory = list;
-                guestsRosterAllInMemory = allList;
+                guestsRosterAllInMemory = list;
                 guestsRosterSortInPlace();
                 guestsMemoryLoaded = true;
             } catch (err) {
