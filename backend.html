@@ -9742,6 +9742,14 @@
             will-change: transform;
         }
 
+        #texteditor .texteditor-pane-heading #texteditor-save-btn.is-saved-spin > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.7s linear 1;
+            will-change: transform;
+        }
+
         #texteditor .texteditor-pane-heading #texteditor-sync-btn {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
@@ -11282,6 +11290,13 @@
                                 id="texteditor-preset-guest-sent-to-reserves-btn"
                                 aria-pressed="false"
                             >Guest sent to reserves</button>
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                data-snippet-key="tbsBackend:texteditor:preset:gentle-payment-reminder"
+                                id="texteditor-preset-gentle-payment-reminder-btn"
+                                aria-pressed="false"
+                            >Gentle payment reminder</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -21654,6 +21669,9 @@
                 current_event = next;
                 selectedevent = next;
                 updateBackendCurrentEventDisplay();
+                if (typeof syncTexteditorPreviewFromCode === 'function') {
+                    syncTexteditorPreviewFromCode();
+                }
                 await syncEventLocationAndSiteSettings(next);
                 await Promise.all([
                     fetchAllGuestsIntoMemory({ force: true, showLoading: true }),
@@ -27448,6 +27466,7 @@
         var TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:register-to-waiting-list';
         var TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-invitation';
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
+        var TBS_TEXTEDITOR_PRESET_GENTLE_PAYMENT_REMINDER_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:gentle-payment-reminder';
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
@@ -27459,6 +27478,7 @@
         var FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD = 'Stand by';
         var FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD = 'Guest invitation';
         var FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD = 'Guest sent to reserves';
+        var FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD = 'guests_gentle_reminder';
         var FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD = 'Sendtoreserves';
         var FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD = 'Speakerinvitation';
         var FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD = 'Requestlodging';
@@ -27562,6 +27582,16 @@
                     loadOk: 'Guest sent to reserves loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest sent to reserves) into the editor.',
                     saveOk: 'Guest sent to reserves saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest sent to reserves).',
                     saveErr: 'Failed to save Guest sent to reserves to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_PRESET_GENTLE_PAYMENT_REMINDER_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD,
+                    metaLabel: 'Guest email templates — Gentle payment reminder',
+                    loadOk: 'Gentle payment reminder loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.guests_gentle_reminder) into the editor.',
+                    saveOk: 'Gentle payment reminder saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.guests_gentle_reminder).',
+                    saveErr: 'Failed to save Gentle payment reminder to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -27896,15 +27926,7 @@
                 texteditorProgrammeFirebaseSavedUi = false;
             }
             btn.classList.remove('texteditor-save-btn--saved');
-            if (!dirty && key && texteditorProgrammeFirebaseSavedUi && parseEventProgrammeKey(key)) {
-                btn.disabled = true;
-                btn.setAttribute('aria-disabled', 'true');
-                btn.setAttribute('title', 'Pre-set saved');
-                btn.setAttribute('aria-label', 'Pre-set saved');
-                btn.classList.add('texteditor-save-btn--saved');
-                return;
-            }
-            var canSave = dirty && texteditorPadlockIsOpen;
+            var canSave = Boolean(key) && texteditorPadlockIsOpen && !backenduserIsReadonly;
             btn.disabled = !canSave;
             btn.setAttribute('aria-disabled', canSave ? 'false' : 'true');
             btn.setAttribute('title', 'Save pre-set');
@@ -27982,6 +28004,21 @@
                 clearTimeout(texteditorFirebaseAutosaveTimer);
                 texteditorFirebaseAutosaveTimer = null;
             }
+        }
+
+        function spinTexteditorSaveButton() {
+            var btn = document.getElementById('texteditor-save-btn');
+            if (!btn) return;
+            var svg = btn.querySelector('svg');
+            if (!svg) return;
+            btn.classList.remove('is-saved-spin');
+            void btn.offsetWidth;
+            btn.classList.add('is-saved-spin');
+            function done() {
+                btn.classList.remove('is-saved-spin');
+                svg.removeEventListener('animationend', done);
+            }
+            svg.addEventListener('animationend', done);
         }
 
         function setTexteditorSaveBtnAutosaving(on) {
@@ -28278,8 +28315,13 @@
             );
         }
 
+        function texteditorRenderWithCurrentEvent(html) {
+            var value = escapeHtml(String(current_event || '').trim());
+            return String(html != null ? html : '').split('{{current_event}}').join(value);
+        }
+
         function texteditorPreviewHtmlForRender(raw, storageKey) {
-            var html = raw != null ? raw : '';
+            var html = texteditorRenderWithCurrentEvent(raw);
             var key = storageKey || '';
             if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
                 return wrapProgrammeInfoPreviewForRender(texteditorPreviewHtmlForProgrammeInfo(html));
@@ -34411,11 +34453,16 @@
                 texteditorSaveBtn.addEventListener('click', async function() {
                     var ta = document.getElementById('texteditor-code');
                     var key = ta && ta.dataset.storageKey;
-                    if (!ta || !key || texteditorSaveBtn.disabled || !texteditorPadlockIsOpen) return;
+                    if (!ta || !key || !texteditorPadlockIsOpen || backenduserIsReadonly) return;
                     if (texteditorSaveBtn.classList.contains('is-autosaving')) return;
                     cancelTexteditorFirebaseAutosaveTimer();
+                    if (ta.value === texteditorLastSavedSnapshot && texteditorKeyHasFirebaseTarget(key)) {
+                        spinTexteditorSaveButton();
+                        return;
+                    }
                     var saved = await saveTexteditorSourceToFirebase({ autosave: false });
                     if (saved) {
+                        spinTexteditorSaveButton();
                         updateTexteditorSaveButtonState();
                         return;
                     }
@@ -34427,6 +34474,7 @@
                             return;
                         }
                         texteditorLastSavedSnapshot = ta.value;
+                        spinTexteditorSaveButton();
                         updateTexteditorSaveButtonState();
                         var day = programmeDayFromTexteditorKey(key);
                         if (day) {
