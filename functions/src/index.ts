@@ -388,6 +388,56 @@ async function loadGuestSentToReservesHtml(
 }
 
 /**
+ * Gentle payment reminder HTML + optional subject from
+ * tbs/Pre-sets/{event_location}/{event_location}.guests_gentle_reminder.
+ * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
+ * @return {Promise<{html: string, subject: string}>} Template fields.
+ */
+async function loadGuestGentleReminderTemplate(
+  db: Firestore,
+  location: string,
+): Promise<{html: string; subject: string}> {
+  const loc = String(location || "").trim();
+  if (!loc) return {html: "", subject: ""};
+  const snap = await db
+    .collection("tbs")
+    .doc("Pre-sets")
+    .collection(loc)
+    .doc(loc)
+    .get();
+  const data = (snap.exists ? snap.data() : null) || {};
+  const raw = data.guests_gentle_reminder;
+  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
+    const obj = raw as Record<string, unknown>;
+    const subject = obj.subject != null ?
+      String(obj.subject) :
+      obj.Subject != null ? String(obj.Subject) : "";
+    return {html: presetHtmlFromField(raw), subject};
+  }
+  return {html: presetHtmlFromField(raw), subject: ""};
+}
+
+/**
+ * Fill guest reminder placeholders. Unknown tokens are left as written.
+ * @param {string} template HTML template.
+ * @param {Record<string, string>} fields Replacement values.
+ * @return {string} HTML with known tokens replaced.
+ */
+function fillGuestTemplateTokens(
+  template: string,
+  fields: Record<string, string>,
+): string {
+  let html = String(template || "");
+  const tokens = Object.keys(fields);
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    html = html.split(token).join(escapeHtml(fields[token] || ""));
+  }
+  return html;
+}
+
+/**
  * First name + last name for waiting-list {{Name}}.
  * @param {Record<string, unknown>} data Guest item data.
  * @return {string} Display name.
@@ -431,6 +481,25 @@ function guestSentToReservesAllowed(
  */
 function guestLogSentToReservesLine(): string {
   return guestLogPrefixYyMmDd() + ": Sent to reserves.";
+}
+
+/**
+ * Log line after a gentle payment reminder.
+ * @return {string} e.g. `261017: First reminder sent on 2026-10-17.`
+ */
+function guestLogGentleReminderLine(): string {
+  return guestLogPrefixYyMmDd() + ": First reminder sent on " +
+    formatGuestInvoicedDateDisplay(new Date()) + ".";
+}
+
+/**
+ * True when Paid is Overdue (legacy Overdue 30 / Overdue 60 still count).
+ * @param {Record<string, unknown>} data Guest item data.
+ * @return {boolean} Whether a payment reminder may be sent.
+ */
+function guestPaidIsOverdue(data: Record<string, unknown>): boolean {
+  const paid = String(data.Paid ?? data.paid ?? "").trim().toLowerCase();
+  return paid === "overdue" || paid === "overdue 30" || paid === "overdue 60";
 }
 
 /**
@@ -1092,7 +1161,7 @@ function isStripeInvoiceOverdue(invoice: StripePaidInvoiceFields): boolean {
 
 /**
  * Paid label for an open send_invoice. Null for any other invoice.
- * Past due is Overdue 30 or Overdue 60. Not yet due is Pending.
+ * Past due is Overdue. Not yet due is Pending.
  * @param {StripePaidInvoiceFields} invoice Stripe invoice.
  * @return {string | null} Paid label, or null when this invoice
  * should not set Paid.
@@ -1113,19 +1182,30 @@ function paidLabelForOpenSendInvoice(
 /**
  * Paid labels that must not be rewritten from an open invoice.
  * @param {string} paid Stored Paid value.
- * @return {boolean} True for Yes or Cancelled.
+ * @return {boolean} True for Yes, Cancelled, or First notice.
  */
 function guestPaidLabelIsLocked(paid: string): boolean {
   const low = String(paid || "").trim().toLowerCase();
-  return low === "yes" || low === "cancelled" || low === "canceled";
+  return low === "yes" ||
+    low === "cancelled" ||
+    low === "canceled" ||
+    low === "first notice";
+}
+
+/**
+ * True when a gentle reminder has already moved Paid to First notice.
+ * @param {string} paid Stored Paid value.
+ * @return {boolean} Whether overdue sync must leave Paid alone.
+ */
+function guestPaidIsFirstNotice(paid: string): boolean {
+  return String(paid || "").trim().toLowerCase() === "first notice";
 }
 
 /**
  * Unpaid Paid label from a Stripe due_date (unix seconds).
- * Pending means the invoice is not yet due. Any past due date is
- * Overdue 30 until 60 days, then Overdue 60, matching Stripe overdue.
+ * Pending means the invoice is not yet due. Any past due date is Overdue.
  * @param {number | null | undefined} dueDate Stripe due_date.
- * @return {string} Pending, Overdue 30, or Overdue 60.
+ * @return {string} Pending or Overdue.
  */
 function unpaidGuestPaidLabel(
   dueDate: number | null | undefined,
@@ -1135,9 +1215,7 @@ function unpaidGuestPaidLabel(
   }
   const now = Math.floor(Date.now() / 1000);
   if (dueDate >= now) return "Pending";
-  const days = Math.floor((now - dueDate) / 86400);
-  if (days >= 60) return "Overdue 60";
-  return "Overdue 30";
+  return "Overdue";
 }
 
 /**
@@ -1147,9 +1225,9 @@ function unpaidGuestPaidLabel(
  */
 function unpaidPaidLabelSeverity(label: string): number {
   const low = String(label || "").trim().toLowerCase();
-  if (low === "overdue 60") return 3;
-  if (low === "overdue 30") return 2;
-  if (low === "overdue") return 1;
+  if (low === "overdue" || low === "overdue 30" || low === "overdue 60") {
+    return 1;
+  }
   if (low === "pending") return 0;
   return -1;
 }
@@ -1580,7 +1658,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
         const cancelled = guestPaidLabelIsLocked(currentPaid) &&
           currentPaid.trim().toLowerCase() !== "yes";
         if (cancelled) return;
-        const overdue = label === "Overdue 30" || label === "Overdue 60";
+        const overdue = label === "Overdue";
         if (!overdue && guestPaidLabelIsLocked(currentPaid)) {
           noteAlreadyPaid(entry.guestId);
           return;
@@ -1669,7 +1747,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
             .toLowerCase();
           const cancelled = currentPaid === "cancelled" ||
             currentPaid === "canceled";
-          if (cancelled) continue;
+          if (cancelled || guestPaidIsFirstNotice(currentPaid)) continue;
           const locked = guestPaidLabelIsLocked(
             String(entry.data["Paid"] || ""),
           );
@@ -1710,6 +1788,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
         const overdueChoice = choice.severity > 0;
         const lowPaid = currentPaid.trim().toLowerCase();
         if (lowPaid === "cancelled" || lowPaid === "canceled") return;
+        if (guestPaidIsFirstNotice(currentPaid)) return;
         if (!overdueChoice && guestPaidLabelIsLocked(currentPaid)) {
           noteAlreadyPaid(choice.entry.guestId);
           return;
@@ -2274,6 +2353,174 @@ export const sendGuestToReservesHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Failed to send waiting-list e-mail.",
+    });
+  }
+});
+
+/**
+ * Guest workflow: send gentle payment reminder HTML from
+ * tbs/Pre-sets/{event_location}/{event_location}.guests_gentle_reminder
+ * as registration@tbs-zermatt.org.
+ * Does not change Paid. Appends a log line.
+ * Expects JSON: { guestId }.
+ */
+export const sendGuestGentleReminderHttp = onRequest({
+  secrets: [
+    gmailSendClientIdParam,
+    gmailSendClientSecretParam,
+    gmailSendRefreshTokenParam,
+    gmailSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const guestId = String(body.guestId || "").trim();
+  if (!guestId) {
+    res.status(400).json({error: "Missing guestId."});
+    return;
+  }
+
+  const configuredFrom = String(gmailSendFromParam.value() || "").trim();
+  if (!configuredFrom || !configuredFrom.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SEND_FROM secret.",
+    });
+    return;
+  }
+  const fromAddress = "registration@tbs-zermatt.org";
+
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Guests")
+    .collection(guestId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Guest item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    if (!guestPaidIsOverdue(data)) {
+      res.status(400).json({
+        error: "Payment reminder is only available when Paid is Overdue.",
+      });
+      return;
+    }
+
+    const email = pickGuestEmail(data);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({error: "Guest has no valid email."});
+      return;
+    }
+
+    const eventLabel = await loadCurrentEventLabel(db);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+
+    const template = await loadGuestGentleReminderTemplate(db, location);
+    if (!String(template.html).trim()) {
+      res.status(500).json({
+        error: "Gentle reminder template is empty in " +
+          "tbs/Pre-sets/" + location + "/" + location +
+          ".guests_gentle_reminder.",
+      });
+      return;
+    }
+
+    const firstName = String(
+      data.Name || data.name || data["First name"] || data.firstName || "",
+    ).trim();
+    const lastName = String(
+      data["Last name"] || data.lastName || data.LastName || "",
+    ).trim();
+    const guestName = pickGuestFirstAndLastName(data);
+    const invoiceUrl = String(
+      data["Stripe Invoice Url"] || data.stripeInvoiceUrl || "",
+    ).trim();
+    const invoiceNumber = String(
+      data["Stripe Invoice Number"] || "",
+    ).trim();
+    const tokens: Record<string, string> = {
+      "{{first_name}}": firstName,
+      "{{First name}}": firstName,
+      "{{Name}}": guestName,
+      "{{Last name}}": lastName,
+      "{{Current event}}": eventLabel,
+      "{{current_event}}": eventLabel,
+      "{{Event}}": eventLabel,
+      "{{Stripe Invoice Url}}": invoiceUrl,
+      "{{Stripe Invoice Number}}": invoiceNumber,
+    };
+    const html = fillGuestTemplateTokens(template.html, tokens);
+    const subject = (eventLabel ? eventLabel + " - Reminder" : "Reminder")
+      .replace(/[\r\n]/g, " ");
+
+    const accessToken = await refreshGmailSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    const logLine = guestLogGentleReminderLine();
+    await itemRef.set({
+      "Paid": "First notice",
+      "Log": FieldValue.arrayUnion(logLine),
+    }, {merge: true});
+
+    logger.info("sendGuestGentleReminderHttp ok", {
+      guestId,
+      to: email,
+      from: fromAddress,
+      location,
+    });
+
+    res.status(200).json({
+      ok: true,
+      guestId,
+      to: email,
+      from: fromAddress,
+      logLine,
+      message: guestName ?
+        "Payment reminder sent to " + guestName :
+        "Payment reminder sent.",
+    });
+  } catch (err) {
+    logger.error("sendGuestGentleReminderHttp failed", {guestId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send payment reminder.",
     });
   }
 });

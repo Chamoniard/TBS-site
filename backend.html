@@ -1392,7 +1392,8 @@
             margin: 0;
         }
 
-        #guest-editor #guest-editor-actions .guest-workflow-invite-row {
+        #guest-editor #guest-editor-actions .guest-workflow-invite-row,
+        #guest-editor #guest-editor-actions .guest-workflow-payment-row {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -1406,6 +1407,19 @@
 
         #guest-editor #guest-editor-actions .guest-workflow-invite-row.is-stacked {
             flex-direction: column;
+        }
+
+        /* Reminder hangs to the right and must not shift the payment step off the arrow. */
+        #guest-editor #guest-editor-actions .guest-workflow-payment-row {
+            position: relative;
+            width: auto;
+            min-width: var(--backend-workflow-btn-width);
+            max-width: 100%;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-payment-received-btn {
+            width: auto;
+            min-width: var(--backend-workflow-btn-width);
         }
 
         #guest-editor #guest-editor-actions .guest-workflow-invite-sep {
@@ -1450,8 +1464,8 @@
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled:not(.is-active):not(.is-awaiting-payment):not(.is-done):not(.guest-workflow-step-btn--applied),
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true']:not(.is-active):not(.is-awaiting-payment):not(.is-done):not(.guest-workflow-step-btn--applied) {
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn:disabled:not(.is-active):not(.is-awaiting-payment):not(.is-done):not(.guest-workflow-step-btn--applied):not(.guest-workflow-send-reminder-btn),
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn[aria-disabled='true']:not(.is-active):not(.is-awaiting-payment):not(.is-done):not(.guest-workflow-step-btn--applied):not(.guest-workflow-send-reminder-btn) {
             background: #f1f5f9;
             border: 1px solid #c5cdd4;
             color: #94a3b8;
@@ -1464,6 +1478,10 @@
         body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn:hover:not(:disabled):not([aria-disabled='true']) {
             transform: translateY(-2px);
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.guest-workflow-send-reminder-btn:hover:not(:disabled):not([aria-disabled='true']) {
+            transform: translateY(-2px);
         }
 
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn--applied,
@@ -1581,6 +1599,46 @@
             background: #ffffff;
             cursor: default;
             animation: guest-workflow-pulse-border-red 1.6s ease-in-out infinite;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-reminder-side {
+            position: absolute;
+            left: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            z-index: 1;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-send-reminder-btn,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-send-reminder-btn:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-send-reminder-btn[aria-disabled='true'] {
+            position: static;
+            left: auto;
+            top: auto;
+            transform: none;
+            width: auto;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-send-reminder-btn.is-active,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-send-reminder-btn.is-active:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-send-reminder-btn.is-active[aria-disabled='true'],
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-send-reminder-btn.is-active[aria-disabled='false'] {
+            background: #338a17;
+            border-color: #338a17;
+            color: #ffffff;
+            cursor: pointer;
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
+        }
+
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.guest-workflow-send-reminder-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
+            background: #338a17;
+            border-color: #338a17;
+            color: #ffffff;
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
         body.backend-page button.guest-editor-padlock-btn.is-angry-shake {
@@ -3127,6 +3185,8 @@
         body.backend-page #guest-editor #guest-editor-actions[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-to-reserves-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-to-reserves-sep[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-reminder-btn[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-reminder-side[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-send-invite-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #readisno[hidden],
         body.backend-page #guest-editor #guest-editor-actions #invitedisno[hidden],
@@ -6128,6 +6188,9 @@
             vertical-align: middle;
         }
 
+        #guest-editor .guests-list-table thead th:nth-child(1) .roster-name-inner,
+        #speaker-editor .speakers-roster-table thead th:nth-child(1) .roster-name-inner,
+        #team-editor .team-list-table thead th:nth-child(1) .roster-name-inner,
         #guest-editor .guests-list-table tbody td.guests-roster-name-cell .roster-name-inner,
         #speaker-editor .speakers-roster-table tbody td.speaker-roster-name-cell .roster-name-inner,
         #team-editor .team-list-table tbody td.team-roster-name-cell .roster-name-inner,
@@ -11970,9 +12033,17 @@
                                                     Send invoice
                                                 </button>
                                                 <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
+                                                <div class="guest-workflow-payment-row" id="guest-workflow-payment-row">
                                                 <button type="button" class="guest-workflow-step-btn" id="guest-workflow-payment-received-btn" disabled aria-disabled="true">
                                                     Payment received
                                                 </button>
+                                                <div class="guest-workflow-reminder-side" id="guest-workflow-reminder-side" hidden aria-hidden="true">
+                                                <span class="guest-workflow-step-arrow guest-workflow-reminder-arrow" aria-hidden="true">⬅</span>
+                                                <button type="button" class="guest-workflow-step-btn guest-workflow-send-reminder-btn" id="guest-workflow-send-reminder-btn" hidden aria-hidden="true" disabled aria-disabled="true">
+                                                    Send reminder
+                                                </button>
+                                                </div>
+                                                </div>
                                                 <div class="guest-workflow-step-arrow" aria-hidden="true">⬇</div>
                                                 <button type="button" class="guest-workflow-step-btn" id="guest-workflow-send-briefing-btn" disabled aria-disabled="true">
                                                     Send briefing
@@ -17133,7 +17204,7 @@
             return String(paidVal != null ? paidVal : '').trim().toLowerCase();
         }
 
-        /** Pending, Overdue, Overdue 30, or Overdue 60 — labels written from Stripe. */
+        /** Pending or Overdue — labels written from Stripe. Older Overdue 30 / Overdue 60 values still count. */
         function guestPaidIsStripeOpenLabel(paidVal) {
             var low = guestPaidLabelLow(paidVal);
             return (
@@ -17174,25 +17245,23 @@
             return n;
         }
 
-        /** Invoiced / direct-bank guests who are not Paid=Yes for Current event. */
+        /**
+         * Issued invoices (Invoiced Yes or Direct) that are not Paid=Yes.
+         * Every unpaid label counts: No, Pending, Overdue, First notice, and any later one.
+         * Paid=Cancelled is a closed invoice, not an outstanding payment.
+         */
         function countGuestsNotPaidForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
             var n = 0;
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
-                if (!guestBelongsOnPaidStatusBar(g)) continue;
+                if (!g || !guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
+                if (!guestHasIssuedInvoice(g)) continue;
                 if (guestPaidFieldIsYes(g.paid)) continue;
-                var low = guestPaidLabelLow(g.paid);
-                if (
-                    low === 'no' ||
-                    low === 'n' ||
-                    low === 'false' ||
-                    low === '' ||
-                    guestPaidIsStripeOpenLabel(g.paid)
-                ) {
-                    n++;
-                }
+                if (guestPaidIsCancelledPill(g.paid)) continue;
+                n++;
             }
             return n;
         }
@@ -17202,10 +17271,7 @@
             var paidN = countGuestsPaidForCurrentEvent();
             var notPaidN = countGuestsNotPaidForCurrentEvent();
             var pendingN = countGuestsWithPaidLabelForCurrentEvent('Pending');
-            var overdueN =
-                countGuestsWithPaidLabelForCurrentEvent('Overdue') +
-                countGuestsWithPaidLabelForCurrentEvent('Overdue 30') +
-                countGuestsWithPaidLabelForCurrentEvent('Overdue 60');
+            var overdueN = countGuestsWithPaidLabelForCurrentEvent('Overdue');
             return (
                 eventName +
                 ': ' +
@@ -18915,7 +18981,9 @@
             var html =
                 '<table class="team-list-table" role="grid" aria-label="Team">' +
                 '<thead><tr>' +
-                '<th scope="col">Name</th>' +
+                '<th scope="col">' +
+                rosterNameHeaderHtml('Name', rosterRowsAllSelected(teamRosterInMemory), 'team members') +
+                '</th>' +
                 '<th scope="col">Event</th>' +
                 '<th scope="col">Team</th>' +
                 '<th scope="col">Lodging</th>' +
@@ -23060,7 +23128,7 @@
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
-        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue 30', 'Overdue 60', 'Cancelled'];
+        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Cancelled'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_BRIEFED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -23117,7 +23185,9 @@
             for (var i = 0; i < keys.length; i++) {
                 var k = keys[i];
                 if (src[k] == null) continue;
-                out[k] = guestsFilterSelectedList(src[k]);
+                var selected = guestsFilterSelectedList(src[k]);
+                if (k === 'paid') selected = selected.map(normalizeGuestPaidFilterValue);
+                out[k] = guestsFilterSelectedList(selected);
             }
             return out;
         }
@@ -23209,14 +23279,24 @@
             return false;
         }
 
+        function normalizeGuestPaidFilterValue(item) {
+            var low = String(item || '').trim().toLowerCase();
+            if (low === 'overdue 30' || low === 'overdue 60') return 'Overdue';
+            return String(item || '').trim();
+        }
+
+        function guestPaidValueIsOverdue(paidVal) {
+            var low = String(paidVal != null ? paidVal : '').trim().toLowerCase();
+            return low === 'overdue' || low === 'overdue 30' || low === 'overdue 60';
+        }
+
         function guestPaidMatchesFilter(actual, selected) {
             if (guestFilterValueInList(actual, selected)) return true;
             var list = guestsFilterSelectedList(selected);
             if (!list.length) return true;
-            var low = String(actual != null ? actual : '').trim().toLowerCase();
-            if (low !== 'overdue') return false;
+            if (!guestPaidValueIsOverdue(actual)) return false;
             for (var i = 0; i < list.length; i++) {
-                if (guestsFilterValuesEqual(list[i], 'Overdue 30')) return true;
+                if (guestPaidValueIsOverdue(list[i])) return true;
             }
             return false;
         }
@@ -23378,6 +23458,8 @@
 
         var stripeInvoiceListCache = null;
         var stripeOverdueAlignPromise = null;
+        var guestInvoiceDueById = Object.create(null);
+        var guestInvoiceDueLoadIds = Object.create(null);
 
         function stripeInvoiceRaw(inv) {
             return inv && inv.stripe && typeof inv.stripe === 'object' ? inv.stripe : {};
@@ -23397,8 +23479,7 @@
             if (!isFinite(due) || due <= 0) return '';
             var now = Math.floor(Date.now() / 1000);
             if (due >= now) return '';
-            var days = Math.floor((now - due) / 86400);
-            return days >= 60 ? 'Overdue 60' : 'Overdue 30';
+            return 'Overdue';
         }
 
         function stripeInvoiceGuestId(inv) {
@@ -23510,8 +23591,8 @@
         }
 
         /**
-         * Label guests from Stripe's overdue rule so Overdue 30 + Overdue 60
-         * is every open invoice whose due date has passed.
+         * Label guests from Stripe's overdue rule: Paid is Overdue for every
+         * open invoice whose due date has passed.
          */
         function alignGuestRosterWithStripeOverdue(opts) {
             opts = opts || {};
@@ -23543,6 +23624,8 @@
                     var ids = Object.keys(best);
                     for (var c = 0; c < ids.length; c++) {
                         var choice = best[ids[c]];
+                        var paidNow = String(choice.guest.paid || '').trim().toLowerCase();
+                        if (paidNow === 'first notice') continue;
                         if (String(choice.guest.paid || '').trim() === choice.label) continue;
                         choice.guest.paid = choice.label;
                         changes.push(choice.guest);
@@ -23660,7 +23743,8 @@
                 low === 'false' ||
                 low === 'overdue' ||
                 low === 'overdue 30' ||
-                low === 'overdue 60'
+                low === 'overdue 60' ||
+                low === 'first notice'
             ) {
                 return ' content-badge--guest-status-no';
             }
@@ -24363,6 +24447,10 @@
             return guestLogYyMmDdPrefix() + ': Invitation emailed to guest.';
         }
 
+        function guestLogGentleReminderEmailedLine() {
+            return guestLogYyMmDdPrefix() + ': First reminder sent on ' + guestPaidDateYyyyMmDd() + '.';
+        }
+
         function guestLogInvoiceSentLine(invoiceId) {
             var idPart = invoiceId ? ' (' + String(invoiceId) + ')' : '';
             return guestLogYyMmDdPrefix() + ': Stripe invoice finalized and sent' + idPart + '.';
@@ -24706,7 +24794,7 @@
             return String(cancelledVal != null ? cancelledVal : '').trim().toLowerCase() === 'yes';
         }
 
-        /** Paid is unpaid: literal No, or Pending / Overdue / Overdue 30 / Overdue 60. */
+        /** Paid is unpaid: literal No, Pending, Overdue, or First notice. Older Overdue 30 / Overdue 60 values still count. */
         function guestPaidFieldIsNo(paidVal) {
             var low = String(paidVal != null ? paidVal : '').trim().toLowerCase();
             return (
@@ -24714,7 +24802,8 @@
                 low === 'pending' ||
                 low === 'overdue' ||
                 low === 'overdue 30' ||
-                low === 'overdue 60'
+                low === 'overdue 60' ||
+                low === 'first notice'
             );
         }
 
@@ -25009,6 +25098,96 @@
             }
         }
 
+        /**
+         * Send the gentle payment reminder via `sendGuestGentleReminderHttp`.
+         * Body is `guests_gentle_reminder` on `tbs/Pre-sets/{event_location}/{event_location}`.
+         * Sent as registration@tbs-zermatt.org. On success sets Paid to First notice.
+         */
+        async function sendGuestGentleReminderFromWorkflow() {
+            if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('guest-workflow-send-reminder-btn');
+            var id = String(guestFormEditingDocId || '').trim();
+            if (!id) {
+                if (typeof showStatus === 'function') showStatus('error', 'Select a guest first.');
+                return;
+            }
+            var rec = findGuestInMemory(id);
+            if (!rec || !guestPaidValueIsOverdue(rec.paid)) return;
+            var toRaw = rec.email != null ? String(rec.email).trim() : '';
+            var emailEl = document.getElementById('edit-guest-email');
+            if (!toRaw && emailEl) toRaw = String(emailEl.value || '').trim();
+            if (!toRaw || /[\r\n]/.test(toRaw) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toRaw)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'This guest has no valid E-mail address.');
+                }
+                return;
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending payment reminder...');
+            }
+            try {
+                var fnUrl =
+                    'https://us-central1-' +
+                    String(firebaseConfig.projectId || '').trim() +
+                    '.cloudfunctions.net/sendGuestGentleReminderHttp';
+                var res = await fetch(fnUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ guestId: id }),
+                });
+                var payload = {};
+                try {
+                    payload = await res.json();
+                } catch (parseErr) {
+                    payload = {};
+                }
+                if (!res.ok) {
+                    var errMsg =
+                        payload && payload.error
+                            ? String(payload.error)
+                            : 'Function call failed (' + res.status + ')';
+                    throw new Error(errMsg);
+                }
+                var logLine =
+                    payload && payload.logLine
+                        ? String(payload.logLine)
+                        : guestLogGentleReminderEmailedLine();
+                rec.paid = 'First notice';
+                rec.log = (Array.isArray(rec.log) ? rec.log.slice() : []).concat([logLine]);
+                renderGuestsRoster();
+                syncGuestWorkflowPaymentReceivedButton();
+                syncGuestInvoicedisnoBlock();
+                syncGuestManagementLogPanel();
+                updateGuestsOverwatchRegisteredCount();
+                var first = String(rec.name || '').trim();
+                var last = String(rec.lastName || '').trim();
+                var guestName = (first + ' ' + last).trim();
+                var sentOkMsg =
+                    payload && payload.message
+                        ? String(payload.message)
+                        : guestName
+                          ? 'Payment reminder sent to ' + guestName
+                          : 'Payment reminder sent.';
+                if (typeof showStatus === 'function') {
+                    showStatus('success', sentOkMsg);
+                }
+            } catch (err) {
+                console.error('sendGuestGentleReminderFromWorkflow:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to send payment reminder.'
+                    );
+                }
+            } finally {
+                syncGuestWorkflowPaymentReceivedButton();
+            }
+        }
+
         function syncGuestWorkflowSendInvoiceButton() {
             var btn = document.getElementById('guest-workflow-send-invoice-btn');
             if (!btn) return;
@@ -25072,8 +25251,25 @@
             return '';
         }
 
+        /** Date of the latest “First reminder sent” log line (YYYY-MM-DD). */
+        function guestFirstReminderDateLabelFromRecord(g) {
+            if (!g) return '';
+            var log = Array.isArray(g.log) ? g.log : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var line = String(log[i] != null ? log[i] : '');
+                var onDate = line.match(/First reminder sent on (\d{4}-\d{2}-\d{2})/i);
+                if (onDate) return onDate[1];
+                var m = line.match(
+                    /^(\d{2})(\d{2})(\d{2}):\s*(?:First reminder sent|Gentle reminder emailed)/i
+                );
+                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
+            }
+            return '';
+        }
+
         function syncGuestWorkflowPaymentReceivedButton() {
             var btn = document.getElementById('guest-workflow-payment-received-btn');
+            var reminderBtn = document.getElementById('guest-workflow-send-reminder-btn');
             if (!btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
@@ -25081,10 +25277,25 @@
             var awaiting = Boolean(
                 g && guestInvoicedFieldIsYes(g.invoiced) && guestPaidFieldIsNo(g.paid)
             );
+            var overdue = Boolean(g && guestPaidValueIsOverdue(g.paid));
+            var firstNotice = Boolean(
+                g && String(g.paid != null ? g.paid : '').trim().toLowerCase() === 'first notice'
+            );
             var label;
             if (paidDone) {
                 var dateLabel = guestPaidDateLabelFromRecord(g);
                 label = dateLabel ? 'Payment received ' + dateLabel : 'Payment received';
+            } else if (firstNotice) {
+                var reminderDate = guestFirstReminderDateLabelFromRecord(g) || '—';
+                label = 'First reminder sent ' + reminderDate;
+            } else if (awaiting && overdue) {
+                var overdueDays = guestOverdueDayCount(g);
+                if (overdueDays == null) {
+                    label = 'Overdue';
+                    ensureGuestInvoiceDueDate(g);
+                } else {
+                    label = 'Overdue by ' + overdueDays + (overdueDays === 1 ? ' day' : ' days');
+                }
             } else if (awaiting) {
                 label = 'Awaiting payment';
             } else {
@@ -25094,9 +25305,11 @@
             btn.setAttribute('aria-label', label);
             btn.setAttribute(
                 'title',
-                awaiting
-                    ? 'Check Stripe for this guest’s payment'
-                    : label
+                firstNotice
+                    ? label
+                    : awaiting
+                      ? 'Check Stripe for this guest’s payment'
+                      : label
             );
             // Clickable while awaiting so missed webhooks can be backfilled.
             btn.disabled = !awaiting;
@@ -25104,6 +25317,96 @@
             btn.classList.toggle('is-awaiting-payment', awaiting && !paidDone);
             btn.classList.toggle('is-active', false);
             btn.classList.toggle('is-done', paidDone);
+            var showReminder = Boolean(overdue && !paidDone);
+            var reminderCanRun = showReminder && guestPadlockIsOpen;
+            var reminderSide = document.getElementById('guest-workflow-reminder-side');
+            if (reminderSide) {
+                reminderSide.hidden = !showReminder;
+                reminderSide.setAttribute('aria-hidden', showReminder ? 'false' : 'true');
+            }
+            if (reminderBtn) {
+                reminderBtn.hidden = !showReminder;
+                reminderBtn.setAttribute('aria-hidden', showReminder ? 'false' : 'true');
+                reminderBtn.disabled = !showReminder;
+                reminderBtn.setAttribute('aria-disabled', reminderCanRun ? 'false' : 'true');
+                reminderBtn.classList.toggle('is-active', showReminder);
+                reminderBtn.textContent = 'Send reminder';
+                reminderBtn.setAttribute('aria-label', 'Send reminder');
+                reminderBtn.setAttribute('title', 'Send payment reminder');
+            }
+        }
+
+        function stripeInvoiceDueUnixFromList(list, invoiceId) {
+            if (!Array.isArray(list) || !invoiceId) return 0;
+            for (var i = 0; i < list.length; i++) {
+                if (String(list[i].id || '').trim() !== invoiceId) continue;
+                var raw = stripeInvoiceRaw(list[i]);
+                var due = Number(list[i].due_date != null ? list[i].due_date : raw.due_date);
+                if (isFinite(due) && due > 0) return due;
+            }
+            return 0;
+        }
+
+        function guestLinkedInvoiceDueUnix(g) {
+            var invoiceId = String(g && g.stripeInvoiceId || '').trim();
+            if (!invoiceId) return 0;
+            if (guestInvoiceDueById[invoiceId]) return guestInvoiceDueById[invoiceId];
+            var due = stripeInvoiceDueUnixFromList(stripeInvoiceListCache, invoiceId);
+            if (!due) due = stripeInvoiceDueUnixFromList(financesInvoicesInMemory, invoiceId);
+            if (due) guestInvoiceDueById[invoiceId] = due;
+            return due;
+        }
+
+        function guestOverdueDayCount(g) {
+            var due = guestLinkedInvoiceDueUnix(g);
+            if (!due) return null;
+            var days = Math.floor((Date.now() / 1000 - due) / 86400);
+            if (!isFinite(days)) return null;
+            if (days < 0) days = 0;
+            return days;
+        }
+
+        function ensureGuestInvoiceDueDate(g) {
+            var invoiceId = String(g && g.stripeInvoiceId || '').trim();
+            if (!invoiceId || guestInvoiceDueById[invoiceId] || guestInvoiceDueLoadIds[invoiceId]) return;
+            guestInvoiceDueLoadIds[invoiceId] = true;
+            function finish(due) {
+                delete guestInvoiceDueLoadIds[invoiceId];
+                var n = Number(due);
+                if (!isFinite(n) || n <= 0) return;
+                if (guestInvoiceDueById[invoiceId] === n) return;
+                guestInvoiceDueById[invoiceId] = n;
+                syncGuestWorkflowPaymentReceivedButton();
+            }
+            var db = null;
+            try {
+                db = getFirestore();
+            } catch (err) {
+                db = null;
+            }
+            if (!db) {
+                delete guestInvoiceDueLoadIds[invoiceId];
+                return;
+            }
+            db.collection('tbs').doc('Invoices').collection('items').doc(invoiceId).get()
+                .then(function (snap) {
+                    var data = snap && snap.exists ? snap.data() || {} : {};
+                    var due = Number(data.due_date);
+                    if (isFinite(due) && due > 0) {
+                        finish(due);
+                        return;
+                    }
+                    return fetchAllStripeInvoices(false).then(function (list) {
+                        finish(stripeInvoiceDueUnixFromList(list, invoiceId));
+                    });
+                })
+                .catch(function () {
+                    return fetchAllStripeInvoices(false).then(function (list) {
+                        finish(stripeInvoiceDueUnixFromList(list, invoiceId));
+                    }).catch(function () {
+                        delete guestInvoiceDueLoadIds[invoiceId];
+                    });
+                });
         }
 
         function reconcileGuestStripePaymentsFromUi(opts) {
@@ -26028,6 +26331,146 @@
             );
         }
 
+        function rosterRowsAllSelected(rows) {
+            if (!rows || !rows.length) return false;
+            for (var i = 0; i < rows.length; i++) {
+                if (!guestSelectedFieldIsYes(rows[i] && rows[i].selected)) return false;
+            }
+            return true;
+        }
+
+        function rosterNameHeaderHtml(title, allOn, noun) {
+            var on = !!allOn;
+            var n = noun || 'rows';
+            return (
+                '<div class="roster-name-inner">' +
+                '<button type="button" class="roster-name-check-btn roster-name-check-all-btn" aria-pressed="' +
+                (on ? 'true' : 'false') +
+                '" aria-label="' +
+                (on ? 'Uncheck all ' + n : 'Check all ' + n) +
+                '" title="' +
+                (on ? 'Uncheck all' : 'Check all') +
+                '">' +
+                '<span class="roster-name-check-mark" aria-hidden="true">✓</span>' +
+                '</button>' +
+                '<span class="roster-name-label">' +
+                escapeHtml(title) +
+                '</span></div>'
+            );
+        }
+
+        function paintRosterCheckButton(btn, on, noun, isAll) {
+            if (!btn) return;
+            var n = noun || 'row';
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            if (isAll) {
+                btn.setAttribute('aria-label', on ? 'Uncheck all ' + n : 'Check all ' + n);
+                btn.setAttribute('title', on ? 'Uncheck all' : 'Check all');
+                return;
+            }
+            btn.setAttribute('aria-label', on ? 'Uncheck ' + n : 'Check ' + n);
+            btn.setAttribute('title', on ? 'Checked' : 'Check');
+        }
+
+        function paintRosterChecksInRoot(root, on, noun) {
+            if (!root) return;
+            var singular = noun === 'guests' ? 'guest' : noun === 'speakers' ? 'speaker' : noun === 'team members' ? 'team member' : noun;
+            var buttons = root.querySelectorAll('.roster-name-check-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                var btn = buttons[i];
+                var isAll = btn.classList.contains('roster-name-check-all-btn');
+                paintRosterCheckButton(btn, on, isAll ? noun : singular, isAll);
+            }
+        }
+
+        function syncRosterCheckAllButton(root, rows, noun) {
+            if (!root) return;
+            paintRosterCheckButton(
+                root.querySelector('.roster-name-check-all-btn'),
+                rosterRowsAllSelected(rows),
+                noun,
+                true
+            );
+        }
+
+        function applyRosterSelectedToRows(rows, nextOn, store, markDirty) {
+            if (backenduserIsReadonly) return 0;
+            var changed = 0;
+            var want = !!nextOn;
+            for (var i = 0; i < rows.length; i++) {
+                var rec = rows[i];
+                if (!rec) continue;
+                var id = String(rec.id || '').trim();
+                if (!id) continue;
+                var currently = guestSelectedFieldIsYes(rec.selected);
+                if (store) {
+                    if (want) store[id] = true;
+                    else delete store[id];
+                }
+                if (currently === want) continue;
+                rec.selected = want ? 'Yes' : 'No';
+                if (typeof markDirty === 'function') markDirty(id);
+                changed += 1;
+            }
+            return changed;
+        }
+
+        function setGuestsRosterChecksForView(nextOn) {
+            if (backenduserIsReadonly) return;
+            var rows = guestsRosterRowsAfterFilter();
+            var changed = applyRosterSelectedToRows(
+                rows,
+                nextOn,
+                guestsRosterNameCheckedIds,
+                markGuestDocDirty
+            );
+            paintRosterChecksInRoot(
+                document.getElementById('guests-roster-items'),
+                !!(nextOn && rows.length),
+                'guests'
+            );
+            if (changed) scheduleGuestFirebaseSync();
+            syncGuestsBulkActionsView();
+        }
+
+        function setSpeakersRosterChecksForView(nextOn) {
+            if (backenduserIsReadonly) return;
+            var rows = speakerRosterRowsForView();
+            var changed = applyRosterSelectedToRows(
+                rows,
+                nextOn,
+                speakersRosterNameCheckedIds,
+                markSpeakerDocDirty
+            );
+            paintRosterChecksInRoot(
+                document.getElementById('speaker-roster-items'),
+                !!(nextOn && rows.length),
+                'speakers'
+            );
+            if (changed) scheduleSpeakerFirebaseSync();
+        }
+
+        function setTeamRosterChecksForView(nextOn) {
+            if (backenduserIsReadonly) return;
+            var rows = [];
+            for (var i = 0; i < teamRosterInMemory.length; i++) {
+                var rec = teamRosterInMemory[i];
+                if (rec && String(rec.id || '').trim()) rows.push(rec);
+            }
+            var changed = applyRosterSelectedToRows(
+                rows,
+                nextOn,
+                teamRosterNameCheckedIds,
+                markTeamDocDirty
+            );
+            paintRosterChecksInRoot(
+                document.getElementById('team-roster-items'),
+                !!(nextOn && rows.length),
+                'team members'
+            );
+            if (changed) scheduleTeamFirebaseSync();
+        }
+
         function rosterNameCheckHtml(store, docId, noun) {
             var id = String(docId || '').trim();
             var on = !!(store && id && store[id]);
@@ -26071,6 +26514,11 @@
             markGuestDocDirty(id);
             scheduleGuestFirebaseSync();
             syncGuestsBulkActionsView();
+            syncRosterCheckAllButton(
+                document.getElementById('guests-roster-items'),
+                guestsRosterRowsAfterFilter(),
+                'guests'
+            );
         }
 
         function rosterNameCheckHtmlFromSelected(docId, rec, noun) {
@@ -26114,6 +26562,11 @@
                 markSpeakerDocDirty,
                 scheduleSpeakerFirebaseSync
             );
+            syncRosterCheckAllButton(
+                document.getElementById('speaker-roster-items'),
+                speakerRosterRowsForView(),
+                'speakers'
+            );
         }
 
         function teamRosterNameCheckHtml(docId) {
@@ -26130,6 +26583,11 @@
                 'team member',
                 markTeamDocDirty,
                 scheduleTeamFirebaseSync
+            );
+            syncRosterCheckAllButton(
+                document.getElementById('team-roster-items'),
+                teamRosterInMemory,
+                'team members'
             );
         }
 
@@ -26247,7 +26705,13 @@
             var colCount = 9;
             var html = '<table class="guests-list-table" role="grid" aria-label="Guests roster">' +
                 '<thead><tr>' +
-                '<th scope="col">Guest name</th>' +
+                '<th scope="col">' +
+                rosterNameHeaderHtml(
+                    'Guest name',
+                    rosterRowsAllSelected(guestsRosterRowsAfterFilter()),
+                    'guests'
+                ) +
+                '</th>' +
                 '<th scope="col">Event</th>' +
                 '<th scope="col">Read</th>' +
                 '<th scope="col">Invited</th>' +
@@ -26783,7 +27247,13 @@
             var colCount = 12;
             var html = '<table class="speakers-roster-table" role="grid" aria-label="Speaker roster">' +
                 '<thead><tr>' +
-                '<th scope="col">Speaker name</th>' +
+                '<th scope="col">' +
+                rosterNameHeaderHtml(
+                    'Speaker name',
+                    rosterRowsAllSelected(speakerRosterRowsForView()),
+                    'speakers'
+                ) +
+                '</th>' +
                 '<th scope="col">Event</th>' +
                 '<th scope="col">Status</th>' +
                 '<th scope="col">Lodging</th>' +
@@ -32452,6 +32922,10 @@
                     if (nameCheckBtn && rosterItemsEl.contains(nameCheckBtn)) {
                         e.preventDefault();
                         e.stopPropagation();
+                        if (nameCheckBtn.classList.contains('roster-name-check-all-btn')) {
+                            setSpeakersRosterChecksForView(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            return;
+                        }
                         var checkRow = nameCheckBtn.closest('.speaker-roster-row');
                         var checkId = checkRow && checkRow.getAttribute('data-speaker-id');
                         if (checkId) toggleSpeakerRosterSelected(checkId, nameCheckBtn);
@@ -32914,6 +33388,23 @@
                             showStatus(
                                 'error',
                                 err && err.message ? err.message : 'Failed to send guest to reserves.'
+                            );
+                        }
+                    });
+                });
+            }
+            var guestWorkflowSendReminderBtn = document.getElementById('guest-workflow-send-reminder-btn');
+            if (guestWorkflowSendReminderBtn) {
+                guestWorkflowSendReminderBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowSendReminderBtn)) return;
+                    sendGuestGentleReminderFromWorkflow().catch(function(err) {
+                        console.error('guest-workflow-send-reminder:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to send payment reminder.'
                             );
                         }
                     });
@@ -33470,6 +33961,10 @@
                     if (nameCheckBtn && teamRosterItemsEl.contains(nameCheckBtn)) {
                         ev.preventDefault();
                         ev.stopPropagation();
+                        if (nameCheckBtn.classList.contains('roster-name-check-all-btn')) {
+                            setTeamRosterChecksForView(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            return;
+                        }
                         var checkRow = nameCheckBtn.closest('.team-roster-row');
                         var checkId = checkRow && checkRow.getAttribute('data-team-id');
                         if (checkId) toggleTeamRosterSelected(checkId, nameCheckBtn);
@@ -33857,6 +34352,10 @@
                     if (nameCheckBtn && guestsRosterItemsEl.contains(nameCheckBtn)) {
                         ev.preventDefault();
                         ev.stopPropagation();
+                        if (nameCheckBtn.classList.contains('roster-name-check-all-btn')) {
+                            setGuestsRosterChecksForView(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            return;
+                        }
                         var checkRow = nameCheckBtn.closest('.guests-roster-row');
                         var checkId = checkRow && checkRow.getAttribute('data-guests-id');
                         if (checkId) toggleGuestRosterSelected(checkId, nameCheckBtn);
