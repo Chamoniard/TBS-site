@@ -2578,8 +2578,56 @@
         }
 
         #guest-editor .guest-overwatch-bulk-count[hidden],
-        #guest-editor .guest-overwatch-body[hidden] {
+        #guest-editor .guest-overwatch-body[hidden],
+        #guest-editor .guest-overwatch-bulk[hidden] {
             display: none !important;
+        }
+
+        #guest-editor .guest-overwatch-bulk {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 16px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+
+        body.backend-page #guest-editor #guest-bulk-first-reminder-btn,
+        body.backend-page #guest-editor #guest-bulk-first-reminder-btn:disabled,
+        body.backend-page #guest-editor #guest-bulk-first-reminder-btn[aria-disabled='true'] {
+            width: auto;
+            max-width: 100%;
+            min-height: 35px;
+            margin: 0;
+            padding: 8px 16px;
+            border: 1px solid #c5cdd4;
+            border-radius: var(--backend-square-btn-radius);
+            background: #f1f5f9;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            white-space: nowrap;
+            cursor: not-allowed;
+            opacity: 1;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            animation: none;
+            transform: none;
+        }
+
+        body.backend-page #guest-editor #guest-bulk-first-reminder-btn.is-active,
+        body.backend-page #guest-editor #guest-bulk-first-reminder-btn.is-active[aria-disabled='false'] {
+            background: #338a17;
+            border-color: #338a17;
+            color: #ffffff;
+            opacity: 1;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
         #guest-editor .guest-overwatch-body {
@@ -12264,6 +12312,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="guest-overwatch-bulk" id="guest-overwatch-bulk" hidden aria-hidden="true">
+                                    <button type="button" class="guest-bulk-first-reminder-btn" id="guest-bulk-first-reminder-btn" disabled aria-disabled="true">Payment overdue. Send first reminder</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -13367,6 +13418,17 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" class="speaker-delete-cancel-btn" id="guest-cancel-no">No</button>
                 <button type="button" class="speaker-delete-yes-btn" id="guest-cancel-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="guest-bulk-reminder-confirm" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guest-bulk-reminder-confirm-title">
+        <div class="guest-delete-confirm__backdrop" id="guest-bulk-reminder-confirm-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <p id="guest-bulk-reminder-confirm-title">Send payment reminder to 0 guests?</p>
+            <div class="guest-delete-confirm__actions">
+                <button type="button" class="speaker-delete-cancel-btn" id="guest-bulk-reminder-cancel">Cancel</button>
+                <button type="button" class="speaker-delete-yes-btn" id="guest-bulk-reminder-yes">Yes</button>
             </div>
         </div>
     </div>
@@ -17031,13 +17093,36 @@
             return countDisplayedSelectedGuests() >= 2;
         }
 
+        /** Checkmarked guests in the current list. Guests hidden by the view, filter, or search are not included. */
+        function displayedSelectedGuestRecords() {
+            var rows = guestsRosterRowsAfterFilter();
+            var out = [];
+            for (var i = 0; i < rows.length; i++) {
+                if (guestSelectedFieldIsYes(rows[i] && rows[i].selected)) out.push(rows[i]);
+            }
+            return out;
+        }
+
+        /** Every checkmarked guest in the current list has Paid Overdue. */
+        function displayedSelectedGuestsAllOverdue() {
+            var rows = displayedSelectedGuestRecords();
+            if (rows.length < 2) return false;
+            for (var i = 0; i < rows.length; i++) {
+                if (!guestPaidValueIsOverdue(rows[i] && rows[i].paid)) return false;
+            }
+            return true;
+        }
+
         function applyGuestsBulkActionsChrome() {
             var bulk = guestsBulkActionsShouldShow();
             var n = countDisplayedSelectedGuests();
+            var allOverdue = bulk && displayedSelectedGuestsAllOverdue();
             var panel = document.getElementById('guest-overwatch-panel');
             var titleEl = document.getElementById('guest-overwatch-title');
             var countEl = document.getElementById('guest-overwatch-bulk-count');
             var statsBody = document.getElementById('guest-overwatch-body');
+            var bulkBody = document.getElementById('guest-overwatch-bulk');
+            var reminderBtn = document.getElementById('guest-bulk-first-reminder-btn');
             if (panel) {
                 panel.classList.toggle('is-bulk', bulk);
                 panel.setAttribute('aria-label', bulk ? 'Bulk actions' : 'Guest overview');
@@ -17051,6 +17136,15 @@
             if (statsBody) {
                 statsBody.hidden = bulk;
                 statsBody.setAttribute('aria-hidden', bulk ? 'true' : 'false');
+            }
+            if (bulkBody) {
+                bulkBody.hidden = !bulk;
+                bulkBody.setAttribute('aria-hidden', bulk ? 'false' : 'true');
+            }
+            if (reminderBtn) {
+                reminderBtn.disabled = !allOverdue;
+                reminderBtn.setAttribute('aria-disabled', allOverdue ? 'false' : 'true');
+                reminderBtn.classList.toggle('is-active', allOverdue);
             }
         }
 
@@ -21034,8 +21128,11 @@
                 renderContactsTable();
                 return;
             }
+            var contactSelectedSnap = rosterSelectedYesSnapshot(contactsRosterInMemory);
             try {
                 contactsRosterInMemory = await fetchContactsFromFirestore();
+                applyRosterSelectedYesSnapshot(contactsRosterInMemory, contactSelectedSnap);
+                rememberRosterSelectedYes(contactsRosterNameCheckedIds, contactsRosterInMemory);
                 contactsMemoryLoaded = true;
                 renderContactsTable();
             } catch (err) {
@@ -21166,7 +21263,10 @@
                 if (!silent && result.error === 'no-nteam' && typeof showStatus === 'function') {
                     showStatus('error', 'Team: missing nteam for ' + eventName + '.');
                 }
+                var teamSelectedSnap = rosterSelectedYesSnapshot(teamRosterInMemory);
                 var members = await fetchTeamMembersFromFirestore(eventName);
+                applyRosterSelectedYesSnapshot(members, teamSelectedSnap);
+                rememberRosterSelectedYes(teamRosterNameCheckedIds, members);
                 teamMemoryLoaded = true;
                 teamMemoryEventName = eventName;
                 if (!members.length && nteam < 1) {
@@ -22119,6 +22219,38 @@
         function guestSelectedFromDoc(d) {
             var s = guestCoalesceGuestItemFieldFromKeys(d, ['Selected', 'selected', 'SELECTED']);
             return guestSelectedFieldIsYes(s) ? 'Yes' : 'No';
+        }
+
+        /** Ids checked in this page session. A fresh load has none, so saved Selected values stay unchecked. */
+        function rosterSelectedYesSnapshot(list) {
+            var snap = Object.create(null);
+            if (!Array.isArray(list)) return snap;
+            for (var i = 0; i < list.length; i++) {
+                var rec = list[i];
+                var id = String(rec && rec.id || '').trim();
+                if (id && guestSelectedFieldIsYes(rec.selected)) snap[id] = true;
+            }
+            return snap;
+        }
+
+        function applyRosterSelectedYesSnapshot(list, snap) {
+            if (!Array.isArray(list)) return;
+            for (var i = 0; i < list.length; i++) {
+                var rec = list[i];
+                if (!rec) continue;
+                var id = String(rec.id || '').trim();
+                rec.selected = id && snap && snap[id] ? 'Yes' : 'No';
+            }
+        }
+
+        function rememberRosterSelectedYes(store, list) {
+            if (!store) return;
+            Object.keys(store).forEach(function (key) { delete store[key]; });
+            if (!Array.isArray(list)) return;
+            for (var i = 0; i < list.length; i++) {
+                var id = String(list[i] && list[i].id || '').trim();
+                if (id && guestSelectedFieldIsYes(list[i].selected)) store[id] = true;
+            }
         }
 
         /** Firestore `tbs/Guests/{guestId}/item` field **Attended** (Yes/No). */
@@ -25098,8 +25230,111 @@
             }
         }
 
+        function guestRosterDisplayName(rec) {
+            var first = String(rec && rec.name || '').trim();
+            var last = String(rec && rec.lastName || '').trim();
+            return (first + ' ' + last).trim();
+        }
+
+        function guestReminderRecipientEmail(rec, useEditorFallback) {
+            var toRaw = rec && rec.email != null ? String(rec.email).trim() : '';
+            if (!toRaw && useEditorFallback) {
+                var emailEl = document.getElementById('edit-guest-email');
+                if (emailEl) toRaw = String(emailEl.value || '').trim();
+            }
+            if (!toRaw || /[\r\n]/.test(toRaw) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toRaw)) return '';
+            return toRaw;
+        }
+
         /**
          * Send the gentle payment reminder via `sendGuestGentleReminderHttp`.
+         * On success sets Paid to First notice and appends the reminder log line.
+         * Does not change any other guest.
+         */
+        async function postGuestGentleReminder(rec) {
+            var id = String(rec && rec.id || '').trim();
+            if (!id) throw new Error('Select a guest first.');
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/sendGuestGentleReminderHttp';
+            var res = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ guestId: id }),
+            });
+            var payload = {};
+            try {
+                payload = await res.json();
+            } catch (parseErr) {
+                payload = {};
+            }
+            if (!res.ok) {
+                var errMsg =
+                    payload && payload.error
+                        ? String(payload.error)
+                        : 'Function call failed (' + res.status + ')';
+                throw new Error(errMsg);
+            }
+            var logLine =
+                payload && payload.logLine
+                    ? String(payload.logLine)
+                    : guestLogGentleReminderEmailedLine();
+            var stored = findGuestInMemory(id) || rec;
+            stored.paid = 'First notice';
+            stored.log = (Array.isArray(stored.log) ? stored.log.slice() : []).concat([logLine]);
+            if (rec && rec !== stored) {
+                rec.paid = stored.paid;
+                rec.log = stored.log.slice();
+            }
+            return payload;
+        }
+
+        /** True when this guest is still in the roster view, filter, and search. */
+        function guestShowsInCurrentRoster(rec) {
+            var id = String(rec && rec.id || '').trim();
+            if (!id) return false;
+            var rows = guestsRosterRowsAfterFilter();
+            for (var i = 0; i < rows.length; i++) {
+                if (String(rows[i] && rows[i].id || '').trim() === id) return true;
+            }
+            return false;
+        }
+
+        function clearGuestRosterCheck(rec) {
+            if (!rec) return;
+            rec.selected = 'No';
+            var id = String(rec.id || '').trim();
+            if (id) delete guestsRosterNameCheckedIds[id];
+        }
+
+        /**
+         * After reminders, drop checks on guests the current filter now hides,
+         * then redraw the roster from that filter.
+         */
+        function syncGuestRosterAfterBulkReminder(targets) {
+            var list = Array.isArray(targets) ? targets : [];
+            for (var i = 0; i < list.length; i++) {
+                var rec = list[i];
+                var stored = rec ? (findGuestInMemory(rec.id) || rec) : null;
+                if (!stored) continue;
+                if (String(stored.paid || '').trim().toLowerCase() !== 'first notice') continue;
+                if (guestShowsInCurrentRoster(stored)) continue;
+                clearGuestRosterCheck(stored);
+            }
+            renderGuestsRoster();
+        }
+
+        function refreshGuestReminderUiAfterSend() {
+            renderGuestsRoster();
+            syncGuestWorkflowPaymentReceivedButton();
+            syncGuestInvoicedisnoBlock();
+            syncGuestManagementLogPanel();
+            updateGuestsOverwatchRegisteredCount();
+        }
+
+        /**
+         * Send the gentle payment reminder for the open guest.
          * Body is `guests_gentle_reminder` on `tbs/Pre-sets/{event_location}/{event_location}`.
          * Sent as registration@tbs-zermatt.org. On success sets Paid to First notice.
          */
@@ -25113,10 +25348,7 @@
             }
             var rec = findGuestInMemory(id);
             if (!rec || !guestPaidValueIsOverdue(rec.paid)) return;
-            var toRaw = rec.email != null ? String(rec.email).trim() : '';
-            var emailEl = document.getElementById('edit-guest-email');
-            if (!toRaw && emailEl) toRaw = String(emailEl.value || '').trim();
-            if (!toRaw || /[\r\n]/.test(toRaw) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toRaw)) {
+            if (!guestReminderRecipientEmail(rec, true)) {
                 if (typeof showStatus === 'function') {
                     showStatus('error', 'This guest has no valid E-mail address.');
                 }
@@ -25130,42 +25362,9 @@
                 showStatus('loading', 'Sending payment reminder...');
             }
             try {
-                var fnUrl =
-                    'https://us-central1-' +
-                    String(firebaseConfig.projectId || '').trim() +
-                    '.cloudfunctions.net/sendGuestGentleReminderHttp';
-                var res = await fetch(fnUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ guestId: id }),
-                });
-                var payload = {};
-                try {
-                    payload = await res.json();
-                } catch (parseErr) {
-                    payload = {};
-                }
-                if (!res.ok) {
-                    var errMsg =
-                        payload && payload.error
-                            ? String(payload.error)
-                            : 'Function call failed (' + res.status + ')';
-                    throw new Error(errMsg);
-                }
-                var logLine =
-                    payload && payload.logLine
-                        ? String(payload.logLine)
-                        : guestLogGentleReminderEmailedLine();
-                rec.paid = 'First notice';
-                rec.log = (Array.isArray(rec.log) ? rec.log.slice() : []).concat([logLine]);
-                renderGuestsRoster();
-                syncGuestWorkflowPaymentReceivedButton();
-                syncGuestInvoicedisnoBlock();
-                syncGuestManagementLogPanel();
-                updateGuestsOverwatchRegisteredCount();
-                var first = String(rec.name || '').trim();
-                var last = String(rec.lastName || '').trim();
-                var guestName = (first + ' ' + last).trim();
+                var payload = await postGuestGentleReminder(rec);
+                refreshGuestReminderUiAfterSend();
+                var guestName = guestRosterDisplayName(rec);
                 var sentOkMsg =
                     payload && payload.message
                         ? String(payload.message)
@@ -25185,6 +25384,104 @@
                 }
             } finally {
                 syncGuestWorkflowPaymentReceivedButton();
+            }
+        }
+
+        var guestBulkReminderConfirmResolver = null;
+
+        function closeGuestBulkReminderConfirm(accepted) {
+            var dlg = document.getElementById('guest-bulk-reminder-confirm');
+            if (dlg) {
+                dlg.hidden = true;
+                dlg.setAttribute('aria-hidden', 'true');
+            }
+            var resolve = guestBulkReminderConfirmResolver;
+            guestBulkReminderConfirmResolver = null;
+            if (typeof resolve === 'function') resolve(!!accepted);
+        }
+
+        function confirmGuestBulkReminder(count) {
+            return new Promise(function (resolve) {
+                var dlg = document.getElementById('guest-bulk-reminder-confirm');
+                var titleEl = document.getElementById('guest-bulk-reminder-confirm-title');
+                if (!dlg) {
+                    resolve(false);
+                    return;
+                }
+                if (typeof guestBulkReminderConfirmResolver === 'function') {
+                    guestBulkReminderConfirmResolver(false);
+                }
+                guestBulkReminderConfirmResolver = resolve;
+                if (titleEl) titleEl.textContent = 'Send payment reminder to ' + count + ' guests?';
+                dlg.hidden = false;
+                dlg.setAttribute('aria-hidden', 'false');
+                var cancel = document.getElementById('guest-bulk-reminder-cancel');
+                if (cancel) cancel.focus();
+            });
+        }
+
+        /**
+         * Bulk actions: same reminder email and Paid / log changes as the individual button,
+         * for checkmarked guests only.
+         */
+        async function sendBulkGuestFirstReminders() {
+            if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('guest-bulk-first-reminder-btn');
+            if (!btn || !btn.classList.contains('is-active')) return;
+            var selected = displayedSelectedGuestRecords();
+            if (!displayedSelectedGuestsAllOverdue() || selected.length < 2) return;
+            var targets = selected.slice();
+            if (!(await confirmGuestBulkReminder(targets.length))) return;
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+            btn.classList.remove('is-active');
+            var sent = 0;
+            var failures = [];
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending payment reminder...');
+            }
+            try {
+                for (var i = 0; i < targets.length; i++) {
+                    var rec = targets[i];
+                    var guestName = guestRosterDisplayName(rec) || 'Guest';
+                    if (!rec || !guestPaidValueIsOverdue(rec.paid)) continue;
+                    if (!guestReminderRecipientEmail(rec, false)) {
+                        failures.push(guestName + ' has no valid E-mail address.');
+                        continue;
+                    }
+                    try {
+                        await postGuestGentleReminder(rec);
+                        sent += 1;
+                    } catch (err) {
+                        failures.push(
+                            guestName + ': ' +
+                            (err && err.message ? err.message : 'Failed to send payment reminder.')
+                        );
+                    }
+                }
+            } finally {
+                syncGuestRosterAfterBulkReminder(targets);
+                syncGuestWorkflowPaymentReceivedButton();
+                syncGuestInvoicedisnoBlock();
+                syncGuestManagementLogPanel();
+                updateGuestsOverwatchRegisteredCount();
+            }
+            if (typeof showStatus === 'function') {
+                if (!failures.length) {
+                    showStatus(
+                        'success',
+                        'Payment reminder sent to ' + sent + (sent === 1 ? ' guest.' : ' guests.')
+                    );
+                } else if (sent > 0) {
+                    showStatus(
+                        'error',
+                        'Payment reminder sent to ' + sent +
+                        (sent === 1 ? ' guest. ' : ' guests. ') +
+                        failures[0]
+                    );
+                } else {
+                    showStatus('error', failures[0] || 'Failed to send payment reminder.');
+                }
             }
         }
 
@@ -26920,6 +27217,7 @@
         async function fetchAllGuestsIntoMemory(opts) {
             opts = opts || {};
             if (guestsMemoryLoaded && !opts.force) return;
+            var guestSelectedSnap = rosterSelectedYesSnapshot(guestsRosterInMemory);
             guestsRosterLoadError = '';
             var itemsEl = document.getElementById('guests-roster-items');
             if (opts.showLoading && itemsEl) {
@@ -26945,6 +27243,7 @@
                     guestsRosterInMemory = [];
                     guestsRosterAllInMemory = [];
                     guestsMemoryLoaded = true;
+                    rememberRosterSelectedYes(guestsRosterNameCheckedIds, []);
                     renderGuestsRoster();
                     return;
                 }
@@ -26952,6 +27251,8 @@
                 if (!list || !list.length) {
                     list = await fetchCurrentEventGuestsByKnownIds(db, guestsParentSnap);
                 }
+                applyRosterSelectedYesSnapshot(list, guestSelectedSnap);
+                rememberRosterSelectedYes(guestsRosterNameCheckedIds, list);
                 guestsRosterInMemory = list;
                 guestsRosterAllInMemory = list;
                 guestsRosterSortInPlace();
@@ -26963,6 +27264,7 @@
                 guestsRosterAllInMemory = [];
                 guestsMemoryLoaded = false;
                 updateBackendCurrentEventDisplay();
+                rememberRosterSelectedYes(guestsRosterNameCheckedIds, []);
             }
             renderGuestsRoster();
             if (guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
@@ -26999,6 +27301,7 @@
         }
 
         async function fetchSpeakersForSelectedEvent() {
+            var speakerSelectedSnap = rosterSelectedYesSnapshot(speakerRosterInMemory);
             speakerDirtyDocIds = Object.create(null);
             if (speakerSyncTimer) {
                 clearTimeout(speakerSyncTimer);
@@ -27017,11 +27320,13 @@
                     console.warn('fetchSpeakersForSelectedEvent events:', evErr);
                 }
                 if (!String(current_event || '').trim()) {
+                    rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
                     renderSpeakerRoster();
                     return;
                 }
                 var ids = await listSpeakerIdsUnderTbsSpeakers(db);
                 if (!ids.length) {
+                    rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
                     renderSpeakerRoster();
                     return;
                 }
@@ -27045,11 +27350,14 @@
                         }
                     }
                 }
+                applyRosterSelectedYesSnapshot(list, speakerSelectedSnap);
+                rememberRosterSelectedYes(speakersRosterNameCheckedIds, list);
                 speakerRosterInMemory = list;
                 speakerRosterSortInPlace();
             } catch (err) {
                 console.error('fetchSpeakersForSelectedEvent:', err);
                 speakerRosterInMemory = [];
+                rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
             }
             renderSpeakerRoster();
         }
@@ -33410,6 +33718,22 @@
                     });
                 });
             }
+            var guestBulkFirstReminderBtn = document.getElementById('guest-bulk-first-reminder-btn');
+            if (guestBulkFirstReminderBtn) {
+                guestBulkFirstReminderBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    sendBulkGuestFirstReminders().catch(function(err) {
+                        console.error('guest-bulk-first-reminder:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to send payment reminder.'
+                            );
+                        }
+                    });
+                });
+            }
             var speakerConfirmSpeakerBtn = document.getElementById('speaker-confirm-speaker-btn');
             if (speakerConfirmSpeakerBtn) {
                 speakerConfirmSpeakerBtn.addEventListener('click', function(ev) {
@@ -34980,6 +35304,24 @@
                     openGuestCancelConfirmModal();
                 });
             }
+            var guestBulkReminderCancel = document.getElementById('guest-bulk-reminder-cancel');
+            var guestBulkReminderYes = document.getElementById('guest-bulk-reminder-yes');
+            var guestBulkReminderBackdrop = document.getElementById('guest-bulk-reminder-confirm-backdrop');
+            if (guestBulkReminderCancel) {
+                guestBulkReminderCancel.addEventListener('click', function () {
+                    closeGuestBulkReminderConfirm(false);
+                });
+            }
+            if (guestBulkReminderBackdrop) {
+                guestBulkReminderBackdrop.addEventListener('click', function () {
+                    closeGuestBulkReminderConfirm(false);
+                });
+            }
+            if (guestBulkReminderYes) {
+                guestBulkReminderYes.addEventListener('click', function () {
+                    closeGuestBulkReminderConfirm(true);
+                });
+            }
             var guestCancelNo = document.getElementById('guest-cancel-no');
             var guestCancelYes = document.getElementById('guest-cancel-yes');
             var guestCancelBackdrop = document.getElementById('guest-cancel-confirm-backdrop');
@@ -35056,6 +35398,12 @@
                 if (guestCancelDlg && !guestCancelDlg.hidden) {
                     ev.preventDefault();
                     closeGuestCancelConfirmModal();
+                    return;
+                }
+                var guestReminderDlg = document.getElementById('guest-bulk-reminder-confirm');
+                if (guestReminderDlg && !guestReminderDlg.hidden) {
+                    ev.preventDefault();
+                    closeGuestBulkReminderConfirm(false);
                     return;
                 }
                 var teamDlg = document.getElementById('team-delete-confirm');
