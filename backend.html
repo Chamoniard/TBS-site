@@ -6,8 +6,6 @@
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
     <title>Backend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1201,7 +1199,7 @@
             overflow: hidden;
         }
 
-        #guest-editor .guests-list-heading .edit-guest-top-trailing,
+        #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
@@ -6745,7 +6743,7 @@
             box-sizing: border-box;
         }
 
-        #guest-editor .guests-list-heading .edit-guest-top-trailing,
+        #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top .edit-guest-top-trailing,
@@ -6769,6 +6767,7 @@
             border-bottom: none;
         }
 
+        #guest-editor .guests-list-heading .guests-roster-table-spacer,
         #guest-editor .edit-guest-top .edit-guest-top-spacer,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
@@ -6778,6 +6777,7 @@
             display: none;
         }
 
+        #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .edit-guest-top .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
@@ -6787,6 +6787,9 @@
             flex: 1 1 auto;
         }
 
+        #guest-editor .guests-list-heading .guests-roster-table-title,
+        #guest-editor .guests-list-heading .guests-roster-table-event,
+        #guest-editor .guests-list-heading .guests-roster-table-label,
         #guest-editor .edit-guest-top .selected-guestname,
         #guest-editor .edit-guest-top .edit-guest-name-first,
         #guest-editor .edit-guest-top .edit-guest-name-last,
@@ -6812,6 +6815,8 @@
         }
 
         /* Flag sits in the trailing side; name is left-aligned (spacer unused). */
+        #guest-editor .guests-list-heading .guests-roster-table-spacer,
+        #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .edit-guest-top-spacer,
         #guest-editor .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
@@ -6829,6 +6834,7 @@
             min-height: 0;
         }
 
+        #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
@@ -6854,6 +6860,70 @@
             display: none !important;
         }
 
+        #guest-editor .guests-list-heading .guests-roster-table-view-link {
+            margin: 0 0 0 1.5rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #94a3b8;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #guest-editor .guests-list-heading .guests-roster-table-view-link.is-active {
+            color: #000000;
+        }
+
+        #guest-editor .guests-list-heading button.guests-roster-table-title {
+            appearance: none;
+            background: none;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            cursor: pointer;
+        }
+
+        #guest-editor .guests-list-heading .guests-roster-table-title:not(.is-active),
+        #guest-editor .guests-list-heading .guests-roster-table-title:not(.is-active) .guests-roster-table-event,
+        #guest-editor .guests-list-heading .guests-roster-table-title:not(.is-active) .guests-roster-table-label {
+            color: #94a3b8;
+        }
+
+        #speaker-editor #speakers-list-heading .speakers-roster-view-link {
+            margin: 0 0 0 1.5rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #94a3b8;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #speaker-editor #speakers-list-heading .speakers-roster-view-link.is-active {
+            color: #000000;
+        }
+
+        #speaker-editor #speakers-list-heading #speakers-roster-all-link {
+            cursor: pointer;
+        }
+
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname:not(.is-active),
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname:not(.is-active) .edit-guest-name-first,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname:not(.is-active) .edit-guest-name-last {
+            color: #94a3b8;
+        }
+
+        #guest-editor .guests-list-heading .guests-roster-table-title-wrap,
         #guest-editor .edit-guest-top .selected-guestname-wrap,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
@@ -6940,6 +7010,7 @@
             box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.2);
         }
 
+        #guest-editor .guests-roster-table-title,
         #guest-editor .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
@@ -6959,7 +7030,7 @@
             max-width: 100%;
         }
 
-        #guest-editor .guests-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #guest-editor .guests-list > .edit-guest-top.guests-list-heading .guests-roster-table-title,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
@@ -7957,6 +8028,8 @@
             word-break: break-word;
         }
 
+        #guest-editor .guests-roster-table-event,
+        #guest-editor .guests-roster-table-label,
         #guest-editor .edit-guest-name-first,
         #guest-editor .edit-guest-name-last,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
@@ -8674,6 +8747,7 @@
         }
 
         .edit-speaker-name-heading,
+        .guests-roster-table-title,
         .selected-guestname,
         .selected-contactname,
         .selected-teamname {
@@ -8692,6 +8766,8 @@
 
         .edit-speaker-name-first,
         .edit-speaker-name-last,
+        .guests-roster-table-event,
+        .guests-roster-table-label,
         .edit-guest-name-first,
         .edit-guest-name-last,
         .edit-contact-name-first,
@@ -11410,10 +11486,11 @@
                         <div class="edit-guest-top guests-list-heading speakers-list-top" id="speakers-list-heading">
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
-                                <div class="selected-guestname" role="group" aria-label="Speakers list title">
+                                <div class="selected-guestname is-active" id="speakers-roster-all-link" role="button" tabindex="0" aria-pressed="true" aria-label="Speakers list">
                                     <span class="edit-guest-name-first" id="speakers-list-heading-event" aria-live="polite">—</span>
                                     <span class="edit-guest-name-last" id="speakers-list-heading-suffix">speakers</span>
                                 </div>
+                                <a class="speakers-roster-view-link" id="speakers-roster-ideas-link" href="#" aria-pressed="false">Ideas</a>
                             </div>
                             <div class="edit-guest-top-trailing">
                             <div id="speakers-actions" class="speakers-actions" aria-label="Speaker actions">
@@ -11726,15 +11803,17 @@
                         <div class="guests-bottom-track" id="guests-bottom-track">
                         <div class="guests-list guests-list--roster" id="guests-list" aria-label="Guests list">
                             <div class="edit-guest-top guests-list-heading" id="guests-list-heading">
-                                <div class="edit-guest-top-spacer" aria-hidden="true"></div>
-                                <div class="selected-guestname-wrap">
-                                    <div class="selected-guestname" role="group" aria-label="Guests list title">
-                                        <span class="edit-guest-name-first" id="guests-list-heading-event" aria-live="polite">—</span>
-                                        <span class="edit-guest-name-last" id="guests-list-heading-suffix">guests</span>
-                                    </div>
+                                <div class="guests-roster-table-spacer" aria-hidden="true"></div>
+                                <div class="guests-roster-table-title-wrap">
+                                    <button type="button" class="guests-roster-table-title is-active" id="guests-roster-all-link" aria-pressed="true" aria-label="Guests list">
+                                        <span class="guests-roster-table-event" id="guests-list-heading-event" aria-live="polite">—</span>
+                                        <span class="guests-roster-table-label" id="guests-list-heading-suffix">guests</span>
+                                    </button>
+                                    <a class="guests-roster-table-view-link" id="guests-roster-waitlist-link" href="#" aria-pressed="false">Wait-list</a>
+                                    <a class="guests-roster-table-view-link" id="guests-roster-cancelled-link" href="#" aria-pressed="false">Cancelled</a>
                                     <span class="guests-roster-filter-note" id="guests-roster-filter-note" hidden aria-hidden="true"></span>
                                 </div>
-                                <div class="edit-guest-top-trailing">
+                                <div class="guests-roster-table-trailing">
                                 <div id="guests-actions" class="guests-actions" aria-label="Guests actions">
                                     <input
                                         type="search"
@@ -13351,6 +13430,8 @@
         let selectedevent = '';
         /** In-memory roster (+ inviteStatus, titlesStatus, travel, cme, refunded) */
         let speakerRosterInMemory = [];
+        /** Speakers heading view: '' current-event speakers, or 'ideas'. */
+        var speakersRosterView = '';
         /** In-memory roster for Guests tab. */
         let guestsRosterInMemory = [];
         let guestsRosterAllInMemory = [];
@@ -13526,6 +13607,8 @@
         };
         /** Live case-insensitive guests roster name search (local only). */
         var guestsRosterSearchQuery = '';
+        /** Roster heading view: '' all guests, 'waitlist', or 'cancelled'. */
+        var guestsRosterView = '';
         /** In-memory rows for Content tab; Image URL is read for editor preview only (Alt-image omitted). */
         let contentRosterInMemory = [];
         let contentFormEditingDocId = '';
@@ -23155,12 +23238,42 @@
             var src = guestsRosterSourceForFilter();
             var filterActive = guestsFilterIsActive(guestsFilterSettings);
             var searchActive = String(guestsRosterSearchQuery || '').trim() !== '';
-            if (!filterActive && !searchActive) return src.slice();
+            var view = String(guestsRosterView || '');
             return src.filter(function (g) {
+                if (view === 'waitlist') {
+                    if (!guestRosterIsWaitList(g)) return false;
+                } else if (view === 'cancelled') {
+                    if (!guestCancelledFieldIsYes(g.cancelled)) return false;
+                } else if (guestRosterIsWaitList(g) || guestCancelledFieldIsYes(g.cancelled)) {
+                    return false;
+                }
                 if (filterActive && !guestMatchesFilterSettings(g, guestsFilterSettings)) return false;
                 if (searchActive && !guestMatchesRosterSearch(g, guestsRosterSearchQuery)) return false;
                 return true;
             });
+        }
+
+        function syncGuestsRosterViewLinks() {
+            var view = String(guestsRosterView || '');
+            var allLink = document.getElementById('guests-roster-all-link');
+            var waitLink = document.getElementById('guests-roster-waitlist-link');
+            var cancelLink = document.getElementById('guests-roster-cancelled-link');
+            function mark(el, on) {
+                if (!el) return;
+                el.classList.toggle('is-active', on);
+                el.setAttribute('aria-pressed', on ? 'true' : 'false');
+            }
+            mark(allLink, view !== 'waitlist' && view !== 'cancelled');
+            mark(waitLink, view === 'waitlist');
+            mark(cancelLink, view === 'cancelled');
+        }
+
+        function setGuestsRosterView(next) {
+            var view = String(next || '');
+            if (view !== 'waitlist' && view !== 'cancelled') view = '';
+            if (view === guestsRosterView) return;
+            guestsRosterView = view;
+            renderGuestsRoster();
         }
 
         function fillGuestsFilterChecks(container, values, selected) {
@@ -26094,20 +26207,6 @@
             );
         }
 
-        function guestRosterSectionRowHtml(title) {
-            return (
-                '<tr class="guests-roster-row guests-roster-blank-row guests-roster-section-row">' +
-                '<td class="guests-roster-section-title-cell" colspan="9">' +
-                escapeHtml(title) +
-                '</td>' +
-                '</tr>'
-            );
-        }
-
-        function guestRosterBlankRowHtml() {
-            return guestRosterSectionRowHtml('');
-        }
-
         function syncGuestsRosterFilterNote() {
             var note = document.getElementById('guests-roster-filter-note');
             if (!note) return;
@@ -26181,26 +26280,39 @@
             } else {
                 var filteredGuests = guestsRosterRowsAfterFilter();
                 if (!filteredGuests.length) {
+                    var emptyViewMsg = 'No guests match the current filter.';
+                    if (
+                        guestsRosterView === 'waitlist' &&
+                        !guestsFilterIsActive(guestsFilterSettings) &&
+                        !String(guestsRosterSearchQuery || '').trim()
+                    ) {
+                        emptyViewMsg = 'No guests on the wait-list.';
+                    } else if (
+                        guestsRosterView === 'cancelled' &&
+                        !guestsFilterIsActive(guestsFilterSettings) &&
+                        !String(guestsRosterSearchQuery || '').trim()
+                    ) {
+                        emptyViewMsg = 'No cancelled guests.';
+                    } else if (
+                        guestsRosterView !== 'waitlist' &&
+                        guestsRosterView !== 'cancelled' &&
+                        !guestsFilterIsActive(guestsFilterSettings) &&
+                        !String(guestsRosterSearchQuery || '').trim()
+                    ) {
+                        emptyViewMsg = 'No guests listed for this event.';
+                    }
                     html +=
                         '<tr class="guests-roster-row">' +
                         '<td class="guests-roster-empty" colspan="' +
                         colCount +
-                        '">No guests match the current filter.</td>' +
+                        '">' +
+                        escapeHtml(emptyViewMsg) +
+                        '</td>' +
                         '</tr>';
                 } else {
-                    var waitListSpacerInserted = false;
-                    var cancelledSpacerInserted = false;
                     for (var i = 0; i < filteredGuests.length; i++) {
                         var g = filteredGuests[i];
                         var isWaitList = guestRosterIsWaitList(g);
-                        if (isWaitList && !waitListSpacerInserted) {
-                            html += guestRosterSectionRowHtml('WAIT-LIST');
-                            waitListSpacerInserted = true;
-                        }
-                        if (guestCancelledFieldIsYes(g.cancelled) && !cancelledSpacerInserted) {
-                            html += guestRosterSectionRowHtml('CANCELLED');
-                            cancelledSpacerInserted = true;
-                        }
                         var guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
                         if (!guestLabel) guestLabel = '-';
                         var eventLabel = String(g.event || '').trim();
@@ -26248,9 +26360,6 @@
                         }
                         html += '</tr>';
                     }
-                    if (cancelledSpacerInserted) {
-                        html += guestRosterBlankRowHtml();
-                    }
                 }
             }
             html += '</tbody></table>';
@@ -26262,6 +26371,7 @@
             syncGuestInvoicedisnoBlock();
             syncGuestManagementLogPanel();
             updateGuestsListHeadingDisplay();
+            syncGuestsRosterViewLinks();
             syncFilterGuestsButtonBadge();
             syncGuestsBulkActionsView();
         }
@@ -26508,6 +26618,37 @@
             }
         }
 
+        function speakerRosterRowsForView() {
+            var src = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory : [];
+            var ideas = speakersRosterView === 'ideas';
+            var out = [];
+            for (var i = 0; i < src.length; i++) {
+                var potential = speakerEventIsPotential(src[i]);
+                if (ideas ? potential : !potential) out.push(src[i]);
+            }
+            return out;
+        }
+
+        function syncSpeakersRosterViewLinks() {
+            var ideas = speakersRosterView === 'ideas';
+            var allLink = document.getElementById('speakers-roster-all-link');
+            var ideasLink = document.getElementById('speakers-roster-ideas-link');
+            function mark(el, on) {
+                if (!el) return;
+                el.classList.toggle('is-active', on);
+                el.setAttribute('aria-pressed', on ? 'true' : 'false');
+            }
+            mark(allLink, !ideas);
+            mark(ideasLink, ideas);
+        }
+
+        function setSpeakersRosterView(next) {
+            var view = String(next || '') === 'ideas' ? 'ideas' : '';
+            if (view === speakersRosterView) return;
+            speakersRosterView = view;
+            renderSpeakerRoster();
+        }
+
         function findSpeakerRosterIndexById(docId) {
             return rosterIndexOfId(speakerRosterInMemory, docId);
         }
@@ -26515,9 +26656,18 @@
         function updateSpeakerNavButtons() {
             var prevBtn = document.getElementById('previous-speaker');
             var nextBtn = document.getElementById('next-speaker');
-            var n = speakerRosterInMemory.length;
+            var visible = speakerRosterRowsForView();
+            var n = visible.length;
             var id = String(speakerFormEditingDocId || '').trim();
-            var idx = id && id !== '_init' ? findSpeakerRosterIndexById(id) : -1;
+            var idx = -1;
+            if (id && id !== '_init') {
+                for (var i = 0; i < visible.length; i++) {
+                    if (String(visible[i].id || '') === id) {
+                        idx = i;
+                        break;
+                    }
+                }
+            }
             var canPrev = idx > 0;
             var canNext = idx >= 0 && idx < n - 1;
             if (n <= 1 || !id || id === '_init' || idx < 0) {
@@ -26538,11 +26688,18 @@
             syncAddSpeakerFormToMemoryIfEditing();
             var id = String(speakerFormEditingDocId || '').trim();
             if (!id || id === '_init') return;
-            var idx = findSpeakerRosterIndexById(id);
+            var visible = speakerRosterRowsForView();
+            var idx = -1;
+            for (var i = 0; i < visible.length; i++) {
+                if (String(visible[i].id || '') === id) {
+                    idx = i;
+                    break;
+                }
+            }
             if (idx < 0) return;
             var nextIdx = idx + delta;
-            if (nextIdx < 0 || nextIdx >= speakerRosterInMemory.length) return;
-            var s = speakerRosterInMemory[nextIdx];
+            if (nextIdx < 0 || nextIdx >= visible.length) return;
+            var s = visible[nextIdx];
             speakerPadlockIsOpen = false;
             populateEditSpeakerFormFromRecord(s);
             syncSpeakerRosterSelectionHighlight();
@@ -26652,19 +26809,21 @@
                     '</td>' +
                     '</tr>';
             } else {
-            var speakerIdeasHeaderInserted = false;
-            for (var i = 0; i < speakerRosterInMemory.length; i++) {
-                var s = speakerRosterInMemory[i];
-                if (speakerEventIsPotential(s) && !speakerIdeasHeaderInserted) {
-                    html +=
-                        '<tr class="speaker-roster-row speaker-roster-blank-row">' +
-                        '<td colspan="' + colCount + '">&nbsp;</td></tr>' +
-                        '<tr class="speaker-roster-row speaker-roster-blank-row speaker-roster-section-row">' +
-                        '<td class="speaker-roster-section-title-cell" colspan="' + colCount + '">' +
-                        '<span class="speaker-roster-section-title-label">SPEAKER IDEAS</span>' +
-                        '</td></tr>';
-                    speakerIdeasHeaderInserted = true;
-                }
+            var visibleSpeakers = speakerRosterRowsForView();
+            if (!visibleSpeakers.length) {
+                var emptyViewMsg = speakersRosterView === 'ideas'
+                    ? 'No speaker ideas.'
+                    : 'No speakers listed for this event.';
+                html += '<tr class="speaker-roster-row">' +
+                    '<td class="speaker-roster-empty" colspan="' +
+                    colCount +
+                    '">' +
+                    escapeHtml(emptyViewMsg) +
+                    '</td>' +
+                    '</tr>';
+            } else {
+            for (var i = 0; i < visibleSpeakers.length; i++) {
+                var s = visibleSpeakers[i];
                 var label = (String(s.firstName || '').trim() + ' ' + String(s.lastName || '').trim()).trim();
                 if (!label) label = s.id;
                 if (speakerEventIsPotential(s)) {
@@ -26750,11 +26909,13 @@
                     '</td></tr>';
             }
             }
+            }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
             syncSpeakerRosterSelectionHighlight();
             updateAddSpeakerDeleteButtonState();
             updateSpeakerNavButtons();
+            syncSpeakersRosterViewLinks();
             renderProgrammeSpeakersTable();
             if (speakersOverwatchOpen) updateSpeakersOverwatchCount();
         }
@@ -32590,6 +32751,24 @@
                     });
                 });
             }
+            var speakersRosterAllLink = document.getElementById('speakers-roster-all-link');
+            if (speakersRosterAllLink) {
+                speakersRosterAllLink.addEventListener('click', function () {
+                    setSpeakersRosterView('');
+                });
+                speakersRosterAllLink.addEventListener('keydown', function (ev) {
+                    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+                    ev.preventDefault();
+                    setSpeakersRosterView('');
+                });
+            }
+            var speakersRosterIdeasLink = document.getElementById('speakers-roster-ideas-link');
+            if (speakersRosterIdeasLink) {
+                speakersRosterIdeasLink.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    setSpeakersRosterView('ideas');
+                });
+            }
             var guestsOverwatchBtn = document.getElementById('guests-overwatch-btn');
             if (guestsOverwatchBtn) {
                 guestsOverwatchBtn.addEventListener('click', function (ev) {
@@ -32620,6 +32799,26 @@
                         guestsRosterSearchQuery = '';
                         renderGuestsRoster();
                     }
+                });
+            }
+            var guestsRosterAllLink = document.getElementById('guests-roster-all-link');
+            if (guestsRosterAllLink) {
+                guestsRosterAllLink.addEventListener('click', function () {
+                    setGuestsRosterView('');
+                });
+            }
+            var guestsRosterWaitlistLink = document.getElementById('guests-roster-waitlist-link');
+            if (guestsRosterWaitlistLink) {
+                guestsRosterWaitlistLink.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    setGuestsRosterView('waitlist');
+                });
+            }
+            var guestsRosterCancelledLink = document.getElementById('guests-roster-cancelled-link');
+            if (guestsRosterCancelledLink) {
+                guestsRosterCancelledLink.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    setGuestsRosterView('cancelled');
                 });
             }
             var guestsFilterBackdrop = document.getElementById('guests-filter-popup-backdrop');
