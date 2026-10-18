@@ -4896,6 +4896,9 @@
 
         #content-editor .content-editor-featured-btn .content-roster-featured-col-star {
             color: #94a3b8;
+            display: inline-block;
+            width: auto;
+            text-align: center;
         }
 
         #content-editor .content-editor-featured-btn.is-active .content-roster-featured-col-star {
@@ -5216,39 +5219,45 @@
         }
 
         #content-editor .content-roster-table th.content-roster-featured-col,
-        #content-editor .content-list-table th.content-roster-featured-col {
-            width: 1%;
-            max-width: none;
-            min-width: min-content;
+        #content-editor .content-list-table th.content-roster-featured-col,
+        #content-editor .content-roster-table td.content-roster-featured-cell,
+        #content-editor .content-list-table td.content-roster-featured-cell {
+            width: 2.25rem;
+            min-width: 2.25rem;
+            max-width: 2.25rem;
+            box-sizing: border-box;
             white-space: nowrap;
             text-align: center;
             vertical-align: middle;
-            padding-left: 4px;
-            padding-right: 4px;
+            padding-left: 0;
+            padding-right: 0;
         }
 
         #content-editor .content-roster-featured-col-star {
-            color: #94a3b8;
+            color: var(--backend-button-yellow);
             font-size: 1.15rem;
             line-height: 1;
             display: inline-block;
         }
 
-        #content-editor .content-roster-table td.content-roster-featured-cell,
-        #content-editor .content-list-table td.content-roster-featured-cell {
-            width: 1%;
-            max-width: min-content;
+        #content-editor .content-list-table th.content-roster-featured-col .content-roster-featured-col-star,
+        #content-editor .content-roster-table th.content-roster-featured-col .content-roster-featured-col-star {
+            display: block;
+            width: 100%;
             text-align: center;
-            vertical-align: middle;
-            padding-left: 4px;
-            padding-right: 4px;
         }
 
         #content-editor .content-roster-featured-star {
-            color: #FECB00;
+            color: #94a3b8;
             font-size: 1.15rem;
             line-height: 1;
-            display: inline-block;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        #content-editor .content-roster-featured-star.is-featured {
+            color: var(--backend-button-yellow);
         }
 
         #content-editor .content-roster-table th.content-roster-published-col,
@@ -5567,21 +5576,28 @@
             display: none;
         }
 
+        /* Name matches a single Type / Event pill column (badge + its right margin + cell padding). */
         #content-editor .content-roster-table th.content-roster-name-col,
-        #content-editor .content-list-table th.content-roster-name-col {
-            max-width: 200px;
-        }
-
+        #content-editor .content-list-table th.content-roster-name-col,
         #content-editor .content-roster-table td.content-roster-name-col,
-        #content-editor .content-list-table td.content-roster-name-col {
-            max-width: 200px;
-            min-width: 0;
+        #content-editor .content-list-table td.content-roster-name-col,
+        #content-editor .content-roster-table th.content-roster-type-col,
+        #content-editor .content-list-table th.content-roster-type-col,
+        #content-editor .content-roster-table td.content-roster-type-col,
+        #content-editor .content-list-table td.content-roster-type-col,
+        #content-editor .content-roster-table th.content-roster-event-col,
+        #content-editor .content-list-table th.content-roster-event-col,
+        #content-editor .content-roster-table td.content-roster-event-col,
+        #content-editor .content-list-table td.content-roster-event-col {
+            width: calc(var(--content-badge-width) + 4px + (2 * var(--backend-table-cell-pad-x)));
+            min-width: calc(var(--content-badge-width) + 4px + (2 * var(--backend-table-cell-pad-x)));
+            max-width: calc(var(--content-badge-width) + 4px + (2 * var(--backend-table-cell-pad-x)));
             box-sizing: border-box;
         }
 
         #content-editor .content-roster-name-truncate {
             display: block;
-            max-width: 200px;
+            max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -5609,16 +5625,25 @@
         }
 
         /* Content tab alignment:
-           - Date / Name / Title: left aligned
-           - Type / Event / Topics: centered
-           - Featured / Published already have explicit centering rules above */
+           - Name / Title: left aligned
+           - Date header and date pills, Type / Event / Topics, Featured stars: centered */
         #content-editor .content-roster-table thead th:nth-child(1),
         #content-editor .content-list-table thead th:nth-child(1) {
             text-align: left;
         }
+        #content-editor .content-roster-table th.content-roster-date-col,
+        #content-editor .content-list-table th.content-roster-date-col,
         #content-editor .content-roster-table td.content-roster-date-cell,
         #content-editor .content-list-table td.content-roster-date-cell {
-            text-align: left;
+            width: calc(var(--content-badge-width) + (2 * var(--backend-table-cell-pad-x)));
+            min-width: calc(var(--content-badge-width) + (2 * var(--backend-table-cell-pad-x)));
+            max-width: calc(var(--content-badge-width) + (2 * var(--backend-table-cell-pad-x)));
+            box-sizing: border-box;
+            text-align: center;
+        }
+        #content-editor .content-list-table .content-badge.content-badge--date,
+        #content-editor .content-roster-table .content-badge.content-badge--date {
+            margin: 0;
         }
         #content-editor .content-roster-table th.content-roster-name-col,
         #content-editor .content-list-table th.content-roster-name-col,
@@ -5654,17 +5679,24 @@
             text-align: left;
         }
 
+        #content-editor .content-roster-table th.content-roster-topics-col,
+        #content-editor .content-list-table th.content-roster-topics-col,
         #content-editor .content-roster-table td.content-badge-cell.content-badge-cell--topics,
         #content-editor .content-list-table td.content-badge-cell.content-badge-cell--topics {
+            width: max-content;
+            max-width: max-content;
             white-space: nowrap;
+        }
+
+        #content-editor .content-roster-table td.content-badge-cell.content-badge-cell--topics,
+        #content-editor .content-list-table td.content-badge-cell.content-badge-cell--topics {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            overflow: visible;
         }
 
         /* Topic / Type / Event share `#content-editor .content-badge` chrome; modifiers only set colours. */
@@ -5761,7 +5793,9 @@
         #content-editor .content-roster-table .content-badge.content-badge--event-tbs25,
         #content-editor .content-roster-table .content-badge.content-badge--event-tbs26,
         #content-editor .content-roster-table .content-badge.content-badge--event-tbs27,
-        #content-editor .content-roster-table .content-badge.content-badge--event-default {
+        #content-editor .content-roster-table .content-badge.content-badge--event-default,
+        #content-editor .content-list-table .content-badge.content-badge--date,
+        #content-editor .content-roster-table .content-badge.content-badge--date {
             background: var(--backend-roster-status-yes-bg);
             color: var(--backend-roster-status-yes-color);
         }
@@ -6081,7 +6115,8 @@
         /* Pack guest columns to the left; headers + pills stay centered in each column. */
         #guest-editor .guests-roster-items,
         #team-editor .team-roster-items,
-        #emailer-editor .contacts-roster-items {
+        #emailer-editor .contacts-roster-items,
+        #content-editor .content-list-items {
             width: max-content;
             min-width: max-content;
             margin-right: auto;
@@ -6110,6 +6145,13 @@
             color: #0f172a;
             font-family: 'Inter', sans-serif;
             table-layout: auto;
+        }
+
+        /* Content roster packs to its columns so Topics does not absorb leftover panel width. */
+        #content-editor .content-list-table,
+        #content-editor .content-roster-table {
+            width: max-content;
+            min-width: max-content;
         }
 
         .speakers-roster-table th,
@@ -6146,6 +6188,18 @@
             position: sticky;
             top: 0;
             z-index: 2;
+        }
+
+        /* Restate after the shared left-align above so these headers stay centered. */
+        #content-editor .content-roster-table th.content-roster-date-col,
+        #content-editor .content-list-table th.content-roster-date-col,
+        #content-editor .content-roster-table td.content-roster-date-cell,
+        #content-editor .content-list-table td.content-roster-date-cell,
+        #content-editor .content-roster-table th.content-roster-featured-col,
+        #content-editor .content-list-table th.content-roster-featured-col,
+        #content-editor .content-roster-table td.content-roster-featured-cell,
+        #content-editor .content-list-table td.content-roster-featured-cell {
+            text-align: center;
         }
 
         /* Speaker roster: center all column headers except "Speaker name" (1st column). */
@@ -6969,6 +7023,19 @@
 
         #guest-editor .guests-list-heading .guests-roster-filter-note[hidden] {
             display: none !important;
+        }
+
+        #speaker-editor #speakers-list-heading .speakers-roster-filter-note {
+            margin-left: 0.65rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #94a3b8;
+            white-space: nowrap;
         }
 
         #guest-editor .guests-list-heading .guests-roster-table-view-link {
@@ -11602,6 +11669,7 @@
                                     <span class="edit-guest-name-last" id="speakers-list-heading-suffix">speakers</span>
                                 </div>
                                 <a class="speakers-roster-view-link" id="speakers-roster-ideas-link" href="#" aria-pressed="false">Ideas</a>
+                                <span class="speakers-roster-filter-note" id="speakers-roster-filter-note" aria-live="polite">(n=0)</span>
                             </div>
                             <div class="edit-guest-top-trailing">
                             <div id="speakers-actions" class="speakers-actions" aria-label="Speaker actions">
@@ -27399,6 +27467,12 @@
             return out;
         }
 
+        function syncSpeakersRosterFilterNote() {
+            var note = document.getElementById('speakers-roster-filter-note');
+            if (!note) return;
+            note.textContent = '(n=' + speakerRosterRowsForView().length + ')';
+        }
+
         function syncSpeakersRosterViewLinks() {
             var ideas = speakersRosterView === 'ideas';
             var allLink = document.getElementById('speakers-roster-all-link');
@@ -27527,6 +27601,7 @@
         }
 
         function renderSpeakerRoster() {
+            syncSpeakersRosterFilterNote();
             var itemsEl = document.getElementById('speaker-roster-items');
             var addBtn = document.getElementById('add-speaker-button');
             speakersStatusArmedDocId = '';
@@ -29904,20 +29979,25 @@
                 '<thead><tr>' +
                 '<th scope="col" class="content-roster-title-col">Title</th>' +
                 '<th scope="col" class="content-roster-name-col">Name</th>' +
-                '<th scope="col">Date</th>' +
+                '<th scope="col" class="content-roster-date-col">Date</th>' +
                 '<th scope="col" class="content-roster-featured-col" aria-label="Featured" title="Featured"><span class="content-roster-featured-col-star" aria-hidden="true">★</span></th>' +
                 '<th scope="col" class="content-roster-published-col">Published</th>' +
-                '<th scope="col">Type</th>' +
-                '<th scope="col">Event</th>' +
-                '<th scope="col">Topics</th>' +
+                '<th scope="col" class="content-roster-type-col">Type</th>' +
+                '<th scope="col" class="content-roster-event-col">Event</th>' +
+                '<th scope="col" class="content-roster-topics-col">Topics</th>' +
                 '</tr></thead><tbody>';
             for (var j = 0; j < contentRosterInMemory.length; j++) {
                 var r = contentRosterInMemory[j];
                 if (r && r.localOnly === true) continue;
+                var featuredOn = r.featured === true;
                 var featuredCell =
-                    r.featured === true
-                        ? '<span class="content-roster-featured-star" title="Featured" aria-label="Featured">★</span>'
-                        : '';
+                    '<span class="content-roster-featured-star' +
+                    (featuredOn ? ' is-featured' : '') +
+                    '" title="' +
+                    (featuredOn ? 'Featured' : 'Not featured') +
+                    '" aria-label="' +
+                    (featuredOn ? 'Featured' : 'Not featured') +
+                    '">★</span>';
                 var pubOn = r.published === true;
                 var pubLabel = pubOn ? 'Published: yes' : 'Published: no';
                 var pubTitle = pubOn ? 'Published — click to unpublish' : 'Not published — click to publish';
@@ -29936,6 +30016,10 @@
                 var typeCell = contentTypeBadgeHtml(r.type);
                 var eventCell = contentEventBadgesHtml(r.event);
                 var topicsCell = contentTopicsBadgesHtml(r.topic);
+                var dateLabel = formatContentDateForDisplay(r.date);
+                var dateCell = dateLabel
+                    ? '<span class="content-badge content-badge--date">' + escapeHtml(dateLabel) + '</span>'
+                    : '';
                 html +=
                     '<tr class="content-roster-row" data-content-id="' +
                     escapeHtml(r.id) +
@@ -29953,7 +30037,7 @@
                     escapeHtml(r.name != null ? String(r.name) : '') +
                     '</span></td>' +
                     '<td class="content-roster-date-cell">' +
-                    escapeHtml(formatContentDateForDisplay(r.date)) +
+                    dateCell +
                     '</td>' +
                     '<td class="content-roster-featured-cell">' +
                     featuredCell +
@@ -29961,10 +30045,10 @@
                     '<td class="content-roster-published-cell">' +
                     publishedCell +
                     '</td>' +
-                    '<td class="content-badge-cell">' +
+                    '<td class="content-badge-cell content-roster-type-col">' +
                     (typeCell || '&nbsp;') +
                     '</td>' +
-                    '<td class="content-badge-cell">' +
+                    '<td class="content-badge-cell content-roster-event-col">' +
                     (eventCell || '&nbsp;') +
                     '</td>' +
                     '<td class="content-badge-cell content-badge-cell--topics">' +
