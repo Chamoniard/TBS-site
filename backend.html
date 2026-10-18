@@ -26965,16 +26965,14 @@
         function syncGuestsRosterFilterNote() {
             var note = document.getElementById('guests-roster-filter-note');
             if (!note) return;
-            if (!guestsFilterIsActive(guestsFilterSettings)) {
-                note.hidden = true;
-                note.textContent = '';
-                note.setAttribute('aria-hidden', 'true');
-                return;
-            }
             var shown = guestsRosterRowsAfterFilter().length;
-            var total = countGuestsRegisteredForCurrentEvent();
             note.hidden = false;
             note.setAttribute('aria-hidden', 'false');
+            if (!guestsFilterIsActive(guestsFilterSettings)) {
+                note.textContent = '(n=' + shown + ')';
+                return;
+            }
+            var total = countGuestsRegisteredForCurrentEvent();
             note.textContent = '(Filtered ' + shown + ' out of ' + total + ')';
         }
 
