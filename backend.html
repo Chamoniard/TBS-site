@@ -13725,6 +13725,17 @@
         </div>
     </div>
 
+    <div id="content-delete-confirm" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="content-delete-confirm-title">
+        <div class="guest-delete-confirm__backdrop" id="content-delete-confirm-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <p id="content-delete-confirm-title">Delete this content?</p>
+            <div class="guest-delete-confirm__actions">
+                <button type="button" class="speaker-delete-cancel-btn" id="content-delete-cancel">Cancel</button>
+                <button type="button" class="speaker-delete-yes-btn" id="content-delete-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
     <div id="guests-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guests-filter-popup-title">
         <div class="guests-filter-popup__backdrop" id="guests-filter-popup-backdrop"></div>
         <div class="guests-filter-popup__box">
@@ -28957,6 +28968,7 @@
         }
 
         async function deleteSelectedContentRecord() {
+            closeContentDeleteConfirmModal();
             var docId = String(contentFormEditingDocId || '').trim();
             if (!docId) return;
             var rec = findContentInMemory(docId);
@@ -29002,6 +29014,27 @@
                     showStatus('error', err && err.message ? err.message : 'Failed to delete selected content.');
                 }
             }
+        }
+
+        function openContentDeleteConfirmModal() {
+            var dlg = document.getElementById('content-delete-confirm');
+            if (!dlg) return;
+            var titleEl = document.getElementById('content-delete-confirm-title');
+            var id = String(contentFormEditingDocId || '').trim();
+            var rec = findContentInMemory(id);
+            var title = rec && rec.title != null ? String(rec.title).trim() : '';
+            if (titleEl) titleEl.textContent = title ? 'Delete ' + title + '?' : 'Delete this content?';
+            dlg.hidden = false;
+            dlg.setAttribute('aria-hidden', 'false');
+            var cancel = document.getElementById('content-delete-cancel');
+            if (cancel) cancel.focus();
+        }
+
+        function closeContentDeleteConfirmModal() {
+            var dlg = document.getElementById('content-delete-confirm');
+            if (!dlg) return;
+            dlg.hidden = true;
+            dlg.setAttribute('aria-hidden', 'true');
         }
 
         function syncContentDeleteButtonUi(hasSelection, canEdit) {
@@ -30246,9 +30279,9 @@
                 '<table class="content-list-table content-roster-table" role="grid" aria-label="Content list">' +
                 '<thead><tr>' +
                 '<th scope="col" class="content-roster-title-col">Title</th>' +
+                '<th scope="col" class="content-roster-featured-col" aria-label="Featured" title="Featured"><span class="content-roster-featured-col-star" aria-hidden="true">★</span></th>' +
                 '<th scope="col" class="content-roster-name-col">Name</th>' +
                 '<th scope="col" class="content-roster-date-col">Date</th>' +
-                '<th scope="col" class="content-roster-featured-col" aria-label="Featured" title="Featured"><span class="content-roster-featured-col-star" aria-hidden="true">★</span></th>' +
                 '<th scope="col" class="content-roster-published-col">Published</th>' +
                 '<th scope="col" class="content-roster-type-col">Type</th>' +
                 '<th scope="col" class="content-roster-event-col">Event</th>' +
@@ -30306,14 +30339,14 @@
                     '">' +
                     escapeHtml(r.title != null ? String(r.title) : '') +
                     '</span></td>' +
+                    '<td class="content-roster-featured-cell">' +
+                    featuredCell +
+                    '</td>' +
                     '<td class="content-roster-name-col">' +
                     nameCell +
                     '</td>' +
                     '<td class="content-roster-date-cell">' +
                     dateCell +
-                    '</td>' +
-                    '<td class="content-roster-featured-cell">' +
-                    featuredCell +
                     '</td>' +
                     '<td class="content-roster-published-cell">' +
                     publishedCell +
@@ -35295,17 +35328,25 @@
             }
             var contentDeleteBtn = document.getElementById('content-editor-delete-btn');
             if (contentDeleteBtn) {
-                contentDeleteBtn.addEventListener('click', async function () {
+                contentDeleteBtn.addEventListener('click', function () {
                     if (contentDeleteBtn.disabled) return;
-                    if (!contentDeleteConfirmArmed) {
-                        contentDeleteConfirmArmed = true;
-                        syncContentEditabilityFromPadlock();
-                        if (typeof showStatus === 'function') {
-                            showStatus('info', 'Press Confirm delete again to delete selected content.');
-                        }
-                        return;
-                    }
-                    await deleteSelectedContentRecord();
+                    var id = String(contentFormEditingDocId || '').trim();
+                    if (!id) return;
+                    openContentDeleteConfirmModal();
+                });
+            }
+            var contentDeleteCancel = document.getElementById('content-delete-cancel');
+            var contentDeleteYes = document.getElementById('content-delete-yes');
+            var contentDeleteBackdrop = document.getElementById('content-delete-confirm-backdrop');
+            if (contentDeleteCancel) {
+                contentDeleteCancel.addEventListener('click', closeContentDeleteConfirmModal);
+            }
+            if (contentDeleteBackdrop) {
+                contentDeleteBackdrop.addEventListener('click', closeContentDeleteConfirmModal);
+            }
+            if (contentDeleteYes) {
+                contentDeleteYes.addEventListener('click', function () {
+                    deleteSelectedContentRecord();
                 });
             }
             var contentToolbarPublishBtn = document.getElementById('content-toolbar-publish-btn');
@@ -35759,6 +35800,12 @@
                 if (guestDlg && !guestDlg.hidden) {
                     ev.preventDefault();
                     closeGuestDeleteConfirmModal();
+                    return;
+                }
+                var contentDlg = document.getElementById('content-delete-confirm');
+                if (contentDlg && !contentDlg.hidden) {
+                    ev.preventDefault();
+                    closeContentDeleteConfirmModal();
                     return;
                 }
                 var guestCancelDlg = document.getElementById('guest-cancel-confirm');
