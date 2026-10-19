@@ -2337,7 +2337,8 @@
             outline: none;
         }
 
-        #guest-editor .guests-actions .guests-roster-search {
+        #guest-editor .guests-actions .guests-roster-search,
+        #content-editor .content-actions .content-roster-search {
             flex: 0 1 11rem;
             width: 11rem;
             min-width: 7rem;
@@ -2358,11 +2359,13 @@
             outline: none;
         }
 
-        #guest-editor .guests-actions .guests-roster-search::placeholder {
+        #guest-editor .guests-actions .guests-roster-search::placeholder,
+        #content-editor .content-actions .content-roster-search::placeholder {
             color: #94a3b8;
         }
 
-        #guest-editor .guests-actions .guests-roster-search:focus {
+        #guest-editor .guests-actions .guests-roster-search:focus,
+        #content-editor .content-actions .content-roster-search:focus {
             border-color: #003153;
             box-shadow: 0 0 0 2px rgba(113, 199, 254, 0.35);
         }
@@ -3466,6 +3469,53 @@
             word-break: break-word;
         }
 
+        #emailer-editor .contacts-list-heading .emailer-roster-title-wrap {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            min-width: 0;
+        }
+
+        #emailer-editor .contacts-list-heading .emailer-roster-view-link {
+            appearance: none;
+            display: inline-flex;
+            align-items: center;
+            flex: 0 0 auto;
+            width: auto;
+            height: auto;
+            min-width: 0;
+            min-height: 0;
+            max-width: none;
+            max-height: none;
+            background: none;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #94a3b8;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #emailer-editor .contacts-list-heading .emailer-roster-view-link + .emailer-roster-view-link {
+            margin-left: 1.5rem;
+        }
+
+        #emailer-editor .contacts-list-heading .emailer-roster-view-link.is-active {
+            color: #000000;
+        }
+
         #emailer-editor .selected-contactname {
             flex-direction: row;
             flex-wrap: wrap;
@@ -4109,8 +4159,8 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
-            flex: 0 0 auto;
+            justify-content: flex-end;
+            flex: 1 1 auto;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
@@ -4546,7 +4596,9 @@
         }
 
         #team-editor .team-list-heading .team-roster-count {
-            margin-left: 0.65rem;
+            margin: 0;
+            flex: 0 0 auto;
+            align-self: center;
             font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
             font-weight: 400;
@@ -7195,7 +7247,8 @@
             justify-content: flex-end;
         }
 
-        #guest-editor .guests-list-heading .guests-roster-filter-note {
+        #guest-editor .guests-list-heading .guests-roster-filter-note,
+        #content-editor .content-list-top .content-roster-filter-note {
             margin: 0;
             flex: 0 0 auto;
             align-self: center;
@@ -7207,7 +7260,8 @@
             white-space: nowrap;
         }
 
-        #guest-editor .guests-list-heading .guests-roster-filter-note[hidden] {
+        #guest-editor .guests-list-heading .guests-roster-filter-note[hidden],
+        #content-editor .content-list-top .content-roster-filter-note[hidden] {
             display: none !important;
         }
 
@@ -12918,10 +12972,20 @@
                                     <span class="edit-team-name-first" id="team-list-heading-event" aria-live="polite">—</span>
                                     <span class="edit-team-name-last" id="team-list-heading-suffix">TEAM</span>
                                 </div>
-                                <span class="team-roster-count" id="team-roster-count" aria-live="polite">(n=0)</span>
                             </div>
                             <div class="edit-team-top-trailing">
+                                <span class="team-roster-count" id="team-roster-count" aria-live="polite">(n=0)</span>
                                 <div id="team-actions" class="team-actions" aria-label="Team actions">
+                                    <button type="button" class="add-speaker-button" id="previous-team" aria-label="Previous team member" title="Previous team member" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M14 6L8 12l6 6z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="next-team" aria-label="Next team member" title="Next team member" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 6l6 6-6 6z" />
+                                        </svg>
+                                    </button>
                                     <button type="button" class="add-speaker-button" id="add-team-button" aria-label="Add team member" title="Add team member">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
@@ -13297,6 +13361,16 @@
                             </div>
                             <div class="edit-guest-top-trailing">
                             <div id="content-actions" class="content-actions" hidden aria-label="Content actions">
+                                <span class="content-roster-filter-note" id="content-roster-filter-note" hidden aria-hidden="true"></span>
+                                <input
+                                    type="search"
+                                    id="content-roster-search"
+                                    class="content-roster-search"
+                                    placeholder="Search"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                    aria-label="Search content"
+                                />
                                 <button type="button" class="add-content-btn" id="previous-content" aria-label="Previous content" title="Previous content">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M14 6L8 12l6 6z" />
@@ -13317,6 +13391,12 @@
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                     </svg>
+                                </button>
+                                <button type="button" class="add-content-btn filter-guests-btn" id="filter-content" aria-label="Filter content" title="Filter content">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                    </svg>
+                                    <span class="filter-guests-active-mark" id="filter-content-active-mark" hidden aria-hidden="true">!</span>
                                 </button>
                             </div>
                             </div>
@@ -13486,9 +13566,11 @@
                             <div class="edit-contact-top contacts-list-heading" id="contacts-list-heading">
                                 <div class="edit-contact-top-spacer" aria-hidden="true"></div>
                                 <div class="selected-contactname-wrap">
-                                    <div class="selected-contactname" role="group" aria-label="Contacts list title">
-                                        <span class="edit-contact-name-first" id="contacts-list-heading-event" aria-live="polite">—</span>
-                                        <span class="edit-contact-name-last" id="contacts-list-heading-suffix">CONTACTS</span>
+                                    <div class="emailer-roster-title-wrap" role="group" aria-label="Contact lists">
+                                        <button type="button" class="emailer-roster-view-link is-active" id="emailer-roster-guests-link" aria-pressed="true">Guests</button>
+                                        <button type="button" class="emailer-roster-view-link" id="emailer-roster-speakers-link" aria-pressed="false">Speakers</button>
+                                        <button type="button" class="emailer-roster-view-link" id="emailer-roster-sponsors-link" aria-pressed="false">Sponsors</button>
+                                        <button type="button" class="emailer-roster-view-link" id="emailer-roster-misc-link" aria-pressed="false">Misc</button>
                                     </div>
                                 </div>
                                 <div class="edit-contact-top-trailing">
@@ -14118,6 +14200,31 @@
         </div>
     </div>
 
+    <div id="content-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="content-filter-popup-title">
+        <div class="guests-filter-popup__backdrop" id="content-filter-popup-backdrop"></div>
+        <div class="guests-filter-popup__box">
+            <h2 class="guests-filter-popup__title" id="content-filter-popup-title">Filter content</h2>
+            <div class="guests-filter-popup__fields">
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="content-filter-type-label">Type</span>
+                    <div class="guests-filter-popup__checks" id="content-filter-type" role="group" aria-labelledby="content-filter-type-label" data-filter-key="type"></div>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="content-filter-event-label">Event</span>
+                    <div class="guests-filter-popup__checks" id="content-filter-event" role="group" aria-labelledby="content-filter-event-label" data-filter-key="event"></div>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="content-filter-topic-label">Topics</span>
+                    <div class="guests-filter-popup__checks" id="content-filter-topic" role="group" aria-labelledby="content-filter-topic-label" data-filter-key="topic"></div>
+                </div>
+            </div>
+            <div class="guests-filter-popup__actions">
+                <button type="button" class="guests-filter-clear-btn" id="content-filter-clear">Clear</button>
+                <button type="button" class="guests-filter-apply-btn" id="content-filter-apply">Filter</button>
+            </div>
+        </div>
+    </div>
+
     <div
         id="guest-application-review"
         class="guest-application-review"
@@ -14225,6 +14332,8 @@
         let emailerEditorBottomPane = 'bio';
         /** Selected contact id for `#emailer-contact-viewer` (from `tbs/Contacts`). */
         let emailerFormEditingDocId = '';
+        /** Emailer roster heading: 'guests', 'speakers', 'sponsors', or 'misc'. Selection does not filter the table yet. */
+        var emailerRosterView = 'guests';
         var contactsRosterInMemory = [];
         var contactsMemoryLoaded = false;
         var contactsDirtyDocIds = Object.create(null);
@@ -14366,6 +14475,14 @@
         var guestsRosterView = '';
         /** In-memory rows for Content tab; Image URL is read for editor preview only (Alt-image omitted). */
         let contentRosterInMemory = [];
+        /** Live case-insensitive content roster search (local only). */
+        var contentRosterSearchQuery = '';
+        /** Content roster filters: Type, Event, and Topics. Empty lists mean no constraint. */
+        var contentFilterSettings = {
+            type: [],
+            event: [],
+            topic: [],
+        };
         let contentFormEditingDocId = '';
         let contentPadlockIsOpen = false;
         let contentDeleteConfirmArmed = false;
@@ -19910,6 +20027,7 @@
             itemsEl.innerHTML = html;
             syncTeamRosterCount();
             syncTeamRosterSelectionHighlight();
+            updateTeamNavButtons();
             if (teamFormEditingDocId && !findTeamInMemory(teamFormEditingDocId)) {
                 clearTeamViewerSelection();
             } else if (teamFormEditingDocId) {
@@ -19925,6 +20043,33 @@
             if (!note) return;
             var n = Array.isArray(teamRosterInMemory) ? teamRosterInMemory.length : 0;
             note.textContent = '(n=' + n + ')';
+        }
+
+        function updateTeamNavButtons() {
+            var prevBtn = document.getElementById('previous-team');
+            var nextBtn = document.getElementById('next-team');
+            if (!prevBtn || !nextBtn) return;
+            var roster = Array.isArray(teamRosterInMemory) ? teamRosterInMemory : [];
+            var id = String(teamFormEditingDocId || '').trim();
+            var idx = id ? rosterIndexOfId(roster, id) : -1;
+            var hasSelection = idx >= 0;
+            var canPrev = roster.length > 0 && (!hasSelection || idx > 0);
+            var canNext = roster.length > 0 && (!hasSelection || idx < roster.length - 1);
+            prevBtn.disabled = !canPrev;
+            nextBtn.disabled = !canNext;
+            prevBtn.setAttribute('aria-disabled', canPrev ? 'false' : 'true');
+            nextBtn.setAttribute('aria-disabled', canNext ? 'false' : 'true');
+        }
+
+        function navigateTeamInRoster(delta) {
+            syncTeamFormToMemoryIfEditing();
+            var roster = Array.isArray(teamRosterInMemory) ? teamRosterInMemory : [];
+            if (!roster.length) return;
+            var id = String(teamFormEditingDocId || '').trim();
+            var idx = id ? rosterIndexOfId(roster, id) : -1;
+            var nextIdx = idx < 0 ? (delta < 0 ? roster.length - 1 : 0) : idx + delta;
+            if (nextIdx < 0 || nextIdx >= roster.length) return;
+            populateTeamViewerFromRecord(roster[nextIdx]);
         }
 
         function findTeamInMemory(docId) {
@@ -20571,6 +20716,7 @@
             syncTeamEditabilityFromPadlock();
             updateSaveTeamToolbarButtonState();
             updateAddTeamDeleteButtonState();
+            updateTeamNavButtons();
             var first = document.getElementById('add-team-first-name');
             if (first) first.focus();
         }
@@ -20782,6 +20928,7 @@
             resetTeamAddLogForm();
             clearTeamRosterItemSelection();
             setTeamViewerEmptyState(true);
+            updateTeamNavButtons();
         }
 
         function populateTeamViewerFromRecord(rec) {
@@ -20814,6 +20961,7 @@
             syncTeamRosterSelectionHighlight();
             syncTeamPadlockButtonUi();
             syncTeamEditabilityFromPadlock();
+            updateTeamNavButtons();
         }
 
         function getEmailerEditorBottomEl() {
@@ -22495,8 +22643,6 @@
             if (programmeEventEl) programmeEventEl.textContent = eventLabel;
             var settingsEventEl = document.getElementById('settings-list-heading-event');
             if (settingsEventEl) settingsEventEl.textContent = eventLabel;
-            var contactsEventEl = document.getElementById('contacts-list-heading-event');
-            if (contactsEventEl) contactsEventEl.textContent = eventLabel;
         }
 
         function updateBackendCurrentEventDisplay() {
@@ -23394,12 +23540,9 @@
                     }
                 }
             }
-            var guestCanPrev = guestIdx > 0;
-            var guestCanNext = guestIdx >= 0 && guestIdx < guestN - 1;
-            if (guestN <= 1 || !guestId || guestIdx < 0) {
-                guestCanPrev = false;
-                guestCanNext = false;
-            }
+            var guestHasSelection = guestIdx >= 0;
+            var guestCanPrev = guestN > 0 && (!guestHasSelection || guestIdx > 0);
+            var guestCanNext = guestN > 0 && (!guestHasSelection || guestIdx < guestN - 1);
             if (prevGuestBtn && nextGuestBtn) {
                 prevGuestBtn.disabled = !guestCanPrev;
                 nextGuestBtn.disabled = !guestCanNext;
@@ -24310,18 +24453,19 @@
 
         function navigateGuestInRoster(delta) {
             syncAddGuestFormToMemoryIfEditing();
-            var navId = String(guestFormEditingDocId || '').trim();
-            if (!navId) return;
             var visibleGuests = guestsRosterRowsAfterFilter();
+            if (!visibleGuests.length) return;
+            var navId = String(guestFormEditingDocId || '').trim();
             var navIdx = -1;
-            for (var i = 0; i < visibleGuests.length; i++) {
-                if (String(visibleGuests[i].id || '') === navId) {
-                    navIdx = i;
-                    break;
+            if (navId) {
+                for (var i = 0; i < visibleGuests.length; i++) {
+                    if (String(visibleGuests[i].id || '') === navId) {
+                        navIdx = i;
+                        break;
+                    }
                 }
             }
-            if (navIdx < 0) return;
-            var navNextIdx = navIdx + delta;
+            var navNextIdx = navIdx < 0 ? (delta < 0 ? visibleGuests.length - 1 : 0) : navIdx + delta;
             if (navNextIdx < 0 || navNextIdx >= visibleGuests.length) return;
             var navG = visibleGuests[navNextIdx];
             guestEditorScrollToManagementOnNextPopulate = isGuestEditorBottomShowingManagement();
@@ -27491,9 +27635,13 @@
                 bioReceivedArrow.hidden = false;
                 bioReceivedArrow.setAttribute('aria-hidden', 'false');
             }
+            // Request lodging, Own lodging, and OR appear together only when Status is Invited and Lodging is No.
+            var lodgingChoiceOpen = Boolean(s && workflowPastInvite && lodgingSt === 'No');
+            var showRequestLodgingBtn = lodgingSt !== 'Own lodging';
+            var showOwnLodgingBtn = lodgingChoiceOpen || lodgingSt === 'Own lodging';
             if (lodgingBtn) {
-                lodgingBtn.hidden = false;
-                lodgingBtn.setAttribute('aria-hidden', 'false');
+                lodgingBtn.hidden = !showRequestLodgingBtn;
+                lodgingBtn.setAttribute('aria-hidden', showRequestLodgingBtn ? 'false' : 'true');
                 lodgingBtn.disabled = !runRequestLodging;
                 lodgingBtn.setAttribute('aria-disabled', runRequestLodging ? 'false' : 'true');
                 var lodgingRequestedOrConfirmed =
@@ -27522,31 +27670,18 @@
                 });
             }
             if (ownLodgingBtn) {
-                // Hide Own lodging (and OR) once lodging is requested or confirmed.
-                var showOwnLodgingChoice = Boolean(
-                    s &&
-                        workflowPastInvite &&
-                        lodgingSt !== 'Requested' &&
-                        lodgingSt !== 'Confirmed'
-                );
-                ownLodgingBtn.hidden = !showOwnLodgingChoice;
-                ownLodgingBtn.setAttribute('aria-hidden', showOwnLodgingChoice ? 'false' : 'true');
+                ownLodgingBtn.hidden = !showOwnLodgingBtn;
+                ownLodgingBtn.setAttribute('aria-hidden', showOwnLodgingBtn ? 'false' : 'true');
                 ownLodgingBtn.disabled = !runRequestLodging;
                 ownLodgingBtn.setAttribute('aria-disabled', runRequestLodging ? 'false' : 'true');
                 setSpeakerWorkflowStepState(ownLodgingBtn, {
-                    active: canRequestLodging,
-                    done: workflowPastInvite && lodgingSt === 'Own lodging'
+                    active: lodgingChoiceOpen,
+                    done: lodgingSt === 'Own lodging'
                 });
             }
             if (lodgingSep) {
-                var showLodgingOr = Boolean(
-                    s &&
-                        workflowPastInvite &&
-                        lodgingSt !== 'Requested' &&
-                        lodgingSt !== 'Confirmed'
-                );
-                lodgingSep.hidden = !showLodgingOr;
-                lodgingSep.setAttribute('aria-hidden', showLodgingOr ? 'false' : 'true');
+                lodgingSep.hidden = !lodgingChoiceOpen;
+                lodgingSep.setAttribute('aria-hidden', lodgingChoiceOpen ? 'false' : 'true');
             }
             if (inviteLodgingRow) {
                 inviteLodgingRow.hidden = false;
@@ -28576,12 +28711,9 @@
                     }
                 }
             }
-            var canPrev = idx > 0;
-            var canNext = idx >= 0 && idx < n - 1;
-            if (n <= 1 || !id || id === '_init' || idx < 0) {
-                canPrev = false;
-                canNext = false;
-            }
+            var hasSelection = idx >= 0;
+            var canPrev = n > 0 && (!hasSelection || idx > 0);
+            var canNext = n > 0 && (!hasSelection || idx < n - 1);
             if (prevBtn && nextBtn) {
                 prevBtn.disabled = !canPrev;
                 nextBtn.disabled = !canNext;
@@ -28594,18 +28726,19 @@
 
         function navigateSpeakerInRoster(delta) {
             syncAddSpeakerFormToMemoryIfEditing();
-            var id = String(speakerFormEditingDocId || '').trim();
-            if (!id || id === '_init') return;
             var visible = speakerRosterRowsForView();
+            if (!visible.length) return;
+            var id = String(speakerFormEditingDocId || '').trim();
             var idx = -1;
-            for (var i = 0; i < visible.length; i++) {
-                if (String(visible[i].id || '') === id) {
-                    idx = i;
-                    break;
+            if (id && id !== '_init') {
+                for (var i = 0; i < visible.length; i++) {
+                    if (String(visible[i].id || '') === id) {
+                        idx = i;
+                        break;
+                    }
                 }
             }
-            if (idx < 0) return;
-            var nextIdx = idx + delta;
+            var nextIdx = idx < 0 ? (delta < 0 ? visible.length - 1 : 0) : idx + delta;
             if (nextIdx < 0 || nextIdx >= visible.length) return;
             var s = visible[nextIdx];
             speakerPadlockIsOpen = false;
@@ -28703,12 +28836,12 @@
                 '<th scope="col">Status</th>' +
                 '<th scope="col">Lodging</th>' +
                 '<th scope="col">Bio</th>' +
-                '<th scope="col" class="content-roster-published-col">Programmed</th>' +
                 '<th scope="col">Titles</th>' +
+                '<th scope="col" class="content-roster-published-col">Programmed</th>' +
                 '<th scope="col">Brief</th>' +
                 '<th scope="col">Presented</th>' +
+                '<th scope="col">CME</th>' +
                 '<th scope="col">Travel</th>' +
-                '<th scope="col">CME sent</th>' +
                 '<th scope="col">Expenses</th>' +
                 '</tr></thead><tbody>';
             if (!speakerRosterInMemory.length) {
@@ -28805,19 +28938,19 @@
                     speakerRosterStatusCellHtml(s.id, inv, false) +
                     speakerRosterLodgingCellHtml(s.id, lod, isPotentialSpeaker) +
                     speakerRosterBioCellHtml(s.id, bioSt, isPotentialSpeaker) +
-                    speakerRosterProgrammedCellHtml(s.id, bioPub, isPotentialSpeaker) +
                     '<td class="speaker-roster-tag-cell">' +
                     '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + ttlCls + '" data-field="titlesStatus" title="' + (isPotentialSpeaker ? 'Titles' : 'Titles (click to change)') + '" aria-label="Titles: ' + escapeHtml(ttl) + '">' + escapeHtml(ttl) + '</button>' +
                     '</td>' +
+                    speakerRosterProgrammedCellHtml(s.id, bioPub, isPotentialSpeaker) +
                     '<td class="speaker-roster-tag-cell">' +
                     '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + brfCls + '" data-field="brief" title="' + (isPotentialSpeaker ? 'Brief' : 'Brief (click to change)') + '" aria-label="Brief: ' + escapeHtml(brf) + '">' + escapeHtml(brf) + '</button>' +
                     '</td>' +
                     presentedCell +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + trvCls + '" data-field="travel" title="' + (isPotentialSpeaker ? 'Travel' : 'Travel (click to change)') + '" aria-label="Travel: ' + escapeHtml(trv) + '">' + escapeHtml(trv) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + cmeCls + '" data-field="cme" title="' + (isPotentialSpeaker ? 'CME' : 'CME (click to change)') + '" aria-label="CME: ' + escapeHtml(cme) + '">' + escapeHtml(cme) + '</button>' +
                     '</td>' +
                     '<td class="speaker-roster-tag-cell">' +
-                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + cmeCls + '" data-field="cme" title="' + (isPotentialSpeaker ? 'CME sent' : 'CME sent (click to change)') + '" aria-label="CME sent: ' + escapeHtml(cme) + '">' + escapeHtml(cme) + '</button>' +
+                    '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + trvCls + '" data-field="travel" title="' + (isPotentialSpeaker ? 'Travel' : 'Travel (click to change)') + '" aria-label="Travel: ' + escapeHtml(trv) + '">' + escapeHtml(trv) + '</button>' +
                     '</td>' +
                     '<td class="speaker-roster-tag-cell">' +
                     '<button type="button"' + pillLock + ' class="speaker-roster-tag ' + rfdCls + '" data-field="refunded" title="' + (isPotentialSpeaker ? 'Expenses' : 'Expenses (click to change)') + '" aria-label="Expenses: ' + escapeHtml(rfd) + '">' + escapeHtml(rfd) + '</button>' +
@@ -31055,14 +31188,254 @@
             return tb - ta;
         }
 
+        function contentSearchFieldText(raw) {
+            if (raw == null) return '';
+            if (Array.isArray(raw)) return raw.join(' ');
+            return String(raw);
+        }
+
+        function contentMatchesRosterSearch(r, query) {
+            var q = String(query != null ? query : contentRosterSearchQuery || '')
+                .trim()
+                .toLowerCase();
+            if (!q) return true;
+            if (!r) return false;
+            var haystack = [
+                r.title,
+                r.name,
+                r.type,
+                contentSearchFieldText(r.event),
+                contentSearchFieldText(r.topic),
+                formatContentDateForDisplay(r.date),
+            ]
+                .join(' ')
+                .toLowerCase();
+            return haystack.indexOf(q) !== -1;
+        }
+
+        function contentRosterHasStoredRows() {
+            for (var i = 0; i < contentRosterInMemory.length; i++) {
+                var row = contentRosterInMemory[i];
+                if (row && row.localOnly !== true) return true;
+            }
+            return false;
+        }
+
+        function contentRosterStoredCount() {
+            var n = 0;
+            for (var i = 0; i < contentRosterInMemory.length; i++) {
+                var row = contentRosterInMemory[i];
+                if (row && row.localOnly !== true) n += 1;
+            }
+            return n;
+        }
+
+        function emptyContentFilterSettings() {
+            return { type: [], event: [], topic: [] };
+        }
+
+        function contentFilterIsActive(filter) {
+            var f = filter || contentFilterSettings;
+            if (!f || typeof f !== 'object') return false;
+            var keys = Object.keys(emptyContentFilterSettings());
+            for (var i = 0; i < keys.length; i++) {
+                if (guestsFilterSelectedList(f[keys[i]]).length) return true;
+            }
+            return false;
+        }
+
+        function contentFilterValueList(raw) {
+            if (raw == null) return [];
+            if (Array.isArray(raw)) {
+                var fromArray = [];
+                for (var i = 0; i < raw.length; i++) {
+                    var item = String(raw[i] != null ? raw[i] : '').trim();
+                    if (item) fromArray.push(item);
+                }
+                return fromArray;
+            }
+            var parsed = contentParseListInputToFirestore(String(raw));
+            if (Array.isArray(parsed)) return parsed;
+            var single = String(parsed || '').trim();
+            return single ? [single] : [];
+        }
+
+        function contentValuesMatchFilter(actualRaw, selected) {
+            var list = guestsFilterSelectedList(selected);
+            if (!list.length) return true;
+            var vals = contentFilterValueList(actualRaw);
+            for (var i = 0; i < vals.length; i++) {
+                if (guestFilterValueInList(vals[i], list)) return true;
+            }
+            return false;
+        }
+
+        function contentMatchesRosterFilter(row) {
+            if (!contentFilterIsActive(contentFilterSettings)) return true;
+            if (!row) return false;
+            if (!contentValuesMatchFilter(row.type, contentFilterSettings.type)) return false;
+            if (!contentValuesMatchFilter(row.event, contentFilterSettings.event)) return false;
+            if (!contentValuesMatchFilter(row.topic, contentFilterSettings.topic)) return false;
+            return true;
+        }
+
+        function contentDistinctFieldValues(field) {
+            var out = [];
+            var seen = {};
+            for (var i = 0; i < contentRosterInMemory.length; i++) {
+                var row = contentRosterInMemory[i];
+                if (!row || row.localOnly === true) continue;
+                var vals = contentFilterValueList(row[field]);
+                for (var j = 0; j < vals.length; j++) {
+                    var key = vals[j].toLowerCase();
+                    if (seen[key]) continue;
+                    seen[key] = true;
+                    out.push(vals[j]);
+                }
+            }
+            return out;
+        }
+
+        function contentMergeFilterOptions(presets, extras) {
+            var out = [];
+            var seen = {};
+            function add(value) {
+                var label = String(value || '').trim();
+                if (!label) return;
+                var key = label.toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push(label);
+            }
+            var base = Array.isArray(presets) ? presets : [];
+            var more = Array.isArray(extras) ? extras : [];
+            for (var i = 0; i < base.length; i++) add(base[i]);
+            for (var j = 0; j < more.length; j++) add(more[j]);
+            return out;
+        }
+
+        function syncContentFilterButtonBadge() {
+            var mark = document.getElementById('filter-content-active-mark');
+            var btn = document.getElementById('filter-content');
+            var active = contentFilterIsActive(contentFilterSettings);
+            if (mark) {
+                mark.hidden = !active;
+                mark.setAttribute('aria-hidden', active ? 'false' : 'true');
+            }
+            if (btn) {
+                btn.setAttribute('aria-label', active ? 'Filter content (filter active)' : 'Filter content');
+                btn.title = active ? 'Filter content (filter active)' : 'Filter content';
+            }
+        }
+
+        function readContentFilterFormValues() {
+            var out = emptyContentFilterSettings();
+            var keys = Object.keys(out);
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var el = document.getElementById('content-filter-' + k);
+                if (!el) continue;
+                var boxes = el.querySelectorAll('input[type="checkbox"]:checked');
+                var picked = [];
+                for (var b = 0; b < boxes.length; b++) {
+                    var v = String(boxes[b].value || '').trim();
+                    if (v) picked.push(v);
+                }
+                out[k] = picked;
+            }
+            return out;
+        }
+
+        function populateContentFilterPopupForm() {
+            fillGuestsFilterChecks(
+                document.getElementById('content-filter-type'),
+                contentMergeFilterOptions(CONTENT_EDITOR_TYPE_OPTIONS, contentDistinctFieldValues('type').concat(contentFilterSettings.type)),
+                contentFilterSettings.type
+            );
+            fillGuestsFilterChecks(
+                document.getElementById('content-filter-event'),
+                contentMergeFilterOptions(CONTENT_EDITOR_EVENT_OPTIONS, contentDistinctFieldValues('event').concat(contentFilterSettings.event)),
+                contentFilterSettings.event
+            );
+            var topicOptions = contentDistinctFieldValues('topic');
+            topicOptions.sort(function (a, b) { return a.localeCompare(b); });
+            fillGuestsFilterChecks(
+                document.getElementById('content-filter-topic'),
+                contentMergeFilterOptions(topicOptions, contentFilterSettings.topic),
+                contentFilterSettings.topic
+            );
+        }
+
+        function closeContentFilterPopup() {
+            var popup = document.getElementById('content-filter-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function openContentFilterPopup() {
+            populateContentFilterPopupForm();
+            var popup = document.getElementById('content-filter-popup');
+            if (!popup) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+        }
+
+        function applyContentFilterSettingsLocal(next) {
+            var src = next || emptyContentFilterSettings();
+            contentFilterSettings = {
+                type: guestsFilterSelectedList(src.type),
+                event: guestsFilterSelectedList(src.event),
+                topic: guestsFilterSelectedList(src.topic),
+            };
+            syncContentFilterButtonBadge();
+            renderContentTableFromMemory();
+        }
+
+        function contentRosterVisibleRows() {
+            var q = String(contentRosterSearchQuery || '').trim();
+            var filterActive = contentFilterIsActive(contentFilterSettings);
+            var out = [];
+            for (var i = 0; i < contentRosterInMemory.length; i++) {
+                var row = contentRosterInMemory[i];
+                if (!row || row.localOnly === true) continue;
+                if (filterActive && !contentMatchesRosterFilter(row)) continue;
+                if (q && !contentMatchesRosterSearch(row, q)) continue;
+                out.push(row);
+            }
+            return out;
+        }
+
+        function contentRosterRowsForNav() {
+            if (String(contentRosterSearchQuery || '').trim() || contentFilterIsActive(contentFilterSettings)) {
+                return contentRosterVisibleRows();
+            }
+            return contentRosterInMemory;
+        }
+
+        function syncContentRosterFilterNote() {
+            var note = document.getElementById('content-roster-filter-note');
+            if (!note) return;
+            var shown = contentRosterVisibleRows().length;
+            note.hidden = false;
+            note.setAttribute('aria-hidden', 'false');
+            if (!contentFilterIsActive(contentFilterSettings)) {
+                note.textContent = '(n=' + shown + ')';
+                return;
+            }
+            note.textContent = '(Filtered ' + shown + ' out of ' + contentRosterStoredCount() + ')';
+        }
+
 
         function renderContentTableFromMemory() {
+            syncContentFilterButtonBadge();
+            syncContentRosterFilterNote();
             var itemsEl = document.getElementById('content-list-items');
             if (!itemsEl) {
                 updateContentNavButtons();
                 return;
             }
-            if (!contentRosterInMemory.length) {
+            if (!contentRosterHasStoredRows()) {
                 itemsEl.innerHTML =
                     '<p class="content-list-empty">No content rows in Firestore path <code>tbs/Content/{rowId}/item</code> ' +
                     '(project <code>' +
@@ -31084,9 +31457,9 @@
                 '<th scope="col" class="content-roster-event-col">Event</th>' +
                 '<th scope="col" class="content-roster-topics-col">Topics</th>' +
                 '</tr></thead><tbody>';
-            for (var j = 0; j < contentRosterInMemory.length; j++) {
-                var r = contentRosterInMemory[j];
-                if (r && r.localOnly === true) continue;
+            var visibleContentRows = contentRosterVisibleRows();
+            for (var j = 0; j < visibleContentRows.length; j++) {
+                var r = visibleContentRows[j];
                 var featuredOn = r.featured === true;
                 var featuredCell =
                     '<span class="content-roster-featured-star' +
@@ -31197,15 +31570,13 @@
             var prevBtn = document.getElementById('previous-content');
             var nextBtn = document.getElementById('next-content');
             if (!prevBtn || !nextBtn) return;
-            var n = contentRosterInMemory.length;
+            var navRows = contentRosterRowsForNav();
+            var visibleRows = contentRosterVisibleRows();
             var id = String(contentFormEditingDocId || '').trim();
-            var idx = id ? findContentRosterIndexById(id) : -1;
-            var canPrev = idx > 0;
-            var canNext = idx >= 0 && idx < n - 1;
-            if (n <= 1 || !id || idx < 0) {
-                canPrev = false;
-                canNext = false;
-            }
+            var idx = id ? rosterIndexOfId(navRows, id) : -1;
+            var hasSelection = idx >= 0;
+            var canPrev = hasSelection ? idx > 0 : visibleRows.length > 0;
+            var canNext = hasSelection ? idx < navRows.length - 1 : visibleRows.length > 0;
             prevBtn.disabled = !canPrev;
             nextBtn.disabled = !canNext;
             prevBtn.setAttribute('aria-disabled', canPrev ? 'false' : 'true');
@@ -31213,13 +31584,19 @@
         }
 
         function navigateContentInRoster(delta) {
+            var navRows = contentRosterRowsForNav();
             var id = String(contentFormEditingDocId || '').trim();
-            if (!id) return;
-            var idx = findContentRosterIndexById(id);
-            if (idx < 0) return;
-            var nextIdx = idx + delta;
-            if (nextIdx < 0 || nextIdx >= contentRosterInMemory.length) return;
-            var rec = contentRosterInMemory[nextIdx];
+            var idx = id ? rosterIndexOfId(navRows, id) : -1;
+            var rec;
+            if (idx < 0) {
+                var visibleRows = contentRosterVisibleRows();
+                if (!visibleRows.length) return;
+                rec = delta < 0 ? visibleRows[visibleRows.length - 1] : visibleRows[0];
+            } else {
+                var nextIdx = idx + delta;
+                if (nextIdx < 0 || nextIdx >= navRows.length) return;
+                rec = navRows[nextIdx];
+            }
             void switchToContentRecord(rec, null);
         }
 
@@ -35562,6 +35939,22 @@
                     }
                 });
             }
+            var prevTeamBtn = document.getElementById('previous-team');
+            var nextTeamBtn = document.getElementById('next-team');
+            if (prevTeamBtn) {
+                prevTeamBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (prevTeamBtn.disabled) return;
+                    navigateTeamInRoster(-1);
+                });
+            }
+            if (nextTeamBtn) {
+                nextTeamBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (nextTeamBtn.disabled) return;
+                    navigateTeamInRoster(1);
+                });
+            }
             var addTeamBtn = document.getElementById('add-team-button');
             if (addTeamBtn) {
                 addTeamBtn.addEventListener('click', function () {
@@ -35577,6 +35970,43 @@
                     showTeamDraftForm();
                 });
             }
+            function syncEmailerRosterViewLinks() {
+                var view = String(emailerRosterView || 'guests');
+                var ids = {
+                    guests: 'emailer-roster-guests-link',
+                    speakers: 'emailer-roster-speakers-link',
+                    sponsors: 'emailer-roster-sponsors-link',
+                    misc: 'emailer-roster-misc-link',
+                };
+                var keys = Object.keys(ids);
+                for (var i = 0; i < keys.length; i++) {
+                    var el = document.getElementById(ids[keys[i]]);
+                    if (!el) continue;
+                    var on = keys[i] === view;
+                    el.classList.toggle('is-active', on);
+                    el.setAttribute('aria-pressed', on ? 'true' : 'false');
+                }
+            }
+            function setEmailerRosterView(next) {
+                var view = String(next || '');
+                if (view !== 'speakers' && view !== 'sponsors' && view !== 'misc') view = 'guests';
+                if (view === emailerRosterView) return;
+                emailerRosterView = view;
+                syncEmailerRosterViewLinks();
+            }
+            [
+                ['emailer-roster-guests-link', 'guests'],
+                ['emailer-roster-speakers-link', 'speakers'],
+                ['emailer-roster-sponsors-link', 'sponsors'],
+                ['emailer-roster-misc-link', 'misc'],
+            ].forEach(function (pair) {
+                var link = document.getElementById(pair[0]);
+                if (!link) return;
+                link.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    setEmailerRosterView(pair[1]);
+                });
+            });
             var addEmailerContactBtn = document.getElementById('emailer-add-contact-button');
             if (addEmailerContactBtn) {
                 addEmailerContactBtn.addEventListener('click', function () {
@@ -36120,6 +36550,50 @@
                     e.stopPropagation();
                     if (nextContentBtn.disabled) return;
                     navigateContentInRoster(1);
+                });
+            }
+            var contentRosterSearchInput = document.getElementById('content-roster-search');
+            if (contentRosterSearchInput) {
+                contentRosterSearchInput.addEventListener('input', function () {
+                    contentRosterSearchQuery = String(contentRosterSearchInput.value || '');
+                    renderContentTableFromMemory();
+                });
+                contentRosterSearchInput.addEventListener('keydown', function (ev) {
+                    if (ev.key === 'Escape') {
+                        contentRosterSearchInput.value = '';
+                        contentRosterSearchQuery = '';
+                        renderContentTableFromMemory();
+                    }
+                });
+            }
+            var filterContentBtn = document.getElementById('filter-content');
+            if (filterContentBtn) {
+                filterContentBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openContentFilterPopup();
+                });
+            }
+            var contentFilterBackdrop = document.getElementById('content-filter-popup-backdrop');
+            if (contentFilterBackdrop) {
+                contentFilterBackdrop.addEventListener('click', function () {
+                    closeContentFilterPopup();
+                });
+            }
+            var contentFilterApplyBtn = document.getElementById('content-filter-apply');
+            if (contentFilterApplyBtn) {
+                contentFilterApplyBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applyContentFilterSettingsLocal(readContentFilterFormValues());
+                    closeContentFilterPopup();
+                });
+            }
+            var contentFilterClearBtn = document.getElementById('content-filter-clear');
+            if (contentFilterClearBtn) {
+                contentFilterClearBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applyContentFilterSettingsLocal(emptyContentFilterSettings());
+                    populateContentFilterPopupForm();
                 });
             }
             var addContentSaveBtn = document.getElementById('add-content-save-btn');
