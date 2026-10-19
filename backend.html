@@ -7196,7 +7196,9 @@
         }
 
         #guest-editor .guests-list-heading .guests-roster-filter-note {
-            margin-left: 0.65rem;
+            margin: 0;
+            flex: 0 0 auto;
+            align-self: center;
             font-size: 0.75rem;
             font-weight: 400;
             letter-spacing: normal;
@@ -7210,7 +7212,9 @@
         }
 
         #speaker-editor #speakers-list-heading .speakers-roster-filter-note {
-            margin-left: 0.65rem;
+            margin: 0;
+            flex: 0 0 auto;
+            align-self: center;
             font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
             font-weight: 400;
@@ -12025,9 +12029,9 @@
                                     <span class="edit-guest-name-last" id="speakers-list-heading-suffix">speakers</span>
                                 </div>
                                 <a class="speakers-roster-view-link" id="speakers-roster-ideas-link" href="#" aria-pressed="false">Ideas</a>
-                                <span class="speakers-roster-filter-note" id="speakers-roster-filter-note" aria-live="polite">(n=0)</span>
                             </div>
                             <div class="edit-guest-top-trailing">
+                            <span class="speakers-roster-filter-note" id="speakers-roster-filter-note" aria-live="polite">(n=0)</span>
                             <div id="speakers-actions" class="speakers-actions" aria-label="Speaker actions">
                                 <button type="button" class="add-speaker-button" id="previous-speaker" aria-label="Previous speaker" title="Previous speaker">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -12346,10 +12350,10 @@
                                     </button>
                                     <a class="guests-roster-table-view-link" id="guests-roster-waitlist-link" href="#" aria-pressed="false">Wait-list</a>
                                     <a class="guests-roster-table-view-link" id="guests-roster-cancelled-link" href="#" aria-pressed="false">Cancelled</a>
-                                    <span class="guests-roster-filter-note" id="guests-roster-filter-note" hidden aria-hidden="true"></span>
                                 </div>
                                 <div class="guests-roster-table-trailing">
                                 <div id="guests-actions" class="guests-actions" aria-label="Guests actions">
+                                    <span class="guests-roster-filter-note" id="guests-roster-filter-note" hidden aria-hidden="true"></span>
                                     <input
                                         type="search"
                                         id="guests-roster-search"
