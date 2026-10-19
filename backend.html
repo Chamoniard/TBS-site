@@ -5347,20 +5347,16 @@
         }
 
         #content-editor .content-roster-table th.content-roster-published-col,
-        #content-editor .content-list-table th.content-roster-published-col {
-            width: auto;
-            min-width: 4.75rem;
+        #content-editor .content-list-table th.content-roster-published-col,
+        #content-editor .content-roster-table td.content-roster-published-cell,
+        #content-editor .content-list-table td.content-roster-published-cell {
+            width: calc(var(--content-badge-width) + (2 * var(--backend-table-cell-pad-x)));
+            min-width: calc(var(--content-badge-width) + (2 * var(--backend-table-cell-pad-x)));
+            max-width: calc(var(--content-badge-width) + (2 * var(--backend-table-cell-pad-x)));
+            box-sizing: border-box;
             text-align: center;
             vertical-align: middle;
             white-space: nowrap;
-        }
-
-        #content-editor .content-roster-table td.content-roster-published-cell,
-        #content-editor .content-list-table td.content-roster-published-cell {
-            width: 2.85rem;
-            text-align: center;
-            vertical-align: middle;
-            padding: 0.15rem var(--backend-table-cell-pad-x);
         }
 
         #content-editor .content-roster-published-btn {
@@ -6766,8 +6762,6 @@
         #guest-editor .guests-list-table .content-badge,
         #team-editor .team-list-table .content-badge,
         #emailer-editor .contacts-list-table .content-badge,
-        #content-editor .content-list-table .content-roster-published-btn,
-        #content-editor .content-roster-table .content-roster-published-btn,
         #programme-editor .programme-speakers-table button.speaker-roster-tag {
             width: var(--backend-roster-pill-width);
             min-width: var(--backend-roster-pill-width);
@@ -6783,6 +6777,17 @@
             font-weight: 400;
             letter-spacing: 0.01875em;
             line-height: 1.2;
+            flex-shrink: 0;
+        }
+
+        #content-editor .content-list-table .content-roster-published-btn,
+        #content-editor .content-roster-table .content-roster-published-btn {
+            width: var(--content-badge-width);
+            min-width: var(--content-badge-width);
+            max-width: var(--content-badge-width);
+            min-height: calc(0.9rem * 1.2 + 4px);
+            justify-content: center;
+            box-sizing: border-box;
             flex-shrink: 0;
         }
 
