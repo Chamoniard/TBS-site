@@ -4545,6 +4545,19 @@
             max-width: 100%;
         }
 
+        #team-editor .team-list-heading .team-roster-count {
+            margin-left: 0.65rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
         #finances-editor,
         #finances-editor .finances-panel,
         #finances-editor .finances-panel-body {
@@ -8484,7 +8497,7 @@
 
         #speaker-editor .speaker-editor-bio input,
         #speaker-editor .speaker-editor-bio textarea,
-        #guest-editor .guest-editor-bio input,
+        #guest-editor .guest-editor-bio input:not([type="checkbox"]):not([type="radio"]),
         #guest-editor .guest-editor-bio .guest-viewer-name-row input,
         #guest-editor .guest-editor-profile input,
         #guest-editor .guest-editor-profile textarea,
@@ -8517,7 +8530,7 @@
 
         #speaker-editor.speaker-padlock-unlocked .speaker-editor-bio input,
         #speaker-editor.speaker-padlock-unlocked .speaker-editor-bio textarea,
-        #guest-editor.guest-padlock-unlocked .guest-editor-bio input,
+        #guest-editor.guest-padlock-unlocked .guest-editor-bio input:not([type="checkbox"]):not([type="radio"]),
         #guest-editor.guest-padlock-unlocked .guest-editor-profile input,
         #guest-editor.guest-padlock-unlocked .guest-editor-profile textarea,
         #guest-editor.guest-padlock-unlocked .guest-bio-display,
@@ -8530,6 +8543,167 @@
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field input:not([type="hidden"]):not([type="file"]),
         #content-editor.content-editable-unlocked .add-content-form .add-content-form-field textarea {
             background: var(--backend-tab-pale-pink);
+        }
+
+        #guest-editor .guest-new-form {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        #guest-editor.guest-editor--new-guest .guest-new-form {
+            display: flex;
+        }
+
+        #guest-editor.guest-editor--new-guest #guest-editor-bio > :not(.guest-new-form) {
+            display: none;
+        }
+
+        #guest-editor .guest-new-form-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 1rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        #guest-editor .guest-new-form .add-speaker-form-field {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.35rem;
+            min-width: 0;
+        }
+
+        #guest-editor .guest-new-form-row > .add-speaker-form-field {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        #guest-editor .guest-new-form .add-speaker-form-field > label {
+            flex: 0 0 auto;
+            min-width: 0;
+            border: none;
+            padding: 0;
+            padding-bottom: 0.35rem;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #guest-editor .guest-new-form input:not([type="checkbox"]):not([type="radio"]),
+        #guest-editor .guest-new-form select,
+        #guest-editor .guest-new-form textarea,
+        #guest-editor .guest-new-choice-field {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--backend-tab-pale-blue);
+            box-shadow: none;
+            outline: none;
+            padding: 0.5rem 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #0f172a;
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+        }
+
+        #guest-editor .guest-new-form select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%230f172a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5L6 6.5L11 1.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 12px 8px;
+            cursor: pointer;
+        }
+
+        #guest-editor .guest-new-form textarea {
+            min-height: 6.5rem;
+            resize: vertical;
+        }
+
+        #guest-editor .guest-new-choice-field {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.35rem;
+        }
+
+        #guest-editor .guest-new-choice-field label {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        #guest-editor .guest-new-choice-field input[type="checkbox"],
+        #guest-editor .guest-new-choice-field input[type="radio"] {
+            width: 1rem;
+            height: 1rem;
+            min-width: 1rem;
+            max-width: 1rem;
+            margin: 0;
+            padding: 0;
+            flex: 0 0 auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            background: #fff;
+            background-color: #fff;
+            box-shadow: none;
+            appearance: auto;
+            -webkit-appearance: auto;
+            accent-color: #0f172a;
+            -webkit-text-fill-color: currentColor;
+            cursor: pointer;
+        }
+
+        #guest-editor.guest-padlock-unlocked #guest-editor-bio .guest-new-form input:not([type="checkbox"]):not([type="radio"]),
+        #guest-editor.guest-padlock-unlocked #guest-editor-bio .guest-new-form select,
+        #guest-editor.guest-padlock-unlocked #guest-editor-bio .guest-new-form textarea,
+        #guest-editor.guest-padlock-unlocked #guest-editor-bio .guest-new-choice-field {
+            background-color: var(--backend-tab-pale-pink);
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+        }
+
+        #guest-editor:not(.guest-padlock-unlocked) #guest-editor-bio .guest-new-form input:not([type="checkbox"]):not([type="radio"]),
+        #guest-editor:not(.guest-padlock-unlocked) #guest-editor-bio .guest-new-form select,
+        #guest-editor:not(.guest-padlock-unlocked) #guest-editor-bio .guest-new-form textarea,
+        #guest-editor:not(.guest-padlock-unlocked) #guest-editor-bio .guest-new-choice-field {
+            background-color: var(--backend-tab-pale-blue);
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+        }
+
+        #guest-editor.guest-padlock-unlocked #guest-editor-bio .guest-new-form input:-webkit-autofill,
+        #guest-editor.guest-padlock-unlocked #guest-editor-bio .guest-new-form input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px var(--backend-tab-pale-pink) inset;
+            box-shadow: 0 0 0 1000px var(--backend-tab-pale-pink) inset;
+            -webkit-text-fill-color: #0f172a;
+            caret-color: #0f172a;
+        }
+
+        #guest-editor:not(.guest-padlock-unlocked) #guest-editor-bio .guest-new-form input:-webkit-autofill,
+        #guest-editor:not(.guest-padlock-unlocked) #guest-editor-bio .guest-new-form input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px var(--backend-tab-pale-blue) inset;
+            box-shadow: 0 0 0 1000px var(--backend-tab-pale-blue) inset;
+            -webkit-text-fill-color: #0f172a;
+            caret-color: #0f172a;
         }
 
         #speaker-editor .speaker-editor-bio input:not([readonly]),
@@ -12358,6 +12532,140 @@
                                         </div>
                                 </div>
                                 <div class="guest-editor-bio" id="guest-editor-bio">
+                                <form class="guest-new-form" id="guest-new-form" autocomplete="off" hidden>
+                                    <div class="guest-new-form-row">
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-first-name">First name</label>
+                                            <input type="text" id="new-guest-first-name" name="firstName" autocomplete="given-name" spellcheck="false">
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-last-name">Last name</label>
+                                            <input type="text" id="new-guest-last-name" name="lastName" autocomplete="family-name" spellcheck="false">
+                                        </div>
+                                    </div>
+                                    <div class="guest-new-form-row">
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-email">E-mail</label>
+                                            <input type="email" id="new-guest-email" name="email" autocomplete="email" spellcheck="false">
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-email-confirm">Confirm e-mail</label>
+                                            <input type="email" id="new-guest-email-confirm" name="emailConfirm" autocomplete="email" spellcheck="false">
+                                        </div>
+                                    </div>
+                                    <div class="guest-new-form-row">
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-city-region">City/region</label>
+                                            <input type="text" id="new-guest-city-region" name="cityRegion" autocomplete="address-level2" spellcheck="false">
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-country">Country</label>
+                                            <select id="new-guest-country" name="country" autocomplete="country-name">
+                                                <option value="">Select country</option>
+                                                <option value="Other (Enter into bio below.)">Other (Enter into bio below.)</option>
+                                                <option value="Australia">Australia</option>
+                                                <option value="Austria">Austria</option>
+                                                <option value="Belgium">Belgium</option>
+                                                <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                                                <option value="Bulgaria">Bulgaria</option>
+                                                <option value="Canada">Canada</option>
+                                                <option value="Croatia">Croatia</option>
+                                                <option value="Czech Republic">Czech Republic</option>
+                                                <option value="Denmark">Denmark</option>
+                                                <option value="Estonia">Estonia</option>
+                                                <option value="Finland">Finland</option>
+                                                <option value="France">France</option>
+                                                <option value="Germany">Germany</option>
+                                                <option value="Greece">Greece</option>
+                                                <option value="Hungary">Hungary</option>
+                                                <option value="Iceland">Iceland</option>
+                                                <option value="India">India</option>
+                                                <option value="Ireland">Ireland</option>
+                                                <option value="Italy">Italy</option>
+                                                <option value="Jersey">Jersey</option>
+                                                <option value="Latvia">Latvia</option>
+                                                <option value="Lithuania">Lithuania</option>
+                                                <option value="Luxembourg">Luxembourg</option>
+                                                <option value="Monaco">Monaco</option>
+                                                <option value="Netherlands">Netherlands</option>
+                                                <option value="New Zeeland">New Zeeland</option>
+                                                <option value="Northern Ireland">Northern Ireland</option>
+                                                <option value="Norway">Norway</option>
+                                                <option value="Poland">Poland</option>
+                                                <option value="Portugal">Portugal</option>
+                                                <option value="Romania">Romania</option>
+                                                <option value="Saudi Arabia">Saudi Arabia</option>
+                                                <option value="Serbia">Serbia</option>
+                                                <option value="Slovakia">Slovakia</option>
+                                                <option value="Slovenia">Slovenia</option>
+                                                <option value="Spain">Spain</option>
+                                                <option value="Sweden">Sweden</option>
+                                                <option value="Switzerland">Switzerland</option>
+                                                <option value="UAE">UAE</option>
+                                                <option value="Ukraine">Ukraine</option>
+                                                <option value="United Kingdom">United Kingdom</option>
+                                                <option value="United States">United States</option>
+                                                <option value="South Africa">South Africa</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="guest-new-form-row">
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-employer-1">Employer 1 (Name/City)</label>
+                                            <input type="text" id="new-guest-employer-1" name="employer1" autocomplete="organization" spellcheck="false">
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="new-guest-employer-2">Employer 2 (Name/City)</label>
+                                            <input type="text" id="new-guest-employer-2" name="employer2" autocomplete="organization" spellcheck="false">
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label id="new-guest-speciality-label">Base medical speciality</label>
+                                        <div class="guest-new-choice-field" role="group" aria-labelledby="new-guest-speciality-label">
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Anaesthesiology"> Anaesthesiology</label>
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Critical Care"> Critical Care</label>
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Emergency Medicine"> Emergency Medicine</label>
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Internal Medicine"> Internal Medicine</label>
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Paramedic"> Paramedic</label>
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Nursing"> Nursing</label>
+                                            <label><input type="checkbox" name="newGuestSpeciality" value="Other"> Other</label>
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label id="new-guest-training-label">Level of training</label>
+                                        <div class="guest-new-choice-field" role="radiogroup" aria-labelledby="new-guest-training-label">
+                                            <label><input type="radio" name="newGuestTraining" value="Consultant physiscian"> Consultant physiscian</label>
+                                            <label><input type="radio" name="newGuestTraining" value="Registrar physiscian"> Registrar physiscian</label>
+                                            <label><input type="radio" name="newGuestTraining" value="Specialist paramedic"> Specialist paramedic</label>
+                                            <label><input type="radio" name="newGuestTraining" value="Paramedic/EMT"> Paramedic/EMT</label>
+                                            <label><input type="radio" name="newGuestTraining" value="Specialist nurse"> Specialist nurse</label>
+                                            <label><input type="radio" name="newGuestTraining" value="Nurse"> Nurse</label>
+                                            <label><input type="radio" name="newGuestTraining" value="Other"> Other</label>
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label id="new-guest-clinical-label">Clinical context</label>
+                                        <div class="guest-new-choice-field" role="group" aria-labelledby="new-guest-clinical-label">
+                                            <label><input type="checkbox" name="newGuestClinical" value="Emergency Department"> Emergency Department</label>
+                                            <label><input type="checkbox" name="newGuestClinical" value="Intensive Care Unit"> Intensive Care Unit</label>
+                                            <label><input type="checkbox" name="newGuestClinical" value="Prehospital"> Prehospital</label>
+                                            <label><input type="checkbox" name="newGuestClinical" value="Operating theatres"> Operating theatres</label>
+                                            <label><input type="checkbox" name="newGuestClinical" value="Tactical/Austere"> Tactical/Austere</label>
+                                            <label><input type="checkbox" name="newGuestClinical" value="Other"> Other</label>
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="new-guest-bio">Very brief bio</label>
+                                        <textarea id="new-guest-bio" name="veryBriefBio" rows="4" spellcheck="true"></textarea>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label id="new-guest-past-label">Have you attended TBS in the past?</label>
+                                        <div class="guest-new-choice-field" role="radiogroup" aria-labelledby="new-guest-past-label">
+                                            <label><input type="radio" name="newGuestPastTbs" value="Yes"> Yes</label>
+                                            <label><input type="radio" name="newGuestPastTbs" value="No"> No</label>
+                                        </div>
+                                    </div>
+                                </form>
                                 <div class="guest-viewer-name-row" role="group" aria-label="Guest name">
                                     <div class="add-speaker-form-field">
                                         <label for="edit-guest-bottom-name-first">First name</label>
@@ -12584,6 +12892,7 @@
                                     <span class="edit-team-name-first" id="team-list-heading-event" aria-live="polite">—</span>
                                     <span class="edit-team-name-last" id="team-list-heading-suffix">TEAM</span>
                                 </div>
+                                <span class="team-roster-count" id="team-roster-count" aria-live="polite">(n=0)</span>
                             </div>
                             <div class="edit-team-top-trailing">
                                 <div id="team-actions" class="team-actions" aria-label="Team actions">
@@ -14034,6 +14343,8 @@
         let contentPadlockIsOpen = false;
         let contentDeleteConfirmArmed = false;
         let guestPadlockIsOpen = false;
+        var guestDraftFormActive = false;
+        var guestNewFormSaveInFlight = false;
         /** Ignore guest-roster row clicks until this timestamp (ms), e.g. after application-review confirm. */
         var suppressGuestRosterSelectUntil = 0;
         let speakerPadlockIsOpen = false;
@@ -17202,6 +17513,12 @@
         function updateSaveGuestToolbarButtonState() {
             var btn = document.getElementById('save-guest-button');
             if (!btn) return;
+            if (guestDraftFormActive) {
+                var draftReady = guestNewIdentityReady(readGuestRegistrationForm());
+                btn.disabled = !draftReady || !!guestNewFormSaveInFlight;
+                btn.setAttribute('aria-disabled', btn.disabled ? 'true' : 'false');
+                return;
+            }
             var id = String(guestFormEditingDocId || '').trim();
             var active = !!id && guestBioFormChangedFromBaseline();
             btn.disabled = !active;
@@ -17283,6 +17600,13 @@
 
         async function saveGuestFromEditor(opts) {
             if (backendBlockIfReadonly()) return false;
+            if (guestDraftFormActive) {
+                if (guestNewFormSyncTimer) {
+                    clearTimeout(guestNewFormSyncTimer);
+                    guestNewFormSyncTimer = null;
+                }
+                return createOrUpdateGuestFromRegistrationForm(opts || {});
+            }
             var id = String(guestFormEditingDocId || '').trim();
             if (!id) return true;
             var rec = findGuestInMemory(id);
@@ -17885,6 +18209,26 @@
             });
             updateSaveGuestToolbarButtonState();
             updateAddGuestDeleteButtonState();
+            var newGuestForm = document.getElementById('guest-new-form');
+            if (newGuestForm) {
+                newGuestForm.querySelectorAll('input, select, textarea').forEach(function (el) {
+                    var type = String(el.type || '').toLowerCase();
+                    if (type === 'checkbox' || type === 'radio' || el.tagName === 'SELECT') {
+                        el.disabled = !canEdit;
+                        return;
+                    }
+                    el.disabled = false;
+                    if (canEdit) {
+                        el.readOnly = false;
+                        el.removeAttribute('readonly');
+                        el.removeAttribute('aria-readonly');
+                    } else {
+                        el.readOnly = true;
+                        el.setAttribute('readonly', 'readonly');
+                        el.setAttribute('aria-readonly', 'true');
+                    }
+                });
+            }
         }
 
         function createSpeakerInMemoryTemplate(docId) {
@@ -19428,6 +19772,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            syncTeamRosterCount();
             syncTeamRosterSelectionHighlight();
             if (teamFormEditingDocId && !findTeamInMemory(teamFormEditingDocId)) {
                 clearTeamViewerSelection();
@@ -19437,6 +19782,13 @@
             } else {
                 setTeamViewerEmptyState(true);
             }
+        }
+
+        function syncTeamRosterCount() {
+            var note = document.getElementById('team-roster-count');
+            if (!note) return;
+            var n = Array.isArray(teamRosterInMemory) ? teamRosterInMemory.length : 0;
+            note.textContent = '(n=' + n + ')';
         }
 
         function findTeamInMemory(docId) {
@@ -23078,6 +23430,10 @@
             if (!guestFirstEl || !guestLastEl) return;
             var headingId = String(guestFormEditingDocId || '').trim();
             if (!headingId) {
+                if (guestDraftFormActive) {
+                    syncGuestDraftHeading();
+                    return;
+                }
                 guestFirstEl.textContent = '';
                 guestLastEl.textContent = '';
                 if (bottomFirstEl) bottomFirstEl.value = '';
@@ -23419,6 +23775,7 @@
 
         function populateEditGuestFormFromRecord(g) {
             if (!g) return;
+            setGuestNewFormVisible(false);
             closeGuestsOverwatch();
             var nextGuestId = String(g.id || '').trim();
             var switchingGuest =
@@ -23495,6 +23852,7 @@
         }
 
         function clearGuestEditorForm() {
+            setGuestNewFormVisible(false);
             guestFormEditingDocId = '';
             guestBioFormBaseline = null;
             var guestEmailClear = document.getElementById('edit-guest-email');
@@ -23519,6 +23877,299 @@
             requestAnimationFrame(function () {
                 scrollGuestEditorBottomToBio();
             });
+        }
+
+        function setGuestNewFormVisible(on) {
+            guestDraftFormActive = !!on;
+            var editor = document.getElementById('guest-editor');
+            if (editor) editor.classList.toggle('guest-editor--new-guest', guestDraftFormActive);
+            var form = document.getElementById('guest-new-form');
+            if (form) {
+                form.hidden = !guestDraftFormActive;
+                form.setAttribute('aria-hidden', guestDraftFormActive ? 'false' : 'true');
+            }
+        }
+
+        function syncGuestDraftHeading() {
+            var guestFirstEl = document.getElementById('edit-guest-name-first');
+            var guestLastEl = document.getElementById('edit-guest-name-last');
+            if (!guestFirstEl || !guestLastEl) return;
+            var firstInput = document.getElementById('new-guest-first-name');
+            var lastInput = document.getElementById('new-guest-last-name');
+            var first = firstInput ? String(firstInput.value || '').trim() : '';
+            var last = lastInput ? String(lastInput.value || '').trim() : '';
+            guestFirstEl.textContent = first || 'New';
+            guestLastEl.textContent = last || 'guest';
+        }
+
+        function guestNewFormFieldValue(id) {
+            var el = document.getElementById(id);
+            return el ? String(el.value || '').trim() : '';
+        }
+
+        function guestNewCheckedValues(name) {
+            var nodes = document.querySelectorAll('#guest-new-form input[name="' + name + '"]:checked');
+            var out = [];
+            for (var i = 0; i < nodes.length; i++) {
+                var v = String(nodes[i].value || '').trim();
+                if (v) out.push(v);
+            }
+            return out;
+        }
+
+        function guestNewRadioValue(name) {
+            var node = document.querySelector('#guest-new-form input[name="' + name + '"]:checked');
+            return node ? String(node.value || '').trim() : '';
+        }
+
+        function registrationSlugPart(input) {
+            var t = String(input == null ? '' : input)
+                .trim()
+                .replace(/[\s/]+/g, '')
+                .replace(/[^a-zA-Z0-9]+/g, '');
+            if (!t) t = 'x';
+            return t.slice(0, 80);
+        }
+
+        function guestNewApplicationLogLine() {
+            var d = new Date();
+            var yy = String(d.getFullYear()).slice(-2);
+            var mm = String(d.getMonth() + 1).padStart(2, '0');
+            var dd = String(d.getDate()).padStart(2, '0');
+            return yy + mm + dd + ': Application received';
+        }
+
+        function guestNewApplicationDate() {
+            var d = new Date();
+            var yyyy = String(d.getFullYear());
+            var mm = String(d.getMonth() + 1).padStart(2, '0');
+            var dd = String(d.getDate()).padStart(2, '0');
+            return yyyy + '-' + mm + '-' + dd;
+        }
+
+        function resetGuestNewFormFields() {
+            var form = document.getElementById('guest-new-form');
+            if (form && typeof form.reset === 'function') form.reset();
+        }
+
+        function showGuestDraftForm() {
+            closeGuestsOverwatch();
+            clearGuestRosterItemSelection();
+            clearGuestEditorForm();
+            resetGuestNewFormFields();
+            setGuestNewFormVisible(true);
+            guestPadlockIsOpen = true;
+            syncGuestPadlockButtonUi();
+            setGuestEditorEmptyState(false);
+            syncGuestEditabilityFromPadlock();
+            syncGuestDraftHeading();
+            scrollGuestEditorBottomToBio();
+            updateSaveGuestToolbarButtonState();
+            var first = document.getElementById('new-guest-first-name');
+            if (first) first.focus();
+        }
+
+        function readGuestRegistrationForm() {
+            return {
+                firstName: guestNewFormFieldValue('new-guest-first-name'),
+                lastName: guestNewFormFieldValue('new-guest-last-name'),
+                email: guestNewFormFieldValue('new-guest-email'),
+                emailConfirm: guestNewFormFieldValue('new-guest-email-confirm'),
+                cityRegion: guestNewFormFieldValue('new-guest-city-region'),
+                country: guestNewFormFieldValue('new-guest-country'),
+                employer1: guestNewFormFieldValue('new-guest-employer-1'),
+                employer2: guestNewFormFieldValue('new-guest-employer-2'),
+                baseSpeciality: guestNewCheckedValues('newGuestSpeciality'),
+                trainingLevel: guestNewRadioValue('newGuestTraining'),
+                clinicalContext: guestNewCheckedValues('newGuestClinical'),
+                veryBriefBio: guestNewFormFieldValue('new-guest-bio'),
+                pastTbs: guestNewRadioValue('newGuestPastTbs'),
+            };
+        }
+
+        function guestNewIdentityReady(data) {
+            if (!data) return false;
+            return !!(data.firstName && data.lastName && data.email);
+        }
+
+        function guestNewBioValue(data) {
+            var bio = data && data.veryBriefBio != null ? String(data.veryBriefBio).trim() : '';
+            return bio || 'No bio submission';
+        }
+
+        var guestNewFormSyncTimer = null;
+
+        function scheduleGuestNewFormSync() {
+            if (guestNewFormSyncTimer) clearTimeout(guestNewFormSyncTimer);
+            guestNewFormSyncTimer = setTimeout(function () {
+                guestNewFormSyncTimer = null;
+                createOrUpdateGuestFromRegistrationForm({ silent: true }).catch(function (err) {
+                    console.error('guest new form autosave:', err);
+                });
+            }, GUEST_FIREBASE_DEBOUNCE_MS);
+        }
+
+        async function allocateNewGuestId(db, eventName, firstName, lastName) {
+            var base = (
+                registrationSlugPart(eventName) +
+                registrationSlugPart(firstName) +
+                registrationSlugPart(lastName)
+            ).slice(0, 150) || 'guest';
+            var guestId = base;
+            for (var suffix = 0; suffix < 50; suffix++) {
+                if (suffix) guestId = (base + String(suffix)).slice(0, 150);
+                if (findGuestInMemory(guestId)) continue;
+                var snap = await tbsGuestItemRef(db, guestId).get();
+                if (snap && snap.exists) continue;
+                return guestId;
+            }
+            return '';
+        }
+
+        function guestRegistrationWritePayload(data, createOpts) {
+            var bio = guestNewBioValue(data);
+            var payload = {
+                Name: data.firstName,
+                'Last name': data.lastName,
+                'Last Name': data.lastName,
+                'E-mail': data.email,
+                'City/region': data.cityRegion,
+                Country: data.country,
+                'Employer 1': data.employer1,
+                'Employer 2': data.employer2,
+                'Base medical speciality': data.baseSpeciality,
+                'Level of Training': data.trainingLevel,
+                'Clinical context': data.clinicalContext,
+                'Brief bio': bio,
+                'Brief Bio': bio,
+                'Past TBS?': data.pastTbs,
+            };
+            if (createOpts) {
+                payload['Application date'] = guestNewApplicationDate();
+                payload.Attended = false;
+                payload.Briefed = 'No';
+                payload['CME sent'] = 'No';
+                payload.Event = createOpts.eventName;
+                payload.Invited = 'No';
+                payload.Invoiced = 'No';
+                payload.Paid = 'No';
+                payload.Read = 'No';
+                payload.Log = [guestNewApplicationLogLine()];
+            }
+            return payload;
+        }
+
+        function applyGuestRegistrationDataToRecord(rec, data) {
+            if (!rec || !data) return;
+            rec.name = data.firstName;
+            rec.lastName = data.lastName;
+            rec.email = data.email;
+            rec.cityRegion = data.cityRegion;
+            rec.country = data.country;
+            rec.employer1 = data.employer1;
+            rec.employer2 = data.employer2;
+            rec.baseSpecialities = data.baseSpeciality.slice();
+            rec.trainingLevel = data.trainingLevel;
+            rec.clinicalContext = data.clinicalContext.join(', ');
+            rec.bio = guestNewBioValue(data);
+        }
+
+        function rememberCreatedGuestRecord(rec) {
+            if (!Array.isArray(guestsRosterInMemory)) guestsRosterInMemory = [];
+            guestsRosterInMemory.push(rec);
+            if (guestsRosterAllInMemory !== guestsRosterInMemory) {
+                if (!Array.isArray(guestsRosterAllInMemory)) guestsRosterAllInMemory = [];
+                guestsRosterAllInMemory.push(rec);
+            }
+            guestsRosterSortInPlace();
+            if (guestsRosterView) setGuestsRosterView('');
+            renderGuestsRoster();
+            syncGuestRosterSelectionHighlight();
+        }
+
+        async function createOrUpdateGuestFromRegistrationForm(opts) {
+            opts = opts || {};
+            if (backendBlockIfReadonly()) return false;
+            if (!guestDraftFormActive) return false;
+            if (guestNewFormSaveInFlight) {
+                scheduleGuestNewFormSync();
+                return false;
+            }
+            var data = readGuestRegistrationForm();
+            if (!guestNewIdentityReady(data)) {
+                if (!opts.silent && typeof showStatus === 'function') {
+                    showStatus('error', 'Enter a first name, last name, and e-mail.');
+                }
+                return false;
+            }
+            guestNewFormSaveInFlight = true;
+            updateSaveGuestToolbarButtonState();
+            var created = false;
+            var savedOk = false;
+            try {
+                var db = getFirestore();
+                var guestId = String(guestFormEditingDocId || '').trim();
+                var payload;
+                if (!guestId) {
+                    var eventName = String(current_event || '').trim() || 'TBS27';
+                    guestId = await allocateNewGuestId(db, eventName, data.firstName, data.lastName);
+                    if (!guestId) {
+                        if (typeof showStatus === 'function') showStatus('error', 'Could not assign a guest id.');
+                        return false;
+                    }
+                    payload = guestRegistrationWritePayload(data, { eventName: eventName });
+                    await tbsGuestItemRef(db, guestId).set(payload);
+                    var FV = firebase.firestore && firebase.firestore.FieldValue;
+                    if (FV && typeof FV.arrayUnion === 'function') {
+                        await db.collection('tbs').doc('Guests').set(
+                            { guestIds: FV.arrayUnion(guestId) },
+                            { merge: true }
+                        );
+                    }
+                    var rec = guestRecordFromTbsItemDoc(guestId, payload);
+                    applyGuestRegistrationDataToRecord(rec, data);
+                    guestFormEditingDocId = guestId;
+                    rememberCreatedGuestRecord(rec);
+                    created = true;
+                } else {
+                    payload = guestRegistrationWritePayload(data, null);
+                    await tbsGuestItemRef(db, guestId).set(payload, { merge: true });
+                    var existing = findGuestInMemory(guestId);
+                    if (existing) {
+                        applyGuestRegistrationDataToRecord(existing, data);
+                        guestsRosterSortInPlace();
+                        renderGuestsRoster();
+                        syncGuestRosterSelectionHighlight();
+                    }
+                }
+                syncGuestDraftHeading();
+                if (typeof showStatus === 'function') {
+                    if (created) showStatus('success', 'New guest created');
+                    else if (!opts.silent) showStatus('success', 'Guest saved.');
+                }
+                savedOk = true;
+                return true;
+            } catch (err) {
+                console.error('createOrUpdateGuestFromRegistrationForm:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', (err && err.message) || 'Failed to save guest.');
+                }
+                return false;
+            } finally {
+                guestNewFormSaveInFlight = false;
+                updateSaveGuestToolbarButtonState();
+                if (savedOk && guestDraftFormActive && guestNewIdentityReady(readGuestRegistrationForm())) {
+                    var latest = readGuestRegistrationForm();
+                    var stored = findGuestInMemory(guestFormEditingDocId);
+                    var bioNow = guestNewBioValue(latest);
+                    var drifted = !stored ||
+                        String(stored.name || '') !== latest.firstName ||
+                        String(stored.lastName || '') !== latest.lastName ||
+                        String(stored.email || '') !== latest.email ||
+                        String(stored.bio || '') !== bioNow;
+                    if (drifted) scheduleGuestNewFormSync();
+                }
+            }
         }
 
         function navigateGuestInRoster(delta) {
@@ -27756,6 +28407,11 @@
             }
             mark(allLink, !ideas);
             mark(ideasLink, ideas);
+            var note = document.getElementById('speakers-roster-filter-note');
+            var anchor = ideas ? ideasLink : allLink;
+            if (note && anchor && anchor.parentNode && note.parentNode === anchor.parentNode && anchor.nextSibling !== note) {
+                anchor.parentNode.insertBefore(note, anchor.nextSibling);
+            }
         }
 
         function setSpeakersRosterView(next) {
@@ -33921,10 +34577,33 @@
             if (addGuestBtn) {
                 addGuestBtn.addEventListener('click', function() {
                     if (backendBlockIfReadonly()) return;
-                    closeGuestsOverwatch();
-                    clearGuestRosterItemSelection();
-                    clearGuestEditorForm();
+                    showGuestDraftForm();
                 });
+            }
+            var guestNewFormEl = document.getElementById('guest-new-form');
+            if (guestNewFormEl) {
+                guestNewFormEl.addEventListener('submit', function (ev) {
+                    ev.preventDefault();
+                    if (!guestDraftFormActive) return;
+                    saveGuestFromEditor().catch(function (err) {
+                        console.error('guest-new-form:', err);
+                    });
+                });
+                function onGuestNewFormEdit() {
+                    if (!guestDraftFormActive) return;
+                    syncGuestDraftHeading();
+                    updateSaveGuestToolbarButtonState();
+                    if (!guestNewIdentityReady(readGuestRegistrationForm())) {
+                        if (guestNewFormSyncTimer) {
+                            clearTimeout(guestNewFormSyncTimer);
+                            guestNewFormSyncTimer = null;
+                        }
+                        return;
+                    }
+                    scheduleGuestNewFormSync();
+                }
+                guestNewFormEl.addEventListener('input', onGuestNewFormEdit);
+                guestNewFormEl.addEventListener('change', onGuestNewFormEdit);
             }
             var speakersOverwatchBtn = document.getElementById('speakers-overwatch-btn');
             if (speakersOverwatchBtn) {
