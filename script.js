@@ -5089,9 +5089,8 @@ async function homeLoadProgrammeDayMeta(db, isoDate) {
     let name = isoDate;
     if (metaSnap.exists) {
         const data = metaSnap.data() || {};
-        if (data.name != null && String(data.name).trim() !== '') {
-            name = String(data.name);
-        }
+        const dayName = data['day-name'] != null ? String(data['day-name']).trim() : '';
+        if (dayName) name = dayName;
     }
     return { isoDate: isoDate, name: name };
 }

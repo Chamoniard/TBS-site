@@ -7226,6 +7226,25 @@
             white-space: nowrap;
         }
 
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .programme-event-date-range {
+            margin: 0;
+            flex: 0 0 auto;
+            align-self: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .programme-event-date-range[hidden] {
+            display: none !important;
+        }
+
         #guest-editor .guests-list-heading .guests-roster-table-view-link {
             margin: 0 0 0 1.5rem;
             font-family: 'Inter', sans-serif;
@@ -11250,6 +11269,7 @@
             opacity: 1;
         }
 
+        #programme-editor .programme-day-name-text[contenteditable='false'],
         #programme-editor .programme-day-session[contenteditable='false'],
         #programme-editor .programme-day-slot-starttime[contenteditable='false'],
         #programme-editor .programme-day-slot-endtime[contenteditable='false'],
@@ -11605,10 +11625,12 @@
             border-radius: 5px;
         }
 
+        #programme-editor .programme-day-name-text[contenteditable="true"],
         #programme-editor .programme-day-session[contenteditable="true"] {
             cursor: text;
         }
 
+        #programme-editor .programme-day-name-text[contenteditable="true"]:focus,
         #programme-editor .programme-day-session[contenteditable="true"]:focus {
             outline: none;
             box-shadow: inset 0 0 0 1px #fc70d7;
@@ -13161,6 +13183,7 @@
                                 </div>
                             </div>
                             <div class="edit-guest-top-trailing">
+                                <span class="programme-event-date-range" id="programme-event-date-range" hidden aria-hidden="true"></span>
                                 <div class="programme-toolbar">
                                     <div class="programme-toolbar-leading">
                                         <button type="button" class="programme-padlock-btn" id="programme-editor-padlock-btn" aria-label="Unlock programme" title="Lock" aria-pressed="false" disabled aria-disabled="true">
@@ -15270,12 +15293,17 @@
             htmlDateByDay: {},
             /** Per ISO date: display name string; stored on same programme doc as field "name" (default: date) */
             nameDateByDay: {},
+            /** Per ISO date: editable heading; stored on the day Programme doc as field "day-name". Empty shows the date id. */
+            dayNameByDay: {},
         /** Per ISO date: session docs (`Session-*`) in `tbs/Programme/{Current event}/days/{ISO}/` */
             sessionsByDay: {},
         };
         let programmeStateDirty = false;
         let programmeSessionNamesDirty = false;
         let programmeSlotsDirty = false;
+        let programmeDayNamesDirty = false;
+        /** Last Firebase-synced `day-name` per ISO date. */
+        let programmePersistedDayNameByDay = {};
         /** Last Firebase-synced programme sessions/slots (editable fields only). */
         let programmePersistedSessionsByDay = {};
         var programmeFirestoreSyncInFlight = false;
@@ -15418,9 +15446,67 @@
             return false;
         }
 
+        function programmeDayNameStored(dateStr) {
+            var raw = programmeState && programmeState.dayNameByDay ? programmeState.dayNameByDay[dateStr] : '';
+            return String(raw != null ? raw : '').trim();
+        }
+
+        function programmePersistedDayName(dateStr) {
+            var raw = programmePersistedDayNameByDay ? programmePersistedDayNameByDay[dateStr] : '';
+            return String(raw != null ? raw : '').trim();
+        }
+
+        /** Empty when the heading still shows the date id, so the date collection is not renamed. */
+        function programmeDayNameFromEditableText(dateStr, text) {
+            var value = String(text != null ? text : '').replace(/\s+/g, ' ').trim();
+            if (!value || value === dateStr) return '';
+            return value;
+        }
+
+        function programmeDayHeadingText(dateStr) {
+            return programmeDayNameStored(dateStr) || dateStr;
+        }
+
+        function syncProgrammePersistedDayNamesFromState() {
+            programmePersistedDayNameByDay = {};
+            var src = programmeState && programmeState.dayNameByDay ? programmeState.dayNameByDay : {};
+            Object.keys(src).forEach(function (dateStr) {
+                programmePersistedDayNameByDay[dateStr] = String(src[dateStr] != null ? src[dateStr] : '').trim();
+            });
+        }
+
+        function readProgrammeDayNameEl(el) {
+            if (!el) return '';
+            return String(el.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function applyProgrammeDayNameInputToLocal(el) {
+            if (!el) return;
+            var dateStr = el.getAttribute('data-programme-date') || '';
+            if (!dateStr || !programmeState || !programmeState.dayNameByDay) return;
+            programmeState.dayNameByDay[dateStr] = programmeDayNameFromEditableText(dateStr, readProgrammeDayNameEl(el));
+            recomputeProgrammeEditDirtyFlags();
+        }
+
+        function applyProgrammeDayNameEditableElToLocal(el) {
+            applyProgrammeDayNameInputToLocal(el);
+            if (!el || document.activeElement === el) return;
+            var dateStr = el.getAttribute('data-programme-date') || '';
+            if (!dateStr) return;
+            el.textContent = programmeDayHeadingText(dateStr);
+        }
+
+        function flushProgrammeDayNameDomEditsToLocal() {
+            var els = document.querySelectorAll('#programme-editor .programme-day-name-text[data-programme-date]');
+            for (var i = 0; i < els.length; i++) {
+                applyProgrammeDayNameInputToLocal(els[i]);
+            }
+        }
+
         function recomputeProgrammeEditDirtyFlags() {
             programmeSessionNamesDirty = false;
             programmeSlotsDirty = false;
+            programmeDayNamesDirty = false;
             var byDay = programmeState && programmeState.sessionsByDay ? programmeState.sessionsByDay : {};
             var dates = Object.keys(byDay);
             for (var di = 0; di < dates.length; di++) {
@@ -15464,6 +15550,25 @@
                 for (var ui = 0; ui < slotEls.length; ui++) {
                     if (programmeSlotDomFieldDiffersFromPersisted(slotEls[ui])) {
                         programmeSlotsDirty = true;
+                        break;
+                    }
+                }
+            }
+            var dayDates = programmeState && programmeState.dayDates ? programmeState.dayDates : [];
+            for (var dn = 0; dn < dayDates.length; dn++) {
+                if (programmeDayNameStored(dayDates[dn]) !== programmePersistedDayName(dayDates[dn])) {
+                    programmeDayNamesDirty = true;
+                    break;
+                }
+            }
+            if (!programmeDayNamesDirty) {
+                var dayNameEls = document.querySelectorAll('#programme-editor .programme-day-name-text[data-programme-date]');
+                for (var de = 0; de < dayNameEls.length; de++) {
+                    var dayNameEl = dayNameEls[de];
+                    var dayDate = dayNameEl.getAttribute('data-programme-date') || '';
+                    if (!dayDate) continue;
+                    if (programmeDayNameFromEditableText(dayDate, readProgrammeDayNameEl(dayNameEl)) !== programmePersistedDayName(dayDate)) {
+                        programmeDayNamesDirty = true;
                         break;
                     }
                 }
@@ -15536,15 +15641,20 @@
                 return false;
             }
             if (!programmeState || !programmeState.eventId) return false;
-            if (!programmeSessionNamesDirty && !programmeSlotsDirty && !(programmeState.meta && programmeStateDirty)) {
+            if (!programmeSessionNamesDirty && !programmeSlotsDirty && !programmeDayNamesDirty && !(programmeState.meta && programmeStateDirty)) {
                 return false;
             }
             programmeFirestoreSyncInFlight = true;
             var savedParts = [];
             try {
+                flushProgrammeDayNameDomEditsToLocal();
                 flushProgrammeSessionDomEditsToLocal();
                 flushProgrammeSlotDomEditsToLocal({ skipRefresh: true });
                 recomputeProgrammeEditDirtyFlags();
+                if (programmeDayNamesDirty) {
+                    await saveProgrammeDayNamesFromState({ silent: true });
+                    if (!programmeDayNamesDirty) savedParts.push('day names');
+                }
                 if (programmeSessionNamesDirty) {
                     await saveProgrammeSessionNamesFromDom({
                         silent: true,
@@ -17265,6 +17375,28 @@
 
 
 
+
+        async function saveProgrammeDayNamesFromState(options) {
+            options = options || {};
+            flushProgrammeDayNameDomEditsToLocal();
+            var db = getFirestore();
+            var writes = [];
+            var dates = programmeState && programmeState.dayDates ? programmeState.dayDates.slice() : [];
+            for (var i = 0; i < dates.length; i++) {
+                var dateStr = dates[i];
+                var dayName = programmeDayNameStored(dateStr);
+                if (dayName === programmePersistedDayName(dateStr)) continue;
+                var payload = {};
+                payload['day-name'] = dayName;
+                writes.push(tbsProgrammeDayDocRef(db, dateStr).set(payload, { merge: true }));
+            }
+            if (writes.length) await Promise.all(writes);
+            syncProgrammePersistedDayNamesFromState();
+            recomputeProgrammeEditDirtyFlags();
+            if (!options.silent && writes.length && typeof showStatus === 'function') {
+                showStatus('success', 'Day names saved.');
+            }
+        }
 
         async function saveProgrammeSessionNamesFromDom(options) {
             options = options || {};
@@ -32556,6 +32688,7 @@
             const hasUnsaved =
                 programmeSessionNamesDirty ||
                 programmeSlotsDirty ||
+                programmeDayNamesDirty ||
                 (programmeState.meta && programmeStateDirty);
             if (!canEdit) {
                 btn.disabled = true;
@@ -32619,7 +32752,7 @@
             var canEdit = programmePadlockIsOpen;
             root.classList.toggle('programme-editor-locked', !canEdit);
             root.querySelectorAll(
-                '.programme-day-session, .programme-day-slot-starttime, .programme-day-slot-endtime, .programme-day-slot-detail'
+                '.programme-day-name-text, .programme-day-session, .programme-day-slot-starttime, .programme-day-slot-endtime, .programme-day-slot-detail'
             ).forEach(function(el) {
                 el.contentEditable = canEdit ? 'true' : 'false';
                 if (canEdit) {
@@ -33530,7 +33663,33 @@
             applyProgrammeEditorDaySelection();
         }
 
+        /** First–last programme day, e.g. "(2027-02-09 – 2027-02-12)". */
+        function formatProgrammeEventDateRange(dates) {
+            var isos = [];
+            (dates || []).forEach(function (iso) {
+                var value = String(iso || '').trim();
+                if (/^\d{4}-\d{2}-\d{2}$/.test(value)) isos.push(value);
+            });
+            isos.sort();
+            if (!isos.length) return '';
+            var first = isos[0];
+            var last = isos[isos.length - 1];
+            if (first === last) return '(' + first + ')';
+            return '(' + first + ' – ' + last + ')';
+        }
+
+        function updateProgrammeEventDateRangeDisplay() {
+            var el = document.getElementById('programme-event-date-range');
+            if (!el) return;
+            var dates = programmeState && programmeState.dayDates ? programmeState.dayDates.slice() : [];
+            var label = formatProgrammeEventDateRange(dates);
+            el.textContent = label;
+            el.hidden = !label;
+            el.setAttribute('aria-hidden', label ? 'false' : 'true');
+        }
+
         function refreshProgrammeEditorDays() {
+            updateProgrammeEventDateRangeDisplay();
             var rowEl = document.getElementById('programme-editor-grid-row');
             if (!rowEl) return;
             if (!selectedevent || !programmeState || !programmeState.eventId) {
@@ -33583,12 +33742,9 @@
                 selectedProgrammeEditorSlotSessionId = null;
             }
             rowEl.innerHTML = dates.map(function(dateStr) {
-                var name = (programmeState.nameDateByDay && programmeState.nameDateByDay[dateStr] != null && String(programmeState.nameDateByDay[dateStr]).trim() !== '')
-                    ? String(programmeState.nameDateByDay[dateStr])
-                    : dateStr;
                 return '<div class="programme-editor-day programme-day-slide" data-programme-date="' + escapeHtml(dateStr) + '">' +
                     '<div class="programme-day-content programmestyle">' +
-                    '<div class="programme-day-name"><h3>' + escapeHtml(name) + '</h3></div>' +
+                    '<div class="programme-day-name"><h3 class="programme-day-name-text" contenteditable="true" spellcheck="false" role="textbox" aria-label="Day name" data-programme-date="' + escapeHtml(dateStr) + '">' + escapeHtml(programmeDayHeadingText(dateStr)) + '</h3></div>' +
                     programmeDaySessionsHtml(dateStr) +
                     '</div>' +
                     '</div>';
@@ -33694,11 +33850,14 @@
                 programmeState.days = {};
                 programmeState.htmlDateByDay = {};
                 programmeState.nameDateByDay = {};
+                programmeState.dayNameByDay = {};
                 programmeState.sessionsByDay = {};
                 programmeStateDirty = false;
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
+                programmeDayNamesDirty = false;
                 programmePersistedSessionsByDay = {};
+                programmePersistedDayNameByDay = {};
                 selectedProgrammeEditorDayDate = null;
                 selectedProgrammeEditorSessionId = null;
                 selectedProgrammeEditorSlotId = null;
@@ -33720,10 +33879,13 @@
                 programmeState.dayDates = [];
                 programmeState.htmlDateByDay = {};
                 programmeState.nameDateByDay = {};
+                programmeState.dayNameByDay = {};
                 programmeState.sessionsByDay = {};
                 programmeStateDirty = false;
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
+                programmeDayNamesDirty = false;
+                programmePersistedDayNameByDay = {};
                 selectedProgrammeEditorDayDate = null;
                 selectedProgrammeEditorSessionId = null;
                 selectedProgrammeEditorSlotId = null;
@@ -33756,9 +33918,11 @@
                     programmeState.nameDateByDay[id] = (tbsData.name != null && String(tbsData.name).trim() !== '')
                         ? String(tbsData.name)
                         : id;
+                    programmeState.dayNameByDay[id] = tbsData['day-name'] != null ? String(tbsData['day-name']).trim() : '';
                 }
                 await loadProgrammeSessionsByDay(db, programmeState.dayDates);
                 syncProgrammePersistedSnapshotFromState();
+                syncProgrammePersistedDayNamesFromState();
                 renderGridFromState();
                 updateSaveButtonState();
                 rebuildTexteditorProgrammeButtons();
@@ -33774,10 +33938,13 @@
                 programmeState.days = {};
                 programmeState.htmlDateByDay = {};
                 programmeState.nameDateByDay = {};
+                programmeState.dayNameByDay = {};
                 programmeState.sessionsByDay = {};
                 programmeSessionNamesDirty = false;
                 programmeSlotsDirty = false;
+                programmeDayNamesDirty = false;
                 programmePersistedSessionsByDay = {};
+                programmePersistedDayNameByDay = {};
                 renderGridFromState();
                 rebuildTexteditorProgrammeButtons();
             }
@@ -33822,10 +33989,11 @@
                     var nameVal = (programmeState.nameDateByDay && programmeState.nameDateByDay[dateStr] != null && String(programmeState.nameDateByDay[dateStr]).trim() !== '')
                         ? String(programmeState.nameDateByDay[dateStr])
                         : dateStr;
-                    await tbsProgrammeDayDocRef(db, dateStr).set({
-                        html: htmlDateVal,
-                        name: nameVal
-                    }, { merge: true });
+                    var dayNamePayload = {};
+                    dayNamePayload['day-name'] = programmeDayNameStored(dateStr);
+                    dayNamePayload.html = htmlDateVal;
+                    dayNamePayload.name = nameVal;
+                    await tbsProgrammeDayDocRef(db, dateStr).set(dayNamePayload, { merge: true });
                 }
                 await loadProgrammeFromFirestore(eventId);
                 programmeStateDirty = false;
@@ -36837,6 +37005,10 @@
             if (programmeEditorEl) {
                 programmeEditorEl.addEventListener('input', function(e) {
                     if (!programmePadlockIsOpen) return;
+                    if (e.target.classList && e.target.classList.contains('programme-day-name-text')) {
+                        applyProgrammeDayNameInputToLocal(e.target);
+                        return;
+                    }
                     if (e.target.classList && e.target.classList.contains('programme-day-session')) {
                         applyProgrammeSessionInputToLocal(e.target, { skipNormalizeDom: true });
                         return;
@@ -36854,12 +37026,17 @@
                     if (!programmePadlockIsOpen) return;
                     var el = e.target;
                     if (!el || !programmeEditorEl.contains(el)) return;
+                    var isDayName = el.classList && el.classList.contains('programme-day-name-text');
                     var isSession = el.classList && el.classList.contains('programme-day-session');
                     var slotField = slotFieldFromEditableEl(el);
-                    if (!isSession && !slotField) return;
+                    if (!isDayName && !isSession && !slotField) return;
                     var targetEl = el;
                     window.setTimeout(function() {
                         if (!document.body.contains(targetEl)) return;
+                        if (targetEl.classList && targetEl.classList.contains('programme-day-name-text')) {
+                            applyProgrammeDayNameEditableElToLocal(targetEl);
+                            return;
+                        }
                         if (targetEl.classList && targetEl.classList.contains('programme-day-session')) {
                             applyProgrammeSessionEditableElToLocal(targetEl);
                             return;
@@ -36871,6 +37048,14 @@
                 });
                 programmeEditorEl.addEventListener('keydown', function(e) {
                     if (!programmePadlockIsOpen) return;
+                    if (e.target.classList && e.target.classList.contains('programme-day-name-text')) {
+                        if (e.key !== 'Enter') return;
+                        e.preventDefault();
+                        var dayNameTarget = e.target;
+                        applyProgrammeDayNameEditableElToLocal(dayNameTarget);
+                        dayNameTarget.blur();
+                        return;
+                    }
                     var slotField = slotFieldFromEditableEl(e.target);
                     if (slotField) {
                         if (e.key !== 'Enter') return;
@@ -36888,6 +37073,11 @@
                     sessionTarget.blur();
                 });
                 programmeEditorEl.addEventListener('mousedown', function(e) {
+                    if (e.target.classList && e.target.classList.contains('programme-day-name-text')) {
+                        e.stopPropagation();
+                        if (!programmePadlockIsOpen) e.preventDefault();
+                        return;
+                    }
                     if (e.target.classList && e.target.classList.contains('programme-day-session')) {
                         e.stopPropagation();
                         if (!programmePadlockIsOpen) e.preventDefault();
