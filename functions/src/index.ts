@@ -493,6 +493,23 @@ function guestLogGentleReminderLine(): string {
 }
 
 /**
+ * Guest Log as a list of strings. Accepts an array or a single string.
+ * @param {Record<string, unknown>} data Guest item data.
+ * @return {string[]} Existing log lines.
+ */
+function guestLogLinesFromData(data: Record<string, unknown>): string[] {
+  const raw = data.Log !== undefined ? data.Log : data.log;
+  if (Array.isArray(raw)) {
+    return raw
+      .map((entry) => String(entry ?? "").trim())
+      .filter(Boolean);
+  }
+  if (raw == null) return [];
+  const one = String(raw).trim();
+  return one ? [one] : [];
+}
+
+/**
  * True when Paid is Overdue (legacy Overdue 30 / Overdue 60 still count).
  * @param {Record<string, unknown>} data Guest item data.
  * @return {boolean} Whether a payment reminder may be sent.
@@ -2493,10 +2510,15 @@ export const sendGuestGentleReminderHttp = onRequest({
     });
 
     const logLine = guestLogGentleReminderLine();
-    await itemRef.set({
-      "Paid": "First notice",
-      "Log": FieldValue.arrayUnion(logLine),
-    }, {merge: true});
+    await db.runTransaction(async (tx) => {
+      const fresh = await tx.get(itemRef);
+      const lines = guestLogLinesFromData(fresh.data() || {});
+      if (!lines.includes(logLine)) lines.push(logLine);
+      tx.set(itemRef, {
+        "Paid": "First notice",
+        "Log": lines,
+      }, {merge: true});
+    });
 
     logger.info("sendGuestGentleReminderHttp ok", {
       guestId,

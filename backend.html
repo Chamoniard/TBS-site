@@ -1202,6 +1202,7 @@
         #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             display: flex;
@@ -4639,7 +4640,7 @@
             flex: 1 1 0;
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: minmax(0, 1fr);
+            grid-template-rows: auto minmax(0, 1fr);
             min-width: 0;
             min-height: 8rem;
             overflow: hidden;
@@ -4651,9 +4652,67 @@
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
-        #content-editor .content-editor-empty {
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-viewer-heading {
             grid-column: 1;
             grid-row: 1;
+            z-index: 1;
+            background-color: #ffffff;
+            border-bottom: 1px solid #cbd5e1;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+        }
+
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-viewer-heading .selected-guestname-wrap,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-viewer-heading .selected-guestname {
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            text-align: left;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-viewer-heading .edit-guest-top-trailing {
+            flex: 0 0 auto;
+            min-width: max-content;
+            max-width: none;
+            overflow: visible;
+            flex-wrap: nowrap;
+        }
+
+        #content-editor .content-viewer-heading .content-editor-toolbar {
+            width: auto;
+            min-width: max-content;
+            max-width: none;
+            min-height: 0;
+            height: auto;
+            padding: 0;
+            margin: 0;
+            flex-wrap: nowrap;
+            justify-content: flex-end;
+        }
+
+        #content-editor .content-viewer--no-selection > .content-viewer-heading {
+            display: none !important;
+        }
+
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-first.content-viewer-title {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: normal;
+            max-width: 100%;
+            text-align: left;
+        }
+
+        #content-editor .content-editor-empty {
+            grid-column: 1;
+            grid-row: 1 / span 2;
             z-index: 5;
             margin: 0;
             align-self: stretch;
@@ -4770,7 +4829,7 @@
         #content-editor .add-content-form .add-content-form-field input,
         #content-editor .add-content-form .add-content-form-field textarea {
             border: none;
-            border-radius: 0;
+            border-radius: 6px;
             background: var(--backend-tab-pale-blue);
             transition: background-color 0.15s ease;
         }
@@ -4803,42 +4862,78 @@
 
         #content-editor .content-editor-badge-dropdown {
             position: absolute;
-            top: calc(100% + 4px);
+            top: calc(100% + 6px);
             left: 0;
-            z-index: 25;
+            right: auto;
+            z-index: 200;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            padding: 6px;
+            gap: 0;
+            width: 100%;
             min-width: 100%;
+            max-width: none;
+            max-height: 16rem;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0.2rem 0;
             background: #ffffff;
-            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+            box-sizing: border-box;
         }
 
         #content-editor .content-editor-badge-dropdown[hidden] {
             display: none !important;
         }
 
-        #content-editor .content-editor-badge-dropdown .content-editor-badge-option {
-            align-self: flex-start;
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option,
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option:disabled {
+            display: block;
+            align-self: stretch;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            margin: 0;
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 0;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            letter-spacing: normal;
+            text-align: left;
+            text-transform: none;
+            white-space: nowrap;
             cursor: pointer;
             pointer-events: auto;
+            box-sizing: border-box;
+            box-shadow: none;
+            opacity: 1;
+            appearance: none;
+            -webkit-appearance: none;
         }
 
-        #content-editor .content-editor-badge-dropdown .content-editor-badge-option.is-selected {
-            box-shadow: inset 0 0 0 2px rgba(15, 23, 42, 0.25);
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option:hover,
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option:focus,
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option:focus-visible {
+            background: #f8fafc;
+            color: #0f172a;
+            outline: none;
         }
 
-        #content-editor .content-editor-badge-dropdown .content-editor-topic-option {
-            background: #e2e8f0;
-            color: #334155;
-        }
-
-        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.is-selected {
-            background: var(--backend-roster-pill-black);
-            color: #ffffff;
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option.is-selected,
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option.is-selected:hover,
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option.is-selected:focus,
+        #content-editor .content-editor-badge-dropdown .content-editor-badge-option.is-selected:focus-visible {
+            background: var(--backend-tab-pale-pink);
+            color: #003153;
+            font-weight: 600;
+            box-shadow: none;
         }
 
         #content-editor .content-type-event-row {
@@ -4849,9 +4944,9 @@
             align-self: flex-start;
             gap: 16px;
             min-width: 0;
-            background: #71C7FE;
-            border-radius: 5px;
-            padding: 8px;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
@@ -4907,7 +5002,7 @@
 
         #content-editor .content-viewer > .edit-content-bottom {
             grid-column: 1;
-            grid-row: 1;
+            grid-row: 2;
             display: flex;
             flex-direction: column;
             min-width: 0;
@@ -4944,17 +5039,8 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #content-editor .edit-content-bottom .content-editor-badge-dropdown .content-editor-badge-option:not(.content-editor-topic-option) {
+        #content-editor .edit-content-bottom .content-editor-badge-dropdown .content-editor-badge-option {
             font-size: 0.875rem;
-            font-weight: 500;
-            color: #0f172a;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: normal;
-        }
-
-        #content-editor .edit-content-bottom .content-editor-badge-dropdown .content-editor-topic-option {
-            font-size: 0.875rem;
-            font-weight: 500;
             font-family: 'Inter', sans-serif;
             letter-spacing: normal;
         }
@@ -5595,12 +5681,16 @@
             box-sizing: border-box;
         }
 
-        #content-editor .content-roster-name-truncate {
+        #content-editor .content-list-table .content-badge.content-badge--name .content-roster-name-truncate,
+        #content-editor .content-roster-table .content-badge.content-badge--name .content-roster-name-truncate {
             display: block;
+            flex: 1 1 auto;
+            min-width: 0;
             max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-align: left;
         }
 
         #content-editor .content-roster-table th.content-roster-title-col,
@@ -5642,8 +5732,14 @@
             text-align: center;
         }
         #content-editor .content-list-table .content-badge.content-badge--date,
-        #content-editor .content-roster-table .content-badge.content-badge--date {
+        #content-editor .content-roster-table .content-badge.content-badge--date,
+        #content-editor .content-list-table .content-badge.content-badge--name,
+        #content-editor .content-roster-table .content-badge.content-badge--name {
             margin: 0;
+        }
+        #content-editor .content-list-table .content-badge.content-badge--name,
+        #content-editor .content-roster-table .content-badge.content-badge--name {
+            justify-content: flex-start;
         }
         #content-editor .content-roster-table th.content-roster-name-col,
         #content-editor .content-list-table th.content-roster-name-col,
@@ -5706,14 +5802,70 @@
             white-space: nowrap;
         }
 
-        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic {
-            background: #e2e8f0 !important;
-            color: #334155 !important;
+        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic,
+        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic.is-selected {
+            background: transparent;
+            color: inherit;
         }
 
-        #content-editor .content-editor-badge-dropdown .content-editor-topic-option.content-badge--topic.is-selected {
-            background: var(--backend-roster-pill-black) !important;
-            color: #ffffff !important;
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn,
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn:disabled,
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn[aria-disabled='true'] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            margin: 0;
+            padding: 0.5rem 1.25rem;
+            text-align: left;
+            background: var(--backend-tab-pale-blue);
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            box-shadow: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            white-space: nowrap;
+            opacity: 1;
+        }
+
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn:hover:not(:disabled),
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn:focus-visible {
+            outline: 2px solid rgba(251, 207, 232, 0.85);
+            outline-offset: 2px;
+        }
+
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn-label {
+            display: block;
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn svg {
+            display: block;
+            width: 0.7rem;
+            height: 0.7rem;
+            flex: 0 0 auto;
+            transition: transform 0.15s ease;
+        }
+
+        #content-editor .add-content-form .content-editor-badge-field .content-editor-badge-btn[aria-expanded='true'] svg {
+            transform: rotate(180deg);
+        }
+
+        #content-editor.content-editable-unlocked .add-content-form .content-editor-badge-field .content-editor-badge-btn,
+        #content-editor.content-editable-unlocked .add-content-form .content-editor-badge-field .content-editor-badge-btn:disabled,
+        #content-editor.content-editable-unlocked .add-content-form .content-editor-badge-field .content-editor-badge-btn[aria-disabled='true'] {
+            background: var(--backend-tab-pale-pink);
+            color: #0f172a;
         }
 
         #content-editor .content-badge.content-badge--type-standard {
@@ -5795,7 +5947,9 @@
         #content-editor .content-roster-table .content-badge.content-badge--event-tbs27,
         #content-editor .content-roster-table .content-badge.content-badge--event-default,
         #content-editor .content-list-table .content-badge.content-badge--date,
-        #content-editor .content-roster-table .content-badge.content-badge--date {
+        #content-editor .content-roster-table .content-badge.content-badge--date,
+        #content-editor .content-list-table .content-badge.content-badge--name,
+        #content-editor .content-roster-table .content-badge.content-badge--name {
             background: var(--backend-roster-status-yes-bg);
             color: var(--backend-roster-status-yes-color);
         }
@@ -6857,6 +7011,7 @@
 
         #guest-editor .edit-guest-top,
         #content-editor .content-list > .edit-guest-top.guests-list-heading,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
@@ -6876,6 +7031,7 @@
 
         #guest-editor .guests-list > .edit-guest-top.guests-list-heading,
         #content-editor .content-list > .edit-guest-top.guests-list-heading,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
@@ -6899,6 +7055,7 @@
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
         #speaker-editor .edit-speaker-top,
         #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-list-top,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
         #programme-editor .activities > .edit-guest-top.guests-list-heading {
             height: var(--backend-panel-header-height);
@@ -6912,6 +7069,7 @@
         #guest-editor .guest-viewer > .guest-editor > .edit-guest-top .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top .edit-guest-top-trailing,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-list-top .edit-guest-top-trailing,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             padding-right: 0;
@@ -6935,6 +7093,7 @@
         #guest-editor .guests-list-heading .guests-roster-table-spacer,
         #guest-editor .edit-guest-top .edit-guest-top-spacer,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
@@ -6945,6 +7104,7 @@
         #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .edit-guest-top .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
@@ -6959,8 +7119,11 @@
         #guest-editor .edit-guest-top .edit-guest-name-first,
         #guest-editor .edit-guest-top .edit-guest-name-last,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
@@ -6985,7 +7148,9 @@
         #guest-editor .edit-guest-top-spacer,
         #guest-editor .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
@@ -7002,6 +7167,7 @@
         #guest-editor .guests-list-heading .guests-roster-table-trailing,
         #guest-editor .edit-guest-top-trailing,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
@@ -7104,6 +7270,7 @@
         #guest-editor .guests-list-heading .guests-roster-table-title-wrap,
         #guest-editor .edit-guest-top .selected-guestname-wrap,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
@@ -7142,6 +7309,7 @@
 
         #guest-editor .edit-guest-top .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
@@ -7191,6 +7359,7 @@
         #guest-editor .guests-roster-table-title,
         #guest-editor .selected-guestname,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
@@ -7210,6 +7379,7 @@
 
         #guest-editor .guests-list > .edit-guest-top.guests-list-heading .guests-roster-table-title,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
@@ -8211,7 +8381,9 @@
         #guest-editor .edit-guest-name-first,
         #guest-editor .edit-guest-name-last,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
@@ -9268,11 +9440,16 @@
 
         #speaker-editor .speaker-editor-bio .add-speaker-long-bio-field,
         #speaker-editor .speaker-editor-bio .add-speaker-short-bio-field {
-            background: #f1f5f9;
+            background: var(--backend-tab-pale-blue);
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 0.75rem 1rem;
             box-sizing: border-box;
+        }
+
+        #speaker-editor.speaker-padlock-unlocked .speaker-editor-bio .add-speaker-long-bio-field,
+        #speaker-editor.speaker-padlock-unlocked .speaker-editor-bio .add-speaker-short-bio-field {
+            background: var(--backend-tab-pale-pink);
         }
 
         #speaker-editor .speaker-editor-bio textarea#add-speaker-short-bio {
@@ -12813,20 +12990,14 @@
                         </div>
                     </div>
                     <div class="content-viewer">
-                        <div class="edit-content-bottom">
-                            <div class="content-editor-media" aria-label="Content image">
-                                <div class="content-editor-image-block" id="edit-content-image-block" hidden>
-                                    <div class="content-editor-image-frame">
-                                        <img id="edit-content-image" alt="" decoding="async" referrerpolicy="no-referrer" />
-                                        <div class="content-editor-image-placeholder" id="edit-content-image-placeholder" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
-                                                <path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5 11 16.51 14.5 12l4.5 6H5l3.5-4.5zM7 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <input type="file" id="edit-content-image-upload" accept="image/*" hidden aria-hidden="true">
+                        <div class="edit-guest-top guests-list-heading content-list-top content-viewer-heading" id="content-viewer-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Content title">
+                                    <span class="edit-guest-name-first content-viewer-title" id="content-viewer-title" aria-live="polite"></span>
                                 </div>
                             </div>
+                            <div class="edit-guest-top-trailing">
                             <div class="content-editor-toolbar" role="toolbar" aria-label="Content editor tools">
                                 <div class="guest-editor-toolbar-leading" aria-hidden="true"></div>
                                 <div class="content-editor-toolbar-center">
@@ -12858,6 +13029,22 @@
                                     </button>
                                 </div>
                             </div>
+                            </div>
+                        </div>
+                        <div class="edit-content-bottom">
+                            <div class="content-editor-media" aria-label="Content image">
+                                <div class="content-editor-image-block" id="edit-content-image-block" hidden>
+                                    <div class="content-editor-image-frame">
+                                        <img id="edit-content-image" alt="" decoding="async" referrerpolicy="no-referrer" />
+                                        <div class="content-editor-image-placeholder" id="edit-content-image-placeholder" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                                                <path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5 11 16.51 14.5 12l4.5 6H5l3.5-4.5zM7 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="edit-content-image-upload" accept="image/*" hidden aria-hidden="true">
+                                </div>
+                            </div>
                             <div class="add-content-form" id="add-content-form">
                             <div class="content-type-event-row">
                                 <div class="add-content-form-field add-content-form-field--featured">
@@ -12871,24 +13058,39 @@
                                     <label for="edit-content-type">Type</label>
                                     <input type="hidden" id="edit-content-type" name="contentType" autocomplete="off" spellcheck="false">
                                     <div class="content-editor-badge-field">
-                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-type-badge-btn" id="edit-content-type-badge-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="edit-content-type-dropdown">Type</button>
-                                        <div class="content-editor-badge-dropdown" id="edit-content-type-dropdown" role="menu" hidden></div>
+                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-type-badge-btn" id="edit-content-type-badge-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="edit-content-type-dropdown">
+                                            <span class="content-editor-badge-btn-label">Type</span>
+                                            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                                                <path d="M2.5 4.25L6 7.75L9.5 4.25" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        <div class="content-editor-badge-dropdown" id="edit-content-type-dropdown" role="listbox" hidden></div>
                                     </div>
                                 </div>
                                 <div class="add-content-form-field">
                                     <label for="edit-content-event">Event</label>
                                     <input type="hidden" id="edit-content-event" name="contentEvent" autocomplete="off" spellcheck="false" placeholder="Comma-separated if multiple">
                                     <div class="content-editor-badge-field">
-                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-event-badge-btn" id="edit-content-event-badge-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="edit-content-event-dropdown">Event</button>
-                                        <div class="content-editor-badge-dropdown" id="edit-content-event-dropdown" role="menu" hidden></div>
+                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-event-badge-btn" id="edit-content-event-badge-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="edit-content-event-dropdown">
+                                            <span class="content-editor-badge-btn-label">Event</span>
+                                            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                                                <path d="M2.5 4.25L6 7.75L9.5 4.25" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        <div class="content-editor-badge-dropdown" id="edit-content-event-dropdown" role="listbox" hidden></div>
                                     </div>
                                 </div>
                                 <div class="add-content-form-field">
                                     <label for="edit-content-topic">Topics</label>
                                     <input type="hidden" id="edit-content-topic" name="contentTopic" autocomplete="off" spellcheck="false">
                                     <div class="content-editor-badge-field">
-                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-topic-badge-btn content-badge--topic" id="edit-content-topic-badge-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="edit-content-topic-dropdown">Topics</button>
-                                        <div class="content-editor-badge-dropdown" id="edit-content-topic-dropdown" role="menu" hidden></div>
+                                        <button type="button" class="content-badge content-editor-badge-btn content-editor-topic-badge-btn" id="edit-content-topic-badge-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="edit-content-topic-dropdown">
+                                            <span class="content-editor-badge-btn-label">Topics</span>
+                                            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                                                <path d="M2.5 4.25L6 7.75L9.5 4.25" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        <div class="content-editor-badge-dropdown" id="edit-content-topic-dropdown" role="listbox" hidden></div>
                                     </div>
                                 </div>
                             </div>
@@ -23546,6 +23748,11 @@
             mark(allLink, view !== 'waitlist' && view !== 'cancelled');
             mark(waitLink, view === 'waitlist');
             mark(cancelLink, view === 'cancelled');
+            var note = document.getElementById('guests-roster-filter-note');
+            var anchor = view === 'waitlist' ? waitLink : view === 'cancelled' ? cancelLink : allLink;
+            if (note && anchor && anchor.parentNode && note.parentNode === anchor.parentNode && anchor.nextSibling !== note) {
+                anchor.parentNode.insertBefore(note, anchor.nextSibling);
+            }
         }
 
         function setGuestsRosterView(next) {
@@ -25350,12 +25557,61 @@
                     : guestLogGentleReminderEmailedLine();
             var stored = findGuestInMemory(id) || rec;
             stored.paid = 'First notice';
-            stored.log = (Array.isArray(stored.log) ? stored.log.slice() : []).concat([logLine]);
+            await persistGuestReminderLogLine(id, logLine, stored);
             if (rec && rec !== stored) {
                 rec.paid = stored.paid;
-                rec.log = stored.log.slice();
+                rec.log = Array.isArray(stored.log) ? stored.log.slice() : [];
+            }
+            if (String(guestFormEditingDocId || '').trim() === id) {
+                syncGuestManagementLogPanel();
             }
             return payload;
+        }
+
+        /**
+         * Append the reminder line to the selected guest's Log and show it in the log panel.
+         * Skips a second copy when the line is already stored.
+         */
+        async function persistGuestReminderLogLine(docId, logLine, stored) {
+            var id = String(docId || '').trim();
+            var line = String(logLine || '').trim();
+            if (!id || !line) return;
+            var rec = stored || findGuestInMemory(id);
+            var existing = rec && Array.isArray(rec.log) ? rec.log.slice() : [];
+            function withLine(lines) {
+                var next = Array.isArray(lines) ? lines.slice() : [];
+                for (var i = 0; i < next.length; i++) {
+                    if (String(next[i] != null ? next[i] : '').trim() === line) return next;
+                }
+                next.push(line);
+                return next;
+            }
+            var merged = withLine(existing);
+            if (rec) rec.log = merged.slice();
+            try {
+                var db = getFirestore();
+                var itemRef = db.collection('tbs').doc('Guests').collection(id).doc('item');
+                var snap = await itemRef.get();
+                var data = snap.exists ? snap.data() || {} : {};
+                merged = withLine(guestLogFromDoc(data));
+                if (rec) rec.log = merged.slice();
+                var alreadyStored = false;
+                var fromDoc = guestLogFromDoc(data);
+                for (var li = 0; li < fromDoc.length; li++) {
+                    if (String(fromDoc[li] != null ? fromDoc[li] : '').trim() === line) {
+                        alreadyStored = true;
+                        break;
+                    }
+                }
+                if (!alreadyStored) {
+                    await itemRef.set({ Log: merged }, { merge: true });
+                }
+            } catch (err) {
+                console.error('persistGuestReminderLogLine:', err);
+            }
+            if (String(guestFormEditingDocId || '').trim() === id) {
+                syncGuestManagementLogPanel();
+            }
         }
 
         /** True when this guest is still in the roster view, filter, and search. */
@@ -29662,19 +29918,13 @@
             var topicBtn = document.getElementById('edit-content-topic-badge-btn');
             if (typeBtn) {
                 var typeLabel = String(typeInput && typeInput.value ? typeInput.value : '').trim();
-                typeBtn.textContent = typeLabel || 'Type';
-                typeBtn.className = 'content-badge content-editor-badge-btn content-editor-type-badge-btn';
-                if (typeLabel) {
-                    typeBtn.className += ' ' + contentTypeBadgeClassForLabel(typeLabel).replace(/^content-badge\s*/, '');
-                } else {
-                    typeBtn.className += ' content-badge--type-standard';
-                }
+                var typeLabelEl = typeBtn.querySelector('.content-editor-badge-btn-label');
+                if (typeLabelEl) typeLabelEl.textContent = typeLabel || 'Type';
             }
             if (eventBtn) {
                 var eventLabel = String(eventInput && eventInput.value ? eventInput.value : '').trim();
-                eventBtn.textContent = eventLabel || 'Event';
-                eventBtn.className = 'content-badge content-editor-badge-btn content-editor-event-badge-btn';
-                eventBtn.className += ' ' + contentEventBadgeClassForLabel(eventLabel).replace(/^content-badge\s*/, '');
+                var eventLabelEl = eventBtn.querySelector('.content-editor-badge-btn-label');
+                if (eventLabelEl) eventLabelEl.textContent = eventLabel || 'Event';
             }
             if (topicBtn) {
                 var topicRaw = contentParseListInputToFirestore(topicInput && topicInput.value ? topicInput.value : '');
@@ -29682,9 +29932,29 @@
                     ? topicRaw
                     : (topicRaw ? [String(topicRaw)] : []);
                 var topicCount = topicValues.length;
-                topicBtn.textContent = 'Topics (' + topicCount + ')';
-                topicBtn.className = 'content-badge content-editor-badge-btn content-editor-topic-badge-btn content-badge--topic';
+                var topicLabelEl = topicBtn.querySelector('.content-editor-badge-btn-label');
+                if (topicLabelEl) topicLabelEl.textContent = 'Topics (' + topicCount + ')';
             }
+            syncContentTypeEventDropdownSelectedUi();
+        }
+
+        function syncContentTypeEventDropdownSelectedUi() {
+            var typeInput = document.getElementById('edit-content-type');
+            var eventInput = document.getElementById('edit-content-event');
+            var typeDropdown = document.getElementById('edit-content-type-dropdown');
+            var eventDropdown = document.getElementById('edit-content-event-dropdown');
+            var typeVal = String(typeInput && typeInput.value ? typeInput.value : '').trim().toLowerCase();
+            var eventVal = String(eventInput && eventInput.value ? eventInput.value : '').trim().toLowerCase();
+            function mark(dropdown, current) {
+                if (!dropdown) return;
+                dropdown.querySelectorAll('.content-editor-badge-option').forEach(function (btn) {
+                    var on = current !== '' && String(btn.getAttribute('data-value') || '').trim().toLowerCase() === current;
+                    btn.classList.toggle('is-selected', on);
+                    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+                });
+            }
+            mark(typeDropdown, typeVal);
+            mark(eventDropdown, eventVal);
         }
 
         function contentTopicOptionsFromMemory() {
@@ -29724,9 +29994,10 @@
                 var on = Boolean(selectedMap[val]);
                 btn.classList.toggle('is-selected', on);
                 btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                btn.setAttribute('aria-selected', on ? 'true' : 'false');
                 btn.setAttribute('title', on ? 'Selected' : 'Not selected');
-                btn.style.background = on ? 'var(--backend-roster-pill-black)' : '#e2e8f0';
-                btn.style.color = on ? '#ffffff' : '#334155';
+                btn.style.background = '';
+                btn.style.color = '';
             });
         }
 
@@ -29738,7 +30009,7 @@
             for (var i = 0; i < options.length; i++) {
                 var opt = String(options[i] || '').trim();
                 if (!opt) continue;
-                html += '<button type="button" class="content-badge content-badge--topic content-editor-badge-option content-editor-topic-option" data-value="' + escapeHtml(opt) + '" role="menuitemcheckbox" aria-pressed="false">' + escapeHtml(opt) + '</button>';
+                html += '<button type="button" class="content-editor-badge-option content-editor-topic-option" data-value="' + escapeHtml(opt) + '" role="option" aria-selected="false" aria-pressed="false">' + escapeHtml(opt) + '</button>';
             }
             dropdown.innerHTML = html;
             syncContentTopicDropdownSelectedUi();
@@ -29763,10 +30034,7 @@
             for (var i = 0; i < options.length; i++) {
                 var opt = String(options[i] || '').trim();
                 if (!opt) continue;
-                var cls = dropdownId === 'edit-content-type-dropdown'
-                    ? contentTypeBadgeClassForLabel(opt)
-                    : contentEventBadgeClassForLabel(opt);
-                html += '<button type="button" class="' + cls + ' content-editor-badge-option" data-value="' + escapeHtml(opt) + '" role="menuitem">' + escapeHtml(opt) + '</button>';
+                html += '<button type="button" class="content-editor-badge-option" data-value="' + escapeHtml(opt) + '" role="option" aria-selected="false">' + escapeHtml(opt) + '</button>';
             }
             dropdown.innerHTML = html;
             dropdown.addEventListener('click', function (ev) {
@@ -30020,6 +30288,14 @@
                 var dateCell = dateLabel
                     ? '<span class="content-badge content-badge--date">' + escapeHtml(dateLabel) + '</span>'
                     : '';
+                var nameLabel = r.name != null ? String(r.name) : '';
+                var nameCell = nameLabel
+                    ? '<span class="content-badge content-badge--name" title="' +
+                      escapeHtml(nameLabel) +
+                      '"><span class="content-roster-name-truncate">' +
+                      escapeHtml(nameLabel) +
+                      '</span></span>'
+                    : '';
                 html +=
                     '<tr class="content-roster-row" data-content-id="' +
                     escapeHtml(r.id) +
@@ -30031,11 +30307,8 @@
                     escapeHtml(r.title != null ? String(r.title) : '') +
                     '</span></td>' +
                     '<td class="content-roster-name-col">' +
-                    '<span class="content-roster-name-truncate" title="' +
-                    escapeHtml(r.name != null ? String(r.name) : '') +
-                    '">' +
-                    escapeHtml(r.name != null ? String(r.name) : '') +
-                    '</span></td>' +
+                    nameCell +
+                    '</td>' +
                     '<td class="content-roster-date-cell">' +
                     dateCell +
                     '</td>' +
@@ -30575,6 +30848,14 @@
             }
         }
 
+        function syncContentViewerTitle() {
+            var el = document.getElementById('content-viewer-title');
+            if (!el) return;
+            var titleEl = document.getElementById('edit-content-title');
+            var text = titleEl ? String(titleEl.value || '').trim() : '';
+            el.textContent = text || 'NEW CONTENT';
+        }
+
         function populateContentEditorFromRecord(rec) {
             var dateEl = document.getElementById('edit-content-date');
             var titleEl = document.getElementById('edit-content-title');
@@ -30617,6 +30898,7 @@
                 syncContentFeaturedUi();
                 autosizeContentLongTextareas();
                 syncContentTopicDropdownSelectedUi();
+                syncContentViewerTitle();
                 return;
             }
             contentFormEditingDocId = String(rec.id || '').trim();
@@ -30705,6 +30987,7 @@
             syncContentFeaturedUi();
             autosizeContentLongTextareas();
             syncContentTopicDropdownSelectedUi();
+            syncContentViewerTitle();
         }
 
         function clearContentEditorForm() {
@@ -35094,6 +35377,7 @@
                 });
             }
             function onContentFormInput() {
+                syncContentViewerTitle();
                 syncContentFormToMemoryIfEditing();
                 updateExcerptLetterCounter();
                 updateContentBodyLetterCounter();
@@ -35188,8 +35472,9 @@
                         }
                         btn.classList.toggle('is-selected', !isOn);
                         btn.setAttribute('aria-pressed', !isOn ? 'true' : 'false');
-                        btn.style.background = !isOn ? 'var(--backend-roster-pill-black)' : '#e2e8f0';
-                        btn.style.color = !isOn ? '#ffffff' : '#334155';
+                        btn.setAttribute('aria-selected', !isOn ? 'true' : 'false');
+                        btn.style.background = '';
+                        btn.style.color = '';
                         var selectedVals = [];
                         topicDropdown.querySelectorAll('.content-editor-topic-option.is-selected').forEach(function (opt) {
                             var t = String(opt.getAttribute('data-value') || '').trim();
