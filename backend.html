@@ -2458,6 +2458,7 @@
         #guest-editor .guests-actions .add-speaker-button:hover:not(:disabled),
         #guest-editor .guest-editor-toolbar .add-speaker-button:hover:not(:disabled),
         #emailer-editor .emailer-actions #emailer-add-contact-button:hover:not(:disabled),
+        #emailer-editor .emailer-actions #emailer-filter-button:hover:not(:disabled),
         #team-editor .team-actions .add-speaker-button:hover:not(:disabled),
         #content-editor .content-actions .add-content-btn:hover:not(:disabled),
         #lodging-editor .lodging-actions .add-lodging-btn:hover:not(:disabled) {
@@ -3624,7 +3625,8 @@
             cursor: not-allowed;
         }
 
-        #emailer-editor .emailer-actions #emailer-add-contact-button:not(:disabled) {
+        #emailer-editor .emailer-actions #emailer-add-contact-button:not(:disabled),
+        #emailer-editor .emailer-actions #emailer-filter-button:not(:disabled) {
             cursor: pointer;
         }
 
@@ -7350,6 +7352,24 @@
 
         #speaker-editor #speakers-list-heading .speakers-roster-view-link.is-active {
             color: #000000;
+        }
+
+        #content-editor #content-list-heading .content-roster-view-title {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: uppercase;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        #content-editor #content-list-heading .selected-guestname-wrap > .content-roster-view-title ~ .selected-guestname,
+        #content-editor #content-list-heading .selected-guestname-wrap > .selected-guestname ~ .content-roster-view-title {
+            margin-left: 1.5rem;
         }
 
         #speaker-editor #speakers-list-heading #speakers-roster-all-link {
@@ -13355,9 +13375,11 @@
                         <div class="edit-guest-top guests-list-heading content-list-top" id="content-list-heading">
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
-                                <div class="selected-guestname" role="group" aria-label="Content list title">
-                                    <span class="edit-guest-name-first">CONTENT</span>
+                                <span class="content-roster-view-title" id="content-roster-processing-link">Processing</span>
+                                <div class="selected-guestname is-active" id="content-roster-site-link" role="group" aria-pressed="true" aria-label="Site content">
+                                    <span class="edit-guest-name-first">Site content</span>
                                 </div>
+                                <span class="content-roster-view-title" id="content-roster-short-link">Short content</span>
                             </div>
                             <div class="edit-guest-top-trailing">
                             <div id="content-actions" class="content-actions" hidden aria-label="Content actions">
@@ -13591,6 +13613,11 @@
                                     <button type="button" class="add-speaker-button" id="emailer-add-contact-button" aria-label="Add contact" title="Add contact">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="emailer-filter-button" aria-label="Filter contacts" title="Filter">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                                         </svg>
                                     </button>
                                 </div>
