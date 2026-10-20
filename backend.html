@@ -3344,8 +3344,9 @@
         }
 
         #emailer-editor .emailer-bottom-track {
-            display: flex;
-            flex-direction: row;
+            display: grid;
+            grid-template-columns: minmax(min-content, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-rows: minmax(0, 1fr);
             align-items: stretch;
             gap: 16px;
             flex: 1 1 auto;
@@ -3359,8 +3360,9 @@
             flex-direction: column;
             align-items: stretch;
             min-height: 0;
+            min-width: min-content;
             overflow: hidden;
-            flex: 2 1 0;
+            flex: 1 1 0;
             background: transparent;
             padding: 0;
             border: 1px solid #e2e8f0;
@@ -3369,9 +3371,12 @@
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
-        #emailer-editor .contacts-list .contacts-roster-list {
+        #emailer-editor .contacts-list .contacts-roster-list,
+        #emailer-editor .contacts-list .contacts-roster-scroll {
             flex: 1 1 0;
             min-height: 0;
+            min-width: 0;
+            width: 100%;
         }
 
         #emailer-editor .contact-viewer {
@@ -3385,6 +3390,15 @@
             padding: 0;
             align-self: stretch;
             background: transparent;
+        }
+
+        #emailer-editor .bulk-email-actions,
+        #emailer-editor .preview {
+            min-width: 0;
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
         #emailer-editor .contact-editor-shell {
@@ -3402,7 +3416,7 @@
         }
 
         #emailer-editor .contact-viewer > .contact-editor-shell > .contact-editor {
-            --emailer-editor-shell-r: 8px;
+            --emailer-editor-shell-r: 5px;
             --emailer-editor-bw: 1px;
             display: flex;
             flex-direction: column;
@@ -3414,10 +3428,10 @@
             padding: 0;
             box-sizing: border-box;
             background: transparent;
-            border: var(--emailer-editor-bw) solid #e2e8f0;
-            border-radius: var(--emailer-editor-shell-r);
+            border: none;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
+            box-shadow: none;
         }
 
         #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading,
@@ -3435,13 +3449,26 @@
             min-height: var(--backend-panel-header-height);
             max-height: var(--backend-panel-header-height);
             padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+            padding-right: 0;
         }
 
         #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading {
             flex: 0 0 auto;
-            width: 100%;
+            flex-wrap: nowrap;
+            width: max-content;
+            min-width: 100%;
+            max-width: none;
             padding-left: var(--backend-table-cell-pad-x);
             padding-right: 0;
+        }
+
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .selected-contactname-wrap,
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .emailer-roster-title-wrap,
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .edit-contact-top-trailing,
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .emailer-actions {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            min-width: max-content;
         }
 
         #emailer-editor .edit-contact-top .edit-contact-top-spacer {
@@ -3539,6 +3566,7 @@
             flex: 1 1 auto;
             min-width: 0;
             min-height: 0;
+            margin-left: auto;
             padding: 0 var(--backend-table-cell-pad-x) 0 0;
             box-sizing: border-box;
         }
@@ -3563,6 +3591,21 @@
             background: transparent !important;
             box-shadow: none;
             outline: none;
+        }
+
+        #emailer-editor .emailer-actions .emailer-roster-count {
+            margin: 0;
+            flex: 0 0 auto;
+            align-self: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #94a3b8;
+            white-space: nowrap;
         }
 
         #emailer-editor .emailer-actions .emailer-roster-search {
@@ -3641,14 +3684,14 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: flex-end;
             gap: 0.5rem;
-            flex: 0 0 auto;
-            width: auto;
+            flex: 1 1 auto;
+            width: 100%;
             min-width: 0;
             min-height: 0;
             padding: 0;
-            margin: 0;
+            margin: 0 0 0 auto;
             background: transparent;
             border-bottom: none;
         }
@@ -3658,9 +3701,38 @@
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: flex-end;
             gap: 0.5rem;
             min-width: 0;
+            margin-left: auto;
+        }
+
+        /* Preview title and toolbar stay on one line; the panel scrolls sideways. */
+        #emailer-editor #preview {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        #emailer-editor #preview > .edit-contact-top.contacts-list-heading {
+            flex-wrap: nowrap;
+            width: max-content;
+            min-width: 100%;
+            max-width: none;
+        }
+
+        #emailer-editor #preview > .edit-contact-top .selected-contactname-wrap,
+        #emailer-editor #preview > .edit-contact-top .emailer-roster-title-wrap,
+        #emailer-editor #preview > .edit-contact-top .edit-contact-top-trailing,
+        #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar,
+        #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar-trailing {
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+            min-width: max-content;
+        }
+
+        #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar {
+            flex: 0 0 auto;
+            width: auto;
         }
 
         #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn svg {
@@ -3921,12 +3993,72 @@
         }
 
         #emailer-editor .contact-viewer--no-selection {
-            background: #e2e8f0;
+            background: transparent;
         }
 
-        #emailer-editor .contact-viewer--no-selection .edit-contact-top,
         #emailer-editor .contact-viewer--no-selection .emailer-editor-bottom {
             display: none !important;
+        }
+
+        #emailer-editor #preview {
+            background: transparent;
+            background-color: transparent;
+        }
+
+        #emailer-editor #preview > .edit-contact-top {
+            background: #ffffff;
+            background-color: #ffffff;
+        }
+
+        #emailer-editor .contact-viewer--no-selection #preview::after,
+        #emailer-editor #bulk-email-actions::after {
+            content: '';
+            flex: 1 1 auto;
+            min-height: 0;
+            background: #ffffff;
+        }
+
+        #emailer-editor #emailer-contact-viewer .contact-editor-empty {
+            display: none !important;
+        }
+
+        #emailer-editor #preview .preview-title {
+            cursor: default;
+        }
+
+        #emailer-editor #bulk-email-actions {
+            background: transparent;
+            background-color: transparent;
+        }
+
+        #emailer-editor #bulk-email-actions > .edit-contact-top {
+            background: #ffffff;
+            background-color: #ffffff;
+        }
+
+        #emailer-editor .bulk-email-actions .contact-editor-empty,
+        #emailer-editor #bulk-email-actions .emailer-editor-toolbar,
+        #emailer-editor #bulk-email-actions .emailer-editor-bottom {
+            display: none !important;
+        }
+
+        #emailer-editor #bulk-email-actions .bulk-email-actions-title {
+            cursor: default;
+        }
+
+        #emailer-editor #bulk-email-actions-count {
+            margin: 0 0 0 0.75rem;
+            flex: 0 0 auto;
+            align-self: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #94a3b8;
+            white-space: nowrap;
         }
 
         .emailer-filter-contacts-btn {
@@ -6236,7 +6368,7 @@
 
         #emailer-editor .contacts-list-table {
             width: max-content;
-            min-width: max-content;
+            min-width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             font-size: 0.875rem;
@@ -6295,7 +6427,7 @@
             line-height: 1.6;
         }
 
-        #emailer-editor .contacts-list-table thead th:not(:first-child),
+        #emailer-editor .contacts-list-table thead th:not(:first-child):not(.roster-fill-col),
         #emailer-editor .contacts-list-table tbody td.guests-roster-tag-cell {
             text-align: center;
             width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
@@ -6305,6 +6437,25 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        #emailer-editor .contacts-list-table.emailer-guests-table thead th:nth-child(1),
+        #emailer-editor .contacts-list-table.emailer-guests-table tbody td.guests-roster-name-cell {
+            width: 240px;
+            min-width: 240px;
+            max-width: 240px;
+        }
+
+        #emailer-editor .contacts-list-table.emailer-guests-table thead th:nth-child(2),
+        #emailer-editor .contacts-list-table.emailer-guests-table tbody td.emailer-guest-email-cell {
+            text-align: left;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: auto;
+            min-width: 16rem;
+            max-width: none;
         }
 
         #emailer-editor .contacts-roster-row {
@@ -6329,21 +6480,36 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Pack guest columns to the left; headers + pills stay centered in each column. */
+        /* Columns stay packed. A trailing filler cell carries each row border to the panel edge. */
         #guest-editor .guests-roster-items,
         #team-editor .team-roster-items,
         #emailer-editor .contacts-roster-items,
-        #content-editor .content-list-items {
+        #content-editor .content-list-items,
+        #speaker-editor .speaker-roster-items,
+        #finances-editor .guests-roster-items {
             width: max-content;
-            min-width: max-content;
-            margin-right: auto;
+            min-width: 100%;
         }
 
         #guest-editor .guests-list-table,
         #team-editor .team-list-table,
-        #emailer-editor .contacts-list-table {
+        #emailer-editor .contacts-list-table,
+        #content-editor .content-list-table,
+        #content-editor .content-roster-table,
+        #speaker-editor .speakers-roster-table,
+        #programme-editor .programme-speakers-table,
+        #finances-editor .guests-list-table {
             width: max-content;
-            min-width: max-content;
+            min-width: 100%;
+        }
+
+        .roster-fill-col {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            padding: 0 !important;
+            border-left: 0;
+            background: #ffffff;
         }
 
         .speakers-roster-table,
@@ -6368,7 +6534,7 @@
         #content-editor .content-list-table,
         #content-editor .content-roster-table {
             width: max-content;
-            min-width: max-content;
+            min-width: 100%;
         }
 
         .speakers-roster-table th,
@@ -6510,6 +6676,7 @@
         #guest-editor .guests-list-table thead th:nth-child(1) .roster-name-inner,
         #speaker-editor .speakers-roster-table thead th:nth-child(1) .roster-name-inner,
         #team-editor .team-list-table thead th:nth-child(1) .roster-name-inner,
+        #emailer-editor .contacts-list-table thead th:nth-child(1) .roster-name-inner,
         #guest-editor .guests-list-table tbody td.guests-roster-name-cell .roster-name-inner,
         #speaker-editor .speakers-roster-table tbody td.speaker-roster-name-cell .roster-name-inner,
         #team-editor .team-list-table tbody td.team-roster-name-cell .roster-name-inner,
@@ -6743,7 +6910,7 @@
          * tag columns and widen the gap between pills. Lock pill columns to the same
          * content width Speakers uses (uniform pill + shared cell pad).
          */
-        #guest-editor .guests-list-table thead th:not(:first-child),
+        #guest-editor .guests-list-table thead th:not(:first-child):not(.roster-fill-col),
         #guest-editor .guests-list-table tbody td.guests-roster-tag-cell,
         #guest-editor .guests-list-table tbody td.content-roster-published-cell,
         #team-editor .team-list-table thead th:nth-child(2),
@@ -9988,8 +10155,9 @@
         .guests-filter-popup__box {
             position: relative;
             width: min(28rem, 100%);
-            max-height: min(90vh, 40rem);
-            overflow: auto;
+            height: auto;
+            max-height: none;
+            overflow: visible;
             background: #d9effc;
             border: 1px solid #71C7FE;
             border-radius: 10px;
@@ -10034,6 +10202,21 @@
             border: 1px solid #71C7FE;
             border-radius: 6px;
             padding: 0.45rem 0.55rem;
+        }
+
+        .guests-filter-popup__select {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0.45rem 0.55rem;
+            border: 1px solid #71C7FE;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            line-height: 1.3;
         }
 
         .guests-filter-popup__check {
@@ -13589,7 +13772,7 @@
                                 <div class="edit-contact-top-spacer" aria-hidden="true"></div>
                                 <div class="selected-contactname-wrap">
                                     <div class="emailer-roster-title-wrap" role="group" aria-label="Contact lists">
-                                        <button type="button" class="emailer-roster-view-link is-active" id="emailer-roster-guests-link" aria-pressed="true">Guests</button>
+                                        <button type="button" class="emailer-roster-view-link" id="emailer-roster-guests-link" aria-pressed="false">Guests</button>
                                         <button type="button" class="emailer-roster-view-link" id="emailer-roster-speakers-link" aria-pressed="false">Speakers</button>
                                         <button type="button" class="emailer-roster-view-link" id="emailer-roster-sponsors-link" aria-pressed="false">Sponsors</button>
                                         <button type="button" class="emailer-roster-view-link" id="emailer-roster-misc-link" aria-pressed="false">Misc</button>
@@ -13597,6 +13780,7 @@
                                 </div>
                                 <div class="edit-contact-top-trailing">
                                 <div id="emailer-actions" class="emailer-actions" aria-label="E-mailer actions">
+                                    <span class="emailer-roster-count" id="emailer-roster-count" aria-live="polite">(n=0)</span>
                                     <input
                                         type="search"
                                         id="emailer-roster-search"
@@ -13615,10 +13799,11 @@
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button" id="emailer-filter-button" aria-label="Filter contacts" title="Filter">
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="emailer-filter-button" aria-label="Filter guests" title="Filter guests" disabled aria-disabled="true">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                                         </svg>
+                                        <span class="filter-guests-active-mark" id="emailer-filter-active-mark" hidden aria-hidden="true">!</span>
                                     </button>
                                 </div>
                                 </div>
@@ -13629,15 +13814,196 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="contact-viewer contact-viewer--no-selection" id="emailer-contact-viewer" aria-label="Contact viewer">
+                        <div class="bulk-email-actions contact-viewer" aria-label="Bulk email actions">
                             <div class="contact-editor-shell">
-                            <div class="contact-editor is-empty" id="contact-editor">
-                            <div class="edit-contact-top">
+                            <div class="contact-editor is-empty" id="bulk-email-actions">
+                            <div class="edit-contact-top contacts-list-heading">
                                 <div class="edit-contact-top-spacer" aria-hidden="true"></div>
                                 <div class="selected-contactname-wrap">
-                                    <div class="selected-contactname" role="group" aria-label="Contact name">
-                                        <span class="edit-contact-name-first" id="emailer-edit-contact-name-first" aria-live="polite"></span>
-                                        <span class="edit-contact-name-last" id="emailer-edit-contact-name-last" aria-live="polite"></span>
+                                    <div class="emailer-roster-title-wrap" role="group" aria-label="Bulk actions">
+                                        <span class="emailer-roster-view-link is-active bulk-email-actions-title" id="bulk-email-actions-title">Bulk actions</span>
+                                        <span class="bulk-email-actions-count" id="bulk-email-actions-count" aria-live="polite">(n=0)</span>
+                                    </div>
+                                </div>
+                                <div class="edit-contact-top-trailing">
+                            <div class="emailer-editor-toolbar" role="toolbar" aria-label="Contact editor tools">
+                                <div class="emailer-editor-toolbar-trailing">
+                                    <button type="button" class="add-speaker-button emailer-editor-padlock-btn" id="bulk-email-actions-emailer-editor-padlock-btn" aria-label="Lock contact" title="Lock" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path
+                                                fill="currentColor"
+                                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="texteditor-save-btn" id="bulk-email-actions-emailer-save-contact-button" disabled aria-disabled="true" title="Save contact" aria-label="Save contact">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="bulk-email-actions-emailer-compose-email-btn" disabled aria-disabled="true" title="E-mail" aria-label="E-mail contact">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="emailer-delete-contact-btn" id="bulk-email-actions-emailer-delete-contact-btn" disabled aria-disabled="true" title="Delete contact" aria-label="Delete contact">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                            <div class="emailer-editor-bottom is-showing-bio">
+                            <div class="emailer-workflow-nav" role="toolbar" aria-label="Contact editor sections">
+                                <button type="button" class="emailer-workflow-nav-link" id="bulk-email-actions-emailer-display-contact-actions" aria-label="Contact workflow" title="Contact workflow" disabled aria-disabled="true">
+                                    <span class="display-editor-actions-text">Workflow</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="emailer-workflow-nav-link"
+                                    id="bulk-email-actions-emailer-contact-bio-btn"
+                                    aria-label="Contact bio"
+                                    title="Contact bio"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <span class="emailer-editor-bio-text">Bio</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="emailer-workflow-nav-link"
+                                    id="bulk-email-actions-emailer-contact-files-btn"
+                                    aria-label="Contact files"
+                                    title="Contact files"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <span class="display-editor-actions-text">Files</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="emailer-workflow-nav-link"
+                                    id="bulk-email-actions-emailer-contact-log-btn"
+                                    aria-label="Contact log"
+                                    title="Contact log"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <span class="display-editor-actions-text">Log</span>
+                                </button>
+                            </div>
+                            <div class="emailer-editor-bottom-panes">
+                                <div class="emailer-editor-bio" id="bulk-email-actions-emailer-editor-bio" aria-label="Contact bio">
+                                    <div class="guest-viewer-name-row" role="group" aria-label="Contact name">
+                                        <div class="add-speaker-form-field">
+                                            <label for="bulk-email-actions-add-emailer-contact-first-name">First name</label>
+                                            <input
+                                                type="text"
+                                                id="bulk-email-actions-add-emailer-contact-first-name"
+                                                name="firstName"
+                                                autocomplete="given-name"
+                                                spellcheck="false"
+                                            />
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="bulk-email-actions-add-emailer-contact-last-name">Last name</label>
+                                            <input
+                                                type="text"
+                                                id="bulk-email-actions-add-emailer-contact-last-name"
+                                                name="lastName"
+                                                autocomplete="family-name"
+                                                spellcheck="false"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="bulk-email-actions-add-emailer-contact-email">E-mail</label>
+                                        <input
+                                            type="email"
+                                            id="bulk-email-actions-add-emailer-contact-email"
+                                            name="email"
+                                            autocomplete="email"
+                                            spellcheck="false"
+                                        />
+                                    </div>
+                                    <div class="guest-viewer-name-row" role="group" aria-label="Contact category and event">
+                                        <div class="add-speaker-form-field">
+                                            <label for="bulk-email-actions-add-emailer-contact-category">Category</label>
+                                            <select id="bulk-email-actions-add-emailer-contact-category" name="category" aria-label="Category">
+                                                <option value="">—</option>
+                                                <option value="Potential">Potential</option>
+                                                <option value="Speaker">Speaker</option>
+                                                <option value="Guest">Guest</option>
+                                                <option value="N/A">N/A</option>
+                                            </select>
+                                        </div>
+                                        <div class="add-speaker-form-field">
+                                            <label for="bulk-email-actions-add-emailer-contact-event">Event</label>
+                                            <select id="bulk-email-actions-add-emailer-contact-event" name="event" aria-label="Event">
+                                                <option value="None">None</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="bulk-email-actions-add-emailer-contact-notes">Notes</label>
+                                        <textarea
+                                            id="bulk-email-actions-add-emailer-contact-notes"
+                                            name="notes"
+                                            rows="6"
+                                            spellcheck="true"
+                                        ></textarea>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="bulk-email-actions-add-emailer-contact-link-one">Link 1</label>
+                                        <input
+                                            type="url"
+                                            id="bulk-email-actions-add-emailer-contact-link-one"
+                                            name="link_one"
+                                            inputmode="url"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="https://"
+                                        />
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="bulk-email-actions-add-emailer-contact-link-two">Link 2</label>
+                                        <input
+                                            type="url"
+                                            id="bulk-email-actions-add-emailer-contact-link-two"
+                                            name="link_two"
+                                            inputmode="url"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="https://"
+                                        />
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="bulk-email-actions-add-emailer-contact-link-three">Link 3</label>
+                                        <input
+                                            type="url"
+                                            id="bulk-email-actions-add-emailer-contact-link-three"
+                                            name="link_three"
+                                            inputmode="url"
+                                            autocomplete="off"
+                                            spellcheck="false"
+                                            placeholder="https://"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                            </div>
+                            <p class="contact-editor-empty" id="bulk-email-actions-contact-editor-empty" role="status">Select contact</p>
+                            </div>
+                        </div>
+                        <div class="preview contact-viewer contact-viewer--no-selection" id="emailer-contact-viewer" aria-label="Preview">
+                            <div class="contact-editor-shell">
+                            <div class="contact-editor is-empty" id="preview">
+                            <div class="edit-contact-top contacts-list-heading">
+                                <div class="edit-contact-top-spacer" aria-hidden="true"></div>
+                                <div class="selected-contactname-wrap">
+                                    <div class="emailer-roster-title-wrap" role="group" aria-label="Preview">
+                                        <span class="emailer-roster-view-link is-active preview-title" id="preview-title">Preview</span>
                                     </div>
                                 </div>
                                 <div class="edit-contact-top-trailing">
@@ -14227,6 +14593,41 @@
         </div>
     </div>
 
+    <div id="emailer-guests-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="emailer-guests-filter-popup-title">
+        <div class="guests-filter-popup__backdrop" id="emailer-guests-filter-popup-backdrop"></div>
+        <div class="guests-filter-popup__box">
+            <h2 class="guests-filter-popup__title" id="emailer-guests-filter-popup-title">Filter guests</h2>
+            <div class="guests-filter-popup__fields">
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="emailer-guests-filter-event-label">Event</span>
+                    <div class="guests-filter-popup__checks" id="emailer-guests-filter-event" role="group" aria-labelledby="emailer-guests-filter-event-label" data-filter-key="event"></div>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <label class="guests-filter-popup__field-title" id="emailer-guests-filter-country-label" for="emailer-guests-filter-country">Country</label>
+                    <select id="emailer-guests-filter-country" class="guests-filter-popup__select" aria-labelledby="emailer-guests-filter-country-label">
+                        <option value="">Any country</option>
+                    </select>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="emailer-guests-filter-speciality-label">Base medical speciality</span>
+                    <div class="guests-filter-popup__checks" id="emailer-guests-filter-speciality" role="group" aria-labelledby="emailer-guests-filter-speciality-label" data-filter-key="speciality"></div>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="emailer-guests-filter-training-label">Level of Training</span>
+                    <div class="guests-filter-popup__checks" id="emailer-guests-filter-training" role="group" aria-labelledby="emailer-guests-filter-training-label" data-filter-key="training"></div>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="emailer-guests-filter-clinical-label">Clinical context</span>
+                    <div class="guests-filter-popup__checks" id="emailer-guests-filter-clinical" role="group" aria-labelledby="emailer-guests-filter-clinical-label" data-filter-key="clinical"></div>
+                </div>
+            </div>
+            <div class="guests-filter-popup__actions">
+                <button type="button" class="guests-filter-clear-btn" id="emailer-guests-filter-clear">Clear</button>
+                <button type="button" class="guests-filter-apply-btn" id="emailer-guests-filter-apply">Filter</button>
+            </div>
+        </div>
+    </div>
+
     <div id="content-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="content-filter-popup-title">
         <div class="guests-filter-popup__backdrop" id="content-filter-popup-backdrop"></div>
         <div class="guests-filter-popup__box">
@@ -14359,8 +14760,15 @@
         let emailerEditorBottomPane = 'bio';
         /** Selected contact id for `#emailer-contact-viewer` (from `tbs/Contacts`). */
         let emailerFormEditingDocId = '';
-        /** Emailer roster heading: 'guests', 'speakers', 'sponsors', or 'misc'. Selection does not filter the table yet. */
-        var emailerRosterView = 'guests';
+        /** Emailer roster heading: '', 'guests', 'speakers', 'sponsors', or 'misc'. Empty until a heading is chosen. */
+        var emailerRosterView = '';
+        /** All guests for the e-mailer Guests list, including every Event. Kept across tab switches. */
+        var emailerGuestsRosterInMemory = [];
+        var emailerGuestsCheckedIds = Object.create(null);
+        var emailerGuestsFilterSettings = emptyEmailerGuestsFilterSettings();
+        var emailerFilterEventOptions = [];
+        var emailerGuestsMemoryLoaded = false;
+        var emailerGuestsLoadPromise = null;
         var contactsRosterInMemory = [];
         var contactsMemoryLoaded = false;
         var contactsDirtyDocIds = Object.create(null);
@@ -19971,6 +20379,25 @@
             return '<span class="content-badge' + mod + '">' + escapeHtml(t || '—') + '</span>';
         }
 
+        function extendRosterTableBorders(root) {
+            if (!root) return;
+            var tables = root.querySelectorAll('table');
+            for (var t = 0; t < tables.length; t++) {
+                var rows = tables[t].rows;
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var last = row.cells.length ? row.cells[row.cells.length - 1] : null;
+                    if (last && last.classList.contains('roster-fill-col')) continue;
+                    var isHead = row.parentNode && row.parentNode.tagName === 'THEAD';
+                    var cell = document.createElement(isHead ? 'th' : 'td');
+                    cell.className = 'roster-fill-col';
+                    cell.setAttribute('aria-hidden', 'true');
+                    if (isHead) cell.scope = 'col';
+                    row.appendChild(cell);
+                }
+            }
+        }
+
         function renderTeamTable(members, rowCount, emptyMessage) {
             var itemsEl = document.getElementById('team-roster-items');
             if (!itemsEl) return;
@@ -20052,6 +20479,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
             syncTeamRosterCount();
             syncTeamRosterSelectionHighlight();
             updateTeamNavButtons();
@@ -20992,11 +21420,11 @@
         }
 
         function getEmailerEditorBottomEl() {
-            return document.querySelector('#emailer-editor #contact-editor .emailer-editor-bottom');
+            return document.querySelector('#emailer-editor #preview .emailer-editor-bottom');
         }
 
         function isEmailerViewerSelectionEmpty() {
-            var panel = document.getElementById('contact-editor');
+            var panel = document.getElementById('preview');
             return !panel || panel.classList.contains('is-empty');
         }
 
@@ -21071,7 +21499,7 @@
         }
 
         function syncEmailerEditabilityFromPadlock() {
-            var panel = document.getElementById('contact-editor');
+            var panel = document.getElementById('preview');
             var bio = document.getElementById('emailer-editor-bio');
             if (!panel || !bio) return;
             var canEdit = !panel.classList.contains('is-empty') && emailerPadlockIsOpen;
@@ -21135,7 +21563,7 @@
         }
 
         function setEmailerViewerEmptyState(isEmpty) {
-            var panel = document.getElementById('contact-editor');
+            var panel = document.getElementById('preview');
             var viewer = document.getElementById('emailer-contact-viewer');
             var emptyEl = document.getElementById('contact-editor-empty');
             if (panel) {
@@ -21453,12 +21881,15 @@
             if (!root) return;
             clearEmailerRosterItemSelection();
             var selId = String(emailerFormEditingDocId || '').trim();
-            if (!selId) return;
             var rows = root.querySelectorAll('.contacts-roster-row');
             for (var i = 0; i < rows.length; i++) {
-                if (rows[i].getAttribute('data-contact-id') === selId) {
+                var guestId = String(rows[i].getAttribute('data-emailer-guest-id') || '').trim();
+                if (guestId && emailerGuestsCheckedIds[guestId]) {
                     rows[i].classList.add('is-selected');
-                    break;
+                    continue;
+                }
+                if (selId && rows[i].getAttribute('data-contact-id') === selId) {
+                    rows[i].classList.add('is-selected');
                 }
             }
         }
@@ -21558,7 +21989,729 @@
             btn.setAttribute('aria-label', active ? 'E-mail ' + email : 'E-mail contact');
         }
 
+        function compareEmailerGuests(a, b) {
+            var af = String(a && a.firstName || '').trim().toLowerCase();
+            var bf = String(b && b.firstName || '').trim().toLowerCase();
+            var byFirst = af.localeCompare(bf, undefined, { sensitivity: 'base' });
+            if (byFirst) return byFirst;
+            var al = String(a && a.lastName || '').trim().toLowerCase();
+            var bl = String(b && b.lastName || '').trim().toLowerCase();
+            var byLast = al.localeCompare(bl, undefined, { sensitivity: 'base' });
+            if (byLast) return byLast;
+            return String(a && a.email || '').localeCompare(String(b && b.email || ''), undefined, { sensitivity: 'base' });
+        }
+
+        function emailerGuestEmailKey(rec) {
+            return String(rec && rec.email || '').trim().toLowerCase();
+        }
+
+        function emailerGuestsWithoutDuplicateEmails(rows) {
+            var seen = Object.create(null);
+            var out = [];
+            for (var i = 0; i < rows.length; i++) {
+                var rec = rows[i];
+                if (!rec) continue;
+                var key = emailerGuestEmailKey(rec);
+                if (key) {
+                    if (seen[key]) continue;
+                    seen[key] = true;
+                }
+                out.push(rec);
+            }
+            return out;
+        }
+
+        var EMAILER_GUEST_FILTER_COUNTRIES = [
+            'Other (Enter into bio below.)',
+            'Australia',
+            'Austria',
+            'Belgium',
+            'Bosnia and Herzegovina',
+            'Bulgaria',
+            'Canada',
+            'Croatia',
+            'Czech Republic',
+            'Denmark',
+            'Estonia',
+            'Finland',
+            'France',
+            'Germany',
+            'Greece',
+            'Hungary',
+            'Iceland',
+            'India',
+            'Ireland',
+            'Italy',
+            'Jersey',
+            'Latvia',
+            'Lithuania',
+            'Luxembourg',
+            'Monaco',
+            'Netherlands',
+            'New Zeeland',
+            'Northern Ireland',
+            'Norway',
+            'Poland',
+            'Portugal',
+            'Romania',
+            'Saudi Arabia',
+            'Serbia',
+            'Slovakia',
+            'Slovenia',
+            'Spain',
+            'Sweden',
+            'Switzerland',
+            'UAE',
+            'Ukraine',
+            'United Kingdom',
+            'United States',
+            'South Africa',
+        ];
+        var EMAILER_GUEST_FILTER_SPECIALITIES = [
+            'Anaesthesiology',
+            'Critical Care',
+            'Emergency Medicine',
+            'Internal Medicine',
+            'Paramedic',
+            'Nursing',
+            'Other',
+        ];
+        var EMAILER_GUEST_FILTER_TRAINING = [
+            'Consultant physiscian',
+            'Registrar physiscian',
+            'Specialist paramedic',
+            'Paramedic/EMT',
+            'Specialist nurse',
+            'Nurse',
+            'Other',
+        ];
+        var EMAILER_GUEST_FILTER_CLINICAL = [
+            'Emergency Department',
+            'Intensive Care Unit',
+            'Prehospital',
+            'Operating theatres',
+            'Tactical/Austere',
+            'Other',
+        ];
+
+        function emptyEmailerGuestsFilterSettings() {
+            return {
+                event: [],
+                country: '',
+                speciality: [],
+                training: [],
+                clinical: [],
+            };
+        }
+
+        function emailerGuestsFilterIsActive(filter) {
+            var f = filter || emailerGuestsFilterSettings;
+            if (!f || typeof f !== 'object') return false;
+            if (String(f.country || '').trim()) return true;
+            var keys = Object.keys(emptyEmailerGuestsFilterSettings());
+            for (var i = 0; i < keys.length; i++) {
+                if (keys[i] === 'country') continue;
+                if (guestsFilterSelectedList(f[keys[i]]).length) return true;
+            }
+            return false;
+        }
+
+        function emailerGuestValueList(raw) {
+            if (Array.isArray(raw)) {
+                var fromArray = [];
+                for (var i = 0; i < raw.length; i++) {
+                    var item = String(raw[i] != null ? raw[i] : '').trim();
+                    if (item) fromArray.push(item);
+                }
+                return fromArray;
+            }
+            return String(raw != null ? raw : '')
+                .split(/[,;]+/)
+                .map(function (part) {
+                    return part.trim();
+                })
+                .filter(Boolean);
+        }
+
+        function emailerGuestAnyListedValueMatches(raw, selected) {
+            var want = guestsFilterSelectedList(selected);
+            if (!want.length) return true;
+            var have = emailerGuestValueList(raw);
+            if (!have.length) return false;
+            for (var i = 0; i < want.length; i++) {
+                for (var j = 0; j < have.length; j++) {
+                    if (guestsFilterValuesEqual(have[j], want[i])) return true;
+                }
+            }
+            return false;
+        }
+
+        function emailerGuestCountryMatchesFilter(rec, selected) {
+            var want = String(selected != null ? selected : '').trim();
+            if (!want) return true;
+            return guestsFilterValuesEqual(rec && rec.country, want);
+        }
+
+        function emailerGuestEventMatchesFilter(rec, selected) {
+            var list = guestsFilterSelectedList(selected);
+            if (!list.length) return true;
+            var ev = String(rec && rec.event != null ? rec.event : '').trim();
+            if (!ev) return false;
+            var parts = ev
+                .split(/[,;]+/)
+                .map(function (part) {
+                    return part.trim();
+                })
+                .filter(Boolean);
+            if (!parts.length) parts = [ev];
+            for (var i = 0; i < list.length; i++) {
+                for (var p = 0; p < parts.length; p++) {
+                    if (guestsFilterValuesEqual(parts[p], list[i])) return true;
+                }
+            }
+            return false;
+        }
+
+        function emailerGuestMatchesFilter(rec, filter) {
+            var f = filter || emailerGuestsFilterSettings;
+            if (!emailerGuestsFilterIsActive(f)) return true;
+            if (!rec) return false;
+            if (!emailerGuestEventMatchesFilter(rec, f.event)) return false;
+            if (!emailerGuestCountryMatchesFilter(rec, f.country)) return false;
+            if (!emailerGuestAnyListedValueMatches(rec.baseSpecialities, f.speciality)) return false;
+            if (!emailerGuestAnyListedValueMatches(rec.trainingLevel, f.training)) return false;
+            if (!emailerGuestAnyListedValueMatches(rec.clinicalContext, f.clinical)) return false;
+            return true;
+        }
+
+        function emailerGuestRowsDeduped() {
+            var rows = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory.slice() : [];
+            rows.sort(compareEmailerGuests);
+            return emailerGuestsWithoutDuplicateEmails(rows);
+        }
+
+        function emailerEventFilterIsActive(filter) {
+            var f = filter || emailerGuestsFilterSettings;
+            return guestsFilterSelectedList(f && f.event).length > 0;
+        }
+
+        function emailerGuestRowsForTable() {
+            var rows = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory.slice() : [];
+            if (emailerGuestsFilterIsActive(emailerGuestsFilterSettings)) {
+                rows = rows.filter(function (rec) {
+                    return emailerGuestMatchesFilter(rec, emailerGuestsFilterSettings);
+                });
+            }
+            rows.sort(compareEmailerGuests);
+            if (emailerEventFilterIsActive(emailerGuestsFilterSettings)) return rows;
+            return emailerGuestsWithoutDuplicateEmails(rows);
+        }
+
+        function emailerFilterEventChoices() {
+            var seen = Object.create(null);
+            var out = [];
+            function add(raw) {
+                var value = String(raw != null ? raw : '').trim();
+                if (!value) return;
+                var key = value.toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push(value);
+            }
+            var known = Array.isArray(emailerFilterEventOptions) ? emailerFilterEventOptions : [];
+            for (var i = 0; i < known.length; i++) add(known[i]);
+            var guests = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory : [];
+            for (var g = 0; g < guests.length; g++) {
+                String(guests[g] && guests[g].event != null ? guests[g].event : '')
+                    .split(/[,;]+/)
+                    .forEach(add);
+            }
+            return out;
+        }
+
+        async function ensureEmailerFilterEvents() {
+            if (emailerFilterEventOptions.length) return emailerFilterEventOptions;
+            try {
+                emailerFilterEventOptions = await loadAlleventsFromTbsSettings(getFirestore());
+            } catch (err) {
+                console.warn('ensureEmailerFilterEvents:', err);
+                emailerFilterEventOptions = [];
+            }
+            return emailerFilterEventOptions;
+        }
+
+        function syncEmailerFilterButton() {
+            var btn = document.getElementById('emailer-filter-button');
+            var mark = document.getElementById('emailer-filter-active-mark');
+            var ready = emailerRosterView === 'guests' && !!emailerGuestsMemoryLoaded;
+            var active = emailerGuestsFilterIsActive(emailerGuestsFilterSettings);
+            if (btn) {
+                btn.disabled = !ready;
+                btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+                btn.setAttribute('aria-label', active ? 'Filter guests (filter active)' : 'Filter guests');
+                btn.title = active ? 'Filter guests (filter active)' : 'Filter guests';
+            }
+            if (mark) {
+                mark.hidden = !active;
+                mark.setAttribute('aria-hidden', active ? 'false' : 'true');
+            }
+        }
+
+        function emailerFilterPresetPlusGuestValues(preset, guestValues) {
+            var seen = Object.create(null);
+            var out = [];
+            function add(raw) {
+                var value = String(raw != null ? raw : '').trim();
+                if (!value) return;
+                var key = value.toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push(value);
+            }
+            var known = Array.isArray(preset) ? preset : [];
+            for (var i = 0; i < known.length; i++) add(known[i]);
+            var extras = Array.isArray(guestValues) ? guestValues.slice() : [];
+            extras.sort(function (a, b) {
+                return String(a).localeCompare(String(b), undefined, { sensitivity: 'base' });
+            });
+            for (var j = 0; j < extras.length; j++) add(extras[j]);
+            return out;
+        }
+
+        function emailerGuestCountriesForFilter() {
+            var extras = [];
+            var guests = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory : [];
+            for (var i = 0; i < guests.length; i++) {
+                var country = String(guests[i] && guests[i].country != null ? guests[i].country : '').trim();
+                if (country) extras.push(country);
+            }
+            return emailerFilterPresetPlusGuestValues(EMAILER_GUEST_FILTER_COUNTRIES, extras);
+        }
+
+        function fillEmailerGuestCountryFilter() {
+            var select = document.getElementById('emailer-guests-filter-country');
+            if (!select) return;
+            var selected = String(emailerGuestsFilterSettings.country || '').trim();
+            var options = emailerGuestCountriesForFilter();
+            var html = '<option value="">Any country</option>';
+            for (var i = 0; i < options.length; i++) {
+                var value = options[i];
+                html +=
+                    '<option value="' +
+                    escapeHtml(value) +
+                    '"' +
+                    (guestsFilterValuesEqual(value, selected) ? ' selected' : '') +
+                    '>' +
+                    escapeHtml(value) +
+                    '</option>';
+            }
+            if (selected) {
+                var known = false;
+                for (var j = 0; j < options.length; j++) {
+                    if (guestsFilterValuesEqual(options[j], selected)) {
+                        known = true;
+                        break;
+                    }
+                }
+                if (!known) {
+                    html +=
+                        '<option value="' +
+                        escapeHtml(selected) +
+                        '" selected>' +
+                        escapeHtml(selected) +
+                        '</option>';
+                }
+            }
+            select.innerHTML = html;
+        }
+
+        function populateEmailerGuestsFilterPopupForm() {
+            fillGuestsFilterChecks(
+                document.getElementById('emailer-guests-filter-event'),
+                emailerFilterEventChoices(),
+                emailerGuestsFilterSettings.event
+            );
+            fillEmailerGuestCountryFilter();
+            fillGuestsFilterChecks(
+                document.getElementById('emailer-guests-filter-speciality'),
+                EMAILER_GUEST_FILTER_SPECIALITIES,
+                emailerGuestsFilterSettings.speciality
+            );
+            fillGuestsFilterChecks(
+                document.getElementById('emailer-guests-filter-training'),
+                EMAILER_GUEST_FILTER_TRAINING,
+                emailerGuestsFilterSettings.training
+            );
+            fillGuestsFilterChecks(
+                document.getElementById('emailer-guests-filter-clinical'),
+                EMAILER_GUEST_FILTER_CLINICAL,
+                emailerGuestsFilterSettings.clinical
+            );
+        }
+
+        function readEmailerGuestsFilterFormValues() {
+            var out = emptyEmailerGuestsFilterSettings();
+            var keys = Object.keys(out);
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var el = document.getElementById('emailer-guests-filter-' + k);
+                if (!el) continue;
+                if (String(el.tagName || '').toUpperCase() === 'SELECT') {
+                    out[k] = String(el.value || '').trim();
+                    continue;
+                }
+                var boxes = el.querySelectorAll('input[type="checkbox"]:checked');
+                var picked = [];
+                for (var b = 0; b < boxes.length; b++) {
+                    var v = String(boxes[b].value || '').trim();
+                    if (v) picked.push(v);
+                }
+                out[k] = guestsFilterSelectedList(picked);
+            }
+            return out;
+        }
+
+        function applyEmailerGuestsFilterSettings(next) {
+            var src = next || emptyEmailerGuestsFilterSettings();
+            var base = emptyEmailerGuestsFilterSettings();
+            var keys = Object.keys(base);
+            for (var i = 0; i < keys.length; i++) {
+                if (keys[i] === 'country') {
+                    base.country = String(src.country || '').trim();
+                    continue;
+                }
+                base[keys[i]] = guestsFilterSelectedList(src[keys[i]]);
+            }
+            emailerGuestsFilterSettings = base;
+            syncEmailerFilterButton();
+            if (emailerRosterView === 'guests') renderEmailerRosterTable();
+        }
+
+        function closeEmailerGuestsFilterPopup() {
+            var popup = document.getElementById('emailer-guests-filter-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        async function openEmailerGuestsFilterPopup() {
+            if (emailerRosterView !== 'guests' || !emailerGuestsMemoryLoaded) return;
+            await ensureEmailerFilterEvents();
+            populateEmailerGuestsFilterPopupForm();
+            var popup = document.getElementById('emailer-guests-filter-popup');
+            if (!popup) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+        }
+
+        function emailerGuestListRowFromRecord(rec) {
+            if (!rec) return null;
+            var id = String(rec.id || '').trim();
+            if (!id) return null;
+            var firstName = rec.firstName != null ? rec.firstName : rec.name;
+            return {
+                id: id,
+                firstName: firstName != null ? String(firstName) : '',
+                lastName: rec.lastName != null ? String(rec.lastName) : '',
+                email: rec.email != null ? String(rec.email) : '',
+                event: rec.event != null ? String(rec.event) : '',
+                country: rec.country != null ? String(rec.country) : '',
+                baseSpecialities: emailerGuestValueList(rec.baseSpecialities),
+                trainingLevel: rec.trainingLevel != null ? String(rec.trainingLevel) : '',
+                clinicalContext: rec.clinicalContext != null ? rec.clinicalContext : '',
+                read: rec.read != null ? String(rec.read) : '',
+                invited: rec.invited != null ? String(rec.invited) : '',
+                invoiced: rec.invoiced != null ? String(rec.invoiced) : '',
+                paid: rec.paid != null ? String(rec.paid) : '',
+                briefed: rec.briefed != null ? String(rec.briefed) : '',
+                attended: !!rec.attended,
+                cmeStatus: rec.cmeStatus != null ? String(rec.cmeStatus) : '',
+            };
+        }
+
+        async function queryEmailerGuestRowsForEvent(db, eventName) {
+            var want = String(eventName || '').trim();
+            if (!want) return [];
+            var specs = [
+                ['Event', '=='],
+                ['event', '=='],
+                ['Events', '=='],
+                ['events', '=='],
+                ['EVENT', '=='],
+                ['Event', 'array-contains'],
+                ['event', 'array-contains'],
+            ];
+            var seen = Object.create(null);
+            var list = [];
+            for (var i = 0; i < specs.length; i++) {
+                try {
+                    var snap = await db.collectionGroup('item').where(specs[i][0], specs[i][1], want).get();
+                    snap.forEach(function (doc) {
+                        var rowId = guestRowIdFromGuestsItemDoc(doc);
+                        if (!rowId || seen[rowId]) return;
+                        var rec = guestRecordFromTbsItemDoc(rowId, doc.data() || {});
+                        if (!emailerGuestEventMatchesFilter(rec, [want])) return;
+                        var row = emailerGuestListRowFromRecord(rec);
+                        if (!row) return;
+                        seen[rowId] = true;
+                        list.push(row);
+                    });
+                } catch (err) {
+                    console.warn('queryEmailerGuestRowsForEvent:', want, specs[i][0], specs[i][1], err);
+                }
+            }
+            return list;
+        }
+
+        async function listEmailerGuestIds(db) {
+            var ids = [];
+            try {
+                var discovered = await discoverGuestRowIdsViaItemCollectionGroup(db);
+                if (discovered && discovered.length) ids = ids.concat(discovered);
+            } catch (err) {
+                console.warn('listEmailerGuestIds discovery:', err);
+            }
+            try {
+                var listed = await listGuestIdsUnderTbsGuests(db);
+                if (listed && listed.length) ids = ids.concat(listed);
+            } catch (err) {
+                console.warn('listEmailerGuestIds index:', err);
+            }
+            return dedupeContentRowIds(ids);
+        }
+
+        async function fetchAllGuestsForEmailer() {
+            var db = getFirestore();
+            var byId = Object.create(null);
+            function addRow(row) {
+                var id = String(row && row.id || '').trim();
+                if (!id || byId[id]) return;
+                byId[id] = row;
+            }
+            if (Array.isArray(guestsRosterInMemory)) {
+                for (var g = 0; g < guestsRosterInMemory.length; g++) {
+                    addRow(emailerGuestListRowFromRecord(guestsRosterInMemory[g]));
+                }
+            }
+            var ids = await listEmailerGuestIds(db);
+            var chunkSize = 20;
+            for (var i = 0; i < ids.length; i += chunkSize) {
+                var chunk = ids.slice(i, i + chunkSize);
+                var snaps = await Promise.all(
+                    chunk.map(function (rowId) {
+                        return tbsGuestItemRef(db, rowId).get();
+                    })
+                );
+                for (var j = 0; j < chunk.length; j++) {
+                    var snap = snaps[j];
+                    if (!snap || !snap.exists) continue;
+                    addRow(emailerGuestListRowFromRecord(guestRecordFromTbsItemDoc(chunk[j], snap.data() || {})));
+                }
+            }
+            var events = [];
+            try {
+                events = await loadAlleventsFromTbsSettings(db);
+            } catch (err) {
+                console.warn('fetchAllGuestsForEmailer events:', err);
+            }
+            if (!Array.isArray(events)) events = [];
+            var currentEvent = String(current_event || '').trim();
+            if (currentEvent) events = events.concat([currentEvent]);
+            var seenEvents = Object.create(null);
+            for (var e = 0; e < events.length; e++) {
+                var eventName = String(events[e] || '').trim();
+                var eventKey = eventName.toLowerCase();
+                if (!eventName || seenEvents[eventKey]) continue;
+                seenEvents[eventKey] = true;
+                var matched = await queryEmailerGuestRowsForEvent(db, eventName);
+                for (var m = 0; m < matched.length; m++) addRow(matched[m]);
+            }
+            var list = [];
+            Object.keys(byId).forEach(function (id) {
+                list.push(byId[id]);
+            });
+            list.sort(compareEmailerGuests);
+            return list;
+        }
+
+        async function ensureEmailerGuestsLoaded() {
+            if (emailerGuestsMemoryLoaded) return emailerGuestsRosterInMemory;
+            if (emailerGuestsLoadPromise) return emailerGuestsLoadPromise;
+            emailerGuestsLoadPromise = fetchAllGuestsForEmailer()
+                .then(function (list) {
+                    emailerGuestsRosterInMemory = list;
+                    emailerGuestsMemoryLoaded = true;
+                    return emailerGuestsRosterInMemory;
+                })
+                .finally(function () {
+                    emailerGuestsLoadPromise = null;
+                });
+            return emailerGuestsLoadPromise;
+        }
+
+        function emailerStatusFilterIsActive(filter) {
+            var f = filter || emailerGuestsFilterSettings;
+            if (String(f && f.country || '').trim()) return true;
+            var keys = ['speciality', 'training', 'clinical'];
+            for (var i = 0; i < keys.length; i++) {
+                if (guestsFilterSelectedList(f && f[keys[i]]).length) return true;
+            }
+            return false;
+        }
+
+        function emailerGuestCountBaseRows() {
+            var rows = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory.slice() : [];
+            if (emailerEventFilterIsActive(emailerGuestsFilterSettings)) {
+                return rows.filter(function (rec) {
+                    return emailerGuestEventMatchesFilter(rec, emailerGuestsFilterSettings.event);
+                });
+            }
+            rows.sort(compareEmailerGuests);
+            return emailerGuestsWithoutDuplicateEmails(rows);
+        }
+
+        function syncEmailerRosterCount(shown, total, narrowed) {
+            var note = document.getElementById('emailer-roster-count');
+            if (!note) return;
+            var n = typeof shown === 'number' ? shown : 0;
+            var all = typeof total === 'number' ? total : n;
+            if (narrowed && emailerRosterView === 'guests') {
+                note.textContent = '(Filtered ' + n + ' out of ' + all + ')';
+                return;
+            }
+            note.textContent = '(n=' + n + ')';
+        }
+
+        function syncBulkEmailActionsCount() {
+            var note = document.getElementById('bulk-email-actions-count');
+            if (!note) return;
+            var n = 0;
+            var ids = emailerGuestsCheckedIds || {};
+            for (var id in ids) {
+                if (Object.prototype.hasOwnProperty.call(ids, id) && ids[id]) n++;
+            }
+            note.textContent = n > 0 ? ('n = ' + n + ' selected guests') : '(n=0)';
+        }
+
+        function emailerGuestsAllChecked(rows) {
+            if (!rows || !rows.length) return false;
+            for (var i = 0; i < rows.length; i++) {
+                var id = String(rows[i] && rows[i].id || '').trim();
+                if (!id || !emailerGuestsCheckedIds[id]) return false;
+            }
+            return true;
+        }
+
+        function setEmailerGuestsChecks(nextOn) {
+            if (backenduserIsReadonly) return;
+            var rows = emailerGuestRowsForTable();
+            var want = !!nextOn;
+            for (var i = 0; i < rows.length; i++) {
+                var id = String(rows[i] && rows[i].id || '').trim();
+                if (!id) continue;
+                if (want) emailerGuestsCheckedIds[id] = true;
+                else delete emailerGuestsCheckedIds[id];
+            }
+            renderEmailerRosterTable();
+        }
+
+        function toggleEmailerGuestCheck(docId) {
+            if (backenduserIsReadonly) return;
+            var id = String(docId || '').trim();
+            if (!id) return;
+            if (emailerGuestsCheckedIds[id]) delete emailerGuestsCheckedIds[id];
+            else emailerGuestsCheckedIds[id] = true;
+            renderEmailerRosterTable();
+        }
+
+        function renderEmailerRosterTable(opts) {
+            opts = opts || {};
+            var itemsEl = document.getElementById('contacts-roster-items');
+            if (!itemsEl) return;
+            var showingGuests = emailerRosterView === 'guests';
+            var baseRows = showingGuests && emailerGuestsMemoryLoaded ? emailerGuestCountBaseRows() : [];
+            var rows = showingGuests && emailerGuestsMemoryLoaded ? emailerGuestRowsForTable() : [];
+            syncEmailerRosterCount(rows.length, baseRows.length, emailerStatusFilterIsActive());
+            syncBulkEmailActionsCount();
+            syncEmailerFilterButton();
+            var html =
+                '<table class="contacts-list-table emailer-guests-table" role="grid" aria-label="E-mailer">' +
+                '<thead><tr>' +
+                '<th scope="col">' +
+                rosterNameHeaderHtml('Name', emailerGuestsAllChecked(rows), 'guests') +
+                '</th>' +
+                '<th scope="col">E-mail</th>' +
+                '</tr></thead><tbody>';
+            if (!showingGuests) {
+                html += '</tbody></table>';
+                itemsEl.innerHTML = html;
+                extendRosterTableBorders(itemsEl);
+                return;
+            }
+            if (opts.loading && !emailerGuestsMemoryLoaded) {
+                syncEmailerRosterCount(0);
+                html +=
+                    '<tr class="contacts-roster-row">' +
+                    '<td class="contacts-roster-empty" colspan="2">Loading guests...</td></tr>';
+                html += '</tbody></table>';
+                itemsEl.innerHTML = html;
+                extendRosterTableBorders(itemsEl);
+                return;
+            }
+            if (!rows.length) {
+                html +=
+                    '<tr class="contacts-roster-row">' +
+                    '<td class="contacts-roster-empty" colspan="2">No guests.</td></tr>';
+            } else {
+                for (var i = 0; i < rows.length; i++) {
+                    var g = rows[i];
+                    var guestId = String(g.id || '').trim();
+                    var guestChecked = !!(guestId && emailerGuestsCheckedIds[guestId]);
+                    var guestName = (
+                        String(g.firstName || '').trim() +
+                        ' ' +
+                        String(g.lastName || '').trim()
+                    ).trim();
+                    html +=
+                        '<tr class="contacts-roster-row' +
+                        (guestChecked ? ' is-selected' : '') +
+                        '" data-emailer-guest-id="' +
+                        escapeHtml(g.id) +
+                        '">' +
+                        '<td class="guests-roster-name-cell">' +
+                        rosterNameInnerHtml(
+                            rosterNameCheckHtml(emailerGuestsCheckedIds, g.id, 'guest'),
+                            escapeHtml(guestName || '—')
+                        ) +
+                        '</td>' +
+                        '<td class="emailer-guest-email-cell">' +
+                        escapeHtml(String(g.email || '').trim() || '—') +
+                        '</td></tr>';
+                }
+            }
+            html += '</tbody></table>';
+            itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
+        }
+
+        async function showEmailerGuestsRoster() {
+            if (!emailerGuestsMemoryLoaded) renderEmailerRosterTable({ loading: true });
+            try {
+                await ensureEmailerGuestsLoaded();
+            } catch (err) {
+                console.error('showEmailerGuestsRoster:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', (err && err.message) || 'Failed to load guests.');
+                }
+            }
+            if (emailerRosterView === 'guests') renderEmailerRosterTable();
+        }
+
         function renderContactsTable() {
+            if (emailerRosterView !== 'speakers' && emailerRosterView !== 'sponsors' && emailerRosterView !== 'misc') {
+                renderEmailerRosterTable();
+                return;
+            }
             var itemsEl = document.getElementById('contacts-roster-items');
             if (!itemsEl) return;
             contactsRosterInMemory = (contactsRosterInMemory || []).filter(function (m) {
@@ -21608,6 +22761,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
             syncEmailerRosterSelectionHighlight();
         }
 
@@ -27204,6 +28358,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
         }
 
         /**
@@ -28412,6 +29567,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
             syncGuestRosterSelectionHighlight();
             updateGuestNavButtons();
             syncGuestSendInviteButton();
@@ -28822,6 +29978,7 @@
             }
             html += '</tbody></table></div>';
             root.innerHTML = html;
+            extendRosterTableBorders(root);
         }
 
         function renderSpeakerRoster() {
@@ -28987,6 +30144,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
             syncSpeakerRosterSelectionHighlight();
             updateAddSpeakerDeleteButtonState();
             updateSpeakerNavButtons();
@@ -31561,6 +32719,7 @@
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
+            extendRosterTableBorders(itemsEl);
             syncContentRosterSelectionHighlight();
             updateContentNavButtons();
         }
@@ -32854,9 +34013,7 @@
                 });
             }
             if (isEmailer) {
-                void loadAndRenderContactsTable().catch(function (err) {
-                    console.error('loadAndRenderContactsTable:', err);
-                });
+                renderEmailerRosterTable();
             }
             if (isSettings) {
                 void syncEventLocationAndSiteSettings(current_event)
@@ -35998,7 +37155,7 @@
                 });
             }
             function syncEmailerRosterViewLinks() {
-                var view = String(emailerRosterView || 'guests');
+                var view = String(emailerRosterView || '');
                 var ids = {
                     guests: 'emailer-roster-guests-link',
                     speakers: 'emailer-roster-speakers-link',
@@ -36016,11 +37173,24 @@
             }
             function setEmailerRosterView(next) {
                 var view = String(next || '');
-                if (view !== 'speakers' && view !== 'sponsors' && view !== 'misc') view = 'guests';
-                if (view === emailerRosterView) return;
+                if (view !== 'guests' && view !== 'speakers' && view !== 'sponsors' && view !== 'misc') return;
+                var sameLoadedGuests = view === 'guests' && view === emailerRosterView && emailerGuestsMemoryLoaded;
+                if (view === emailerRosterView && view !== 'guests') return;
+                if (sameLoadedGuests) {
+                    renderEmailerRosterTable();
+                    return;
+                }
                 emailerRosterView = view;
                 syncEmailerRosterViewLinks();
+                if (view === 'guests') {
+                    showEmailerGuestsRoster().catch(function (err) {
+                        console.error('emailer-roster-guests-link:', err);
+                    });
+                } else {
+                    renderEmailerRosterTable();
+                }
             }
+            syncEmailerRosterViewLinks();
             [
                 ['emailer-roster-guests-link', 'guests'],
                 ['emailer-roster-speakers-link', 'speakers'],
@@ -36034,6 +37204,39 @@
                     setEmailerRosterView(pair[1]);
                 });
             });
+            var emailerFilterBtn = document.getElementById('emailer-filter-button');
+            if (emailerFilterBtn) {
+                emailerFilterBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (emailerFilterBtn.disabled) return;
+                    openEmailerGuestsFilterPopup().catch(function (err) {
+                        console.error('emailer-filter-button:', err);
+                    });
+                });
+            }
+            var emailerGuestsFilterBackdrop = document.getElementById('emailer-guests-filter-popup-backdrop');
+            if (emailerGuestsFilterBackdrop) {
+                emailerGuestsFilterBackdrop.addEventListener('click', function () {
+                    closeEmailerGuestsFilterPopup();
+                });
+            }
+            var emailerGuestsFilterApplyBtn = document.getElementById('emailer-guests-filter-apply');
+            if (emailerGuestsFilterApplyBtn) {
+                emailerGuestsFilterApplyBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applyEmailerGuestsFilterSettings(readEmailerGuestsFilterFormValues());
+                    closeEmailerGuestsFilterPopup();
+                });
+            }
+            var emailerGuestsFilterClearBtn = document.getElementById('emailer-guests-filter-clear');
+            if (emailerGuestsFilterClearBtn) {
+                emailerGuestsFilterClearBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applyEmailerGuestsFilterSettings(emptyEmailerGuestsFilterSettings());
+                    populateEmailerGuestsFilterPopupForm();
+                });
+            }
             var addEmailerContactBtn = document.getElementById('emailer-add-contact-button');
             if (addEmailerContactBtn) {
                 addEmailerContactBtn.addEventListener('click', function () {
@@ -36106,7 +37309,16 @@
                     if (nameCheckBtn && contactsRosterItemsEl.contains(nameCheckBtn)) {
                         ev.preventDefault();
                         ev.stopPropagation();
+                        if (nameCheckBtn.classList.contains('roster-name-check-all-btn')) {
+                            setEmailerGuestsChecks(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            return;
+                        }
                         var checkRow = nameCheckBtn.closest('.contacts-roster-row');
+                        var guestCheckId = checkRow && checkRow.getAttribute('data-emailer-guest-id');
+                        if (guestCheckId) {
+                            toggleEmailerGuestCheck(guestCheckId);
+                            return;
+                        }
                         var checkId = checkRow && checkRow.getAttribute('data-contact-id');
                         if (checkId) toggleContactRosterSelected(checkId, nameCheckBtn);
                         return;
