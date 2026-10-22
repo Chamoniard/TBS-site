@@ -1268,17 +1268,29 @@
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #guest-editor .guests-bottom-row::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         #guest-editor .guests-bottom-track {
+            --guest-list-min: 0px;
+            --guest-viewer-min: 0px;
             display: flex;
             flex-direction: row;
             align-items: stretch;
             gap: 16px;
-            flex: 1 1 auto;
+            flex: none;
+            width: max(100%, calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
+            min-width: max(100%, calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
             min-height: 0;
-            min-width: 0;
+            height: 100%;
             box-sizing: border-box;
         }
 
@@ -2287,11 +2299,84 @@
             flex-direction: column;
             flex: 1 1 0;
             min-height: 0;
-            min-width: 0;
+            min-width: var(--guest-viewer-min, 0px);
             overflow: hidden;
             padding: 0;
             align-self: stretch;
             background: transparent;
+        }
+
+        #guest-editor .guests-list {
+            min-width: var(--guest-list-min, 0px);
+        }
+
+        #guest-editor #guests-list-heading {
+            flex-wrap: nowrap;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        #guest-editor #guests-list-heading .guests-roster-table-title-wrap,
+        #guest-editor #guests-list-heading .guests-roster-table-title,
+        #guest-editor #guests-list-heading .guests-roster-table-view-link {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            min-width: max-content;
+            width: auto;
+            white-space: nowrap;
+        }
+
+        #guest-editor #guests-list-heading .guests-roster-table-trailing,
+        #guest-editor #guests-list-heading .guests-actions {
+            flex: 1 1 auto;
+            flex-wrap: nowrap;
+            min-width: 0;
+            max-width: none;
+        }
+
+        #guest-editor #guests-list-heading .guests-roster-search {
+            width: auto;
+        }
+
+        #guest-editor #guest-editor-panel > .edit-guest-top {
+            flex-wrap: nowrap;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        #guest-editor #guest-editor-panel > .edit-guest-top .selected-guestname-wrap,
+        #guest-editor #guest-editor-panel > .edit-guest-top .selected-guestname,
+        #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-name-first,
+        #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-name-last {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            min-width: max-content;
+            width: auto;
+            white-space: nowrap;
+            word-break: normal;
+        }
+
+        #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-top-trailing {
+            flex: 1 0 auto;
+            flex-wrap: nowrap;
+            min-width: max-content;
+            width: auto;
+        }
+
+        #guest-editor #guest-editor-panel > .edit-guest-top .guest-editor-toolbar,
+        #guest-editor #guest-editor-panel > .edit-guest-top .guest-editor-toolbar-trailing {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            width: auto;
+            min-width: max-content;
+        }
+
+        #guest-editor .guest-overwatch-title,
+        #guest-editor .guest-overwatch-title > * {
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         #speaker-editor .speakers-actions {
@@ -3299,6 +3384,7 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+            position: relative;
         }
 
         #emailer-editor,
@@ -3310,6 +3396,54 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+            position: relative;
+        }
+
+        /* Thin horizontal scrollbar sits in the existing top padding, so the
+           gap under the event strip does not change when the panes overflow. */
+        #emailer-editor .emailer-pane-scrollbar,
+        #guest-editor .guest-pane-scrollbar {
+            position: absolute;
+            top: 5px;
+            left: 16px;
+            right: 16px;
+            height: 6px;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(240, 224, 235, 0.45);
+            z-index: 6;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #emailer-editor .emailer-pane-scrollbar[hidden],
+        #guest-editor .guest-pane-scrollbar[hidden] {
+            display: none !important;
+        }
+
+        #emailer-editor .emailer-pane-scrollbar-thumb,
+        #guest-editor .guest-pane-scrollbar-thumb {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 6px;
+            width: 0;
+            border-radius: 999px;
+            background: var(--tbs-pink);
+            cursor: grab;
+            touch-action: none;
+        }
+
+        #emailer-editor .emailer-pane-scrollbar-thumb:hover,
+        #guest-editor .guest-pane-scrollbar-thumb:hover {
+            background: var(--tbs-pink-soft);
+        }
+
+        #emailer-editor .emailer-pane-scrollbar-thumb:active,
+        #guest-editor .guest-pane-scrollbar-thumb:active {
+            cursor: grabbing;
         }
 
         #emailer-editor.is-open,
@@ -3340,18 +3474,29 @@
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #emailer-editor .emailer-bottom-row::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         #emailer-editor .emailer-bottom-track {
+            --emailer-pane-min: 0px;
             display: grid;
-            grid-template-columns: minmax(min-content, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: repeat(3, minmax(var(--emailer-pane-min), 1fr));
             grid-template-rows: minmax(0, 1fr);
             align-items: stretch;
             gap: 16px;
-            flex: 1 1 auto;
+            flex: none;
+            width: max(100%, calc(var(--emailer-pane-min) * 3 + 32px));
+            min-width: max(100%, calc(var(--emailer-pane-min) * 3 + 32px));
             min-height: 0;
-            min-width: 0;
+            height: 100%;
             box-sizing: border-box;
         }
 
@@ -3360,7 +3505,7 @@
             flex-direction: column;
             align-items: stretch;
             min-height: 0;
-            min-width: min-content;
+            min-width: 0;
             overflow: hidden;
             flex: 1 1 0;
             background: transparent;
@@ -3452,23 +3597,39 @@
             padding-right: 0;
         }
 
-        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading {
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading,
+        #emailer-editor #bulk-email-actions > .edit-contact-top,
+        #emailer-editor #preview > .edit-contact-top {
             flex: 0 0 auto;
             flex-wrap: nowrap;
-            width: max-content;
-            min-width: 100%;
+            width: 100%;
+            min-width: 0;
             max-width: none;
+        }
+
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading {
             padding-left: var(--backend-table-cell-pad-x);
             padding-right: 0;
         }
 
         #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .selected-contactname-wrap,
         #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .emailer-roster-title-wrap,
-        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .edit-contact-top-trailing,
-        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .emailer-actions {
+        #emailer-editor #bulk-email-actions > .edit-contact-top .selected-contactname-wrap,
+        #emailer-editor #bulk-email-actions > .edit-contact-top .emailer-roster-title-wrap,
+        #emailer-editor #preview > .edit-contact-top .selected-contactname-wrap,
+        #emailer-editor #preview > .edit-contact-top .emailer-roster-title-wrap {
             flex: 0 0 auto;
             flex-wrap: nowrap;
             min-width: max-content;
+            width: auto;
+        }
+
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .edit-contact-top-trailing,
+        #emailer-editor .contacts-list > .edit-contact-top.contacts-list-heading .emailer-actions {
+            flex: 1 1 auto;
+            flex-wrap: nowrap;
+            min-width: 0;
+            max-width: none;
         }
 
         #emailer-editor .edit-contact-top .edit-contact-top-spacer {
@@ -3610,9 +3771,9 @@
 
         #emailer-editor .emailer-actions .emailer-roster-search {
             flex: 0 1 11rem;
-            width: 11rem;
+            width: auto;
             min-width: 7rem;
-            max-width: 14rem;
+            max-width: 11rem;
             height: var(--backend-square-btn-size);
             min-height: var(--backend-square-btn-size);
             max-height: var(--backend-square-btn-size);
@@ -3707,32 +3868,19 @@
             margin-left: auto;
         }
 
-        /* Preview title and toolbar stay on one line; the panel scrolls sideways. */
-        #emailer-editor #preview {
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
-
-        #emailer-editor #preview > .edit-contact-top.contacts-list-heading {
+        #emailer-editor #preview > .edit-contact-top .edit-contact-top-trailing {
+            flex: 1 0 auto;
             flex-wrap: nowrap;
-            width: max-content;
-            min-width: 100%;
-            max-width: none;
+            min-width: max-content;
+            width: auto;
         }
 
-        #emailer-editor #preview > .edit-contact-top .selected-contactname-wrap,
-        #emailer-editor #preview > .edit-contact-top .emailer-roster-title-wrap,
-        #emailer-editor #preview > .edit-contact-top .edit-contact-top-trailing,
         #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar,
         #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar-trailing {
-            flex-wrap: nowrap;
-            flex-shrink: 0;
-            min-width: max-content;
-        }
-
-        #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar {
             flex: 0 0 auto;
+            flex-wrap: nowrap;
             width: auto;
+            min-width: max-content;
         }
 
         #emailer-editor .emailer-editor-toolbar .emailer-editor-padlock-btn svg {
@@ -12616,6 +12764,9 @@
             </section>
 
             <section class="guest-overview-section" id="guest-editor" aria-hidden="true" aria-label="Guests" data-name="guest-editor">
+                <div class="guest-pane-scrollbar" id="guest-pane-scrollbar" hidden>
+                    <div class="guest-pane-scrollbar-thumb" id="guest-pane-scrollbar-thumb"></div>
+                </div>
                 <div class="guests-overview">
                     <div class="guests-bottom-row" id="guests-bottom-row">
                         <div class="guests-bottom-track" id="guests-bottom-track">
@@ -13764,6 +13915,9 @@
             </section>
 
             <section class="emailer-overview-section" id="emailer-editor" aria-hidden="true" aria-label="E-mailer" data-name="emailer-editor">
+                <div class="emailer-pane-scrollbar" id="emailer-pane-scrollbar" hidden>
+                    <div class="emailer-pane-scrollbar-thumb" id="emailer-pane-scrollbar-thumb"></div>
+                </div>
                 <div class="emailer-overview">
                     <div class="emailer-bottom-row" id="emailer-bottom-row">
                         <div class="emailer-bottom-track" id="emailer-bottom-track">
@@ -18370,6 +18524,7 @@
                     overwatch.setAttribute('aria-hidden', 'true');
                 }
             }
+            scheduleGuestPaneLayout();
         }
 
         function closeGuestsOverwatch() {
@@ -19431,6 +19586,7 @@
                 });
             }
             syncGuestEditorToolbarForBottomScroll();
+            scheduleGuestPaneLayout();
         }
 
         function openSpeakerDeleteConfirmModal() {
@@ -22577,9 +22733,11 @@
             var all = typeof total === 'number' ? total : n;
             if (narrowed && emailerRosterView === 'guests') {
                 note.textContent = '(Filtered ' + n + ' out of ' + all + ')';
+                scheduleEmailerPaneLayout();
                 return;
             }
             note.textContent = '(n=' + n + ')';
+            scheduleEmailerPaneLayout();
         }
 
         function syncBulkEmailActionsCount() {
@@ -22591,6 +22749,273 @@
                 if (Object.prototype.hasOwnProperty.call(ids, id) && ids[id]) n++;
             }
             note.textContent = n > 0 ? ('n = ' + n + ' selected guests') : '(n=0)';
+            scheduleEmailerPaneLayout();
+        }
+
+        var emailerPaneLayoutFrame = 0;
+        var emailerPaneScrollDrag = null;
+
+        function scheduleEmailerPaneLayout() {
+            if (emailerPaneLayoutFrame) return;
+            emailerPaneLayoutFrame = requestAnimationFrame(function () {
+                emailerPaneLayoutFrame = 0;
+                syncEmailerPaneLayout();
+            });
+        }
+
+        function emailerHeaderFloorWidth(head) {
+            if (!head) return 0;
+            var clone = head.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.querySelectorAll('[id]').forEach(function (el) {
+                el.removeAttribute('id');
+            });
+            clone.setAttribute('aria-hidden', 'true');
+            clone.style.position = 'absolute';
+            clone.style.left = '-10000px';
+            clone.style.top = '0';
+            clone.style.visibility = 'hidden';
+            clone.style.width = 'max-content';
+            clone.style.minWidth = '0';
+            clone.style.maxWidth = 'none';
+            clone.style.height = 'auto';
+            clone.style.flex = '0 0 auto';
+            var search = clone.querySelector('input');
+            if (search) {
+                search.style.setProperty('width', '7rem', 'important');
+                search.style.setProperty('flex', '0 0 7rem', 'important');
+                search.style.setProperty('min-width', '7rem', 'important');
+                search.style.setProperty('max-width', '7rem', 'important');
+            }
+            (head.parentNode || document.body).appendChild(clone);
+            var width = Math.ceil(clone.getBoundingClientRect().width);
+            if (clone.parentNode) clone.parentNode.removeChild(clone);
+            return width;
+        }
+
+        function syncEmailerPaneScrollbar() {
+            var row = document.getElementById('emailer-bottom-row');
+            var bar = document.getElementById('emailer-pane-scrollbar');
+            var thumb = document.getElementById('emailer-pane-scrollbar-thumb');
+            if (!row || !bar || !thumb) return;
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
+
+        function ensureEmailerPaneScroll() {
+            if (ensureEmailerPaneScroll.done) return;
+            var row = document.getElementById('emailer-bottom-row');
+            var editor = document.getElementById('emailer-editor');
+            var bar = document.getElementById('emailer-pane-scrollbar');
+            var thumb = document.getElementById('emailer-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureEmailerPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleEmailerPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleEmailerPaneLayout);
+            }
+            row.addEventListener('scroll', syncEmailerPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                emailerPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
+                    maxScroll: maxScroll,
+                    maxLeft: maxLeft
+                };
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!emailerPaneScrollDrag) return;
+                var drag = emailerPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endEmailerPaneScrollDrag(event) {
+                if (!emailerPaneScrollDrag) return;
+                emailerPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
+                }
+            }
+            thumb.addEventListener('pointerup', endEmailerPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endEmailerPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
+            });
+        }
+
+        function syncEmailerPaneLayout() {
+            var editor = document.getElementById('emailer-editor');
+            var track = document.getElementById('emailer-bottom-track');
+            if (!editor || !track || !editor.classList.contains('is-open')) return;
+            ensureEmailerPaneScroll();
+            var heads = [
+                document.getElementById('contacts-list-heading'),
+                document.querySelector('#bulk-email-actions > .edit-contact-top'),
+                document.querySelector('#preview > .edit-contact-top')
+            ];
+            var minPane = 0;
+            for (var i = 0; i < heads.length; i++) {
+                minPane = Math.max(minPane, emailerHeaderFloorWidth(heads[i]));
+            }
+            if (minPane > 0) {
+                track.style.setProperty('--emailer-pane-min', (minPane + 2) + 'px');
+            }
+            syncEmailerPaneScrollbar();
+        }
+
+        var guestPaneLayoutFrame = 0;
+        var guestPaneScrollDrag = null;
+
+        function scheduleGuestPaneLayout() {
+            if (guestPaneLayoutFrame) return;
+            guestPaneLayoutFrame = requestAnimationFrame(function () {
+                guestPaneLayoutFrame = 0;
+                syncGuestPaneLayout();
+            });
+        }
+
+        function guestViewerHeaderEl() {
+            var viewer = document.getElementById('guest-viewer');
+            if (viewer && viewer.classList.contains('guest-viewer--overwatch')) {
+                return viewer.querySelector('.guest-overwatch-title');
+            }
+            return document.querySelector('#guest-editor-panel > .edit-guest-top');
+        }
+
+        function syncGuestPaneScrollbar() {
+            var row = document.getElementById('guests-bottom-row');
+            var bar = document.getElementById('guest-pane-scrollbar');
+            var thumb = document.getElementById('guest-pane-scrollbar-thumb');
+            if (!row || !bar || !thumb) return;
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
+
+        function ensureGuestPaneScroll() {
+            if (ensureGuestPaneScroll.done) return;
+            var row = document.getElementById('guests-bottom-row');
+            var editor = document.getElementById('guest-editor');
+            var bar = document.getElementById('guest-pane-scrollbar');
+            var thumb = document.getElementById('guest-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureGuestPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleGuestPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleGuestPaneLayout);
+            }
+            var watch = [
+                document.getElementById('guests-list-heading'),
+                document.querySelector('#guest-editor-panel > .edit-guest-top'),
+                document.querySelector('#guest-editor .guest-overwatch-title')
+            ];
+            if (window.MutationObserver) {
+                var mutations = new MutationObserver(function () {
+                    scheduleGuestPaneLayout();
+                });
+                for (var i = 0; i < watch.length; i++) {
+                    if (!watch[i]) continue;
+                    mutations.observe(watch[i], { childList: true, subtree: true, characterData: true, attributes: true });
+                }
+            }
+            row.addEventListener('scroll', syncGuestPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                guestPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
+                    maxScroll: maxScroll,
+                    maxLeft: maxLeft
+                };
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!guestPaneScrollDrag) return;
+                var drag = guestPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endGuestPaneScrollDrag(event) {
+                if (!guestPaneScrollDrag) return;
+                guestPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
+                }
+            }
+            thumb.addEventListener('pointerup', endGuestPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endGuestPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
+            });
+        }
+
+        function syncGuestPaneLayout() {
+            var editor = document.getElementById('guest-editor');
+            var track = document.getElementById('guests-bottom-track');
+            if (!editor || !track || !editor.classList.contains('is-open')) return;
+            ensureGuestPaneScroll();
+            var listMin = emailerHeaderFloorWidth(document.getElementById('guests-list-heading'));
+            var viewerMin = emailerHeaderFloorWidth(guestViewerHeaderEl());
+            track.style.setProperty('--guest-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
+            track.style.setProperty('--guest-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
+            syncGuestPaneScrollbar();
         }
 
         function emailerGuestsAllChecked(rows) {
@@ -33991,6 +34416,7 @@
                 void openGuestsOverwatch().catch(function (err) {
                     console.error('openGuestsOverwatch on Guests tab:', err);
                 });
+                scheduleGuestPaneLayout();
             }
             if (isProgramme) {
                 renderGridFromState();
@@ -34014,6 +34440,7 @@
             }
             if (isEmailer) {
                 renderEmailerRosterTable();
+                scheduleEmailerPaneLayout();
             }
             if (isSettings) {
                 void syncEventLocationAndSiteSettings(current_event)
