@@ -975,6 +975,26 @@
             flex-shrink: 0;
         }
 
+        #content-editor .content-bottom-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 0;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #content-editor .content-bottom-row::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
         .content-editor-panels {
             display: flex;
             flex-direction: row;
@@ -984,6 +1004,17 @@
             min-width: 0;
             flex: 1;
             min-height: 0;
+            overflow: hidden;
+        }
+
+        #content-editor .content-editor-panels {
+            --content-list-min: 0px;
+            --content-viewer-min: 0px;
+            flex: none;
+            width: max(100%, calc(1500px - 32px), calc(var(--content-list-min) + var(--content-viewer-min) + 16px));
+            min-width: max(100%, calc(1500px - 32px), calc(var(--content-list-min) + var(--content-viewer-min) + 16px));
+            height: 100%;
+            box-sizing: border-box;
             overflow: hidden;
         }
 
@@ -1288,8 +1319,8 @@
             align-items: stretch;
             gap: 16px;
             flex: none;
-            width: max(100%, calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
-            min-width: max(100%, calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
+            width: max(100%, calc(1500px - 32px), calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
+            min-width: max(100%, calc(1500px - 32px), calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
             min-height: 0;
             height: 100%;
             box-sizing: border-box;
@@ -2132,8 +2163,8 @@
             align-items: stretch;
             gap: 16px;
             flex: none;
-            width: max(100%, calc(var(--speaker-list-min) + var(--speaker-viewer-min) + 16px));
-            min-width: max(100%, calc(var(--speaker-list-min) + var(--speaker-viewer-min) + 16px));
+            width: max(100%, calc(1500px - 32px), calc(var(--speaker-list-min) + var(--speaker-viewer-min) + 16px));
+            min-width: max(100%, calc(1500px - 32px), calc(var(--speaker-list-min) + var(--speaker-viewer-min) + 16px));
             min-height: 0;
             height: 100%;
             box-sizing: border-box;
@@ -3442,6 +3473,7 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+            position: relative;
         }
 
         /* Speakers / Guests / Programme activities: one pill size for roster tags + pills (matches Content badge width). */
@@ -3481,6 +3513,8 @@
         #emailer-editor .emailer-pane-scrollbar,
         #guest-editor .guest-pane-scrollbar,
         #speaker-editor .speaker-pane-scrollbar,
+        #team-editor .team-pane-scrollbar,
+        #content-editor .content-pane-scrollbar,
         #texteditor .texteditor-pane-scrollbar {
             position: absolute;
             top: 5px;
@@ -3500,6 +3534,8 @@
         #emailer-editor .emailer-pane-scrollbar[hidden],
         #guest-editor .guest-pane-scrollbar[hidden],
         #speaker-editor .speaker-pane-scrollbar[hidden],
+        #team-editor .team-pane-scrollbar[hidden],
+        #content-editor .content-pane-scrollbar[hidden],
         #texteditor .texteditor-pane-scrollbar[hidden] {
             display: none !important;
         }
@@ -3507,6 +3543,8 @@
         #emailer-editor .emailer-pane-scrollbar-thumb,
         #guest-editor .guest-pane-scrollbar-thumb,
         #speaker-editor .speaker-pane-scrollbar-thumb,
+        #team-editor .team-pane-scrollbar-thumb,
+        #content-editor .content-pane-scrollbar-thumb,
         #texteditor .texteditor-pane-scrollbar-thumb {
             position: absolute;
             top: 0;
@@ -3522,6 +3560,8 @@
         #emailer-editor .emailer-pane-scrollbar-thumb:hover,
         #guest-editor .guest-pane-scrollbar-thumb:hover,
         #speaker-editor .speaker-pane-scrollbar-thumb:hover,
+        #team-editor .team-pane-scrollbar-thumb:hover,
+        #content-editor .content-pane-scrollbar-thumb:hover,
         #texteditor .texteditor-pane-scrollbar-thumb:hover {
             background: var(--tbs-pink-soft);
         }
@@ -3529,6 +3569,8 @@
         #emailer-editor .emailer-pane-scrollbar-thumb:active,
         #guest-editor .guest-pane-scrollbar-thumb:active,
         #speaker-editor .speaker-pane-scrollbar-thumb:active,
+        #team-editor .team-pane-scrollbar-thumb:active,
+        #content-editor .content-pane-scrollbar-thumb:active,
         #texteditor .texteditor-pane-scrollbar-thumb:active {
             cursor: grabbing;
         }
@@ -4349,6 +4391,7 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+            position: relative;
         }
 
         #team-editor.is-open,
@@ -4379,6 +4422,7 @@
             flex-direction: column;
             align-items: stretch;
             min-height: 0;
+            min-width: var(--team-list-min, 0px);
             overflow: hidden;
             flex: 2 1 0;
             height: 100%;
@@ -4399,17 +4443,29 @@
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #team-editor .team-bottom-row::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         #team-editor .team-bottom-track {
+            --team-list-min: 0px;
+            --team-viewer-min: 0px;
             display: flex;
             flex-direction: row;
             align-items: stretch;
             gap: 16px;
-            flex: 1 1 auto;
+            flex: none;
+            width: max(100%, calc(1500px - 32px), calc(var(--team-list-min) + var(--team-viewer-min) + 16px));
+            min-width: max(100%, calc(1500px - 32px), calc(var(--team-list-min) + var(--team-viewer-min) + 16px));
             min-height: 0;
-            min-width: 0;
+            height: 100%;
             box-sizing: border-box;
         }
 
@@ -4419,7 +4475,7 @@
             flex-direction: column;
             flex: 1 1 0;
             min-height: 0;
-            min-width: 0;
+            min-width: var(--team-viewer-min, 0px);
             overflow: hidden;
             padding: 0;
             align-self: stretch;
@@ -4499,16 +4555,17 @@
 
         #team-editor .team-viewer > .team-member-editor > .edit-team-top .selected-teamname {
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
             text-align: left;
             gap: 0.5rem;
             padding: 0;
             box-sizing: border-box;
-            flex: 0 1 auto;
-            min-width: 0;
-            max-width: 100%;
+            flex: 0 0 auto;
+            min-width: max-content;
+            max-width: none;
+            white-space: nowrap;
             font-size: 1.2rem;
             font-weight: 700;
             line-height: 1.2;
@@ -4519,8 +4576,9 @@
         #team-editor .team-viewer > .team-member-editor > .edit-team-top .edit-team-name-last {
             font-size: 1.2rem;
             display: inline;
-            min-width: 0;
-            word-break: break-word;
+            min-width: max-content;
+            white-space: nowrap;
+            word-break: normal;
         }
 
         #team-editor .team-editor-toolbar {
@@ -4634,7 +4692,8 @@
             display: inline-block;
             margin: 0;
             width: auto;
-            min-width: 0;
+            min-width: max-content;
+            white-space: nowrap;
             padding: 0.25rem 0.625rem;
             border: none;
             border-radius: 0;
@@ -4927,7 +4986,8 @@
             justify-content: flex-end;
             gap: 0.5rem;
             flex: 1 1 auto;
-            min-width: 0;
+            min-width: max-content;
+            max-width: none;
             padding: 0 var(--backend-table-cell-pad-x) 0 0;
             box-sizing: border-box;
         }
@@ -4952,16 +5012,17 @@
 
         #team-editor .team-list > .edit-team-top.team-list-heading .selected-teamname {
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
             justify-content: center;
             text-align: center;
             gap: 0.5rem;
             padding: 8px 0;
             box-sizing: border-box;
-            flex: 0 1 auto;
-            min-width: 0;
-            max-width: 100%;
+            flex: 0 0 auto;
+            min-width: max-content;
+            max-width: none;
+            white-space: nowrap;
         }
 
         #team-editor .team-list-heading .team-roster-count {
@@ -5064,6 +5125,7 @@
 
         #content-editor .content-editor-panels > .content-list {
             flex: 2 1 0;
+            min-width: var(--content-list-min, 0px);
             min-height: 0;
             padding-top: 0;
             box-sizing: border-box;
@@ -5076,7 +5138,7 @@
             display: grid;
             grid-template-columns: 1fr;
             grid-template-rows: auto minmax(0, 1fr);
-            min-width: 0;
+            min-width: var(--content-viewer-min, 0px);
             min-height: 8rem;
             overflow: hidden;
             padding: 0;
@@ -5137,12 +5199,44 @@
 
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-first.content-viewer-title {
             display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            overflow: visible;
+            text-overflow: clip;
             white-space: nowrap;
             word-break: normal;
-            max-width: 100%;
+            min-width: max-content;
+            max-width: none;
             text-align: left;
+        }
+
+        #content-editor #content-list-heading .selected-guestname-wrap,
+        #content-editor #content-viewer-heading .selected-guestname-wrap,
+        #content-editor #content-viewer-heading .selected-guestname {
+            flex: 0 0 auto;
+            min-width: max-content;
+            max-width: none;
+            flex-wrap: nowrap;
+            overflow: visible;
+        }
+
+        #content-editor #content-list-heading .edit-guest-top-trailing {
+            flex: 1 1 auto;
+            min-width: max-content;
+            max-width: none;
+            flex-wrap: nowrap;
+        }
+
+        #content-editor #content-list-heading .content-actions {
+            flex-wrap: nowrap;
+            width: auto;
+            min-width: max-content;
+            max-width: none;
+        }
+
+        #content-editor #content-list-heading .content-roster-search {
+            flex: 0 0 11rem;
+            width: 11rem;
+            min-width: 11rem;
+            max-width: 11rem;
         }
 
         #content-editor .content-editor-empty {
@@ -8950,6 +9044,21 @@
             word-break: break-word;
         }
 
+        #team-editor #team-list-heading .edit-team-name-first,
+        #team-editor #team-list-heading .edit-team-name-last,
+        #team-editor .team-viewer > .team-member-editor > .edit-team-top .edit-team-name-first,
+        #team-editor .team-viewer > .team-member-editor > .edit-team-top .edit-team-name-last {
+            min-width: max-content;
+            white-space: nowrap;
+            word-break: normal;
+        }
+
+        #team-editor #team-list-heading .team-actions {
+            min-width: max-content;
+            max-width: none;
+            flex-wrap: nowrap;
+        }
+
         .edit-guest-top:has(#edit-guest-name-first:empty):has(#edit-guest-name-last:empty) {
             margin-bottom: 0;
         }
@@ -10775,6 +10884,36 @@
             overflow: hidden;
         }
 
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: var(--backend-button-yellow);
+            box-shadow: var(--backend-button-shadow);
+            color: #003153;
+            cursor: pointer;
+        }
+
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn:disabled {
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            filter: none;
+        }
+
         #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap,
         #texteditor .renderbox > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap {
             flex: 0 1 auto;
@@ -11223,11 +11362,16 @@
             justify-content: center;
         }
 
-        /* Email template rows: same gray surface; preview HTML stays dark-on-light. */
+        /* Selected pre-sets: white preview. Email HTML sits flush in the pane. */
+        .renderbox:not(.renderbox--idle) .texteditor-render-surface {
+            background-color: #ffffff;
+        }
+
         .renderbox.renderbox--preset-email .texteditor-render-surface {
-            background-color: #e2e8f0;
+            background-color: #ffffff;
             color: #0f172a;
             border: 1px solid #e2e8f0;
+            padding: 0;
         }
 
         .renderbox.renderbox--preset-email .texteditor-render-html {
@@ -12593,7 +12737,15 @@
                                 <span class="edit-guest-name-first">Render</span>
                             </div>
                         </div>
-                        <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                        <div class="edit-guest-top-trailing">
+                            <div class="texteditor-pane-actions" role="toolbar" aria-label="Render tools">
+                                <button type="button" class="add-speaker-button" id="texteditor-render-email-btn" disabled aria-disabled="true" title="Select an e-mail pre-set" aria-label="Select an e-mail pre-set">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                        <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="texteditor-render-surface">
                         <div id="texteditor-render-html" class="texteditor-render-html" aria-live="polite"></div>
@@ -13477,6 +13629,9 @@
             </section>
 
             <section class="team-section" id="team-editor" aria-hidden="true" aria-label="Team" data-name="team-editor">
+                <div class="team-pane-scrollbar" id="team-pane-scrollbar" hidden>
+                    <div class="team-pane-scrollbar-thumb" id="team-pane-scrollbar-thumb"></div>
+                </div>
                 <div class="team-overview">
                     <div class="team-bottom-row" id="team-bottom-row">
                         <div class="team-bottom-track" id="team-bottom-track">
@@ -13866,7 +14021,11 @@
             </section>
 
             <section class="content-editor-section" id="content-editor" aria-hidden="true" aria-label="Content" data-name="content-editor">
-                <div class="content-editor-panels">
+                <div class="content-pane-scrollbar" id="content-pane-scrollbar" hidden>
+                    <div class="content-pane-scrollbar-thumb" id="content-pane-scrollbar-thumb"></div>
+                </div>
+                <div class="content-bottom-row" id="content-bottom-row">
+                <div class="content-editor-panels" id="content-bottom-track">
                     <div class="content-list" id="content-list" aria-label="Content list">
                         <div class="edit-guest-top guests-list-heading content-list-top" id="content-list-heading">
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
@@ -14073,6 +14232,7 @@
                         </div>
                         <p class="content-editor-empty" id="content-editor-empty" hidden aria-hidden="true" role="status">Select content</p>
                     </div>
+                </div>
                 </div>
             </section>
 
@@ -20819,6 +20979,7 @@
             if (!note) return;
             var n = Array.isArray(teamRosterInMemory) ? teamRosterInMemory.length : 0;
             note.textContent = '(n=' + n + ')';
+            scheduleTeamPaneLayout();
         }
 
         function updateTeamNavButtons() {
@@ -21663,6 +21824,7 @@
             }
             syncTeamEditorToolbarForBottomScroll();
             syncTeamEditabilityFromPadlock();
+            scheduleTeamPaneLayout();
         }
 
         function updateEditTeamNameHeading(rec) {
@@ -21672,6 +21834,7 @@
             var lastEl = document.getElementById('edit-team-name-last');
             if (firstEl) firstEl.textContent = first;
             if (lastEl) lastEl.textContent = last;
+            scheduleTeamPaneLayout();
         }
 
         function syncTeamManagementLogPanel() {
@@ -23424,6 +23587,243 @@
             track.style.setProperty('--speaker-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
             track.style.setProperty('--speaker-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
             syncSpeakerPaneScrollbar();
+        }
+
+        var teamPaneLayoutFrame = 0;
+        var teamPaneScrollDrag = null;
+
+        function scheduleTeamPaneLayout() {
+            if (teamPaneLayoutFrame) return;
+            teamPaneLayoutFrame = requestAnimationFrame(function () {
+                teamPaneLayoutFrame = 0;
+                syncTeamPaneLayout();
+            });
+        }
+
+        function syncTeamPaneScrollbar() {
+            var row = document.getElementById('team-bottom-row');
+            var bar = document.getElementById('team-pane-scrollbar');
+            var thumb = document.getElementById('team-pane-scrollbar-thumb');
+            if (!row || !bar || !thumb) return;
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
+
+        function ensureTeamPaneScroll() {
+            if (ensureTeamPaneScroll.done) return;
+            var row = document.getElementById('team-bottom-row');
+            var editor = document.getElementById('team-editor');
+            var bar = document.getElementById('team-pane-scrollbar');
+            var thumb = document.getElementById('team-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureTeamPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleTeamPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleTeamPaneLayout);
+            }
+            var watch = [
+                document.getElementById('team-list-heading'),
+                document.querySelector('#team-member-panel > .edit-team-top'),
+                document.querySelector('#team-editor .team-editor-nav'),
+                document.getElementById('team-viewer')
+            ];
+            if (window.MutationObserver) {
+                var mutations = new MutationObserver(function () {
+                    scheduleTeamPaneLayout();
+                });
+                for (var i = 0; i < watch.length; i++) {
+                    if (!watch[i]) continue;
+                    mutations.observe(watch[i], { childList: true, subtree: true, characterData: true, attributes: true });
+                }
+            }
+            row.addEventListener('scroll', syncTeamPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                teamPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
+                    maxScroll: maxScroll,
+                    maxLeft: maxLeft
+                };
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!teamPaneScrollDrag) return;
+                var drag = teamPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endTeamPaneScrollDrag(event) {
+                if (!teamPaneScrollDrag) return;
+                teamPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
+                }
+            }
+            thumb.addEventListener('pointerup', endTeamPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endTeamPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
+            });
+        }
+
+        function syncTeamPaneLayout() {
+            var editor = document.getElementById('team-editor');
+            var track = document.getElementById('team-bottom-track');
+            if (!editor || !track || !editor.classList.contains('is-open')) return;
+            ensureTeamPaneScroll();
+            var listMin = speakerBarFloorWidth(document.getElementById('team-list-heading'));
+            var viewerMin = speakerBarFloorWidth(document.querySelector('#team-member-panel > .edit-team-top'));
+            var navMin = speakerBarFloorWidth(document.querySelector('#team-editor .team-editor-nav'));
+            if (navMin > viewerMin) viewerMin = navMin;
+            track.style.setProperty('--team-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
+            track.style.setProperty('--team-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
+            syncTeamPaneScrollbar();
+        }
+
+        var contentPaneLayoutFrame = 0;
+        var contentPaneScrollDrag = null;
+
+        function scheduleContentPaneLayout() {
+            if (contentPaneLayoutFrame) return;
+            contentPaneLayoutFrame = requestAnimationFrame(function () {
+                contentPaneLayoutFrame = 0;
+                syncContentPaneLayout();
+            });
+        }
+
+        function syncContentPaneScrollbar() {
+            var row = document.getElementById('content-bottom-row');
+            var bar = document.getElementById('content-pane-scrollbar');
+            var thumb = document.getElementById('content-pane-scrollbar-thumb');
+            if (!row || !bar || !thumb) return;
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
+
+        function ensureContentPaneScroll() {
+            if (ensureContentPaneScroll.done) return;
+            var row = document.getElementById('content-bottom-row');
+            var editor = document.getElementById('content-editor');
+            var bar = document.getElementById('content-pane-scrollbar');
+            var thumb = document.getElementById('content-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureContentPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleContentPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleContentPaneLayout);
+            }
+            var watch = [
+                document.getElementById('content-list-heading'),
+                document.getElementById('content-viewer-heading'),
+                document.querySelector('#content-editor .content-viewer')
+            ];
+            if (window.MutationObserver) {
+                var mutations = new MutationObserver(function () {
+                    scheduleContentPaneLayout();
+                });
+                for (var i = 0; i < watch.length; i++) {
+                    if (!watch[i]) continue;
+                    mutations.observe(watch[i], { childList: true, subtree: true, characterData: true, attributes: true });
+                }
+            }
+            row.addEventListener('scroll', syncContentPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                contentPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
+                    maxScroll: maxScroll,
+                    maxLeft: maxLeft
+                };
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!contentPaneScrollDrag) return;
+                var drag = contentPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endContentPaneScrollDrag(event) {
+                if (!contentPaneScrollDrag) return;
+                contentPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
+                }
+            }
+            thumb.addEventListener('pointerup', endContentPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endContentPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
+            });
+        }
+
+        function syncContentPaneLayout() {
+            var editor = document.getElementById('content-editor');
+            var track = document.getElementById('content-bottom-track');
+            if (!editor || !track || !editor.classList.contains('is-open')) return;
+            ensureContentPaneScroll();
+            var listMin = speakerBarFloorWidth(document.getElementById('content-list-heading'));
+            var viewerMin = speakerBarFloorWidth(document.getElementById('content-viewer-heading'));
+            track.style.setProperty('--content-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
+            track.style.setProperty('--content-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
+            syncContentPaneScrollbar();
         }
 
         function emailerGuestsAllChecked(rows) {
@@ -32341,6 +32741,13 @@
             var key = opts.key != null ? String(opts.key) : String(ta.dataset.storageKey || '');
             var html = opts.html != null ? opts.html : ta.value;
             if (!key || !texteditorKeyHasFirebaseTarget(key)) return false;
+            if (!opts.autosave || key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
+                html = texteditorHtmlPreparedForSave(key, html);
+                if (opts.html == null && String(ta.dataset.storageKey || '') === key && ta.value !== html) {
+                    ta.value = html;
+                    syncTexteditorPreviewFromCode();
+                }
+            }
             if (opts.key == null && html === texteditorLastSavedSnapshot) return false;
 
             if (texteditorFirebaseSaveInFlight) {
@@ -32352,12 +32759,6 @@
                 return false;
             }
 
-            if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
-                html = beautifyTexteditorSourceHtml(texteditorPreviewHtmlForProgrammeInfo(html));
-                if (opts.html == null && String(ta.dataset.storageKey || '') === key) {
-                    ta.value = html;
-                }
-            }
             try {
                 localStorage.setItem(key, html);
             } catch (err) {
@@ -32482,6 +32883,87 @@
                 texteditorPadlockIsOpen = false;
                 syncTexteditorPadlockButtonUi();
                 syncTexteditorEditabilityFromPadlock();
+            }
+            syncTexteditorRenderEmailButton();
+        }
+
+        function texteditorHtmlPreparedForSave(key, html) {
+            var out = html;
+            if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
+                out = texteditorPreviewHtmlForProgrammeInfo(out);
+            }
+            return beautifyTexteditorSourceHtml(out);
+        }
+
+        function texteditorSnippetIsWebsite(key) {
+            var k = String(key || '').trim();
+            if (!k) return false;
+            if (k.indexOf(':home:') !== -1) return true;
+            var escaped = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(k) : k.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            var btn = document.querySelector('.texteditor-snippet-btn[data-snippet-key="' + escaped + '"]');
+            return !!(btn && btn.closest && btn.closest('#texteditor-home-selectors'));
+        }
+
+        function syncTexteditorRenderEmailButton() {
+            var btn = document.getElementById('texteditor-render-email-btn');
+            var ta = document.getElementById('texteditor-code');
+            if (!btn) return;
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var html = ta ? String(ta.value || '').trim() : '';
+            var website = texteditorSnippetIsWebsite(key);
+            var active = !!key && !website && !!html;
+            btn.disabled = !active;
+            btn.setAttribute('aria-disabled', active ? 'false' : 'true');
+            var label = 'Open this e-mail draft';
+            if (website) label = 'Website pre-sets are not e-mails';
+            else if (!key || !html) label = 'Select an e-mail pre-set';
+            btn.setAttribute('title', label);
+            btn.setAttribute('aria-label', label);
+        }
+
+        function texteditorEmailSubject(html, key) {
+            var m = String(html || '').match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+            var fromTitle = m ? String(m[1]).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : '';
+            if (fromTitle) return fromTitle;
+            return texteditorPresetLabelForSnippetKey(key) || 'TBS';
+        }
+
+        function texteditorDraftEml(subject, html) {
+            var safeSubject = String(subject || 'TBS').replace(/[\r\n]+/g, ' ').trim() || 'TBS';
+            return [
+                'MIME-Version: 1.0',
+                'X-Unsent: 1',
+                'X-Uniform-Type-Identifier: com.apple.mail-draft',
+                'Subject: ' + safeSubject,
+                'Content-Type: text/html; charset=UTF-8',
+                'Content-Transfer-Encoding: 8bit',
+                '',
+                String(html || '')
+            ].join('\r\n');
+        }
+
+        function openTexteditorPresetInMailClient() {
+            var ta = document.getElementById('texteditor-code');
+            var btn = document.getElementById('texteditor-render-email-btn');
+            if (!ta || !btn || btn.disabled) return;
+            var key = String(ta.dataset.storageKey || '');
+            if (!key || texteditorSnippetIsWebsite(key)) return;
+            var html = String(ta.value || '').trim();
+            if (!html) return;
+            var subject = texteditorEmailSubject(html, key);
+            var blob = new Blob([texteditorDraftEml(subject, html)], { type: 'message/rfc822' });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement('a');
+            var fileName = subject.replace(/[^\w\-]+/g, '-').replace(/^-+|-+$/g, '') || 'email';
+            link.href = url;
+            link.download = fileName + '.eml';
+            link.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(link);
+            link.click();
+            if (link.parentNode) link.parentNode.removeChild(link);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+            if (typeof showStatus === 'function') {
+                showStatus('success', 'Draft downloaded. Open it to edit the formatted e-mail in your mail app.');
             }
         }
 
@@ -32979,6 +33461,7 @@
             ta.addEventListener('input', function() {
                 scheduleTexteditorPreviewSync();
                 updateTexteditorSaveButtonState();
+                syncTexteditorRenderEmailButton();
                 var key = ta.dataset.storageKey;
                 if (!key) return;
                 try {
@@ -33613,9 +34096,11 @@
             note.setAttribute('aria-hidden', 'false');
             if (!contentFilterIsActive(contentFilterSettings)) {
                 note.textContent = '(n=' + shown + ')';
+                scheduleContentPaneLayout();
                 return;
             }
             note.textContent = '(Filtered ' + shown + ' out of ' + contentRosterStoredCount() + ')';
+            scheduleContentPaneLayout();
         }
 
 
@@ -34111,6 +34596,7 @@
             }
             syncContentPadlockButtonUi();
             syncContentEditabilityFromPadlock();
+            scheduleContentPaneLayout();
         }
 
         function syncContentPadlockButtonUi() {
@@ -34254,6 +34740,7 @@
             var titleEl = document.getElementById('edit-content-title');
             var text = titleEl ? String(titleEl.value || '').trim() : '';
             el.textContent = text || 'NEW CONTENT';
+            scheduleContentPaneLayout();
         }
 
         function populateContentEditorFromRecord(rec) {
@@ -34988,6 +35475,7 @@
             }
             if (isContent) {
                 loadAndRenderContentTable();
+                scheduleContentPaneLayout();
             }
             if (isSpeakers) {
                 void openSpeakersOverwatch().catch(function (err) {
@@ -35021,6 +35509,7 @@
                 void loadAndRenderTeamTable().catch(function (err) {
                     console.error('loadAndRenderTeamTable:', err);
                 });
+                scheduleTeamPaneLayout();
             }
             if (isEmailer) {
                 renderEmailerRosterTable();
@@ -39488,6 +39977,16 @@
                 syncTexteditorPadlockButtonUi();
                 syncTexteditorEditabilityFromPadlock();
             }
+            var texteditorRenderEmailBtn = document.getElementById('texteditor-render-email-btn');
+            if (texteditorRenderEmailBtn) {
+                texteditorRenderEmailBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (texteditorRenderEmailBtn.disabled) return;
+                    openTexteditorPresetInMailClient();
+                });
+                syncTexteditorRenderEmailButton();
+            }
             var texteditorSaveBtn = document.getElementById('texteditor-save-btn');
             if (texteditorSaveBtn) {
                 texteditorSaveBtn.addEventListener('click', async function() {
@@ -39496,6 +39995,11 @@
                     if (!ta || !key || !texteditorPadlockIsOpen || backenduserIsReadonly) return;
                     if (texteditorSaveBtn.classList.contains('is-autosaving')) return;
                     cancelTexteditorFirebaseAutosaveTimer();
+                    var pretty = texteditorHtmlPreparedForSave(key, ta.value);
+                    if (pretty !== ta.value) {
+                        ta.value = pretty;
+                        syncTexteditorPreviewFromCode();
+                    }
                     if (ta.value === texteditorLastSavedSnapshot && texteditorKeyHasFirebaseTarget(key)) {
                         spinTexteditorSaveButton();
                         return;
