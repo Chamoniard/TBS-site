@@ -14379,7 +14379,7 @@
                                 <div class="selected-contactname-wrap">
                                     <div class="emailer-roster-title-wrap" role="group" aria-label="Bulk actions">
                                         <span class="emailer-roster-view-link is-active bulk-email-actions-title" id="bulk-email-actions-title">Bulk actions</span>
-                                        <span class="bulk-email-actions-count" id="bulk-email-actions-count" aria-live="polite">(n=0)</span>
+                                        <span class="bulk-email-actions-count" id="bulk-email-actions-count" aria-live="polite">0 guests selected. 0 speakers selected.</span>
                                     </div>
                                 </div>
                                 <div class="edit-contact-top-trailing">
@@ -15185,6 +15185,23 @@
         </div>
     </div>
 
+    <div id="emailer-speakers-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="emailer-speakers-filter-popup-title">
+        <div class="guests-filter-popup__backdrop" id="emailer-speakers-filter-popup-backdrop"></div>
+        <div class="guests-filter-popup__box">
+            <h2 class="guests-filter-popup__title" id="emailer-speakers-filter-popup-title">Filter speakers</h2>
+            <div class="guests-filter-popup__fields">
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="emailer-speakers-filter-event-label">Event</span>
+                    <div class="guests-filter-popup__checks" id="emailer-speakers-filter-event" role="group" aria-labelledby="emailer-speakers-filter-event-label" data-filter-key="event"></div>
+                </div>
+            </div>
+            <div class="guests-filter-popup__actions">
+                <button type="button" class="guests-filter-clear-btn" id="emailer-speakers-filter-clear">Clear</button>
+                <button type="button" class="guests-filter-apply-btn" id="emailer-speakers-filter-apply">Filter</button>
+            </div>
+        </div>
+    </div>
+
     <div id="content-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="content-filter-popup-title">
         <div class="guests-filter-popup__backdrop" id="content-filter-popup-backdrop"></div>
         <div class="guests-filter-popup__box">
@@ -15277,6 +15294,8 @@
         let selectedevent = '';
         /** In-memory roster (+ inviteStatus, titlesStatus, travel, cme, refunded) */
         let speakerRosterInMemory = [];
+        /** Event name whose speakers are complete in speakerRosterInMemory. */
+        var speakerRosterLoadedForEvent = '';
         /** Speakers heading view: '' current-event speakers, or 'ideas'. */
         var speakersRosterView = '';
         /** In-memory roster for Guests tab. */
@@ -15326,6 +15345,18 @@
         var emailerFilterEventOptions = [];
         var emailerGuestsMemoryLoaded = false;
         var emailerGuestsLoadPromise = null;
+        /** Event names already stored in the e-mailer guest list. Empty filter loads every event once. */
+        var emailerGuestsLoadedEventKeys = Object.create(null);
+        var emailerGuestsLoadedEveryEvent = false;
+        /** All speakers for the e-mailer Speakers list, including every Event. */
+        var emailerSpeakersRosterInMemory = [];
+        var emailerSpeakersCheckedIds = Object.create(null);
+        var emailerSpeakersFilterSettings = emptyEmailerSpeakersFilterSettings();
+        var emailerSpeakersMemoryLoaded = false;
+        var emailerSpeakersLoadPromise = null;
+        /** Event names already stored in the e-mailer speaker list. Empty filter loads every event once. */
+        var emailerSpeakersLoadedEventKeys = Object.create(null);
+        var emailerSpeakersLoadedEveryEvent = false;
         var contactsRosterInMemory = [];
         var contactsMemoryLoaded = false;
         var contactsDirtyDocIds = Object.create(null);
@@ -22462,7 +22493,12 @@
             var rows = root.querySelectorAll('.contacts-roster-row');
             for (var i = 0; i < rows.length; i++) {
                 var guestId = String(rows[i].getAttribute('data-emailer-guest-id') || '').trim();
+                var speakerId = String(rows[i].getAttribute('data-emailer-speaker-id') || '').trim();
                 if (guestId && emailerGuestsCheckedIds[guestId]) {
+                    rows[i].classList.add('is-selected');
+                    continue;
+                }
+                if (speakerId && emailerSpeakersCheckedIds[speakerId]) {
                     rows[i].classList.add('is-selected');
                     continue;
                 }
@@ -22672,6 +22708,12 @@
             'Other',
         ];
 
+        function emptyEmailerSpeakersFilterSettings() {
+            return {
+                event: [],
+            };
+        }
+
         function emptyEmailerGuestsFilterSettings() {
             return {
                 event: [],
@@ -22798,6 +22840,7 @@
             }
             var known = Array.isArray(emailerFilterEventOptions) ? emailerFilterEventOptions : [];
             for (var i = 0; i < known.length; i++) add(known[i]);
+            add(current_event);
             var guests = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory : [];
             for (var g = 0; g < guests.length; g++) {
                 String(guests[g] && guests[g].event != null ? guests[g].event : '')
@@ -22821,13 +22864,19 @@
         function syncEmailerFilterButton() {
             var btn = document.getElementById('emailer-filter-button');
             var mark = document.getElementById('emailer-filter-active-mark');
-            var ready = emailerRosterView === 'guests' && !!emailerGuestsMemoryLoaded;
-            var active = emailerGuestsFilterIsActive(emailerGuestsFilterSettings);
+            var speakersView = emailerRosterView === 'speakers';
+            var ready = speakersView
+                ? !!emailerSpeakersMemoryLoaded
+                : emailerRosterView === 'guests' && !!emailerGuestsMemoryLoaded;
+            var active = speakersView
+                ? emailerSpeakersFilterIsActive(emailerSpeakersFilterSettings)
+                : emailerGuestsFilterIsActive(emailerGuestsFilterSettings);
+            var noun = speakersView ? 'speakers' : 'guests';
             if (btn) {
                 btn.disabled = !ready;
                 btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
-                btn.setAttribute('aria-label', active ? 'Filter guests (filter active)' : 'Filter guests');
-                btn.title = active ? 'Filter guests (filter active)' : 'Filter guests';
+                btn.setAttribute('aria-label', active ? 'Filter ' + noun + ' (filter active)' : 'Filter ' + noun);
+                btn.title = active ? 'Filter ' + noun + ' (filter active)' : 'Filter ' + noun;
             }
             if (mark) {
                 mark.hidden = !active;
@@ -22962,7 +23011,11 @@
             }
             emailerGuestsFilterSettings = base;
             syncEmailerFilterButton();
-            if (emailerRosterView === 'guests') renderEmailerRosterTable();
+            if (emailerRosterView === 'guests') {
+                showEmailerGuestsRoster().catch(function (err) {
+                    console.error('applyEmailerGuestsFilterSettings:', err);
+                });
+            }
         }
 
         function closeEmailerGuestsFilterPopup() {
@@ -22973,6 +23026,7 @@
         }
 
         async function openEmailerGuestsFilterPopup() {
+            closeEmailerSpeakersFilterPopup();
             if (emailerRosterView !== 'guests' || !emailerGuestsMemoryLoaded) return;
             await ensureEmailerFilterEvents();
             populateEmailerGuestsFilterPopupForm();
@@ -23112,19 +23166,384 @@
             return list;
         }
 
+        function emailerEventKey(name) {
+            return String(name != null ? name : '').trim().toLowerCase();
+        }
+
+        function emailerWantedEventNames(filterSettings) {
+            return guestsFilterSelectedList(filterSettings && filterSettings.event);
+        }
+
+        function applyEmailerLaunchEventFilters() {
+            var ev = String(current_event || '').trim();
+            if (!ev) return;
+            var guests = emptyEmailerGuestsFilterSettings();
+            guests.event = [ev];
+            emailerGuestsFilterSettings = guests;
+            var speakers = emptyEmailerSpeakersFilterSettings();
+            speakers.event = [ev];
+            emailerSpeakersFilterSettings = speakers;
+            syncEmailerFilterButton();
+        }
+
+        function emailerGuestsNeedLoad() {
+            if (emailerGuestsLoadedEveryEvent) return false;
+            var wanted = emailerWantedEventNames(emailerGuestsFilterSettings);
+            if (!wanted.length) return true;
+            for (var i = 0; i < wanted.length; i++) {
+                if (!emailerGuestsLoadedEventKeys[emailerEventKey(wanted[i])]) return true;
+            }
+            return false;
+        }
+
+        function emailerMergeRowsById(existing, incoming) {
+            var byId = Object.create(null);
+            function addRow(row) {
+                var id = String(row && row.id || '').trim();
+                if (!id || byId[id]) return;
+                byId[id] = row;
+            }
+            var kept = Array.isArray(existing) ? existing : [];
+            var added = Array.isArray(incoming) ? incoming : [];
+            for (var i = 0; i < kept.length; i++) addRow(kept[i]);
+            for (var j = 0; j < added.length; j++) addRow(added[j]);
+            var list = [];
+            Object.keys(byId).forEach(function (id) {
+                list.push(byId[id]);
+            });
+            list.sort(compareEmailerGuests);
+            return list;
+        }
+
+        async function fetchEmailerGuestsForEvents(eventNames) {
+            var db = getFirestore();
+            var rows = Array.isArray(emailerGuestsRosterInMemory) ? emailerGuestsRosterInMemory.slice() : [];
+            var currentKey = emailerEventKey(current_event);
+            var names = Array.isArray(eventNames) ? eventNames : [];
+            for (var i = 0; i < names.length; i++) {
+                var name = String(names[i] || '').trim();
+                var key = emailerEventKey(name);
+                if (!key || emailerGuestsLoadedEventKeys[key] || emailerGuestsLoadedEveryEvent) continue;
+                if (key === currentKey && guestsMemoryLoaded) {
+                    var fromRoster = [];
+                    var roster = Array.isArray(guestsRosterInMemory) ? guestsRosterInMemory : [];
+                    for (var g = 0; g < roster.length; g++) {
+                        var row = emailerGuestListRowFromRecord(roster[g]);
+                        if (row && emailerGuestEventMatchesFilter(row, [name])) fromRoster.push(row);
+                    }
+                    rows = emailerMergeRowsById(rows, fromRoster);
+                    continue;
+                }
+                var matched = await queryEmailerGuestRowsForEvent(db, name);
+                rows = emailerMergeRowsById(rows, matched);
+            }
+            return rows;
+        }
+
         async function ensureEmailerGuestsLoaded() {
-            if (emailerGuestsMemoryLoaded) return emailerGuestsRosterInMemory;
-            if (emailerGuestsLoadPromise) return emailerGuestsLoadPromise;
-            emailerGuestsLoadPromise = fetchAllGuestsForEmailer()
-                .then(function (list) {
-                    emailerGuestsRosterInMemory = list;
-                    emailerGuestsMemoryLoaded = true;
-                    return emailerGuestsRosterInMemory;
-                })
-                .finally(function () {
-                    emailerGuestsLoadPromise = null;
+            var guard = 0;
+            while (emailerGuestsNeedLoad() && guard < 4) {
+                guard++;
+                if (emailerGuestsLoadPromise) {
+                    await emailerGuestsLoadPromise;
+                    continue;
+                }
+                var wanted = emailerWantedEventNames(emailerGuestsFilterSettings).slice();
+                var run = (!wanted.length ? fetchAllGuestsForEmailer() : fetchEmailerGuestsForEvents(wanted))
+                    .then(function (list) {
+                        emailerGuestsRosterInMemory = Array.isArray(list) ? list : [];
+                        emailerGuestsMemoryLoaded = true;
+                        if (!wanted.length) {
+                            emailerGuestsLoadedEveryEvent = true;
+                        } else {
+                            for (var i = 0; i < wanted.length; i++) {
+                                var key = emailerEventKey(wanted[i]);
+                                if (key) emailerGuestsLoadedEventKeys[key] = true;
+                            }
+                        }
+                        return emailerGuestsRosterInMemory;
+                    })
+                    .finally(function () {
+                        emailerGuestsLoadPromise = null;
+                    });
+                emailerGuestsLoadPromise = run;
+                await run;
+            }
+            return emailerGuestsRosterInMemory;
+        }
+
+        function emailerSpeakersFilterIsActive(filter) {
+            var f = filter || emailerSpeakersFilterSettings;
+            if (!f || typeof f !== 'object') return false;
+            return guestsFilterSelectedList(f.event).length > 0;
+        }
+
+        function emailerSpeakerEventChoices() {
+            var seen = Object.create(null);
+            var out = emailerFilterEventChoices().filter(function (value) {
+                var key = String(value || '').toLowerCase();
+                if (!key || seen[key]) return false;
+                seen[key] = true;
+                return true;
+            });
+            var speakers = Array.isArray(emailerSpeakersRosterInMemory) ? emailerSpeakersRosterInMemory : [];
+            for (var i = 0; i < speakers.length; i++) {
+                String(speakers[i] && speakers[i].event != null ? speakers[i].event : '')
+                    .split(/[,;]+/)
+                    .forEach(function (raw) {
+                        var value = String(raw || '').trim();
+                        var key = value.toLowerCase();
+                        if (!value || seen[key]) return;
+                        seen[key] = true;
+                        out.push(value);
+                    });
+            }
+            return out;
+        }
+
+        function emailerSpeakerMatchesFilter(rec, filter) {
+            var f = filter || emailerSpeakersFilterSettings;
+            if (!emailerSpeakersFilterIsActive(f)) return true;
+            if (!rec) return false;
+            if (!emailerGuestEventMatchesFilter(rec, f.event)) return false;
+            return true;
+        }
+
+        function emailerSpeakerRowsForTable() {
+            var rows = Array.isArray(emailerSpeakersRosterInMemory) ? emailerSpeakersRosterInMemory.slice() : [];
+            if (emailerSpeakersFilterIsActive(emailerSpeakersFilterSettings)) {
+                rows = rows.filter(function (rec) {
+                    return emailerSpeakerMatchesFilter(rec, emailerSpeakersFilterSettings);
                 });
-            return emailerGuestsLoadPromise;
+            }
+            rows.sort(compareEmailerGuests);
+            if (emailerEventFilterIsActive(emailerSpeakersFilterSettings)) return rows;
+            return emailerGuestsWithoutDuplicateEmails(rows);
+        }
+
+        function emailerSpeakerCountBaseRows() {
+            var rows = Array.isArray(emailerSpeakersRosterInMemory) ? emailerSpeakersRosterInMemory.slice() : [];
+            if (emailerEventFilterIsActive(emailerSpeakersFilterSettings)) {
+                return rows.filter(function (rec) {
+                    return emailerGuestEventMatchesFilter(rec, emailerSpeakersFilterSettings.event);
+                });
+            }
+            rows.sort(compareEmailerGuests);
+            return emailerGuestsWithoutDuplicateEmails(rows);
+        }
+
+        function emailerSpeakerListRowFromRecord(rec) {
+            if (!rec) return null;
+            var id = String(rec.id || '').trim();
+            if (!id) return null;
+            return {
+                id: id,
+                firstName: rec.firstName != null ? String(rec.firstName) : '',
+                lastName: rec.lastName != null ? String(rec.lastName) : '',
+                email: rec.email != null ? String(rec.email) : '',
+                event: rec.event != null ? String(rec.event) : '',
+            };
+        }
+
+        async function fetchAllSpeakersForEmailer() {
+            var db = getFirestore();
+            var byId = Object.create(null);
+            function addRow(row) {
+                var id = String(row && row.id || '').trim();
+                if (!id || byId[id]) return;
+                byId[id] = row;
+            }
+            if (Array.isArray(speakerRosterInMemory)) {
+                for (var s = 0; s < speakerRosterInMemory.length; s++) {
+                    addRow(emailerSpeakerListRowFromRecord(speakerRosterInMemory[s]));
+                }
+            }
+            var ids = await listSpeakerIdsUnderTbsSpeakers(db);
+            var chunkSize = 20;
+            for (var i = 0; i < ids.length; i += chunkSize) {
+                var chunk = ids.slice(i, i + chunkSize);
+                var snaps = await Promise.all(
+                    chunk.map(function (rowId) {
+                        return tbsSpeakerItemRef(db, rowId).get();
+                    })
+                );
+                for (var j = 0; j < chunk.length; j++) {
+                    var snap = snaps[j];
+                    if (!snap || !snap.exists) continue;
+                    addRow(emailerSpeakerListRowFromRecord(speakerRecordFromTbsItemDoc(chunk[j], snap.data() || {})));
+                }
+            }
+            var list = [];
+            Object.keys(byId).forEach(function (id) {
+                list.push(byId[id]);
+            });
+            list.sort(compareEmailerGuests);
+            return list;
+        }
+
+        function emailerSpeakersNeedLoad() {
+            if (emailerSpeakersLoadedEveryEvent) return false;
+            var wanted = emailerWantedEventNames(emailerSpeakersFilterSettings);
+            if (!wanted.length) return true;
+            for (var i = 0; i < wanted.length; i++) {
+                if (!emailerSpeakersLoadedEventKeys[emailerEventKey(wanted[i])]) return true;
+            }
+            return false;
+        }
+
+        function speakerRowIdFromSpeakersItemDoc(doc) {
+            var parts = String((doc && doc.ref && doc.ref.path) || '').split('/');
+            if (parts.length === 4 && parts[0] === 'tbs' && parts[1] === 'Speakers' && parts[3] === 'item') {
+                return String(parts[2] || '').trim();
+            }
+            return '';
+        }
+
+        async function queryEmailerSpeakerRowsForEvent(db, eventName) {
+            var want = String(eventName || '').trim();
+            if (!want) return [];
+            var specs = [
+                ['Event', '=='],
+                ['event', '=='],
+                ['Events', '=='],
+                ['events', '=='],
+                ['EVENT', '=='],
+                ['Event', 'array-contains'],
+                ['event', 'array-contains'],
+            ];
+            var seen = Object.create(null);
+            var list = [];
+            for (var i = 0; i < specs.length; i++) {
+                try {
+                    var snap = await db.collectionGroup('item').where(specs[i][0], specs[i][1], want).get();
+                    snap.forEach(function (doc) {
+                        var rowId = speakerRowIdFromSpeakersItemDoc(doc);
+                        if (!rowId || seen[rowId]) return;
+                        var rec = speakerRecordFromTbsItemDoc(rowId, doc.data() || {});
+                        if (!emailerGuestEventMatchesFilter(rec, [want])) return;
+                        var row = emailerSpeakerListRowFromRecord(rec);
+                        if (!row) return;
+                        seen[rowId] = true;
+                        list.push(row);
+                    });
+                } catch (err) {
+                    console.warn('queryEmailerSpeakerRowsForEvent:', want, specs[i][0], specs[i][1], err);
+                }
+            }
+            return list;
+        }
+
+        async function fetchEmailerSpeakersForEvents(eventNames) {
+            var db = getFirestore();
+            var rows = Array.isArray(emailerSpeakersRosterInMemory) ? emailerSpeakersRosterInMemory.slice() : [];
+            var loadedSpeakerEvent = emailerEventKey(speakerRosterLoadedForEvent);
+            var names = Array.isArray(eventNames) ? eventNames : [];
+            for (var i = 0; i < names.length; i++) {
+                var name = String(names[i] || '').trim();
+                var key = emailerEventKey(name);
+                if (!key || emailerSpeakersLoadedEventKeys[key] || emailerSpeakersLoadedEveryEvent) continue;
+                if (loadedSpeakerEvent && key === loadedSpeakerEvent) {
+                    var fromRoster = [];
+                    var roster = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory : [];
+                    for (var s = 0; s < roster.length; s++) {
+                        var row = emailerSpeakerListRowFromRecord(roster[s]);
+                        if (row && emailerGuestEventMatchesFilter(row, [name])) fromRoster.push(row);
+                    }
+                    rows = emailerMergeRowsById(rows, fromRoster);
+                    continue;
+                }
+                var matched = await queryEmailerSpeakerRowsForEvent(db, name);
+                rows = emailerMergeRowsById(rows, matched);
+            }
+            return rows;
+        }
+
+        async function ensureEmailerSpeakersLoaded() {
+            var guard = 0;
+            while (emailerSpeakersNeedLoad() && guard < 4) {
+                guard++;
+                if (emailerSpeakersLoadPromise) {
+                    await emailerSpeakersLoadPromise;
+                    continue;
+                }
+                var wanted = emailerWantedEventNames(emailerSpeakersFilterSettings).slice();
+                var run = (!wanted.length ? fetchAllSpeakersForEmailer() : fetchEmailerSpeakersForEvents(wanted))
+                    .then(function (list) {
+                        emailerSpeakersRosterInMemory = Array.isArray(list) ? list : [];
+                        emailerSpeakersMemoryLoaded = true;
+                        if (!wanted.length) {
+                            emailerSpeakersLoadedEveryEvent = true;
+                        } else {
+                            for (var i = 0; i < wanted.length; i++) {
+                                var key = emailerEventKey(wanted[i]);
+                                if (key) emailerSpeakersLoadedEventKeys[key] = true;
+                            }
+                        }
+                        return emailerSpeakersRosterInMemory;
+                    })
+                    .finally(function () {
+                        emailerSpeakersLoadPromise = null;
+                    });
+                emailerSpeakersLoadPromise = run;
+                await run;
+            }
+            return emailerSpeakersRosterInMemory;
+        }
+
+        function populateEmailerSpeakersFilterPopupForm() {
+            fillGuestsFilterChecks(
+                document.getElementById('emailer-speakers-filter-event'),
+                emailerSpeakerEventChoices(),
+                emailerSpeakersFilterSettings.event
+            );
+        }
+
+        function readEmailerSpeakersFilterFormValues() {
+            var out = emptyEmailerSpeakersFilterSettings();
+            var keys = Object.keys(out);
+            for (var i = 0; i < keys.length; i++) {
+                var el = document.getElementById('emailer-speakers-filter-' + keys[i]);
+                if (!el) continue;
+                var boxes = el.querySelectorAll('input[type="checkbox"]:checked');
+                var picked = [];
+                for (var b = 0; b < boxes.length; b++) {
+                    var v = String(boxes[b].value || '').trim();
+                    if (v) picked.push(v);
+                }
+                out[keys[i]] = guestsFilterSelectedList(picked);
+            }
+            return out;
+        }
+
+        function applyEmailerSpeakersFilterSettings(next) {
+            var src = next || emptyEmailerSpeakersFilterSettings();
+            var base = emptyEmailerSpeakersFilterSettings();
+            base.event = guestsFilterSelectedList(src.event);
+            emailerSpeakersFilterSettings = base;
+            syncEmailerFilterButton();
+            if (emailerRosterView === 'speakers') {
+                showEmailerSpeakersRoster().catch(function (err) {
+                    console.error('applyEmailerSpeakersFilterSettings:', err);
+                });
+            }
+        }
+
+        function closeEmailerSpeakersFilterPopup() {
+            var popup = document.getElementById('emailer-speakers-filter-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        async function openEmailerSpeakersFilterPopup() {
+            closeEmailerGuestsFilterPopup();
+            if (emailerRosterView !== 'speakers' || !emailerSpeakersMemoryLoaded) return;
+            await ensureEmailerFilterEvents();
+            populateEmailerSpeakersFilterPopupForm();
+            var popup = document.getElementById('emailer-speakers-filter-popup');
+            if (!popup) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
         }
 
         function emailerStatusFilterIsActive(filter) {
@@ -23153,7 +23572,7 @@
             if (!note) return;
             var n = typeof shown === 'number' ? shown : 0;
             var all = typeof total === 'number' ? total : n;
-            if (narrowed && emailerRosterView === 'guests') {
+            if (narrowed && (emailerRosterView === 'guests' || emailerRosterView === 'speakers')) {
                 note.textContent = '(Filtered ' + n + ' out of ' + all + ')';
                 scheduleEmailerPaneLayout();
                 return;
@@ -23162,15 +23581,21 @@
             scheduleEmailerPaneLayout();
         }
 
-        function syncBulkEmailActionsCount() {
-            var note = document.getElementById('bulk-email-actions-count');
-            if (!note) return;
+        function emailerCheckedIdCount(store) {
             var n = 0;
-            var ids = emailerGuestsCheckedIds || {};
+            var ids = store || {};
             for (var id in ids) {
                 if (Object.prototype.hasOwnProperty.call(ids, id) && ids[id]) n++;
             }
-            note.textContent = n > 0 ? ('n = ' + n + ' selected guests') : '(n=0)';
+            return n;
+        }
+
+        function syncBulkEmailActionsCount() {
+            var note = document.getElementById('bulk-email-actions-count');
+            if (!note) return;
+            var guests = emailerCheckedIdCount(emailerGuestsCheckedIds);
+            var speakers = emailerCheckedIdCount(emailerSpeakersCheckedIds);
+            note.textContent = guests + ' guests selected. ' + speakers + ' speakers selected.';
             scheduleEmailerPaneLayout();
         }
 
@@ -23951,35 +24376,95 @@
             renderEmailerRosterTable();
         }
 
+        function emailerRosterRowsAllChecked(rows, store) {
+            if (!rows || !rows.length) return false;
+            for (var i = 0; i < rows.length; i++) {
+                var id = String(rows[i] && rows[i].id || '').trim();
+                if (!id || !store || !store[id]) return false;
+            }
+            return true;
+        }
+
+        function setEmailerSpeakersChecks(nextOn) {
+            if (backenduserIsReadonly) return;
+            var rows = emailerSpeakerRowsForTable();
+            var want = !!nextOn;
+            for (var i = 0; i < rows.length; i++) {
+                var id = String(rows[i] && rows[i].id || '').trim();
+                if (!id) continue;
+                if (want) emailerSpeakersCheckedIds[id] = true;
+                else delete emailerSpeakersCheckedIds[id];
+            }
+            renderEmailerRosterTable();
+        }
+
+        function toggleEmailerSpeakerCheck(docId) {
+            if (backenduserIsReadonly) return;
+            var id = String(docId || '').trim();
+            if (!id) return;
+            if (emailerSpeakersCheckedIds[id]) delete emailerSpeakersCheckedIds[id];
+            else emailerSpeakersCheckedIds[id] = true;
+            renderEmailerRosterTable();
+        }
+
         function renderEmailerRosterTable(opts) {
             opts = opts || {};
             var itemsEl = document.getElementById('contacts-roster-items');
             if (!itemsEl) return;
             var showingGuests = emailerRosterView === 'guests';
-            var baseRows = showingGuests && emailerGuestsMemoryLoaded ? emailerGuestCountBaseRows() : [];
-            var rows = showingGuests && emailerGuestsMemoryLoaded ? emailerGuestRowsForTable() : [];
-            syncEmailerRosterCount(rows.length, baseRows.length, emailerStatusFilterIsActive());
+            var showingSpeakers = emailerRosterView === 'speakers';
+            var loaded = showingSpeakers ? emailerSpeakersMemoryLoaded : emailerGuestsMemoryLoaded;
+            var rows = [];
+            var baseRows = [];
+            var checkedStore = emailerGuestsCheckedIds;
+            var rowAttr = 'data-emailer-guest-id';
+            var noun = 'guest';
+            var nounPlural = 'guests';
+            var emptyCopy = 'No guests.';
+            var loadingCopy = 'Loading guests...';
+            if (showingSpeakers) {
+                checkedStore = emailerSpeakersCheckedIds;
+                rowAttr = 'data-emailer-speaker-id';
+                noun = 'speaker';
+                nounPlural = 'speakers';
+                emptyCopy = 'No speakers.';
+                loadingCopy = 'Loading speakers...';
+                if (emailerSpeakersMemoryLoaded) {
+                    rows = emailerSpeakerRowsForTable();
+                    baseRows = emailerSpeakerCountBaseRows();
+                }
+            } else if (showingGuests && emailerGuestsMemoryLoaded) {
+                rows = emailerGuestRowsForTable();
+                baseRows = emailerGuestCountBaseRows();
+            }
+            syncEmailerRosterCount(
+                rows.length,
+                baseRows.length,
+                showingSpeakers ? false : emailerStatusFilterIsActive()
+            );
             syncBulkEmailActionsCount();
             syncEmailerFilterButton();
             var html =
                 '<table class="contacts-list-table emailer-guests-table" role="grid" aria-label="E-mailer">' +
                 '<thead><tr>' +
                 '<th scope="col">' +
-                rosterNameHeaderHtml('Name', emailerGuestsAllChecked(rows), 'guests') +
+                rosterNameHeaderHtml('Name', emailerRosterRowsAllChecked(rows, checkedStore), nounPlural) +
                 '</th>' +
                 '<th scope="col">E-mail</th>' +
                 '</tr></thead><tbody>';
-            if (!showingGuests) {
+            if (!showingGuests && !showingSpeakers) {
                 html += '</tbody></table>';
                 itemsEl.innerHTML = html;
                 extendRosterTableBorders(itemsEl);
                 return;
             }
-            if (opts.loading && !emailerGuestsMemoryLoaded) {
+            if (opts.loading && !loaded) {
                 syncEmailerRosterCount(0);
                 html +=
                     '<tr class="contacts-roster-row">' +
-                    '<td class="contacts-roster-empty" colspan="2">Loading guests...</td></tr>';
+                    '<td class="contacts-roster-empty" colspan="2">' +
+                    loadingCopy +
+                    '</td></tr>';
                 html += '</tbody></table>';
                 itemsEl.innerHTML = html;
                 extendRosterTableBorders(itemsEl);
@@ -23988,31 +24473,35 @@
             if (!rows.length) {
                 html +=
                     '<tr class="contacts-roster-row">' +
-                    '<td class="contacts-roster-empty" colspan="2">No guests.</td></tr>';
+                    '<td class="contacts-roster-empty" colspan="2">' +
+                    emptyCopy +
+                    '</td></tr>';
             } else {
                 for (var i = 0; i < rows.length; i++) {
-                    var g = rows[i];
-                    var guestId = String(g.id || '').trim();
-                    var guestChecked = !!(guestId && emailerGuestsCheckedIds[guestId]);
-                    var guestName = (
-                        String(g.firstName || '').trim() +
+                    var row = rows[i];
+                    var rowId = String(row.id || '').trim();
+                    var checked = !!(rowId && checkedStore[rowId]);
+                    var rowName = (
+                        String(row.firstName || '').trim() +
                         ' ' +
-                        String(g.lastName || '').trim()
+                        String(row.lastName || '').trim()
                     ).trim();
                     html +=
                         '<tr class="contacts-roster-row' +
-                        (guestChecked ? ' is-selected' : '') +
-                        '" data-emailer-guest-id="' +
-                        escapeHtml(g.id) +
+                        (checked ? ' is-selected' : '') +
+                        '" ' +
+                        rowAttr +
+                        '="' +
+                        escapeHtml(row.id) +
                         '">' +
                         '<td class="guests-roster-name-cell">' +
                         rosterNameInnerHtml(
-                            rosterNameCheckHtml(emailerGuestsCheckedIds, g.id, 'guest'),
-                            escapeHtml(guestName || '—')
+                            rosterNameCheckHtml(checkedStore, row.id, noun),
+                            escapeHtml(rowName || '—')
                         ) +
                         '</td>' +
                         '<td class="emailer-guest-email-cell">' +
-                        escapeHtml(String(g.email || '').trim() || '—') +
+                        escapeHtml(String(row.email || '').trim() || '—') +
                         '</td></tr>';
                 }
             }
@@ -24021,8 +24510,21 @@
             extendRosterTableBorders(itemsEl);
         }
 
+        async function showEmailerSpeakersRoster() {
+            if (emailerSpeakersNeedLoad()) renderEmailerRosterTable({ loading: true });
+            try {
+                await ensureEmailerSpeakersLoaded();
+            } catch (err) {
+                console.error('showEmailerSpeakersRoster:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', (err && err.message) || 'Failed to load speakers.');
+                }
+            }
+            if (emailerRosterView === 'speakers') renderEmailerRosterTable();
+        }
+
         async function showEmailerGuestsRoster() {
-            if (!emailerGuestsMemoryLoaded) renderEmailerRosterTable({ loading: true });
+            if (emailerGuestsNeedLoad()) renderEmailerRosterTable({ loading: true });
             try {
                 await ensureEmailerGuestsLoaded();
             } catch (err) {
@@ -31078,6 +31580,7 @@
                 speakerSyncTimer = null;
             }
             speakerRosterInMemory = [];
+            speakerRosterLoadedForEvent = '';
             try {
                 var db = getFirestore();
                 applyBackendUserCurrentEventFromSettings(
@@ -31096,6 +31599,8 @@
                 }
                 var ids = await listSpeakerIdsUnderTbsSpeakers(db);
                 if (!ids.length) {
+                    speakerRosterInMemory = [];
+                    speakerRosterLoadedForEvent = String(current_event || '').trim();
                     rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
                     renderSpeakerRoster();
                     return;
@@ -31123,10 +31628,12 @@
                 applyRosterSelectedYesSnapshot(list, speakerSelectedSnap);
                 rememberRosterSelectedYes(speakersRosterNameCheckedIds, list);
                 speakerRosterInMemory = list;
+                speakerRosterLoadedForEvent = String(current_event || '').trim();
                 speakerRosterSortInPlace();
             } catch (err) {
                 console.error('fetchSpeakersForSelectedEvent:', err);
                 speakerRosterInMemory = [];
+                speakerRosterLoadedForEvent = '';
                 rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
             }
             renderSpeakerRoster();
@@ -32775,6 +33282,57 @@
             }
         }
 
+        var texteditorTopicAutosaveTimer = null;
+
+        function cancelTexteditorTopicAutosaveTimer() {
+            if (texteditorTopicAutosaveTimer) {
+                clearTimeout(texteditorTopicAutosaveTimer);
+                texteditorTopicAutosaveTimer = null;
+            }
+        }
+
+        function scheduleTexteditorEmailTopicAutosave() {
+            if (backenduserIsReadonly || !texteditorPresetIsEmailType()) return;
+            cancelTexteditorTopicAutosaveTimer();
+            if (!texteditorEmailTopicDirty()) return;
+            texteditorTopicAutosaveTimer = setTimeout(function () {
+                texteditorTopicAutosaveTimer = null;
+                void saveTexteditorEmailTopicNow();
+            }, TEXTEDITOR_FIREBASE_AUTOSAVE_MS);
+        }
+
+        async function saveTexteditorEmailTopicNow() {
+            cancelTexteditorTopicAutosaveTimer();
+            if (backenduserIsReadonly || !texteditorPresetIsEmailType()) return false;
+            if (!texteditorEmailTopicDirty()) return false;
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var spec = homeSnippetFirestoreSpecForKey(key);
+            if (!spec || spec.target !== 'tbs-snippets') return false;
+            var topic = texteditorEmailTopicValue();
+            setTexteditorSaveBtnAutosaving(true);
+            if (typeof showStatus === 'function') showStatus('loading', 'Autosaving');
+            try {
+                var payload = {};
+                payload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = topic;
+                await tbsPresetValueDocRef(getFirestore(), spec.field).set(payload, { merge: true });
+                if (texteditorEmailTopicValue() === topic) {
+                    texteditorPresetTopicSaved = topic;
+                } else {
+                    scheduleTexteditorEmailTopicAutosave();
+                }
+                return true;
+            } catch (err) {
+                console.error('saveTexteditorEmailTopicNow:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', (err && err.message) || 'Failed to save e-mail topic.');
+                }
+                return false;
+            } finally {
+                setTexteditorSaveBtnAutosaving(false);
+            }
+        }
+
         function spinTexteditorSaveButton() {
             var btn = document.getElementById('texteditor-save-btn');
             if (!btn) return;
@@ -32821,6 +33379,7 @@
 
         function flushTexteditorFirebaseIfDirty() {
             cancelTexteditorFirebaseAutosaveTimer();
+            cancelTexteditorTopicAutosaveTimer();
             var ta = document.getElementById('texteditor-code');
             if (!ta) return;
             var key = String(ta.dataset.storageKey || '').trim();
@@ -33717,7 +34276,13 @@
                 topicInput.dataset.persistenceBound = '1';
                 topicInput.addEventListener('input', function () {
                     updateTexteditorSaveButtonState();
-                    scheduleTexteditorFirebaseAutosave();
+                    scheduleTexteditorEmailTopicAutosave();
+                });
+                topicInput.addEventListener('change', function () {
+                    void saveTexteditorEmailTopicNow();
+                });
+                topicInput.addEventListener('blur', function () {
+                    void saveTexteditorEmailTopicNow();
                 });
             }
             ta.addEventListener('input', function() {
@@ -38937,16 +39502,23 @@
                 var view = String(next || '');
                 if (view !== 'guests' && view !== 'speakers' && view !== 'sponsors' && view !== 'misc') return;
                 var sameLoadedGuests = view === 'guests' && view === emailerRosterView && emailerGuestsMemoryLoaded;
-                if (view === emailerRosterView && view !== 'guests') return;
-                if (sameLoadedGuests) {
+                var sameLoadedSpeakers = view === 'speakers' && view === emailerRosterView && emailerSpeakersMemoryLoaded;
+                if (view === emailerRosterView && view !== 'guests' && view !== 'speakers') return;
+                if (sameLoadedGuests || sameLoadedSpeakers) {
                     renderEmailerRosterTable();
                     return;
                 }
+                closeEmailerGuestsFilterPopup();
+                closeEmailerSpeakersFilterPopup();
                 emailerRosterView = view;
                 syncEmailerRosterViewLinks();
                 if (view === 'guests') {
                     showEmailerGuestsRoster().catch(function (err) {
                         console.error('emailer-roster-guests-link:', err);
+                    });
+                } else if (view === 'speakers') {
+                    showEmailerSpeakersRoster().catch(function (err) {
+                        console.error('emailer-roster-speakers-link:', err);
                     });
                 } else {
                     renderEmailerRosterTable();
@@ -38972,7 +39544,10 @@
                     ev.preventDefault();
                     ev.stopPropagation();
                     if (emailerFilterBtn.disabled) return;
-                    openEmailerGuestsFilterPopup().catch(function (err) {
+                    var openFilter = emailerRosterView === 'speakers'
+                        ? openEmailerSpeakersFilterPopup
+                        : openEmailerGuestsFilterPopup;
+                    openFilter().catch(function (err) {
                         console.error('emailer-filter-button:', err);
                     });
                 });
@@ -38989,6 +39564,28 @@
                     ev.preventDefault();
                     applyEmailerGuestsFilterSettings(readEmailerGuestsFilterFormValues());
                     closeEmailerGuestsFilterPopup();
+                });
+            }
+            var emailerSpeakersFilterBackdrop = document.getElementById('emailer-speakers-filter-popup-backdrop');
+            if (emailerSpeakersFilterBackdrop) {
+                emailerSpeakersFilterBackdrop.addEventListener('click', function () {
+                    closeEmailerSpeakersFilterPopup();
+                });
+            }
+            var emailerSpeakersFilterApplyBtn = document.getElementById('emailer-speakers-filter-apply');
+            if (emailerSpeakersFilterApplyBtn) {
+                emailerSpeakersFilterApplyBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applyEmailerSpeakersFilterSettings(readEmailerSpeakersFilterFormValues());
+                    closeEmailerSpeakersFilterPopup();
+                });
+            }
+            var emailerSpeakersFilterClearBtn = document.getElementById('emailer-speakers-filter-clear');
+            if (emailerSpeakersFilterClearBtn) {
+                emailerSpeakersFilterClearBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applyEmailerSpeakersFilterSettings(emptyEmailerSpeakersFilterSettings());
+                    populateEmailerSpeakersFilterPopupForm();
                 });
             }
             var emailerGuestsFilterClearBtn = document.getElementById('emailer-guests-filter-clear');
@@ -39072,10 +39669,19 @@
                         ev.preventDefault();
                         ev.stopPropagation();
                         if (nameCheckBtn.classList.contains('roster-name-check-all-btn')) {
-                            setEmailerGuestsChecks(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            if (emailerRosterView === 'speakers') {
+                                setEmailerSpeakersChecks(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            } else {
+                                setEmailerGuestsChecks(nameCheckBtn.getAttribute('aria-pressed') !== 'true');
+                            }
                             return;
                         }
                         var checkRow = nameCheckBtn.closest('.contacts-roster-row');
+                        var speakerCheckId = checkRow && checkRow.getAttribute('data-emailer-speaker-id');
+                        if (speakerCheckId) {
+                            toggleEmailerSpeakerCheck(speakerCheckId);
+                            return;
+                        }
                         var guestCheckId = checkRow && checkRow.getAttribute('data-emailer-guest-id');
                         if (guestCheckId) {
                             toggleEmailerGuestCheck(guestCheckId);
@@ -40232,6 +40838,7 @@
                     ev.preventDefault();
                     if (texteditorPadlockBtn.disabled) return;
                     if (backendBlockIfReadonly()) return;
+                    if (texteditorPadlockIsOpen) void saveTexteditorEmailTopicNow();
                     texteditorPadlockIsOpen = !texteditorPadlockIsOpen;
                     syncTexteditorPadlockButtonUi();
                     syncTexteditorEditabilityFromPadlock();
@@ -40385,6 +40992,7 @@
             setBackendPageLoading(true);
             try {
             await syncSelectedAndCurrentEventFromSettings();
+            applyEmailerLaunchEventFilters();
             updateBackendEditorVisibility();
             updateEditSpeakerNameHeading();
             updateAddSpeakerSaveButtonState();
