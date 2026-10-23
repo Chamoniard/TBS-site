@@ -4338,6 +4338,288 @@
             white-space: nowrap;
         }
 
+        #emailer-editor #bulk-email-preset-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 16px;
+            background: #ffffff;
+            box-sizing: border-box;
+        }
+
+        body.backend-page #emailer-editor .bulk-email-preset-btn,
+        body.backend-page #emailer-editor .bulk-email-preset-btn:disabled,
+        body.backend-page #emailer-editor .bulk-email-preset-btn[aria-disabled='true'] {
+            display: block;
+            position: relative;
+            width: var(--backend-workflow-btn-width);
+            max-width: 100%;
+            min-width: 0;
+            min-height: 35px;
+            height: auto;
+            margin: 0;
+            padding: 8px 12px;
+            box-sizing: border-box;
+            border: 1px solid #c5cdd4;
+            border-radius: var(--backend-square-btn-radius);
+            background: #f1f5f9;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: not-allowed;
+            appearance: none;
+            opacity: 1;
+            transform: none;
+            filter: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        body.backend-page #emailer-editor .bulk-email-preset-btn.is-active,
+        body.backend-page #emailer-editor .bulk-email-preset-btn.is-active[aria-disabled='false'] {
+            border-color: var(--backend-roster-status-yes-bg);
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            cursor: pointer;
+            animation: none;
+        }
+
+        body.backend-page #emailer-editor .bulk-email-preset-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
+            animation: none;
+            transform: none;
+            border-color: var(--backend-roster-status-yes-bg);
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        body.backend-page #emailer-editor .bulk-email-preset-btn.is-selected,
+        body.backend-page #emailer-editor .bulk-email-preset-btn.is-selected[aria-disabled='false'] {
+            background: var(--backend-roster-status-yes-bg);
+            border-color: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            cursor: pointer;
+            animation: none;
+        }
+
+        body.backend-page #emailer-editor .bulk-email-preset-btn.is-selected:hover:not(:disabled):not([aria-disabled='true']) {
+            animation: none;
+            transform: none;
+            background: var(--backend-roster-status-yes-bg);
+            border-color: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        #emailer-editor .bulk-email-preset-row {
+            display: inline-flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        #emailer-editor .bulk-email-preset-row:has(.bulk-email-preset-btn:hover:not(:disabled):not([aria-disabled='true'])),
+        #emailer-editor .bulk-email-preset-row:has(#sendbulkemails:hover) {
+            transform: translateY(-2px);
+        }
+
+        #emailer-editor .bulk-email-preset-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: auto;
+            margin: 0;
+            color: #338a17;
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #emailer-editor .bulk-email-preset-arrow[hidden] {
+            display: none !important;
+        }
+
+        #emailer-editor #sendbulkemails {
+            display: block;
+            align-self: center;
+            flex: 0 0 auto;
+            width: auto;
+            min-width: var(--backend-workflow-btn-width);
+            max-width: none;
+            min-height: 35px;
+            height: auto;
+            margin: 0;
+            padding: 8px 12px;
+            box-sizing: border-box;
+            border: 1px solid var(--backend-roster-status-yes-bg);
+            border-radius: var(--backend-square-btn-radius);
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+            cursor: pointer;
+            appearance: none;
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
+        }
+
+        #emailer-editor #sendbulkemails[hidden] {
+            display: none !important;
+        }
+
+        #emailer-editor #sendbulkemails:hover {
+            animation: none;
+            transform: none;
+            border-color: var(--backend-roster-status-yes-bg);
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        #emailer-editor #preview.is-showing-bulk-preview::after {
+            content: none;
+            display: none;
+        }
+
+        #emailer-editor #preview.is-showing-bulk-preview > .emailer-editor-bottom,
+        #emailer-editor #preview.is-showing-bulk-preview > .contact-editor-empty {
+            display: none !important;
+        }
+
+        #emailer-editor #preview .emailer-bulk-preview {
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #ffffff;
+            color: #0f172a;
+        }
+
+        #emailer-editor #preview .emailer-bulk-preview[hidden] {
+            display: none !important;
+        }
+
+        #emailer-editor #preview .emailer-bulk-preview .texteditor-render-surface {
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            max-height: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: none;
+        }
+
+        #emailer-editor .emailer-bulk-preview .texteditor-email-topic {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 16px;
+            flex: 0 0 auto;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        #emailer-editor .emailer-bulk-preview .texteditor-email-topic label {
+            flex: 0 0 auto;
+            min-width: 0;
+            margin: 0;
+            border: none;
+            padding: 0;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 400;
+            line-height: 1.4;
+            color: #64748b;
+        }
+
+        #emailer-editor .emailer-bulk-preview .texteditor-email-topic input {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 6px;
+            background: var(--backend-tab-pale-blue);
+            box-shadow: none;
+            outline: none;
+            padding: 0.5rem 0.75rem;
+            cursor: default;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #0f172a;
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: left;
+        }
+
+        #emailer-editor .emailer-bulk-preview .texteditor-email-topic input:focus,
+        #emailer-editor .emailer-bulk-preview .texteditor-email-topic input:focus-visible {
+            outline: none;
+            border: none;
+            box-shadow: none;
+        }
+
+        #emailer-editor .emailer-bulk-preview .texteditor-render-html,
+        #emailer-editor .emailer-bulk-preview .texteditor-render-html .programme-day-content p,
+        #emailer-editor .emailer-bulk-preview .texteditor-render-html .programmestyle p {
+            color: #0f172a !important;
+        }
+
+        #emailer-editor .emailer-bulk-preview .texteditor-render-html a,
+        #emailer-editor .emailer-bulk-preview .texteditor-render-html a:hover {
+            color: #71C7FE;
+        }
+
+        #emailer-editor .bulk-email-preset-empty {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #64748b;
+        }
+
         .emailer-filter-contacts-btn {
             position: relative;
             overflow: visible;
@@ -14377,9 +14659,9 @@
                             <div class="edit-contact-top contacts-list-heading">
                                 <div class="edit-contact-top-spacer" aria-hidden="true"></div>
                                 <div class="selected-contactname-wrap">
-                                    <div class="emailer-roster-title-wrap" role="group" aria-label="Bulk actions">
-                                        <span class="emailer-roster-view-link is-active bulk-email-actions-title" id="bulk-email-actions-title">Bulk actions</span>
-                                        <span class="bulk-email-actions-count" id="bulk-email-actions-count" aria-live="polite">0 guests selected. 0 speakers selected.</span>
+                                    <div class="emailer-roster-title-wrap" role="group" aria-label="Bulk email">
+                                        <span class="emailer-roster-view-link is-active bulk-email-actions-title" id="bulk-email-actions-title">Bulk email</span>
+                                        <span class="bulk-email-actions-count" id="bulk-email-actions-count" aria-live="polite">(0 guests selected. 0 speakers selected. 0 total.)</span>
                                     </div>
                                 </div>
                                 <div class="edit-contact-top-trailing">
@@ -14410,6 +14692,8 @@
                             </div>
                                 </div>
                             </div>
+                            <div id="bulk-email-preset-buttons" class="bulk-email-preset-buttons" aria-live="polite"></div>
+                            <button type="button" id="sendbulkemails" class="sendbulkemails" hidden>Send e-mail to 0 contacts</button>
                             <div class="emailer-editor-bottom is-showing-bio">
                             <div class="emailer-workflow-nav" role="toolbar" aria-label="Contact editor sections">
                                 <button type="button" class="emailer-workflow-nav-link" id="bulk-email-actions-emailer-display-contact-actions" aria-label="Contact workflow" title="Contact workflow" disabled aria-disabled="true">
@@ -14589,6 +14873,15 @@
                                     </button>
                                 </div>
                             </div>
+                                </div>
+                            </div>
+                            <div class="emailer-bulk-preview" id="emailer-bulk-preview" hidden>
+                                <div class="texteditor-render-surface">
+                                    <div class="texteditor-email-topic" id="emailer-bulk-preview-topic">
+                                        <label for="emailer-bulk-preview-topic-input">E-mail topic:</label>
+                                        <input type="text" id="emailer-bulk-preview-topic-input" autocomplete="off" spellcheck="false" readonly aria-readonly="true">
+                                    </div>
+                                    <div id="emailer-bulk-preview-html" class="texteditor-render-html" aria-live="polite"></div>
                                 </div>
                             </div>
                             <div class="emailer-editor-bottom is-showing-bio">
@@ -15072,6 +15365,18 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" class="speaker-delete-cancel-btn" id="guest-bulk-reminder-cancel">Cancel</button>
                 <button type="button" class="speaker-delete-yes-btn" id="guest-bulk-reminder-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sendbulkemails-confirm" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sendbulkemails-confirm-title">
+        <div class="guest-delete-confirm__backdrop" id="sendbulkemails-confirm-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <p id="sendbulkemails-confirm-title">Send bulk e-mail to 0 contacts</p>
+            <div class="guest-delete-confirm__actions">
+                <button type="button" class="speaker-delete-cancel-btn" id="sendbulkemails-cancel">Cancel</button>
+                <button type="button" class="speaker-delete-yes-btn" id="sendbulkemails-confirm-send">Send</button>
+                <button type="button" class="speaker-delete-yes-btn" id="sendbulkemails-ok" hidden>OK</button>
             </div>
         </div>
     </div>
@@ -20384,9 +20689,19 @@
             return db.collection('tbs').doc('Pre-sets').collection('Zermatt').doc('Zermatt');
         }
 
+        /** `tbs/Pre-sets/{event_location}/{event_location}`. */
+        function tbsPresetsLocationDocRef(db, locationOpt) {
+            var loc = String(locationOpt != null ? locationOpt : event_location || '').trim();
+            if (!loc) return null;
+            return db.collection('tbs').doc('Pre-sets').collection(loc).doc(loc);
+        }
+
         var FIRESTORE_TBS_PRESET_VALUE_FIELD = 'Value';
         var FIRESTORE_TBS_PRESET_TYPE_FIELD = 'Type';
+        var FIRESTORE_TBS_PRESET_WHERE_FIELD = 'Where';
         var FIRESTORE_TBS_PRESET_TOPIC_FIELD = 'Topic';
+        /** Subcollection names under `tbs/Pre-sets/{event_location}/{event_location}`. The browser cannot list those folders. */
+        var FIRESTORE_TBS_PRESET_IDS_FIELD = 'presetIds';
         var texteditorPresetType = '';
         var texteditorPresetTopicSaved = '';
 
@@ -20394,6 +20709,15 @@
         function tbsPresetValueDocRef(db, fieldName) {
             var field = String(fieldName || '').trim();
             return tbsPresetsZermattDocRef(db).collection(field).doc(field);
+        }
+
+        async function rememberTbsPresetFieldName(db, fieldName, locationOpt) {
+            var field = String(fieldName || '').trim();
+            var parent = tbsPresetsLocationDocRef(db, locationOpt);
+            if (!field || !parent || typeof firebase === 'undefined' || !firebase.firestore) return;
+            var patch = {};
+            patch[FIRESTORE_TBS_PRESET_IDS_FIELD] = firebase.firestore.FieldValue.arrayUnion(field);
+            await parent.set(patch, { merge: true });
         }
 
         function tbsSettingsRootDocRef(db) {
@@ -23590,13 +23914,490 @@
             return n;
         }
 
-        function syncBulkEmailActionsCount() {
-            var note = document.getElementById('bulk-email-actions-count');
-            if (!note) return;
+        function syncEmailerBulkPresetButtons() {
+            var active =
+                emailerCheckedIdCount(emailerGuestsCheckedIds) +
+                    emailerCheckedIdCount(emailerSpeakersCheckedIds) >
+                0;
+            var selected = String(emailerBulkPresetSelectedField || '');
+            var buttons = document.querySelectorAll('#bulk-email-preset-buttons .bulk-email-preset-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                var chosen = selected && buttons[i].getAttribute('data-preset-field') === selected;
+                buttons[i].disabled = !active;
+                buttons[i].setAttribute('aria-disabled', active ? 'false' : 'true');
+                buttons[i].classList.toggle('is-active', active && !chosen);
+                buttons[i].classList.toggle('is-selected', active && chosen);
+            }
+            syncEmailerBulkPresetArrows();
+            syncSendBulkEmailsButton();
+        }
+
+        function syncSendBulkEmailsButton() {
+            var btn = document.getElementById('sendbulkemails');
+            var root = document.getElementById('bulk-email-preset-buttons');
+            if (!btn) return;
             var guests = emailerCheckedIdCount(emailerGuestsCheckedIds);
             var speakers = emailerCheckedIdCount(emailerSpeakersCheckedIds);
-            note.textContent = guests + ' guests selected. ' + speakers + ' speakers selected.';
-            scheduleEmailerPaneLayout();
+            var total = guests + speakers;
+            var selected = String(emailerBulkPresetSelectedField || '').trim();
+            var row = null;
+            if (selected && root) {
+                var escaped = typeof CSS !== 'undefined' && CSS.escape
+                    ? CSS.escape(selected)
+                    : selected.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+                var presetBtn = root.querySelector('.bulk-email-preset-btn[data-preset-field="' + escaped + '"]');
+                row = presetBtn && presetBtn.closest ? presetBtn.closest('.bulk-email-preset-row') : null;
+            }
+            if (!row) {
+                btn.hidden = true;
+                if (root && root.parentNode && root.contains(btn)) {
+                    root.parentNode.insertBefore(btn, root.nextSibling);
+                }
+                return;
+            }
+            row.appendChild(btn);
+            btn.hidden = false;
+            btn.textContent = 'Send e-mail to ' + total + ' contacts';
+            btn.setAttribute('aria-label', btn.textContent);
+        }
+
+        function parkSendBulkEmailsButton() {
+            var btn = document.getElementById('sendbulkemails');
+            var root = document.getElementById('bulk-email-preset-buttons');
+            if (!btn || !root || !root.parentNode) return;
+            if (root.contains(btn)) root.parentNode.insertBefore(btn, root.nextSibling);
+        }
+
+        var sendBulkEmailsPhase = '';
+        var SENDBULKEMAILS_GAP_MS = 2000;
+
+        function setSendBulkEmailsPopupPhase(phase, message) {
+            sendBulkEmailsPhase = phase;
+            var dlg = document.getElementById('sendbulkemails-confirm');
+            var titleEl = document.getElementById('sendbulkemails-confirm-title');
+            var cancel = document.getElementById('sendbulkemails-cancel');
+            var send = document.getElementById('sendbulkemails-confirm-send');
+            var ok = document.getElementById('sendbulkemails-ok');
+            if (titleEl && message != null) titleEl.textContent = message;
+            if (cancel) cancel.hidden = phase !== 'confirm';
+            if (send) {
+                send.hidden = phase !== 'confirm';
+                send.disabled = phase !== 'confirm';
+            }
+            if (ok) ok.hidden = phase !== 'done';
+            if (!dlg) return;
+            var open = phase === 'confirm' || phase === 'sending' || phase === 'done';
+            dlg.hidden = !open;
+            dlg.setAttribute('aria-hidden', open ? 'false' : 'true');
+        }
+
+        function closeSendBulkEmailsPopup() {
+            if (sendBulkEmailsPhase === 'sending') return;
+            setSendBulkEmailsPopupPhase('', '');
+        }
+
+        function emailerBulkSendTargets() {
+            var out = [];
+            var seen = Object.create(null);
+            var guestIds = emailerGuestsCheckedIds || {};
+            var speakerIds = emailerSpeakersCheckedIds || {};
+            Object.keys(guestIds).forEach(function (id) {
+                var key = String(id || '').trim();
+                if (!key || !guestIds[id] || seen['guest:' + key]) return;
+                seen['guest:' + key] = true;
+                out.push({ kind: 'guest', id: key });
+            });
+            Object.keys(speakerIds).forEach(function (id) {
+                var key = String(id || '').trim();
+                if (!key || !speakerIds[id] || seen['speaker:' + key]) return;
+                seen['speaker:' + key] = true;
+                out.push({ kind: 'speaker', id: key });
+            });
+            return out;
+        }
+
+        function waitSendBulkEmailsGap(ms) {
+            return new Promise(function (resolve) {
+                setTimeout(resolve, ms);
+            });
+        }
+
+        async function postSendBulkEmail(field, target) {
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/sendBulkEmailHttp';
+            var res = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    field: field,
+                    kind: target.kind,
+                    id: target.id,
+                }),
+            });
+            var payload = {};
+            try {
+                payload = await res.json();
+            } catch (parseErr) {
+                payload = {};
+            }
+            if (!res.ok) {
+                throw new Error(
+                    payload && payload.error
+                        ? String(payload.error)
+                        : 'Function call failed (' + res.status + ')'
+                );
+            }
+            return payload;
+        }
+
+        async function runSendBulkEmails(field, targets) {
+            var sent = 0;
+            var failed = 0;
+            var firstError = '';
+            setSendBulkEmailsPopupPhase('sending', 'Sending 1 of ' + targets.length + '…');
+            for (var i = 0; i < targets.length; i++) {
+                if (i > 0) await waitSendBulkEmailsGap(SENDBULKEMAILS_GAP_MS);
+                setSendBulkEmailsPopupPhase(
+                    'sending',
+                    'Sending ' + (i + 1) + ' of ' + targets.length + '…'
+                );
+                try {
+                    await postSendBulkEmail(field, targets[i]);
+                    sent += 1;
+                } catch (err) {
+                    failed += 1;
+                    if (!firstError) {
+                        firstError = err && err.message ? String(err.message) : 'Failed to send.';
+                    }
+                }
+            }
+            var result = 'Sent ' + sent + ' of ' + targets.length + '.';
+            if (failed) {
+                result += ' ' + failed + ' could not be sent.';
+                if (firstError) result += ' ' + firstError;
+            }
+            setSendBulkEmailsPopupPhase('done', result);
+            var ok = document.getElementById('sendbulkemails-ok');
+            if (ok) ok.focus();
+        }
+
+        function openSendBulkEmailsConfirm() {
+            if (backendBlockIfReadonly()) return;
+            if (sendBulkEmailsPhase === 'sending' || sendBulkEmailsPhase === 'confirm') return;
+            var field = String(emailerBulkPresetSelectedField || '').trim();
+            var item = field ? emailerBulkPresetByField[field] : null;
+            var targets = emailerBulkSendTargets();
+            if (!field || !item || !targets.length) return;
+            var label = String(item.label || field).trim() || field;
+            setSendBulkEmailsPopupPhase(
+                'confirm',
+                'Send ' + label + ' to ' + targets.length + ' contacts'
+            );
+            var cancel = document.getElementById('sendbulkemails-cancel');
+            if (cancel) cancel.focus();
+            var send = document.getElementById('sendbulkemails-confirm-send');
+            if (send && send.dataset.bound !== '1') {
+                send.dataset.bound = '1';
+                send.addEventListener('click', function () {
+                    if (sendBulkEmailsPhase !== 'confirm') return;
+                    var currentField = String(emailerBulkPresetSelectedField || '').trim();
+                    var currentItem = currentField ? emailerBulkPresetByField[currentField] : null;
+                    var currentTargets = emailerBulkSendTargets();
+                    if (!currentField || !currentItem || !currentTargets.length) {
+                        closeSendBulkEmailsPopup();
+                        return;
+                    }
+                    void runSendBulkEmails(currentField, currentTargets);
+                });
+            }
+        }
+
+        function syncBulkEmailActionsCount() {
+            var note = document.getElementById('bulk-email-actions-count');
+            if (note) {
+                var guests = emailerCheckedIdCount(emailerGuestsCheckedIds);
+                var speakers = emailerCheckedIdCount(emailerSpeakersCheckedIds);
+                var total = guests + speakers;
+                note.textContent =
+                    '(' +
+                    guests +
+                    ' guests selected. ' +
+                    speakers +
+                    ' speakers selected. ' +
+                    total +
+                    ' total.)';
+                scheduleEmailerPaneLayout();
+            }
+            syncEmailerBulkPresetButtons();
+        }
+
+        var emailerBulkPresetLoadSerial = 0;
+        var emailerBulkPresetByField = Object.create(null);
+        var emailerBulkPresetSelectedField = '';
+
+        function knownTbsPresetFieldNames() {
+            var names = [
+                FIRESTORE_TBS_SNIPPETS_EVENTINFO_FIELD,
+                FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD,
+                FIRESTORE_TBS_SNIPPETS_SPEAKERS_FIELD,
+                FIRESTORE_TBS_SNIPPETS_REGISTRATION_FIELD,
+                FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD,
+                FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD,
+                FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD,
+                FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD,
+                FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD,
+                FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
+                FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD,
+                FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD,
+                FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD,
+                FIRESTORE_TBS_SNIPPETS_MTACC_2027_FIELD,
+                'CME-text',
+                'Post-eventinfo',
+                'Speakerinfo',
+                'waitinglist',
+                'test',
+                'w',
+            ];
+            var seen = Object.create(null);
+            var out = [];
+            for (var i = 0; i < names.length; i++) {
+                var name = String(names[i] || '').trim();
+                if (!name || seen[name]) continue;
+                seen[name] = true;
+                out.push(name);
+            }
+            return out;
+        }
+
+        function emailerPresetIsBulkEmail(data) {
+            var d = data || {};
+            var type = String(d[FIRESTORE_TBS_PRESET_TYPE_FIELD] || '').trim().toLowerCase();
+            var where = String(d[FIRESTORE_TBS_PRESET_WHERE_FIELD] || '').trim().toLowerCase();
+            return type === 'e-mail' && where === 'bulk_e-mails';
+        }
+
+        function emailerBulkPresetLabelForField(fieldName) {
+            var want = String(fieldName || '').trim();
+            var buttons = document.querySelectorAll('#texteditor .texteditor-snippet-btn[data-snippet-key]');
+            for (var i = 0; i < buttons.length; i++) {
+                var key = buttons[i].getAttribute('data-snippet-key') || '';
+                var spec = homeSnippetFirestoreSpecForKey(key);
+                if (!spec || spec.field !== want) continue;
+                var label = String(buttons[i].textContent || '').trim();
+                if (label) return label;
+            }
+            return want;
+        }
+
+        async function listEmailerPresetFieldNames(loc) {
+            var seen = Object.create(null);
+            var out = [];
+            function add(raw) {
+                var name = String(raw != null ? raw : '').trim();
+                if (!name || seen[name]) return;
+                seen[name] = true;
+                out.push(name);
+            }
+            var idToken = await ensureFirebaseAuthForFirestoreRest();
+            var ids = await firestoreRestListCollectionIdsUnderDocumentPath(
+                'tbs/Pre-sets/' + loc + '/' + loc,
+                idToken
+            );
+            if (Array.isArray(ids)) {
+                for (var i = 0; i < ids.length; i++) add(ids[i]);
+            }
+            try {
+                var parentRef = tbsPresetsLocationDocRef(getFirestore(), loc);
+                if (parentRef) {
+                    var parentSnap = await parentRef.get();
+                    var stored =
+                        parentSnap && parentSnap.exists
+                            ? (parentSnap.data() || {})[FIRESTORE_TBS_PRESET_IDS_FIELD]
+                            : [];
+                    if (Array.isArray(stored)) {
+                        for (var s = 0; s < stored.length; s++) add(stored[s]);
+                    }
+                }
+            } catch (err) {
+                console.warn('listEmailerPresetFieldNames presetIds:', err);
+            }
+            var known = knownTbsPresetFieldNames();
+            for (var k = 0; k < known.length; k++) add(known[k]);
+            return out;
+        }
+
+        function clearEmailerBulkPreview() {
+            var pane = document.getElementById('preview');
+            var wrap = document.getElementById('emailer-bulk-preview');
+            var topicInput = document.getElementById('emailer-bulk-preview-topic-input');
+            var htmlEl = document.getElementById('emailer-bulk-preview-html');
+            if (pane) pane.classList.remove('is-showing-bulk-preview');
+            if (wrap) wrap.hidden = true;
+            if (topicInput) topicInput.value = '';
+            if (htmlEl) htmlEl.innerHTML = '';
+        }
+
+        function showEmailerBulkPreview(item) {
+            var pane = document.getElementById('preview');
+            var wrap = document.getElementById('emailer-bulk-preview');
+            var topicInput = document.getElementById('emailer-bulk-preview-topic-input');
+            var htmlEl = document.getElementById('emailer-bulk-preview-html');
+            if (!pane || !wrap || !htmlEl || !item) return;
+            pane.classList.add('is-showing-bulk-preview');
+            wrap.hidden = false;
+            if (topicInput) topicInput.value = item.topic != null ? String(item.topic) : '';
+            var raw = item.value != null ? String(item.value) : '';
+            try {
+                htmlEl.innerHTML = texteditorPreviewHtmlForRender(raw, 'emailer:preset:' + item.field);
+            } catch (err) {
+                console.warn('Emailer bulk preview:', err);
+                htmlEl.textContent = raw;
+            }
+        }
+
+        function syncEmailerBulkPresetArrows() {
+            var selected = String(emailerBulkPresetSelectedField || '');
+            var buttons = document.querySelectorAll('#bulk-email-preset-buttons .bulk-email-preset-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                var btn = buttons[i];
+                var on = selected && btn.getAttribute('data-preset-field') === selected;
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                var row = btn.closest ? btn.closest('.bulk-email-preset-row') : null;
+                var arrow = row ? row.querySelector('.bulk-email-preset-arrow') : null;
+                if (!arrow) continue;
+                arrow.hidden = !on;
+                arrow.setAttribute('aria-hidden', on ? 'false' : 'true');
+            }
+        }
+
+        function selectEmailerBulkPreset(field) {
+            var name = String(field || '').trim();
+            var item = emailerBulkPresetByField[name];
+            if (!item) return;
+            emailerBulkPresetSelectedField = name;
+            syncEmailerBulkPresetButtons();
+            showEmailerBulkPreview(item);
+        }
+
+        function ensureEmailerBulkPresetClicks() {
+            var root = document.getElementById('bulk-email-preset-buttons');
+            if (!root || root.dataset.bound === '1') return;
+            root.dataset.bound = '1';
+            root.addEventListener('click', function (ev) {
+                var btn = ev.target && ev.target.closest ? ev.target.closest('.bulk-email-preset-btn') : null;
+                if (!btn || btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
+                selectEmailerBulkPreset(btn.getAttribute('data-preset-field') || '');
+            });
+        }
+
+        function renderEmailerBulkPresetButtons(items) {
+            var root = document.getElementById('bulk-email-preset-buttons');
+            if (!root) return;
+            parkSendBulkEmailsButton();
+            var list = Array.isArray(items) ? items : [];
+            var map = Object.create(null);
+            for (var n = 0; n < list.length; n++) {
+                if (list[n] && list[n].field) map[list[n].field] = list[n];
+            }
+            emailerBulkPresetByField = map;
+            if (emailerBulkPresetSelectedField && !map[emailerBulkPresetSelectedField]) {
+                emailerBulkPresetSelectedField = '';
+                clearEmailerBulkPreview();
+            }
+            if (!list.length) {
+                root.innerHTML = '<p class="bulk-email-preset-empty">No bulk e-mails.</p>';
+                syncSendBulkEmailsButton();
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var item = list[i];
+                var selected = item.field === emailerBulkPresetSelectedField;
+                html +=
+                    '<div class="bulk-email-preset-row">' +
+                    '<button type="button" class="bulk-email-preset-btn" data-preset-field="' +
+                    escapeHtml(item.field) +
+                    '" disabled aria-disabled="true" aria-pressed="' +
+                    (selected ? 'true' : 'false') +
+                    '">' +
+                    escapeHtml(item.label) +
+                    '</button>' +
+                    '<span class="bulk-email-preset-arrow" ' +
+                    (selected ? '' : 'hidden ') +
+                    'aria-hidden="' +
+                    (selected ? 'false' : 'true') +
+                    '" aria-label="Selected bulk e-mail">⮕</span>' +
+                    '</div>';
+            }
+            root.innerHTML = html;
+            syncEmailerBulkPresetButtons();
+            ensureEmailerBulkPresetClicks();
+            if (emailerBulkPresetSelectedField && map[emailerBulkPresetSelectedField]) {
+                showEmailerBulkPreview(map[emailerBulkPresetSelectedField]);
+            }
+        }
+
+        async function loadEmailerBulkPresetButtons() {
+            var root = document.getElementById('bulk-email-preset-buttons');
+            if (!root) return;
+            parkSendBulkEmailsButton();
+            var parkedSend = document.getElementById('sendbulkemails');
+            if (parkedSend) parkedSend.hidden = true;
+            var serial = ++emailerBulkPresetLoadSerial;
+            var loc = String(event_location || '').trim();
+            if (!loc) {
+                root.innerHTML = '<p class="bulk-email-preset-empty">No event location.</p>';
+                return;
+            }
+            root.innerHTML = '<p class="bulk-email-preset-empty">Loading bulk e-mails...</p>';
+            try {
+                var db = getFirestore();
+                var parent = tbsPresetsLocationDocRef(db, loc);
+                var names = await listEmailerPresetFieldNames(loc);
+                if (serial !== emailerBulkPresetLoadSerial) return;
+                var items = [];
+                var chunkSize = 12;
+                for (var i = 0; i < names.length; i += chunkSize) {
+                    var chunk = names.slice(i, i + chunkSize);
+                    var snaps = await Promise.all(
+                        chunk.map(function (fieldName) {
+                            return parent.collection(fieldName).doc(fieldName).get();
+                        })
+                    );
+                    if (serial !== emailerBulkPresetLoadSerial) return;
+                    for (var j = 0; j < chunk.length; j++) {
+                        var snap = snaps[j];
+                        if (!snap || !snap.exists) continue;
+                        var data = snap.data() || {};
+                        if (!emailerPresetIsBulkEmail(data)) continue;
+                        items.push({
+                            field: chunk[j],
+                            label: emailerBulkPresetLabelForField(chunk[j]),
+                            value:
+                                data[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null
+                                    ? String(data[FIRESTORE_TBS_PRESET_VALUE_FIELD])
+                                    : '',
+                            topic:
+                                data[FIRESTORE_TBS_PRESET_TOPIC_FIELD] != null
+                                    ? String(data[FIRESTORE_TBS_PRESET_TOPIC_FIELD])
+                                    : '',
+                        });
+                    }
+                }
+                items.sort(function (a, b) {
+                    return String(a.label || '').localeCompare(String(b.label || ''), undefined, {
+                        sensitivity: 'base',
+                    });
+                });
+                if (serial !== emailerBulkPresetLoadSerial) return;
+                renderEmailerBulkPresetButtons(items);
+            } catch (err) {
+                console.error('loadEmailerBulkPresetButtons:', err);
+                if (serial !== emailerBulkPresetLoadSerial) return;
+                root.innerHTML = '<p class="bulk-email-preset-empty">Could not load bulk e-mails.</p>';
+            }
         }
 
         var emailerPaneLayoutFrame = 0;
@@ -25854,6 +26655,7 @@
                     syncTexteditorPreviewFromCode();
                 }
                 await syncEventLocationAndSiteSettings(next);
+                void loadEmailerBulkPresetButtons();
                 await Promise.all([
                     fetchAllGuestsIntoMemory({ force: true, showLoading: true }),
                     fetchSpeakersForSelectedEvent(),
@@ -33316,6 +34118,11 @@
                 var payload = {};
                 payload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = topic;
                 await tbsPresetValueDocRef(getFirestore(), spec.field).set(payload, { merge: true });
+                try {
+                    await rememberTbsPresetFieldName(getFirestore(), spec.field, 'Zermatt');
+                } catch (indexErr) {
+                    console.warn('rememberTbsPresetFieldName:', indexErr);
+                }
                 if (texteditorEmailTopicValue() === topic) {
                     texteditorPresetTopicSaved = topic;
                 } else {
@@ -33452,6 +34259,11 @@
                             valuePayload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = texteditorEmailTopicValue();
                         }
                         await tbsPresetValueDocRef(dbHome, homeSpec.field).set(valuePayload, { merge: true });
+                        try {
+                            await rememberTbsPresetFieldName(dbHome, homeSpec.field, 'Zermatt');
+                        } catch (indexErr) {
+                            console.warn('rememberTbsPresetFieldName:', indexErr);
+                        }
                         if (texteditorPresetIsEmailType()) {
                             texteditorPresetTopicSaved = valuePayload[FIRESTORE_TBS_PRESET_TOPIC_FIELD];
                         }
@@ -36341,6 +37153,7 @@
             if (isEmailer) {
                 renderEmailerRosterTable();
                 scheduleEmailerPaneLayout();
+                void loadEmailerBulkPresetButtons();
             }
             if (isSettings) {
                 void syncEventLocationAndSiteSettings(current_event)
@@ -40665,6 +41478,31 @@
             if (guestBulkReminderYes) {
                 guestBulkReminderYes.addEventListener('click', function () {
                     closeGuestBulkReminderConfirm(true);
+                });
+            }
+            var sendBulkEmailsBtn = document.getElementById('sendbulkemails');
+            var sendBulkEmailsCancel = document.getElementById('sendbulkemails-cancel');
+            var sendBulkEmailsOk = document.getElementById('sendbulkemails-ok');
+            var sendBulkEmailsBackdrop = document.getElementById('sendbulkemails-confirm-backdrop');
+            if (sendBulkEmailsBtn && sendBulkEmailsBtn.dataset.bound !== '1') {
+                sendBulkEmailsBtn.dataset.bound = '1';
+                sendBulkEmailsBtn.addEventListener('click', function () {
+                    openSendBulkEmailsConfirm();
+                });
+            }
+            if (sendBulkEmailsCancel) {
+                sendBulkEmailsCancel.addEventListener('click', function () {
+                    if (sendBulkEmailsPhase === 'confirm') closeSendBulkEmailsPopup();
+                });
+            }
+            if (sendBulkEmailsOk) {
+                sendBulkEmailsOk.addEventListener('click', function () {
+                    if (sendBulkEmailsPhase === 'done') closeSendBulkEmailsPopup();
+                });
+            }
+            if (sendBulkEmailsBackdrop) {
+                sendBulkEmailsBackdrop.addEventListener('click', function () {
+                    if (sendBulkEmailsPhase === 'confirm') closeSendBulkEmailsPopup();
                 });
             }
             var guestCancelNo = document.getElementById('guest-cancel-no');

@@ -3508,3 +3508,177 @@ export const listTbsContactsCollectionIdsHttp = onRequest({
     });
   }
 });
+
+/**
+ * Send one bulk e-mail from registration@tbs-zermatt.org.
+ * The pre-set must be Type e-mail and Where bulk_e-mails under the
+ * current event location. The recipient is one guest or speaker item.
+ * Expects JSON: { field, kind: "guest"|"speaker", id }.
+ */
+export const sendBulkEmailHttp = onRequest({
+  secrets: [
+    gmailSendClientIdParam,
+    gmailSendClientSecretParam,
+    gmailSendRefreshTokenParam,
+    gmailSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const field = String(body.field || "").trim();
+  const kind = String(body.kind || "").trim().toLowerCase();
+  const id = String(body.id || "").trim();
+  if (!field || /[\\/]/.test(field) || field === "." || field === "..") {
+    res.status(400).json({error: "Invalid bulk e-mail."});
+    return;
+  }
+  if ((kind !== "guest" && kind !== "speaker") || !id || /[\\/]/.test(id)) {
+    res.status(400).json({error: "Missing bulk e-mail recipient."});
+    return;
+  }
+
+  const fromAddress = "registration@tbs-zermatt.org";
+  const db = getFirestore();
+
+  try {
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+
+    const presetSnap = await tbsPresetValueDocRef(db, field, location).get();
+    if (!presetSnap.exists) {
+      res.status(404).json({
+        error: "Bulk e-mail not found at " +
+          presetValueDocPath(location, field) + ".",
+      });
+      return;
+    }
+    const preset = (presetSnap.data() || {}) as Record<string, unknown>;
+    const presetType = String(preset.Type || "").trim().toLowerCase();
+    const presetWhere = String(preset.Where || "").trim().toLowerCase();
+    if (presetType !== "e-mail" || presetWhere !== "bulk_e-mails") {
+      res.status(400).json({error: "That pre-set is not a bulk e-mail."});
+      return;
+    }
+    const htmlTemplate = presetHtmlFromField(
+      preset[FIRESTORE_TBS_PRESET_VALUE_FIELD],
+    );
+    const topic = presetTopicFromData(preset);
+    if (!String(htmlTemplate).trim()) {
+      res.status(500).json({
+        error: "Bulk e-mail template is empty in " +
+          presetValueDocPath(location, field) + ".",
+      });
+      return;
+    }
+    if (!topic.trim()) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, field) + ".",
+      });
+      return;
+    }
+
+    const itemRef = db
+      .collection("tbs")
+      .doc(kind === "guest" ? "Guests" : "Speakers")
+      .collection(id)
+      .doc("item");
+    const personSnap = await itemRef.get();
+    if (!personSnap.exists) {
+      res.status(404).json({error: "Contact not found."});
+      return;
+    }
+    const person = (personSnap.data() || {}) as Record<string, unknown>;
+    const email = kind === "guest" ?
+      pickGuestEmail(person) :
+      pickSpeakerEmail(person);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({error: "Contact has no valid email."});
+      return;
+    }
+
+    const firstName = kind === "guest" ?
+      String(
+        person.Name || person.name ||
+        person["First name"] || person.firstName || "",
+      ).trim() :
+      pickSpeakerFirstName(person);
+    const lastName = kind === "guest" ?
+      String(
+        person["Last name"] || person.lastName || person.LastName || "",
+      ).trim() :
+      pickSpeakerLastName(person);
+    const fullName = `${firstName} ${lastName}`.trim();
+    const tokens = {
+      event: eventLabel,
+      eventDates: eventDatesAfterCommaForCurrentEvent(settingsData, eventLabel),
+      firstName,
+      lastName,
+      name: fullName || firstName || lastName,
+      invoiceUrl: kind === "guest" ?
+        String(
+          person["Stripe Invoice Url"] || person.stripeInvoiceUrl || "",
+        ).trim() :
+        "",
+      invoiceNumber: kind === "guest" ?
+        String(person["Stripe Invoice Number"] || "").trim() :
+        "",
+    };
+    const subject = emailSubjectFromTopic(topic, tokens);
+    if (!subject) {
+      res.status(500).json({error: "E-mail topic is empty."});
+      return;
+    }
+    const html = fillObservedEmailTokens(htmlTemplate, tokens);
+    const accessToken = await refreshGmailSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    logger.info("sendBulkEmailHttp ok", {
+      field,
+      kind,
+      id,
+      to: email,
+      from: fromAddress,
+      location,
+    });
+    res.status(200).json({ok: true, to: email, subject});
+  } catch (err) {
+    logger.error("sendBulkEmailHttp failed", {field, kind, id, err});
+    res.status(500).json({
+      error: err instanceof Error ? err.message : "Failed to send bulk e-mail.",
+    });
+  }
+});
