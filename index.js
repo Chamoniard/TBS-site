@@ -1,4 +1,4 @@
-/** Index standby line: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Stand by` (edited in backend Pre-sets → Home). */
+/** Index standby line: Firestore `tbs/Pre-sets/Zermatt/Zermatt/Stand by/Stand by` field `Value` (edited in backend Pre-sets → Home). */
 const firebaseConfig = {
     apiKey: 'AIzaSyANhRZZnQ9tXH-DmO8QQT-H-64LOaa0oAU',
     authDomain: 'tbs-app-e2062.firebaseapp.com',
@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 const FIRESTORE_TBS_SETTINGS_STANDBY_FIELD = 'Standby';
 const FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD = 'Stand by';
+const FIRESTORE_TBS_PRESET_VALUE_FIELD = 'Value';
 const TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY = 'tbsBackend:texteditor:home:standby';
 const INDEX_STANDBY_MODE_LS_KEY = 'tbs:index:standby';
 const INDEX_STANDBY_DEFAULT = 'Stand by...';
@@ -21,6 +22,11 @@ const INDEX_STANDBY_MODE_CACHE_TTL_MS = 5 * 60 * 1000;
 
 function tbsPresetsZermattDocRef(db) {
     return db.collection('tbs').doc('Pre-sets').collection('Zermatt').doc('Zermatt');
+}
+
+function tbsPresetValueDocRef(db, fieldName) {
+    const field = String(fieldName || '').trim();
+    return tbsPresetsZermattDocRef(db).collection(field).doc(field);
 }
 
 function withFirestoreTimeout(promise, label, timeoutMs) {
@@ -126,11 +132,11 @@ async function loadIndexStandbyFromFirestore() {
     try {
         const db = firebase.firestore();
         const snap = await withFirestoreTimeout(
-            tbsPresetsZermattDocRef(db).get(),
-            'Firestore tbs/Pre-sets/Zermatt/Zermatt (index standby)'
+            tbsPresetValueDocRef(db, FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD).get(),
+            'Firestore tbs/Pre-sets/Zermatt/Zermatt/Stand by/Stand by Value'
         );
         const data = snap.exists ? snap.data() || {} : {};
-        const raw = data[FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD];
+        const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
         const html = raw != null ? String(raw) : '';
         if (String(html).trim() !== '') {
             try {

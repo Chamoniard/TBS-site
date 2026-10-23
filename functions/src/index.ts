@@ -290,26 +290,69 @@ function eventDatesAfterCommaForCurrentEvent(
   return chosen.slice(comma + 1).trim();
 }
 
+const FIRESTORE_TBS_PRESET_VALUE_FIELD = "Value";
+
 /**
- * Site pre-set copy used by email templates.
+ * Location pre-set parent: `tbs/Pre-sets/{location}/{location}`.
  * @param {Firestore} db Firestore instance.
- * @return {DocumentReference} Zermatt pre-set document.
+ * @param {string} location Location id.
+ * @return {DocumentReference} Location pre-set document.
  */
-function tbsPresetsZermattDocRef(db: Firestore) {
-  return db.collection("tbs").doc("Pre-sets")
-    .collection("Zermatt").doc("Zermatt");
+function tbsPresetsLocationDocRef(
+  db: Firestore,
+  location: string,
+): DocumentReference {
+  const loc = String(location || "").trim();
+  return db.collection("tbs").doc("Pre-sets").collection(loc).doc(loc);
 }
 
 /**
- * Load guest invitation HTML from tbs/Pre-sets/Zermatt/Zermatt.
+ * One pre-set string:
+ * `tbs/Pre-sets/{location}/{location}/{field}/{field}` field `Value`.
  * @param {Firestore} db Firestore instance.
+ * @param {string} fieldName Subcollection and document id.
+ * @param {string=} location Location id. Defaults to Zermatt.
+ * @return {DocumentReference} Value document.
+ */
+function tbsPresetValueDocRef(
+  db: Firestore,
+  fieldName: string,
+  location?: string,
+): DocumentReference {
+  const field = String(fieldName || "").trim();
+  const loc = String(location || "Zermatt").trim() || "Zermatt";
+  return tbsPresetsLocationDocRef(db, loc).collection(field).doc(field);
+}
+
+/**
+ * `tbs/Pre-sets/{location}/{location}/{field}/{field}`.
+ * @param {string} location Event location id.
+ * @param {string} fieldName Pre-set field name.
+ * @return {string} Document path for error text.
+ */
+function presetValueDocPath(location: string, fieldName: string): string {
+  const loc = String(location || "").trim();
+  const field = String(fieldName || "").trim();
+  return "tbs/Pre-sets/" + loc + "/" + loc + "/" + field + "/" + field;
+}
+
+/**
+ * Load guest invitation HTML from
+ * tbs/Pre-sets/{event_location}/{event_location}/Guest invitation/
+ * Guest invitation `Value`.
+ * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
  * @return {Promise<string>} HTML template string.
  */
-async function loadGuestInvitationHtml(db: Firestore): Promise<string> {
-  const snap = await tbsPresetsZermattDocRef(db).get();
+async function loadGuestInvitationHtml(
+  db: Firestore,
+  location: string,
+): Promise<string> {
+  const loc = String(location || "").trim();
+  if (!loc) return "";
+  const snap = await tbsPresetValueDocRef(db, "Guest invitation", loc).get();
   const data = (snap.exists ? snap.data() : null) || {};
-  const raw = data["Guest invitation"];
-  return raw != null ? String(raw) : "";
+  return presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]);
 }
 
 /**
@@ -366,7 +409,8 @@ async function loadEventLocationForEvent(
 
 /**
  * Guest waiting-list HTML from
- * tbs/Pre-sets/{event_location}/{event_location}.
+ * tbs/Pre-sets/{event_location}/{event_location}/Guest sent to reserves/
+ * Guest sent to reserves `Value`.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
  * @return {Promise<string>} HTML template string.
@@ -377,19 +421,19 @@ async function loadGuestSentToReservesHtml(
 ): Promise<string> {
   const loc = String(location || "").trim();
   if (!loc) return "";
-  const snap = await db
-    .collection("tbs")
-    .doc("Pre-sets")
-    .collection(loc)
-    .doc(loc)
-    .get();
+  const snap = await tbsPresetValueDocRef(
+    db,
+    "Guest sent to reserves",
+    loc,
+  ).get();
   const data = (snap.exists ? snap.data() : null) || {};
-  return presetHtmlFromField(data["Guest sent to reserves"]);
+  return presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]);
 }
 
 /**
  * Gentle payment reminder HTML + optional subject from
- * tbs/Pre-sets/{event_location}/{event_location}.guests_gentle_reminder.
+ * tbs/Pre-sets/{event_location}/{event_location}/guests_gentle_reminder/
+ * guests_gentle_reminder `Value`.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
  * @return {Promise<{html: string, subject: string}>} Template fields.
@@ -400,14 +444,13 @@ async function loadGuestGentleReminderTemplate(
 ): Promise<{html: string; subject: string}> {
   const loc = String(location || "").trim();
   if (!loc) return {html: "", subject: ""};
-  const snap = await db
-    .collection("tbs")
-    .doc("Pre-sets")
-    .collection(loc)
-    .doc(loc)
-    .get();
+  const snap = await tbsPresetValueDocRef(
+    db,
+    "guests_gentle_reminder",
+    loc,
+  ).get();
   const data = (snap.exists ? snap.data() : null) || {};
-  const raw = data.guests_gentle_reminder;
+  const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
   if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
     const obj = raw as Record<string, unknown>;
     const subject = obj.subject != null ?
@@ -521,16 +564,25 @@ function guestPaidIsOverdue(data: Record<string, unknown>): boolean {
 
 /**
  * Load speaker invitation HTML + optional subject from
- * tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation.
+ * tbs/Pre-sets/{event_location}/{event_location}/Speakerinvitation/
+ * Speakerinvitation `Value`.
  * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
  * @return {Promise<{html: string, subject: string}>} Template fields.
  */
 async function loadSpeakerInvitationFromSnippets(
   db: Firestore,
+  location: string,
 ): Promise<{html: string; subject: string}> {
-  const snap = await tbsPresetsZermattDocRef(db).get();
+  const loc = String(location || "").trim();
+  if (!loc) return {html: "", subject: ""};
+  const snap = await tbsPresetValueDocRef(
+    db,
+    "Speakerinvitation",
+    loc,
+  ).get();
   const data = (snap.exists ? snap.data() : null) || {};
-  const raw = data.Speakerinvitation;
+  const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
   if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
     const obj = raw as Record<string, unknown>;
     let html = "";
@@ -546,19 +598,22 @@ async function loadSpeakerInvitationFromSnippets(
 }
 
 /**
- * Load request-lodging HTML from tbs/Pre-sets/Zermatt/Zermatt.Requestlodging.
+ * Load request-lodging HTML from
+ * tbs/Pre-sets/{event_location}/{event_location}/Requestlodging/
+ * Requestlodging `Value`.
  * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
  * @return {Promise<string>} HTML template string.
  */
 async function loadRequestLodgingHtmlFromSnippets(
   db: Firestore,
+  location: string,
 ): Promise<string> {
-  const snap = await tbsPresetsZermattDocRef(db).get();
+  const loc = String(location || "").trim();
+  if (!loc) return "";
+  const snap = await tbsPresetValueDocRef(db, "Requestlodging", loc).get();
   const data = (snap.exists ? snap.data() : null) || {};
-  const raw =
-    data.Requestlodging ??
-    data["Request lodging"] ??
-    data.RequestLodging;
+  const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
   if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
     const obj = raw as Record<string, unknown>;
     if (obj.html != null) return String(obj.html);
@@ -2089,7 +2144,9 @@ export const importStripeInvoicesHttp = onRequest({
 
 /**
  * Guest workflow: send invitation HTML from
- * tbs/Pre-sets/Zermatt/Zermatt as Registration@…
+ * tbs/Pre-sets/{event_location}/{event_location}/Guest invitation/
+ * Guest invitation `Value`
+ * as Registration@…
  * using server-side Gmail OAuth (refresh token). Sets Invited=Yes + log line.
  * Expects JSON: { guestId }.
  */
@@ -2162,11 +2219,23 @@ export const sendGuestInviteHttp = onRequest({
       return;
     }
 
-    const htmlTemplate = await loadGuestInvitationHtml(db);
+    const eventLabel = await loadCurrentEventLabel(db);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+    const htmlTemplate = await loadGuestInvitationHtml(db, location);
     if (!String(htmlTemplate).trim()) {
       res.status(500).json({
         error: "Guest invitation template is empty in " +
-          "tbs/Pre-sets/Zermatt/Zermatt.",
+          presetValueDocPath(location, "Guest invitation") + ".",
       });
       return;
     }
@@ -2174,7 +2243,6 @@ export const sendGuestInviteHttp = onRequest({
     const firstName = String(
       data.Name || data.name || data["First name"] || data.firstName || "",
     ).trim();
-    const eventLabel = await loadCurrentEventLabel(db);
     const subject = (eventLabel ? eventLabel + " - Invitation" : "Invitation")
       .replace(/[\r\n]/g, " ");
     const html = String(htmlTemplate)
@@ -2228,8 +2296,8 @@ export const sendGuestInviteHttp = onRequest({
 
 /**
  * Guest workflow: send waiting-list HTML from
- * tbs/Pre-sets/{event_location}/{event_location}
- * field `Guest sent to reserves` as Registration@…
+ * tbs/Pre-sets/{event_location}/{event_location}/Guest sent to reserves/
+ * Guest sent to reserves `Value` as Registration@…
  * using server-side Gmail OAuth (refresh token).
  * Sets Invited=Reserve + log line.
  * Expects JSON: { guestId }.
@@ -2319,7 +2387,8 @@ export const sendGuestToReservesHttp = onRequest({
     if (!String(htmlTemplate).trim()) {
       res.status(500).json({
         error: "Guest sent to reserves template is empty in " +
-          "tbs/Pre-sets/" + location + "/" + location + ".",
+          "tbs/Pre-sets/" + location + "/" + location +
+          "/Guest sent to reserves/Guest sent to reserves.",
       });
       return;
     }
@@ -2376,7 +2445,8 @@ export const sendGuestToReservesHttp = onRequest({
 
 /**
  * Guest workflow: send gentle payment reminder HTML from
- * tbs/Pre-sets/{event_location}/{event_location}.guests_gentle_reminder
+ * tbs/Pre-sets/{event_location}/{event_location}/guests_gentle_reminder/
+ * guests_gentle_reminder `Value`
  * as registration@tbs-zermatt.org.
  * Does not change Paid. Appends a log line.
  * Expects JSON: { guestId }.
@@ -2468,7 +2538,7 @@ export const sendGuestGentleReminderHttp = onRequest({
       res.status(500).json({
         error: "Gentle reminder template is empty in " +
           "tbs/Pre-sets/" + location + "/" + location +
-          ".guests_gentle_reminder.",
+          "/guests_gentle_reminder/guests_gentle_reminder.",
       });
       return;
     }
@@ -2549,7 +2619,9 @@ export const sendGuestGentleReminderHttp = onRequest({
 
 /**
  * Speaker workflow: send formal invitation HTML from
- * tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation as info@…
+ * tbs/Pre-sets/{event_location}/{event_location}/Speakerinvitation/
+ * Speakerinvitation `Value`
+ * as info@…
  * using server-side Gmail OAuth
  * (GMAIL_SPEAKER_SEND_* secrets).
  * Sets Status/inviteStatus to Invited, Bio to Requested,
@@ -2627,19 +2699,30 @@ export const sendSpeakerInviteHttp = onRequest({
       return;
     }
 
-    const template = await loadSpeakerInvitationFromSnippets(db);
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+    const template = await loadSpeakerInvitationFromSnippets(db, location);
     const htmlTemplate = String(template.html || "").trim();
     if (!htmlTemplate) {
       res.status(500).json({
         error: "Speaker invitation template is empty in " +
-          "tbs/Pre-sets/Zermatt/Zermatt.",
+          presetValueDocPath(location, "Speakerinvitation") + ".",
       });
       return;
     }
 
     const firstName = pickSpeakerFirstName(data);
-    const settingsData = await loadTbsSettingsData(db);
-    const eventLabel = currentEventFromSettingsData(settingsData);
     const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
       settingsData,
       eventLabel,
@@ -2704,7 +2787,8 @@ export const sendSpeakerInviteHttp = onRequest({
 
 /**
  * Speaker workflow: send Request lodging HTML from
- * tbs/Pre-sets/Zermatt/Zermatt.Requestlodging as info@…
+ * tbs/Pre-sets/{event_location}/{event_location}/Requestlodging/
+ * Requestlodging `Value` as info@…
  * to hotel AlX with speaker in Cc.
  * Subject: "{Current event} - Lodging request".
  * On success sets Lodging to Requested + Speaker log line.
@@ -2783,21 +2867,32 @@ export const sendSpeakerRequestLodgingHttp = onRequest({
       return;
     }
 
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
     const htmlTemplate = String(
-      await loadRequestLodgingHtmlFromSnippets(db) || "",
+      await loadRequestLodgingHtmlFromSnippets(db, location) || "",
     ).trim();
     if (!htmlTemplate) {
       res.status(500).json({
         error: "Request lodging template is empty in " +
-          "tbs/Pre-sets/Zermatt/Zermatt.",
+          presetValueDocPath(location, "Requestlodging") + ".",
       });
       return;
     }
 
     const firstName = pickSpeakerFirstName(data);
     const lastName = pickSpeakerLastName(data);
-    const settingsData = await loadTbsSettingsData(db);
-    const eventLabel = currentEventFromSettingsData(settingsData);
     const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
       settingsData,
       eventLabel,

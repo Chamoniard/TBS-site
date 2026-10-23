@@ -18,17 +18,17 @@ const firestoreHomeCache = {
     speakersByEventId: new Map(), // eventId -> { value, fetchedAt, promise }
     speakerInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — events/{id} field speakerinfo (first card bio HTML)
     locationInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — events/{id} field locationinfo (home Location band body)
-    eventInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — tbs/Pre-sets/Zermatt/Zermatt field Eventinfo (home .event-contents)
+    eventInfoByEventId: new Map(), // eventId -> { value, fetchedAt, promise } — tbs/Pre-sets/Zermatt/Zermatt/Eventinfo/Eventinfo Value (home .event-contents)
     registrationManifesto: { value: '', fetchedAt: 0, promise: null },
     /** Full `tbs/Settings/{event-location}/{event-location}` document (all fields). */
     siteSettingsFields: { value: {}, location: '', fetchedAt: 0, promise: null },
     /** `tbs/Settings/{event-location}/{event-location}` field `Waiting_list`. */
     siteSettingsWaitingList: { value: false, location: '', fetchedAt: 0, promise: null },
-    /** `tbs/Pre-sets/{event-location}/{event-location}` field `Sendtoreserves`. */
+    /** `tbs/Pre-sets/{event-location}/{event-location}/Sendtoreserves/Sendtoreserves` field `Value`. */
     sendToReserves: { value: '', location: '', fetchedAt: 0, promise: null },
-    /** First programme-band card: `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
+    /** First programme-band card: `tbs/Pre-sets/Zermatt/Zermatt/Programmeinfo/Programmeinfo` field `Value`. */
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
-    /** `tbs/Pre-sets/{event-location}/{event-location}` field `CME-text`. */
+    /** `tbs/Pre-sets/{event-location}/{event-location}/CME-text/CME-text` field `Value`. */
     onDemandCmeText: { value: '', location: '', fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
@@ -60,9 +60,20 @@ function getFirestore() {
     return firestoreDb;
 }
 
-/** Site pre-set copy: `tbs/Pre-sets/Zermatt/Zermatt`. */
+/** Site pre-set copy: `tbs/Pre-sets/Zermatt/Zermatt`. Each string is `Value` on `{field}/{field}`. */
 function tbsPresetsZermattDocRef(db) {
     return db.collection('tbs').doc('Pre-sets').collection('Zermatt').doc('Zermatt');
+}
+
+const FIRESTORE_TBS_PRESET_VALUE_FIELD = 'Value';
+
+/** `tbs/Pre-sets/{location}/{location}/{field}/{field}` field `Value`. */
+function tbsPresetValueDocRef(db, fieldName, location) {
+    const field = String(fieldName || '').trim();
+    const parent = location != null && String(location).trim() !== ''
+        ? tbsPresetsLocationDocRef(db, location)
+        : tbsPresetsZermattDocRef(db);
+    return parent.collection(field).doc(field);
 }
 
 /** Reject if a Promise does not settle in time (Firestore and fetch can hang without a deadline). */
@@ -2743,7 +2754,7 @@ async function syncHomeOnDemandSectionVisibility(homeSection) {
     return show;
 }
 
-/** HTML for `.on-demand-left` from `tbs/Pre-sets/{event_location}/{event_location}` field `CME-text`. */
+/** HTML for `.on-demand-left` from `tbs/Pre-sets/{event_location}/{event_location}/CME-text/CME-text` field `Value`. */
 async function fetchHomeOnDemandCmeTextFromFirebase() {
     if (typeof firebase === 'undefined') return '';
     const location = currentHomeEventLocation();
@@ -2760,12 +2771,12 @@ async function fetchHomeOnDemandCmeTextFromFirebase() {
         try {
             const db = getFirestore();
             const snap = await withTimeout(
-                tbsPresetsLocationDocRef(db, location).get(),
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_CME_TEXT_FIELD, location).get(),
                 10000,
-                'Firestore tbs/Pre-sets/' + location + '/' + location + ' CME-text'
+                'Firestore tbs/Pre-sets/' + location + '/' + location + '/CME-text/CME-text Value'
             );
             const data = snap.exists ? snap.data() || {} : {};
-            const raw = data[HOME_SNIPPETS_CME_TEXT_FIELD] != null ? data[HOME_SNIPPETS_CME_TEXT_FIELD] : '';
+            const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null ? data[FIRESTORE_TBS_PRESET_VALUE_FIELD] : '';
             return raw != null ? String(raw) : '';
         } catch (e) {
             console.warn('[home snippets CME-text]', e);
@@ -4509,7 +4520,7 @@ const PROGRAMME_INDEX_DAY_ORDER = ['tuesday', 'wednesday', 'thursday', 'friday']
 /** Same prefix as backend.html text editor (localStorage per programme day). */
 const TBS_TEXTEDITOR_PROGRAMME_LS_PREFIX = 'tbsBackend:texteditor:programme:';
 
-/** Home Location band: localStorage key (backend editor / cross-tab); Firestore `tbs/Pre-sets/Zermatt/Zermatt.Locationinfo` is preferred on load. */
+/** Home Location band: localStorage key (backend editor / cross-tab); Firestore `tbs/Pre-sets/Zermatt/Zermatt/Locationinfo/Locationinfo.Value` is preferred on load. */
 const TBS_TEXTEDITOR_HOME_LOCATION_LS_KEY = 'tbsBackend:texteditor:home:locationinfo';
 
 /** Default copy for the home Location band (left column) when Firestore and localStorage are empty. */
@@ -4916,17 +4927,17 @@ async function fetchHomeRegistrationOpenFromFirestore() {
     const settings = await fetchHomeSiteSettingsFromFirestore();
     return settings.registrationOpen;
 }
-/** Home registration manifesto HTML: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Registration`. */
+/** Home registration manifesto HTML: Firestore `tbs/Pre-sets/Zermatt/Zermatt/Registration/Registration` field `Value`. */
 const HOME_SNIPPETS_TEGISTRATION_FIELD = 'Registration';
-/** Home waiting-list copy: Firestore `tbs/Pre-sets/{event-location}/{event-location}` field `Sendtoreserves`. */
+/** Home waiting-list copy: Firestore `tbs/Pre-sets/{event-location}/{event-location}/Sendtoreserves/Sendtoreserves` field `Value`. */
 const HOME_SNIPPETS_SEND_TO_RESERVES_FIELD = 'Sendtoreserves';
-/** Home Location body HTML: Firestore `events/{eventId}` field `locationinfo` (legacy; backend Pre-sets Location save is `tbs/Pre-sets/Zermatt/Zermatt.Locationinfo`). */
+/** Home Location body HTML: Firestore `events/{eventId}` field `locationinfo` (legacy; backend Pre-sets Location save is `tbs/Pre-sets/Zermatt/Zermatt/Locationinfo/Locationinfo.Value`). */
 const HOME_EVENT_LOCATIONINFO_FIELD = 'locationinfo';
-/** Home `.event-contents` HTML: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Eventinfo`. */
+/** Home `.event-contents` HTML: Firestore `tbs/Pre-sets/Zermatt/Zermatt/Eventinfo/Eventinfo` field `Value`. */
 const HOME_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
-/** First programme slider card body: Firestore `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo` (backend Pre-sets → Programme intro). */
+/** First programme slider card body: Firestore `tbs/Pre-sets/Zermatt/Zermatt/Programmeinfo/Programmeinfo` field `Value` (backend Pre-sets → Programme intro). */
 const HOME_SNIPPETS_PROGRAMMEINFO_FIELD = 'Programmeinfo';
-/** On-demand left column: Firestore `tbs/Pre-sets/{event_location}/{event_location}` field `CME-text`. */
+/** On-demand left column: Firestore `tbs/Pre-sets/{event_location}/{event_location}/CME-text/CME-text` field `Value`. */
 const HOME_SNIPPETS_CME_TEXT_FIELD = 'CME-text';
 /** localStorage key for Programme intro snippet (must match backend `data-snippet-key`). */
 const TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = 'tbsBackend:texteditor:home:programmeinfo';
@@ -5735,14 +5746,14 @@ async function fetchHomeEventSpeakerInfoFromFirebase(eventId) {
         try {
             const db = getFirestore();
             const snap = await withTimeout(
-                tbsPresetsZermattDocRef(db).get(),
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_SPEAKERS_FIELD).get(),
                 10000,
-                'Firestore tbs/Pre-sets/Zermatt/Zermatt Speakers'
+                'Firestore tbs/Pre-sets/Zermatt/Zermatt/Speakers/Speakers Value'
             );
             const data = snap.exists ? snap.data() || {} : {};
-            const raw = data[HOME_SNIPPETS_SPEAKERS_FIELD] != null
-                ? data[HOME_SNIPPETS_SPEAKERS_FIELD]
-                : (data.speakers != null ? data.speakers : data.speakerinfo);
+            const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null
+                ? data[FIRESTORE_TBS_PRESET_VALUE_FIELD]
+                : '';
             const fromSnippets = raw != null ? String(raw) : '';
             if (String(fromSnippets).trim() !== '') return fromSnippets;
             const eventSnap = await withTimeout(
@@ -5772,7 +5783,7 @@ async function fetchHomeEventSpeakerInfoFromFirebase(eventId) {
     return typeof value === 'string' ? value : '';
 }
 
-/** HTML for `.registration-manifesto` from `tbs/Pre-sets/Zermatt/Zermatt` field `Registration`. */
+/** HTML for `.registration-manifesto` from `tbs/Pre-sets/Zermatt/Zermatt/Registration/Registration` field `Value`. */
 async function fetchHomeRegistrationManifestoFromFirebase() {
     if (typeof firebase === 'undefined') return '';
     const cached = firestoreHomeCache.registrationManifesto;
@@ -5785,12 +5796,12 @@ async function fetchHomeRegistrationManifestoFromFirebase() {
         try {
             const db = getFirestore();
             const snap = await withTimeout(
-                tbsPresetsZermattDocRef(db).get(),
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_TEGISTRATION_FIELD).get(),
                 10000,
-                'Firestore tbs/Pre-sets/Zermatt/Zermatt Registration'
+                'Firestore tbs/Pre-sets/Zermatt/Zermatt/Registration/Registration Value'
             );
             const data = snap.exists ? snap.data() || {} : {};
-            const raw = data[HOME_SNIPPETS_TEGISTRATION_FIELD] != null ? data[HOME_SNIPPETS_TEGISTRATION_FIELD] : '';
+            const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null ? data[FIRESTORE_TBS_PRESET_VALUE_FIELD] : '';
             return raw != null ? String(raw) : '';
         } catch (e) {
             console.warn('[home snippets Registration]', e);
@@ -5828,7 +5839,7 @@ function applyHomeRegistrationToReserves(regWrap, state) {
     el.hidden = false;
 }
 
-/** Waiting-list banner: `Waiting_list` from in-memory Settings, copy from Pre-sets `Sendtoreserves`. */
+/** Waiting-list banner: `Waiting_list` from in-memory Settings, copy from Pre-sets `Sendtoreserves` `Value`. */
 async function fetchHomeRegistrationToReservesFromFirebase() {
     if (typeof firebase === 'undefined') return { show: false, html: '' };
     const location = currentHomeEventLocation();
@@ -5852,14 +5863,14 @@ async function fetchHomeRegistrationToReservesFromFirebase() {
         try {
             const db = getFirestore();
             const presetsSnap = await withTimeout(
-                tbsPresetsLocationDocRef(db, location).get(),
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_SEND_TO_RESERVES_FIELD, location).get(),
                 10000,
-                'Firestore tbs/Pre-sets/' + location + '/' + location + ' Sendtoreserves'
+                'Firestore tbs/Pre-sets/' + location + '/' + location + '/Sendtoreserves/Sendtoreserves Value'
             );
             const presetsData = presetsSnap.exists ? presetsSnap.data() || {} : {};
             const raw =
-                presetsData[HOME_SNIPPETS_SEND_TO_RESERVES_FIELD] != null
-                    ? presetsData[HOME_SNIPPETS_SEND_TO_RESERVES_FIELD]
+                presetsData[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null
+                    ? presetsData[FIRESTORE_TBS_PRESET_VALUE_FIELD]
                     : '';
             return raw != null ? String(raw) : '';
         } catch (e) {
@@ -5885,7 +5896,7 @@ async function fetchHomeRegistrationToReservesFromFirebase() {
     return { show: true, html: typeof html === 'string' ? html : '' };
 }
 
-/** HTML for the first programme-band slider card from `tbs/Pre-sets/Zermatt/Zermatt` field `Programmeinfo`. */
+/** HTML for the first programme-band slider card from `tbs/Pre-sets/Zermatt/Zermatt/Programmeinfo/Programmeinfo` field `Value`. */
 async function fetchHomeProgrammeBandIntroFromSnippets() {
     if (typeof firebase === 'undefined') return '';
     const cached = firestoreHomeCache.programmeBandIntroSnippets;
@@ -5898,12 +5909,12 @@ async function fetchHomeProgrammeBandIntroFromSnippets() {
         try {
             const db = getFirestore();
             const snap = await withTimeout(
-                tbsPresetsZermattDocRef(db).get(),
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_PROGRAMMEINFO_FIELD).get(),
                 10000,
-                'Firestore tbs/Pre-sets/Zermatt/Zermatt Programmeinfo'
+                'Firestore tbs/Pre-sets/Zermatt/Zermatt/Programmeinfo/Programmeinfo Value'
             );
             const data = snap.exists ? snap.data() || {} : {};
-            const raw = data[HOME_SNIPPETS_PROGRAMMEINFO_FIELD] != null ? data[HOME_SNIPPETS_PROGRAMMEINFO_FIELD] : '';
+            const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null ? data[FIRESTORE_TBS_PRESET_VALUE_FIELD] : '';
             return raw != null ? String(raw) : '';
         } catch (e) {
             console.warn('[home snippets Programmeinfo]', e);
@@ -5962,7 +5973,7 @@ async function fetchHomeEventLocationInfoFromFirebase(eventId) {
     return typeof value === 'string' ? value : '';
 }
 
-/** HTML for home `.event-contents` from `tbs/Pre-sets/Zermatt/Zermatt` field `Eventinfo` (legacy: same-doc `eventinfo`, then `events/{eventId}.eventinfo`). */
+/** HTML for home `.event-contents` from `tbs/Pre-sets/Zermatt/Zermatt/Eventinfo/Eventinfo` field `Value` (legacy: `events/{eventId}.eventinfo`). */
 async function fetchHomeEventEventInfoFromFirebase(eventId) {
     if (!eventId || typeof firebase === 'undefined') return '';
     const cached = firestoreHomeCache.eventInfoByEventId.get(eventId);
@@ -5972,15 +5983,12 @@ async function fetchHomeEventEventInfoFromFirebase(eventId) {
         try {
             const db = getFirestore();
             const snap = await withTimeout(
-                tbsPresetsZermattDocRef(db).get(),
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_EVENTINFO_FIELD).get(),
                 10000,
-                'Firestore tbs/Pre-sets/Zermatt/Zermatt Eventinfo'
+                'Firestore tbs/Pre-sets/Zermatt/Zermatt/Eventinfo/Eventinfo Value'
             );
             const data = snap.exists ? snap.data() || {} : {};
-            let raw = data[HOME_SNIPPETS_EVENTINFO_FIELD];
-            if (raw == null || String(raw).trim() === '') {
-                raw = data.eventinfo != null ? data.eventinfo : '';
-            }
+            let raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
             if (raw != null && String(raw).trim() !== '') {
                 return String(raw);
             }
@@ -6396,7 +6404,7 @@ function wireHomeSpeakerCardBioExpandOnce() {
 }
 
 /**
- * Fills `.speakerslider-track`: optional intro card from `tbs/Pre-sets/Zermatt/Zermatt.Speakers`, then `tbs/Speakers/{id}/item`
+ * Fills `.speakerslider-track`: optional intro card from `tbs/Pre-sets/Zermatt/Zermatt/Speakers/Speakers.Value`, then `tbs/Speakers/{id}/item`
  * rows (fallback: `events/{id}/speakers`). Speakers are shown only when `event` is identical to history `site-event`.
  */
 async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
