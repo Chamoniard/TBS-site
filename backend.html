@@ -141,8 +141,9 @@
 
         body.backend-page #texteditor .texteditor-preset-table button.texteditor-day-btn,
         body.backend-page #texteditor .texteditor-preset-table button.texteditor-snippet-btn {
-            width: 100%;
-            max-width: 100%;
+            width: max-content;
+            max-width: none;
+            white-space: nowrap;
             text-align: left;
             box-sizing: border-box;
             background: transparent !important;
@@ -1704,7 +1705,8 @@
             display: inline-block;
             margin: 0;
             width: auto;
-            min-width: 0;
+            min-width: max-content;
+            white-space: nowrap;
             padding: 0.25rem 0.625rem;
             border: none;
             border-radius: 0;
@@ -2111,17 +2113,29 @@
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #speaker-editor .speakers-bottom-row::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         #speaker-editor .speakers-bottom-track {
+            --speaker-list-min: 0px;
+            --speaker-viewer-min: 0px;
             display: flex;
             flex-direction: row;
             align-items: stretch;
             gap: 16px;
-            flex: 1 1 auto;
+            flex: none;
+            width: max(100%, calc(var(--speaker-list-min) + var(--speaker-viewer-min) + 16px));
+            min-width: max(100%, calc(var(--speaker-list-min) + var(--speaker-viewer-min) + 16px));
             min-height: 0;
-            min-width: 0;
+            height: 100%;
             box-sizing: border-box;
         }
 
@@ -2285,11 +2299,74 @@
             flex-direction: column;
             flex: 1 1 0;
             min-height: 0;
-            min-width: 0;
+            min-width: var(--speaker-viewer-min, 0px);
             overflow: hidden;
             padding: 0;
             align-self: stretch;
             background: transparent;
+        }
+
+        #speaker-editor .speakers-list {
+            min-width: var(--speaker-list-min, 0px);
+        }
+
+        #speaker-editor #speakers-list-heading {
+            flex-wrap: nowrap;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        #speaker-editor #speakers-list-heading .selected-guestname-wrap,
+        #speaker-editor #speakers-list-heading .selected-guestname,
+        #speaker-editor #speakers-list-heading .edit-guest-name-first,
+        #speaker-editor #speakers-list-heading .edit-guest-name-last,
+        #speaker-editor #speakers-list-heading .speakers-roster-view-link {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            align-items: center;
+            min-width: max-content;
+            width: auto;
+            max-width: none;
+            white-space: nowrap;
+            word-break: normal;
+        }
+
+        #speaker-editor #speakers-list-heading .selected-guestname {
+            gap: 0.35rem;
+        }
+
+        #speaker-editor #speakers-list-heading .edit-guest-top-trailing,
+        #speaker-editor #speakers-list-heading .speakers-actions {
+            flex-wrap: nowrap;
+            max-width: none;
+            min-width: max-content;
+        }
+
+        #speaker-editor .edit-speaker-top {
+            flex-wrap: nowrap;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        #speaker-editor .edit-speaker-top .edit-speaker-name-heading,
+        #speaker-editor .edit-speaker-top .edit-speaker-name-first,
+        #speaker-editor .edit-speaker-top .edit-speaker-name-last {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            min-width: max-content;
+            width: auto;
+            white-space: nowrap;
+            word-break: normal;
+        }
+
+        #speaker-editor .edit-speaker-top .edit-speaker-top-trailing,
+        #speaker-editor .edit-speaker-top .speaker-editor-toolbar,
+        #speaker-editor .edit-speaker-top .speaker-editor-toolbar-trailing {
+            flex-wrap: nowrap;
+            max-width: none;
         }
 
         /* Guests: viewer is editor only. */
@@ -3402,7 +3479,9 @@
         /* Thin horizontal scrollbar sits in the existing top padding, so the
            gap under the event strip does not change when the panes overflow. */
         #emailer-editor .emailer-pane-scrollbar,
-        #guest-editor .guest-pane-scrollbar {
+        #guest-editor .guest-pane-scrollbar,
+        #speaker-editor .speaker-pane-scrollbar,
+        #texteditor .texteditor-pane-scrollbar {
             position: absolute;
             top: 5px;
             left: 16px;
@@ -3419,12 +3498,16 @@
         }
 
         #emailer-editor .emailer-pane-scrollbar[hidden],
-        #guest-editor .guest-pane-scrollbar[hidden] {
+        #guest-editor .guest-pane-scrollbar[hidden],
+        #speaker-editor .speaker-pane-scrollbar[hidden],
+        #texteditor .texteditor-pane-scrollbar[hidden] {
             display: none !important;
         }
 
         #emailer-editor .emailer-pane-scrollbar-thumb,
-        #guest-editor .guest-pane-scrollbar-thumb {
+        #guest-editor .guest-pane-scrollbar-thumb,
+        #speaker-editor .speaker-pane-scrollbar-thumb,
+        #texteditor .texteditor-pane-scrollbar-thumb {
             position: absolute;
             top: 0;
             left: 0;
@@ -3437,12 +3520,16 @@
         }
 
         #emailer-editor .emailer-pane-scrollbar-thumb:hover,
-        #guest-editor .guest-pane-scrollbar-thumb:hover {
+        #guest-editor .guest-pane-scrollbar-thumb:hover,
+        #speaker-editor .speaker-pane-scrollbar-thumb:hover,
+        #texteditor .texteditor-pane-scrollbar-thumb:hover {
             background: var(--tbs-pink-soft);
         }
 
         #emailer-editor .emailer-pane-scrollbar-thumb:active,
-        #guest-editor .guest-pane-scrollbar-thumb:active {
+        #guest-editor .guest-pane-scrollbar-thumb:active,
+        #speaker-editor .speaker-pane-scrollbar-thumb:active,
+        #texteditor .texteditor-pane-scrollbar-thumb:active {
             cursor: grabbing;
         }
 
@@ -4963,6 +5050,7 @@
             background: #e2e8f0;
             border: none;
             padding: 16px;
+            position: relative;
         }
 
         #settings-editor,
@@ -7392,8 +7480,8 @@
         }
 
         #speaker-editor .edit-speaker-top .edit-speaker-name-heading {
-            flex: 1 1 auto;
-            min-width: 0;
+            flex: 0 0 auto;
+            min-width: max-content;
         }
 
         #guest-editor .edit-guest-top,
@@ -7724,7 +7812,7 @@
 
         #speaker-editor .edit-speaker-name-heading {
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
             gap: 0.5rem;
@@ -7734,6 +7822,34 @@
 
         #speaker-editor .edit-speaker-top .edit-speaker-name-heading {
             padding: 0;
+        }
+
+        /* Class selectors, not the heading id: the width measurement clones the bar and strips ids. */
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top {
+            flex-wrap: nowrap;
+        }
+
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .selected-guestname-wrap,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .selected-guestname,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .edit-guest-name-first,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .edit-guest-name-last,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .speakers-roster-view-link {
+            flex: 0 0 auto;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            min-width: max-content;
+            width: auto;
+            max-width: none;
+            white-space: nowrap;
+            word-break: normal;
+        }
+
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .edit-guest-top-trailing,
+        #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading.speakers-list-top .speakers-actions {
+            flex-wrap: nowrap;
+            max-width: none;
+            min-width: max-content;
         }
 
 
@@ -10614,6 +10730,7 @@
             display: none;
             margin-bottom: 0;
             padding: 16px;
+            position: relative;
             background: #e2e8f0;
             border: none;
             outline: none;
@@ -10821,22 +10938,45 @@
             display: flex;
             flex-direction: row;
             align-items: stretch;
-            gap: 1rem;
+            gap: 0;
             flex: 1 1 0;
             min-width: 0;
             min-height: 0;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
         }
 
-        /* Pre-sets column (left rail): same shell as guests roster list. */
+        #texteditor .texteditor-main::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        #texteditor .texteditor-panes {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 1rem;
+            flex: none;
+            width: max(100%, calc(1500px - 32px));
+            min-width: max(100%, calc(1500px - 32px));
+            height: 100%;
+            min-height: 0;
+            box-sizing: border-box;
+        }
+
+        /* Pre-sets column (left rail): fixed to its longest unwrapped row. */
         .select-pre-set {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             justify-content: flex-start;
             gap: 0;
-            flex: 1.2 1.2 0;
-            min-width: 0;
+            flex: 0 0 auto;
+            width: max-content;
+            min-width: max-content;
+            max-width: max-content;
             min-height: 0;
             align-self: stretch;
             overflow: hidden;
@@ -10896,8 +11036,9 @@
             text-transform: uppercase;
             font-size: 1.2rem;
             display: inline;
-            min-width: 0;
-            word-break: break-word;
+            min-width: max-content;
+            white-space: nowrap;
+            word-break: normal;
         }
 
         /* Match `#guest-editor .guests-roster-list` + scroll region. */
@@ -10914,7 +11055,9 @@
             gap: 0;
             background: #ffffff;
             border-radius: 0 0 5px 5px;
-            overflow-x: auto;
+            width: max-content;
+            min-width: 100%;
+            overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: auto;
             overscroll-behavior: contain;
@@ -10928,8 +11071,8 @@
             flex-wrap: nowrap;
             align-items: stretch;
             gap: 0;
-            min-width: 0;
-            width: 100%;
+            min-width: max-content;
+            width: max-content;
             flex: 0 0 auto;
             margin: 0;
             padding: 0;
@@ -10953,7 +11096,9 @@
             letter-spacing: normal;
             border-bottom: none;
             box-sizing: border-box;
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
+            white-space: nowrap;
         }
 
         #texteditor .select-pre-set-body .texteditor-selectors {
@@ -11008,8 +11153,8 @@
             align-self: stretch;
         }
 
-        #texteditor .texteditor-main > .html-editor,
-        #texteditor .texteditor-main > .renderbox {
+        #texteditor .texteditor-panes > .html-editor,
+        #texteditor .texteditor-panes > .renderbox {
             flex: 3 3 0;
             background-color: #71C7FE;
             border: 1px solid #e2e8f0;
@@ -11019,16 +11164,6 @@
         }
 
         @media (max-width: 720px) {
-            .texteditor-main {
-                flex-direction: column;
-            }
-
-            .select-pre-set {
-                flex: 0 0 auto;
-                max-width: none;
-                min-width: 0;
-            }
-
             .html-editor {
                 min-height: 0;
             }
@@ -11280,7 +11415,7 @@
         }
 
         #texteditor .texteditor-preset-table {
-            width: 100%;
+            width: max-content;
             min-width: 100%;
             border-collapse: separate;
             border-spacing: 0;
@@ -11330,6 +11465,7 @@
             justify-content: flex-start !important;
             text-transform: none;
             cursor: pointer;
+            white-space: nowrap;
             word-break: normal;
             overflow-wrap: normal;
         }
@@ -12283,7 +12419,11 @@
             </div>
 
             <section class="texteditor" id="texteditor" aria-hidden="true" data-name="texteditor">
-                <div class="texteditor-main">
+                <div class="texteditor-pane-scrollbar" id="texteditor-pane-scrollbar" hidden>
+                    <div class="texteditor-pane-scrollbar-thumb" id="texteditor-pane-scrollbar-thumb"></div>
+                </div>
+                <div class="texteditor-main" id="texteditor-main">
+                <div class="texteditor-panes" id="texteditor-panes">
                 <div class="select-pre-set">
                     <div class="edit-preset-top presets-list-heading texteditor-pane-heading" id="texteditor-presets-heading">
                         <div class="edit-guest-top-spacer" aria-hidden="true"></div>
@@ -12310,12 +12450,12 @@
                     </div>
                     <div class="texteditor-programme-toolbar">
                         <br>
-                        <p class="texteditor-programme-heading">Guest email templates</p>
+                        <p class="texteditor-programme-heading">Guest workflow e-mails</p>
                         <div
                             class="texteditor-selectors"
                             id="texteditor-guest-email-templates-selectors"
                             role="group"
-                            aria-label="Guest email templates"
+                            aria-label="Guest workflow e-mails"
                         >
                             <button
                                 type="button"
@@ -12342,12 +12482,12 @@
                     </div>
                     <div class="texteditor-programme-toolbar">
                         <br>
-                        <p class="texteditor-programme-heading">Speaker email templates</p>
+                        <p class="texteditor-programme-heading">Speaker workflow e-mails</p>
                         <div
                             class="texteditor-selectors"
                             id="texteditor-speaker-email-templates-selectors"
                             role="group"
-                            aria-label="Speaker email templates"
+                            aria-label="Speaker workflow e-mails"
                         >
                             <button
                                 type="button"
@@ -12372,6 +12512,24 @@
                                 aria-pressed="false"
                                 title="Coming soon"
                             >Speaker brief</button>
+                        </div>
+                    </div>
+                    <div class="texteditor-programme-toolbar">
+                        <br>
+                        <p class="texteditor-programme-heading">Bulk e-mails</p>
+                        <div
+                            class="texteditor-selectors"
+                            id="texteditor-bulk-email-selectors"
+                            role="group"
+                            aria-label="Bulk e-mails"
+                        >
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                data-snippet-key="tbsBackend:texteditor:preset:mtacc-2027-invite"
+                                id="texteditor-preset-mtacc-2027-invite-btn"
+                                aria-pressed="false"
+                            >MTACC 2027 invite</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -12442,9 +12600,13 @@
                     </div>
                 </div>
                 </div>
+                </div>
             </section>
 
             <section class="speakers-overview is-open" id="speaker-editor" aria-hidden="false" aria-label="Speakers" data-name="speaker-editor">
+                <div class="speaker-pane-scrollbar" id="speaker-pane-scrollbar" hidden>
+                    <div class="speaker-pane-scrollbar-thumb" id="speaker-pane-scrollbar-thumb"></div>
+                </div>
                 <div class="speakers-bottom-row" id="speakers-bottom-row">
                     <div class="speakers-bottom-track" id="speakers-bottom-track">
                     <div class="speakers-list speakers-list--roster" id="speakers-list" aria-label="Roster">
@@ -18926,6 +19088,7 @@
                     overwatch.setAttribute('aria-hidden', 'false');
                 }
                 updateSpeakersOverwatchCount();
+                scheduleSpeakerPaneLayout();
                 var actions = document.getElementById('speaker-editor-actions');
                 if (actions) {
                     actions.hidden = true;
@@ -18945,6 +19108,7 @@
                     overwatch.setAttribute('aria-hidden', 'true');
                 }
             }
+            scheduleSpeakerPaneLayout();
         }
 
         /** Count of speakers whose Event matches Current event. */
@@ -19553,6 +19717,7 @@
             syncSpeakerEditorBioMeta();
             syncSpeakerManagementLogPanel();
             syncSpeakerWorkflowActionsPanel();
+            scheduleSpeakerPaneLayout();
         }
 
         function setGuestEditorEmptyState(isEmpty) {
@@ -22893,6 +23058,99 @@
             syncEmailerPaneScrollbar();
         }
 
+        var texteditorPaneLayoutFrame = 0;
+        var texteditorPaneScrollDrag = null;
+
+        function scheduleTexteditorPaneLayout() {
+            if (texteditorPaneLayoutFrame) return;
+            texteditorPaneLayoutFrame = requestAnimationFrame(function () {
+                texteditorPaneLayoutFrame = 0;
+                syncTexteditorPaneScrollbar();
+            });
+        }
+
+        function syncTexteditorPaneScrollbar() {
+            var row = document.getElementById('texteditor-main');
+            var editor = document.getElementById('texteditor');
+            var bar = document.getElementById('texteditor-pane-scrollbar');
+            var thumb = document.getElementById('texteditor-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb || !editor.classList.contains('is-open')) return;
+            ensureTexteditorPaneScroll();
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
+
+        function ensureTexteditorPaneScroll() {
+            if (ensureTexteditorPaneScroll.done) return;
+            var row = document.getElementById('texteditor-main');
+            var editor = document.getElementById('texteditor');
+            var bar = document.getElementById('texteditor-pane-scrollbar');
+            var thumb = document.getElementById('texteditor-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureTexteditorPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleTexteditorPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleTexteditorPaneLayout);
+            }
+            row.addEventListener('scroll', syncTexteditorPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                texteditorPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
+                    maxScroll: maxScroll,
+                    maxLeft: maxLeft
+                };
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!texteditorPaneScrollDrag) return;
+                var drag = texteditorPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endTexteditorPaneScrollDrag(event) {
+                if (!texteditorPaneScrollDrag) return;
+                texteditorPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
+                }
+            }
+            thumb.addEventListener('pointerup', endTexteditorPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endTexteditorPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
+            });
+        }
+
         var guestPaneLayoutFrame = 0;
         var guestPaneScrollDrag = null;
 
@@ -23016,6 +23274,156 @@
             track.style.setProperty('--guest-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
             track.style.setProperty('--guest-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
             syncGuestPaneScrollbar();
+        }
+
+        var speakerPaneLayoutFrame = 0;
+        var speakerPaneScrollDrag = null;
+
+        function scheduleSpeakerPaneLayout() {
+            if (speakerPaneLayoutFrame) return;
+            speakerPaneLayoutFrame = requestAnimationFrame(function () {
+                speakerPaneLayoutFrame = 0;
+                syncSpeakerPaneLayout();
+            });
+        }
+
+        function speakerViewerHeaderEl() {
+            var viewer = document.getElementById('speaker-viewer');
+            if (viewer && viewer.classList.contains('speaker-viewer--overwatch')) {
+                return document.getElementById('speaker-overwatch-title');
+            }
+            return document.querySelector('#speaker-editor-panel > .edit-speaker-top');
+        }
+
+        function syncSpeakerPaneScrollbar() {
+            var row = document.getElementById('speakers-bottom-row');
+            var bar = document.getElementById('speaker-pane-scrollbar');
+            var thumb = document.getElementById('speaker-pane-scrollbar-thumb');
+            if (!row || !bar || !thumb) return;
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
+
+        function ensureSpeakerPaneScroll() {
+            if (ensureSpeakerPaneScroll.done) return;
+            var row = document.getElementById('speakers-bottom-row');
+            var editor = document.getElementById('speaker-editor');
+            var bar = document.getElementById('speaker-pane-scrollbar');
+            var thumb = document.getElementById('speaker-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureSpeakerPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleSpeakerPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleSpeakerPaneLayout);
+            }
+            var watch = [
+                document.getElementById('speakers-list-heading'),
+                document.querySelector('#speaker-editor-panel > .edit-speaker-top'),
+                document.querySelector('#speaker-editor .speaker-workflow-nav'),
+                document.getElementById('speaker-overwatch-title')
+            ];
+            if (window.MutationObserver) {
+                var mutations = new MutationObserver(function () {
+                    scheduleSpeakerPaneLayout();
+                });
+                for (var i = 0; i < watch.length; i++) {
+                    if (!watch[i]) continue;
+                    mutations.observe(watch[i], { childList: true, subtree: true, characterData: true, attributes: true });
+                }
+            }
+            row.addEventListener('scroll', syncSpeakerPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                speakerPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
+                    maxScroll: maxScroll,
+                    maxLeft: maxLeft
+                };
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!speakerPaneScrollDrag) return;
+                var drag = speakerPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endSpeakerPaneScrollDrag(event) {
+                if (!speakerPaneScrollDrag) return;
+                speakerPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
+                }
+            }
+            thumb.addEventListener('pointerup', endSpeakerPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endSpeakerPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
+                var maxScroll = row.scrollWidth - row.clientWidth;
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
+            });
+        }
+
+        function speakerBarFloorWidth(head) {
+            if (!head) return 0;
+            var clone = head.cloneNode(true);
+            clone.querySelectorAll('[id]').forEach(function (el) {
+                if (el !== clone) el.removeAttribute('id');
+            });
+            clone.setAttribute('aria-hidden', 'true');
+            clone.style.position = 'absolute';
+            clone.style.left = '-10000px';
+            clone.style.top = '0';
+            clone.style.visibility = 'hidden';
+            clone.style.width = 'max-content';
+            clone.style.minWidth = 'max-content';
+            clone.style.maxWidth = 'none';
+            clone.style.height = 'auto';
+            clone.style.flex = '0 0 auto';
+            (head.parentNode || document.body).appendChild(clone);
+            var width = Math.ceil(clone.getBoundingClientRect().width);
+            if (clone.parentNode) clone.parentNode.removeChild(clone);
+            return width;
+        }
+
+        function syncSpeakerPaneLayout() {
+            var editor = document.getElementById('speaker-editor');
+            var track = document.getElementById('speakers-bottom-track');
+            if (!editor || !track || !editor.classList.contains('is-open')) return;
+            ensureSpeakerPaneScroll();
+            var listMin = speakerBarFloorWidth(document.getElementById('speakers-list-heading'));
+            var viewerMin = speakerBarFloorWidth(speakerViewerHeaderEl());
+            var navMin = speakerBarFloorWidth(document.querySelector('#speaker-editor .speaker-workflow-nav'));
+            if (navMin > viewerMin) viewerMin = navMin;
+            track.style.setProperty('--speaker-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
+            track.style.setProperty('--speaker-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
+            syncSpeakerPaneScrollbar();
         }
 
         function emailerGuestsAllChecked(rows) {
@@ -30273,6 +30681,7 @@
             var note = document.getElementById('speakers-roster-filter-note');
             if (!note) return;
             note.textContent = '(n=' + speakerRosterRowsForView().length + ')';
+            scheduleSpeakerPaneLayout();
         }
 
         function syncSpeakersRosterViewLinks() {
@@ -31207,6 +31616,7 @@
             if (!id || id === '_init') {
                 firstEl.textContent = '';
                 lastEl.textContent = '';
+                scheduleSpeakerPaneLayout();
                 return;
             }
             var fn = document.getElementById('add-speaker-first-name');
@@ -31215,6 +31625,7 @@
             var last = ln ? String(ln.value || '').trim() : '';
             firstEl.textContent = first;
             lastEl.textContent = last;
+            scheduleSpeakerPaneLayout();
         }
 
         function populateEditSpeakerFormFromRecord(s) {
@@ -31289,6 +31700,7 @@
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
+        var TBS_TEXTEDITOR_PRESET_MTACC_2027_INVITE_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:mtacc-2027-invite';
         var FIRESTORE_TBS_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
         var FIRESTORE_TBS_SNIPPETS_LOCATIONINFO_FIELD = 'Locationinfo';
         var FIRESTORE_TBS_SNIPPETS_SPEAKERS_FIELD = 'Speakers';
@@ -31302,6 +31714,7 @@
         var FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD = 'Speakerinvitation';
         var FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD = 'Requestlodging';
         var FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD = 'Scrapbook';
+        var FIRESTORE_TBS_SNIPPETS_MTACC_2027_FIELD = 'MTACC2027';
 
         /**
          * @returns {{
@@ -31387,7 +31800,7 @@
             if (key === TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD,
-                    metaLabel: 'Guest email templates — Guest invitation',
+                    metaLabel: 'Guest workflow e-mails — Guest invitation',
                     loadOk: 'Guest invitation loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest invitation) into the editor.',
                     saveOk: 'Guest invitation saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest invitation).',
                     saveErr: 'Failed to save Guest invitation to Firestore.',
@@ -31397,7 +31810,7 @@
             if (key === TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD,
-                    metaLabel: 'Guest email templates — Guest sent to reserves',
+                    metaLabel: 'Guest workflow e-mails — Guest sent to reserves',
                     loadOk: 'Guest sent to reserves loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest sent to reserves) into the editor.',
                     saveOk: 'Guest sent to reserves saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Guest sent to reserves).',
                     saveErr: 'Failed to save Guest sent to reserves to Firestore.',
@@ -31407,7 +31820,7 @@
             if (key === TBS_TEXTEDITOR_PRESET_GENTLE_PAYMENT_REMINDER_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD,
-                    metaLabel: 'Guest email templates — Gentle payment reminder',
+                    metaLabel: 'Guest workflow e-mails — Gentle payment reminder',
                     loadOk: 'Gentle payment reminder loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.guests_gentle_reminder) into the editor.',
                     saveOk: 'Gentle payment reminder saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.guests_gentle_reminder).',
                     saveErr: 'Failed to save Gentle payment reminder to Firestore.',
@@ -31417,7 +31830,7 @@
             if (key === TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD,
-                    metaLabel: 'Speaker email templates — Speaker invitation',
+                    metaLabel: 'Speaker workflow e-mails — Speaker invitation',
                     loadOk: 'Speaker invitation loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation) into the editor.',
                     saveOk: 'Speaker invitation saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Speakerinvitation).',
                     saveErr: 'Failed to save Speaker invitation to Firestore.',
@@ -31427,7 +31840,7 @@
             if (key === TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD,
-                    metaLabel: 'Speaker email templates — Request lodging',
+                    metaLabel: 'Speaker workflow e-mails — Request lodging',
                     loadOk: 'Request lodging loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Requestlodging) into the editor.',
                     saveOk: 'Request lodging saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Requestlodging).',
                     saveErr: 'Failed to save Request lodging to Firestore.',
@@ -31441,6 +31854,16 @@
                     loadOk: 'Scrapbook loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.Scrapbook) into the editor.',
                     saveOk: 'Scrapbook saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.Scrapbook).',
                     saveErr: 'Failed to save Scrapbook to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_PRESET_MTACC_2027_INVITE_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_MTACC_2027_FIELD,
+                    metaLabel: 'Bulk e-mails — MTACC 2027 invite',
+                    loadOk: 'MTACC 2027 invite loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt.MTACC2027) into the editor.',
+                    saveOk: 'MTACC 2027 invite saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt.MTACC2027).',
+                    saveErr: 'Failed to save MTACC 2027 invite to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -31930,7 +32353,7 @@
             }
 
             if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
-                html = texteditorPreviewHtmlForProgrammeInfo(html);
+                html = beautifyTexteditorSourceHtml(texteditorPreviewHtmlForProgrammeInfo(html));
                 if (opts.html == null && String(ta.dataset.storageKey || '') === key) {
                     ta.value = html;
                 }
@@ -32232,6 +32655,164 @@
             return '';
         }
 
+        /**
+         * Indent HTML for the source window. Whitespace is only inserted around
+         * block tags, so inline text (and the render box) stays unchanged.
+         */
+        function beautifyTexteditorSourceHtml(html) {
+            var src = String(html == null ? '' : html).replace(/\r\n/g, '\n');
+            if (!src.trim() || src.indexOf('<') === -1) return src;
+
+            var INLINE = {
+                a: 1, abbr: 1, b: 1, bdi: 1, bdo: 1, br: 1, cite: 1, code: 1, data: 1, dfn: 1,
+                em: 1, font: 1, i: 1, img: 1, kbd: 1, label: 1, mark: 1, q: 1, s: 1, samp: 1,
+                small: 1, span: 1, strong: 1, sub: 1, sup: 1, time: 1, u: 1, var: 1, wbr: 1
+            };
+            var VOID = {
+                area: 1, base: 1, br: 1, col: 1, embed: 1, hr: 1, img: 1, input: 1,
+                link: 1, meta: 1, param: 1, source: 1, track: 1, wbr: 1
+            };
+            var RAW = { script: 1, style: 1, pre: 1, textarea: 1 };
+
+            function tagEnd(from) {
+                if (src.substr(from, 4) === '<!--') {
+                    var commentEnd = src.indexOf('-->', from + 4);
+                    return commentEnd === -1 ? src.length : commentEnd + 3;
+                }
+                var quote = '';
+                for (var j = from + 1; j < src.length; j++) {
+                    var ch = src.charAt(j);
+                    if (quote) {
+                        if (ch === quote) quote = '';
+                        continue;
+                    }
+                    if (ch === '"' || ch === "'") {
+                        quote = ch;
+                        continue;
+                    }
+                    if (ch === '>') return j + 1;
+                }
+                return src.length;
+            }
+
+            var tokens = [];
+            var i = 0;
+            while (i < src.length) {
+                if (src.charAt(i) !== '<') {
+                    var nextLt = src.indexOf('<', i);
+                    if (nextLt === -1) nextLt = src.length;
+                    tokens.push({ type: 'text', text: src.slice(i, nextLt) });
+                    i = nextLt;
+                    continue;
+                }
+                var end = tagEnd(i);
+                var rawTag = src.slice(i, end);
+                if (rawTag.indexOf('<!--') === 0) {
+                    tokens.push({ type: 'comment', text: rawTag });
+                    i = end;
+                    continue;
+                }
+                if (/^<!DOCTYPE/i.test(rawTag)) {
+                    tokens.push({ type: 'doctype', text: rawTag });
+                    i = end;
+                    continue;
+                }
+                var nameMatch = /^<\s*(\/?)\s*([a-zA-Z][\w:-]*)/.exec(rawTag);
+                if (!nameMatch) {
+                    tokens.push({ type: 'text', text: rawTag });
+                    i = end;
+                    continue;
+                }
+                var closing = nameMatch[1] === '/';
+                var name = nameMatch[2].toLowerCase();
+                var selfClose = !closing && (VOID[name] || /\/\s*>$/.test(rawTag));
+                if (!closing && !selfClose && RAW[name]) {
+                    var closeRe = new RegExp('<\\/\\s*' + name + '\\b[^>]*>', 'i');
+                    var rest = src.slice(end);
+                    var found = closeRe.exec(rest);
+                    var inner = found ? rest.slice(0, found.index) : rest;
+                    var closeTag = found ? found[0] : '';
+                    tokens.push({ type: 'raw', text: rawTag + inner + closeTag });
+                    i = end + (found ? found.index + found[0].length : rest.length);
+                    continue;
+                }
+                tokens.push({
+                    type: 'tag',
+                    name: name,
+                    closing: closing,
+                    selfClose: selfClose,
+                    inline: !!INLINE[name],
+                    text: rawTag
+                });
+                i = end;
+            }
+
+            function isBoundary(tok) {
+                return !tok || tok.type === 'doctype' || tok.type === 'comment' || tok.type === 'raw' || (tok.type === 'tag' && !tok.inline);
+            }
+
+            var indent = '  ';
+            var depth = 0;
+            var out = '';
+            var atLineStart = true;
+
+            function ensureLine() {
+                if (!out || out.charAt(out.length - 1) === '\n') {
+                    atLineStart = true;
+                    return;
+                }
+                out += '\n';
+                atLineStart = true;
+            }
+
+            function writeChunk(text, useIndent) {
+                if (!text) return;
+                if (atLineStart && useIndent) out += indent.repeat(depth);
+                out += text;
+                atLineStart = false;
+            }
+
+            for (var t = 0; t < tokens.length; t++) {
+                var tok = tokens[t];
+                if (tok.type === 'text') {
+                    var text = tok.text;
+                    if (isBoundary(tokens[t - 1])) text = text.replace(/^\s+/, '');
+                    if (isBoundary(tokens[t + 1])) text = text.replace(/\s+$/, '');
+                    if (!text) continue;
+                    writeChunk(text, true);
+                    continue;
+                }
+                if (tok.type === 'doctype') {
+                    ensureLine();
+                    writeChunk(tok.text, false);
+                    ensureLine();
+                    continue;
+                }
+                if (tok.type === 'comment' || tok.type === 'raw') {
+                    ensureLine();
+                    writeChunk(tok.text, true);
+                    ensureLine();
+                    continue;
+                }
+                if (tok.inline) {
+                    writeChunk(tok.text, true);
+                    continue;
+                }
+                if (tok.closing) {
+                    ensureLine();
+                    depth = Math.max(0, depth - 1);
+                    writeChunk(tok.text, true);
+                    ensureLine();
+                    continue;
+                }
+                ensureLine();
+                writeChunk(tok.text, true);
+                ensureLine();
+                if (!tok.selfClose) depth += 1;
+            }
+            return out.replace(/\n+$/, '');
+        }
+
         function updateTexteditorCodeEditor(html, storageKey, presetName, opts) {
             opts = opts || {};
             var ta = document.getElementById('texteditor-code');
@@ -32258,6 +32839,7 @@
             if (nextKey === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) {
                 effectiveHtml = texteditorPreviewHtmlForProgrammeInfo(effectiveHtml);
             }
+            effectiveHtml = beautifyTexteditorSourceHtml(effectiveHtml);
             ta.value = effectiveHtml != null ? effectiveHtml : '';
             if (nextKey) {
                 ta.dataset.storageKey = nextKey;
@@ -34402,6 +34984,7 @@
             if (isEditor) {
                 invalidateIndexProgrammeCache();
                 syncRenderboxIdleState();
+                scheduleTexteditorPaneLayout();
             }
             if (isContent) {
                 loadAndRenderContentTable();
@@ -34410,6 +34993,7 @@
                 void openSpeakersOverwatch().catch(function (err) {
                     console.error('openSpeakersOverwatch on Speakers tab:', err);
                 });
+                scheduleSpeakerPaneLayout();
             }
             if (isGuests) {
                 void loadAndRenderGuestsTable();
@@ -39018,6 +39602,10 @@
             var texteditorSpeakerEmailTemplatesSelectorsEl = document.getElementById('texteditor-speaker-email-templates-selectors');
             if (texteditorSpeakerEmailTemplatesSelectorsEl) {
                 texteditorSpeakerEmailTemplatesSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
+            }
+            var texteditorBulkEmailSelectorsEl = document.getElementById('texteditor-bulk-email-selectors');
+            if (texteditorBulkEmailSelectorsEl) {
+                texteditorBulkEmailSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
             }
             var texteditorMiscellaneousSelectorsEl = document.getElementById('texteditor-miscellaneous-selectors');
             if (texteditorMiscellaneousSelectorsEl) {
