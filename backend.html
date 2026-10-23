@@ -9553,6 +9553,11 @@
             color: var(--backend-roster-status-no-color);
         }
 
+        #team-editor .team-list-table .content-badge.content-badge--team-atacc {
+            background: var(--backend-roster-pill-black);
+            color: #ffffff;
+        }
+
         #guest-editor .guests-list-table .content-badge.content-badge--guest-field-empty,
         #team-editor .team-list-table .content-badge.content-badge--guest-field-empty {
             background: #f1f5f9;
@@ -11374,6 +11379,78 @@
             padding: 0;
         }
 
+        #texteditor .texteditor-email-topic {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 16px;
+            flex: 0 0 auto;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        #texteditor .texteditor-email-topic[hidden] {
+            display: none !important;
+        }
+
+        #texteditor .texteditor-email-topic label {
+            flex: 0 0 auto;
+            min-width: 0;
+            margin: 0;
+            border: none;
+            padding: 0;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 400;
+            line-height: 1.4;
+            color: #64748b;
+        }
+
+        #texteditor .texteditor-email-topic input {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 6px;
+            background: var(--backend-tab-pale-blue);
+            box-shadow: none;
+            outline: none;
+            padding: 0.5rem 0.75rem;
+            cursor: default;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #0f172a;
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: left;
+        }
+
+        #texteditor .texteditor-email-topic input:not([readonly]) {
+            background: var(--backend-tab-pale-pink);
+            cursor: text;
+        }
+
+        #texteditor .texteditor-email-topic input:focus,
+        #texteditor .texteditor-email-topic input:focus-visible {
+            outline: none;
+            border: none;
+            box-shadow: none;
+        }
+
         .renderbox.renderbox--preset-email .texteditor-render-html {
             color: #0f172a;
         }
@@ -12748,6 +12825,10 @@
                         </div>
                     </div>
                     <div class="texteditor-render-surface">
+                        <div class="texteditor-email-topic" id="texteditor-email-topic" hidden>
+                            <label for="texteditor-email-topic-input">E-mail topic:</label>
+                            <input type="text" id="texteditor-email-topic-input" autocomplete="off" spellcheck="false" readonly aria-readonly="true">
+                        </div>
                         <div id="texteditor-render-html" class="texteditor-render-html" aria-live="polite"></div>
                     </div>
                 </div>
@@ -15257,7 +15338,7 @@
         var emailerContactAllevents = [];
         var speakerRosterAllevents = [];
         var teamFormBaseline = null;
-        var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary', 'Corpuls'];
+        var TEAM_ROLE_OPTIONS = ['Logistics', 'Ultrasound', 'Auxillary', 'Corpuls', 'ATACC'];
         var TEAM_LODGING_OPTIONS = ['A', 'B', 'TBD', 'Own'];
         var TEAM_COUNTRY_OPTIONS = [
             'Other (Enter into bio below.)',
@@ -20273,6 +20354,10 @@
         }
 
         var FIRESTORE_TBS_PRESET_VALUE_FIELD = 'Value';
+        var FIRESTORE_TBS_PRESET_TYPE_FIELD = 'Type';
+        var FIRESTORE_TBS_PRESET_TOPIC_FIELD = 'Topic';
+        var texteditorPresetType = '';
+        var texteditorPresetTopicSaved = '';
 
         /** `tbs/Pre-sets/Zermatt/Zermatt/{field}/{field}` — the string lives on `Value`. */
         function tbsPresetValueDocRef(db, fieldName) {
@@ -20865,6 +20950,7 @@
             if (low === 'logistics') mod = ' content-badge--team-logistics';
             else if (low === 'auxillary') mod = ' content-badge--team-auxillary';
             else if (low === 'corpuls') mod = ' content-badge--team-corpuls';
+            else if (low === 'atacc') mod = ' content-badge--team-atacc';
             return '<span class="content-badge' + mod + '">' + escapeHtml(t || '—') + '</span>';
         }
 
@@ -32315,7 +32401,11 @@
                 });
                 var taPre = document.getElementById('texteditor-code');
                 if (taPre) delete taPre.dataset.programmeAlias;
-                updateTexteditorCodeEditor(html, key, texteditorPresetLabelForSnippetKey(key) || spec.metaLabel, { forceHtml: true });
+                updateTexteditorCodeEditor(html, key, texteditorPresetLabelForSnippetKey(key) || spec.metaLabel, {
+                    forceHtml: true,
+                    presetType: d[FIRESTORE_TBS_PRESET_TYPE_FIELD],
+                    presetTopic: d[FIRESTORE_TBS_PRESET_TOPIC_FIELD]
+                });
                 if (typeof showStatus === 'function') {
                     showStatus('success', spec.loadOk);
                 }
@@ -32655,6 +32745,7 @@
             }
             updateTexteditorSaveButtonState();
             updateTexteditorSyncButtonState();
+            syncTexteditorEmailTopicRow();
         }
 
         function flushTexteditorStorageNow() {
@@ -32720,7 +32811,7 @@
             if (!ta) return;
             var key = String(ta.dataset.storageKey || '').trim();
             if (!texteditorKeyHasFirebaseTarget(key)) return;
-            if (ta.value === texteditorLastSavedSnapshot) return;
+            if (ta.value === texteditorLastSavedSnapshot && !texteditorEmailTopicDirty()) return;
             cancelTexteditorFirebaseAutosaveTimer();
             texteditorFirebaseAutosaveTimer = setTimeout(function () {
                 texteditorFirebaseAutosaveTimer = null;
@@ -32734,7 +32825,7 @@
             if (!ta) return;
             var key = String(ta.dataset.storageKey || '').trim();
             if (!key) return;
-            if (ta.value === texteditorLastSavedSnapshot) return;
+            if (ta.value === texteditorLastSavedSnapshot && !texteditorEmailTopicDirty()) return;
             void saveTexteditorSourceToFirebase({
                 autosave: true,
                 key: key,
@@ -32762,7 +32853,7 @@
                     syncTexteditorPreviewFromCode();
                 }
             }
-            if (opts.key == null && html === texteditorLastSavedSnapshot) return false;
+            if (opts.key == null && html === texteditorLastSavedSnapshot && !texteditorEmailTopicDirty()) return false;
 
             if (texteditorFirebaseSaveInFlight) {
                 texteditorFirebaseSavePending = {
@@ -32798,7 +32889,13 @@
                     if (homeSpec.target === 'tbs-snippets') {
                         var valuePayload = {};
                         valuePayload[FIRESTORE_TBS_PRESET_VALUE_FIELD] = html;
+                        if (texteditorPresetIsEmailType()) {
+                            valuePayload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = texteditorEmailTopicValue();
+                        }
                         await tbsPresetValueDocRef(dbHome, homeSpec.field).set(valuePayload, { merge: true });
+                        if (texteditorPresetIsEmailType()) {
+                            texteditorPresetTopicSaved = valuePayload[FIRESTORE_TBS_PRESET_TOPIC_FIELD];
+                        }
                     } else {
                         var homePayload = {};
                         homePayload[homeSpec.field] = html;
@@ -32901,6 +32998,49 @@
                 syncTexteditorEditabilityFromPadlock();
             }
             syncTexteditorRenderEmailButton();
+            syncTexteditorEmailTopicRow();
+        }
+
+        function texteditorPresetIsEmailType() {
+            return String(texteditorPresetType || '').trim().toLowerCase() === 'e-mail';
+        }
+
+        function texteditorEmailTopicValue() {
+            var input = document.getElementById('texteditor-email-topic-input');
+            return input ? String(input.value || '') : '';
+        }
+
+        function texteditorEmailTopicDirty() {
+            return texteditorPresetIsEmailType() && texteditorEmailTopicValue() !== texteditorPresetTopicSaved;
+        }
+
+        function setTexteditorPresetMeta(type, topic) {
+            texteditorPresetType = type != null ? String(type) : '';
+            texteditorPresetTopicSaved = topic != null ? String(topic) : '';
+            var input = document.getElementById('texteditor-email-topic-input');
+            if (input) input.value = texteditorPresetTopicSaved;
+            syncTexteditorEmailTopicRow();
+        }
+
+        function syncTexteditorEmailTopicRow() {
+            var row = document.getElementById('texteditor-email-topic');
+            var input = document.getElementById('texteditor-email-topic-input');
+            if (!row) return;
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var show = !!key && texteditorPresetIsEmailType();
+            row.hidden = !show;
+            if (!input) return;
+            var canEdit = show && texteditorPadlockIsOpen && !backenduserIsReadonly;
+            if (canEdit) {
+                input.readOnly = false;
+                input.removeAttribute('readonly');
+                input.removeAttribute('aria-readonly');
+            } else {
+                input.readOnly = true;
+                input.setAttribute('readonly', 'readonly');
+                input.setAttribute('aria-readonly', 'true');
+            }
         }
 
         function texteditorHtmlPreparedForSave(key, html) {
@@ -32944,6 +33084,87 @@
             return texteditorPresetLabelForSnippetKey(key) || 'TBS';
         }
 
+        function texteditorNormalizeEmailToken(raw) {
+            return String(raw || '').replace(/[^A-Za-z0-9]+/g, '').toLowerCase();
+        }
+
+        function texteditorEventDatesAfterComma(data, currentEvent) {
+            var current = String(currentEvent || '').trim();
+            if (!current || !data) return '';
+            var raw = data.Eventdates != null ? data.Eventdates
+                : data['Event dates'] != null ? data['Event dates']
+                : data.EventDates != null ? data.EventDates
+                : data.eventdates;
+            var list = [];
+            if (Array.isArray(raw)) {
+                raw.forEach(function (item) {
+                    var s = String(item != null ? item : '').trim();
+                    if (s) list.push(s);
+                });
+            } else if (raw && typeof raw === 'object') {
+                Object.keys(raw).forEach(function (k) {
+                    var s = String(raw[k] != null ? raw[k] : '').trim();
+                    if (s) list.push(s);
+                });
+            } else if (raw != null && String(raw).trim()) {
+                list.push(String(raw).trim());
+            }
+            var chosen = '';
+            for (var i = 0; i < list.length; i++) {
+                var row = list[i];
+                if (row === current || row.indexOf(current + ',') === 0 || row.indexOf(current + ' ,') === 0 || row.indexOf(current) === 0) {
+                    chosen = row;
+                    break;
+                }
+            }
+            var comma = chosen.indexOf(',');
+            if (comma < 0) return '';
+            return chosen.slice(comma + 1).trim();
+        }
+
+        /** Fill {{ }} in a topic. Empty values are left as written. */
+        function texteditorFillEmailTopic(topic, values) {
+            values = values || {};
+            var event = String(values.event || '');
+            var dates = String(values.eventDates || '');
+            var first = String(values.firstName || '');
+            var last = String(values.lastName || '');
+            var name = values.name != null ? String(values.name) : (first + ' ' + last).trim();
+            var byKey = {
+                event: event,
+                currentevent: event,
+                eventdate: dates,
+                eventdates: dates,
+                firstname: first,
+                lastname: last,
+                name: name,
+                stripeinvoiceurl: String(values.invoiceUrl || ''),
+                stripeinvoicenumber: String(values.invoiceNumber || '')
+            };
+            return String(topic || '').replace(/\{\{[^{}]*\}\}/g, function (token) {
+                var key = texteditorNormalizeEmailToken(token);
+                if (!Object.prototype.hasOwnProperty.call(byKey, key)) return token;
+                return byKey[key] ? byKey[key] : token;
+            }).replace(/[\r\n]/g, ' ').trim();
+        }
+
+        async function texteditorResolvedEmailTopic() {
+            var topic = texteditorEmailTopicValue();
+            var event = String(current_event || '').trim();
+            var dates = '';
+            try {
+                var data = await fetchTbsSettingsFields(getFirestore());
+                if (!event) event = guestCoalesceCurrentEventField(data);
+                dates = texteditorEventDatesAfterComma(data, event);
+            } catch (err) {
+                console.warn('E-mail topic tokens:', err);
+            }
+            return texteditorFillEmailTopic(topic, {
+                event: event,
+                eventDates: dates
+            });
+        }
+
         function texteditorDraftEml(subject, html) {
             var safeSubject = String(subject || 'TBS').replace(/[\r\n]+/g, ' ').trim() || 'TBS';
             return [
@@ -32958,7 +33179,7 @@
             ].join('\r\n');
         }
 
-        function openTexteditorPresetInMailClient() {
+        async function openTexteditorPresetInMailClient() {
             var ta = document.getElementById('texteditor-code');
             var btn = document.getElementById('texteditor-render-email-btn');
             if (!ta || !btn || btn.disabled) return;
@@ -32966,7 +33187,9 @@
             if (!key || texteditorSnippetIsWebsite(key)) return;
             var html = String(ta.value || '').trim();
             if (!html) return;
-            var subject = texteditorEmailSubject(html, key);
+            var subject = texteditorPresetIsEmailType()
+                ? await texteditorResolvedEmailTopic()
+                : texteditorEmailSubject(html, key);
             var blob = new Blob([texteditorDraftEml(subject, html)], { type: 'message/rfc822' });
             var url = URL.createObjectURL(blob);
             var link = document.createElement('a');
@@ -33352,6 +33575,11 @@
             }
             syncTexteditorPreviewFromCode();
             syncRenderboxIdleState();
+            if (opts.presetType != null || opts.presetTopic != null) {
+                setTexteditorPresetMeta(opts.presetType, opts.presetTopic);
+            } else {
+                setTexteditorPresetMeta('', '');
+            }
             texteditorLastSavedSnapshot = ta.value;
             texteditorPadlockIsOpen = false;
             syncTexteditorPadlockButtonUi();
@@ -33416,7 +33644,11 @@
                     html = raw != null ? String(raw) : '';
                     label = texteditorPresetLabelForSnippetKey(key) || spec.metaLabel;
                     delete ta.dataset.programmeAlias;
-                    updateTexteditorCodeEditor(html, key, label, { forceHtml: true });
+                    updateTexteditorCodeEditor(html, key, label, {
+                        forceHtml: true,
+                        presetType: d[FIRESTORE_TBS_PRESET_TYPE_FIELD],
+                        presetTopic: d[FIRESTORE_TBS_PRESET_TOPIC_FIELD]
+                    });
                     if (typeof showStatus === 'function') {
                         showStatus('success', spec.loadOk || 'Synced from Firebase into Source.');
                     }
@@ -33480,6 +33712,14 @@
             var ta = document.getElementById('texteditor-code');
             if (!ta || ta.dataset.persistenceBound === '1') return;
             ta.dataset.persistenceBound = '1';
+            var topicInput = document.getElementById('texteditor-email-topic-input');
+            if (topicInput && topicInput.dataset.persistenceBound !== '1') {
+                topicInput.dataset.persistenceBound = '1';
+                topicInput.addEventListener('input', function () {
+                    updateTexteditorSaveButtonState();
+                    scheduleTexteditorFirebaseAutosave();
+                });
+            }
             ta.addEventListener('input', function() {
                 scheduleTexteditorPreviewSync();
                 updateTexteditorSaveButtonState();
@@ -40022,7 +40262,11 @@
                         ta.value = pretty;
                         syncTexteditorPreviewFromCode();
                     }
-                    if (ta.value === texteditorLastSavedSnapshot && texteditorKeyHasFirebaseTarget(key)) {
+                    if (
+                        ta.value === texteditorLastSavedSnapshot &&
+                        !texteditorEmailTopicDirty() &&
+                        texteditorKeyHasFirebaseTarget(key)
+                    ) {
                         spinTexteditorSaveButton();
                         return;
                     }

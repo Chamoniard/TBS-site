@@ -269,6 +269,17 @@ function eventDatesAfterCommaForCurrentEvent(
 }
 
 const FIRESTORE_TBS_PRESET_VALUE_FIELD = "Value";
+const FIRESTORE_TBS_PRESET_TOPIC_FIELD = "Topic";
+
+/**
+ * `Topic` on a pre-set value document. May contain `{{ }}` tags.
+ * @param {Record<string, unknown>} data Pre-set document fields.
+ * @return {string} Topic template, or empty.
+ */
+function presetTopicFromData(data: Record<string, unknown>): string {
+  const raw = data[FIRESTORE_TBS_PRESET_TOPIC_FIELD];
+  return raw != null ? String(raw) : "";
+}
 
 /**
  * Location pre-set parent: `tbs/Pre-sets/{location}/{location}`.
@@ -320,17 +331,21 @@ function presetValueDocPath(location: string, fieldName: string): string {
  * Guest invitation `Value`.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
- * @return {Promise<string>} HTML template string.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
  */
 async function loadGuestInvitationHtml(
   db: Firestore,
   location: string,
-): Promise<string> {
+): Promise<{html: string; topic: string}> {
   const loc = String(location || "").trim();
-  if (!loc) return "";
+  if (!loc) return {html: "", topic: ""};
   const snap = await tbsPresetValueDocRef(db, "Guest invitation", loc).get();
-  const data = (snap.exists ? snap.data() : null) || {};
-  return presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]);
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
 }
 
 /**
@@ -391,52 +406,52 @@ async function loadEventLocationForEvent(
  * Guest sent to reserves `Value`.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
- * @return {Promise<string>} HTML template string.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
  */
 async function loadGuestSentToReservesHtml(
   db: Firestore,
   location: string,
-): Promise<string> {
+): Promise<{html: string; topic: string}> {
   const loc = String(location || "").trim();
-  if (!loc) return "";
+  if (!loc) return {html: "", topic: ""};
   const snap = await tbsPresetValueDocRef(
     db,
     "Guest sent to reserves",
     loc,
   ).get();
-  const data = (snap.exists ? snap.data() : null) || {};
-  return presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]);
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
 }
 
 /**
- * Gentle payment reminder HTML + optional subject from
+ * Gentle payment reminder HTML and Topic from
  * tbs/Pre-sets/{event_location}/{event_location}/guests_gentle_reminder/
- * guests_gentle_reminder `Value`.
+ * guests_gentle_reminder.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
- * @return {Promise<{html: string, subject: string}>} Template fields.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
  */
 async function loadGuestGentleReminderTemplate(
   db: Firestore,
   location: string,
-): Promise<{html: string; subject: string}> {
+): Promise<{html: string; topic: string}> {
   const loc = String(location || "").trim();
-  if (!loc) return {html: "", subject: ""};
+  if (!loc) return {html: "", topic: ""};
   const snap = await tbsPresetValueDocRef(
     db,
     "guests_gentle_reminder",
     loc,
   ).get();
-  const data = (snap.exists ? snap.data() : null) || {};
-  const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
-  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
-    const obj = raw as Record<string, unknown>;
-    const subject = obj.subject != null ?
-      String(obj.subject) :
-      obj.Subject != null ? String(obj.Subject) : "";
-    return {html: presetHtmlFromField(raw), subject};
-  }
-  return {html: presetHtmlFromField(raw), subject: ""};
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
 }
 
 /**
@@ -451,9 +466,11 @@ function normalizeEmailToken(raw: string): string {
 /**
  * Replace every `{{ }}` token in an e-mail with a value already in hand.
  * Unknown tokens are left as written.
- * @param {string} template HTML template.
+ * @param {string} template HTML or topic template.
  * @param {Object} values Loaded event, dates, and recipient fields.
- * @return {string} HTML with known tokens replaced.
+ * @param {boolean=} escapeValues Escape replacements for HTML.
+ *     Pass false for an e-mail topic.
+ * @return {string} Text with known tokens replaced.
  */
 function fillObservedEmailTokens(
   template: string,
@@ -466,6 +483,7 @@ function fillObservedEmailTokens(
     invoiceUrl?: string;
     invoiceNumber?: string;
   },
+  escapeValues?: boolean,
 ): string {
   const event = String(values.event || "");
   const dates = String(values.eventDates || "");
@@ -485,11 +503,35 @@ function fillObservedEmailTokens(
     stripeinvoiceurl: String(values.invoiceUrl || ""),
     stripeinvoicenumber: String(values.invoiceNumber || ""),
   };
+  const escape = escapeValues !== false;
   return String(template || "").replace(/\{\{[^{}]*\}\}/g, (token) => {
     const key = normalizeEmailToken(token);
     if (!Object.prototype.hasOwnProperty.call(byKey, key)) return token;
-    return escapeHtml(byKey[key]);
+    return escape ? escapeHtml(byKey[key]) : byKey[key];
   });
+}
+
+/**
+ * E-mail subject from a pre-set Topic, with `{{ }}` filled in.
+ * @param {string} topic Topic template.
+ * @param {Object} values Same values as the message body.
+ * @return {string} Plain-text subject.
+ */
+function emailSubjectFromTopic(
+  topic: string,
+  values: {
+    event?: string;
+    eventDates?: string;
+    firstName?: string;
+    lastName?: string;
+    name?: string;
+    invoiceUrl?: string;
+    invoiceNumber?: string;
+  },
+): string {
+  return fillObservedEmailTokens(topic, values, false)
+    .replace(/[\r\n]/g, " ")
+    .trim();
 }
 
 /**
@@ -575,38 +617,30 @@ function guestPaidIsOverdue(data: Record<string, unknown>): boolean {
 }
 
 /**
- * Load speaker invitation HTML + optional subject from
+ * Load speaker invitation HTML and Topic from
  * tbs/Pre-sets/{event_location}/{event_location}/Speakerinvitation/
- * Speakerinvitation `Value`.
+ * Speakerinvitation.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
- * @return {Promise<{html: string, subject: string}>} Template fields.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
  */
 async function loadSpeakerInvitationFromSnippets(
   db: Firestore,
   location: string,
-): Promise<{html: string; subject: string}> {
+): Promise<{html: string; topic: string}> {
   const loc = String(location || "").trim();
-  if (!loc) return {html: "", subject: ""};
+  if (!loc) return {html: "", topic: ""};
   const snap = await tbsPresetValueDocRef(
     db,
     "Speakerinvitation",
     loc,
   ).get();
-  const data = (snap.exists ? snap.data() : null) || {};
-  const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
-  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
-    const obj = raw as Record<string, unknown>;
-    let html = "";
-    if (obj.html != null) html = String(obj.html);
-    else if (obj.body != null) html = String(obj.body);
-    else if (obj.HTML != null) html = String(obj.HTML);
-    const subject = obj.subject != null ?
-      String(obj.subject) :
-      obj.Subject != null ? String(obj.Subject) : "";
-    return {html, subject};
-  }
-  return {html: raw != null ? String(raw) : "", subject: ""};
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
 }
 
 /**
@@ -615,25 +649,21 @@ async function loadSpeakerInvitationFromSnippets(
  * Requestlodging `Value`.
  * @param {Firestore} db Firestore instance.
  * @param {string} location Event location id.
- * @return {Promise<string>} HTML template string.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
  */
 async function loadRequestLodgingHtmlFromSnippets(
   db: Firestore,
   location: string,
-): Promise<string> {
+): Promise<{html: string; topic: string}> {
   const loc = String(location || "").trim();
-  if (!loc) return "";
+  if (!loc) return {html: "", topic: ""};
   const snap = await tbsPresetValueDocRef(db, "Requestlodging", loc).get();
-  const data = (snap.exists ? snap.data() : null) || {};
-  const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
-  if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
-    const obj = raw as Record<string, unknown>;
-    if (obj.html != null) return String(obj.html);
-    if (obj.body != null) return String(obj.body);
-    if (obj.HTML != null) return String(obj.HTML);
-    return "";
-  }
-  return raw != null ? String(raw) : "";
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
 }
 
 /**
@@ -2244,7 +2274,8 @@ export const sendGuestInviteHttp = onRequest({
       });
       return;
     }
-    const htmlTemplate = await loadGuestInvitationHtml(db, location);
+    const inviteTemplate = await loadGuestInvitationHtml(db, location);
+    const htmlTemplate = inviteTemplate.html;
     if (!String(htmlTemplate).trim()) {
       res.status(500).json({
         error: "Guest invitation template is empty in " +
@@ -2263,15 +2294,25 @@ export const sendGuestInviteHttp = onRequest({
       settingsData,
       eventLabel,
     );
-    const subject = (eventLabel ? eventLabel + " - Invitation" : "Invitation")
-      .replace(/[\r\n]/g, " ");
-    const html = fillObservedEmailTokens(htmlTemplate, {
+    const inviteTokens = {
       event: eventLabel,
       eventDates: eventDatesLabel,
       firstName,
       lastName,
       name: `${firstName} ${lastName}`.trim(),
-    });
+    };
+    const subject = emailSubjectFromTopic(
+      inviteTemplate.topic,
+      inviteTokens,
+    );
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "Guest invitation") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(htmlTemplate, inviteTokens);
 
     const accessToken = await refreshGmailSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2406,7 +2447,8 @@ export const sendGuestToReservesHttp = onRequest({
       return;
     }
 
-    const htmlTemplate = await loadGuestSentToReservesHtml(db, location);
+    const reservesTemplate = await loadGuestSentToReservesHtml(db, location);
+    const htmlTemplate = reservesTemplate.html;
     if (!String(htmlTemplate).trim()) {
       res.status(500).json({
         error: "Guest sent to reserves template is empty in " +
@@ -2427,15 +2469,25 @@ export const sendGuestToReservesHttp = onRequest({
       settingsData,
       eventLabel,
     );
-    const subject = (eventLabel + " - Waiting list")
-      .replace(/[\r\n]/g, " ");
-    const html = fillObservedEmailTokens(htmlTemplate, {
+    const reservesTokens = {
       event: eventLabel,
       eventDates: eventDatesLabel,
       firstName,
       lastName,
       name: guestName,
-    });
+    };
+    const subject = emailSubjectFromTopic(
+      reservesTemplate.topic,
+      reservesTokens,
+    );
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "Guest sent to reserves") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(htmlTemplate, reservesTokens);
 
     const accessToken = await refreshGmailSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2596,7 +2648,7 @@ export const sendGuestGentleReminderHttp = onRequest({
       settingsData,
       eventLabel,
     );
-    const html = fillObservedEmailTokens(template.html, {
+    const reminderTokens = {
       event: eventLabel,
       eventDates: eventDatesLabel,
       firstName,
@@ -2604,9 +2656,16 @@ export const sendGuestGentleReminderHttp = onRequest({
       name: guestName,
       invoiceUrl,
       invoiceNumber,
-    });
-    const subject = (eventLabel ? eventLabel + " - Reminder" : "Reminder")
-      .replace(/[\r\n]/g, " ");
+    };
+    const subject = emailSubjectFromTopic(template.topic, reminderTokens);
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "guests_gentle_reminder") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(template.html, reminderTokens);
 
     const accessToken = await refreshGmailSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2764,17 +2823,23 @@ export const sendSpeakerInviteHttp = onRequest({
       settingsData,
       eventLabel,
     );
-    const subject = (eventLabel ?
-      eventLabel + " - Speaker invitation" :
-      "Speaker invitation").replace(/[\r\n]/g, " ");
     const lastName = pickSpeakerLastName(data);
-    const html = fillObservedEmailTokens(htmlTemplate, {
+    const speakerTokens = {
       event: eventLabel,
       eventDates: eventDatesLabel,
       firstName,
       lastName,
       name: firstName,
-    });
+    };
+    const subject = emailSubjectFromTopic(template.topic, speakerTokens);
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "Speakerinvitation") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(htmlTemplate, speakerTokens);
 
     const accessToken = await refreshGmailSpeakerSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2828,7 +2893,7 @@ export const sendSpeakerInviteHttp = onRequest({
  * tbs/Pre-sets/{event_location}/{event_location}/Requestlodging/
  * Requestlodging `Value` as info@…
  * to hotel AlX with speaker in Cc.
- * Subject: "{Current event} - Lodging request".
+ * Subject is the pre-set Topic, with {{ }} tags filled in.
  * On success sets Lodging to Requested + Speaker log line.
  * Expects JSON: { speakerId }.
  */
@@ -2918,9 +2983,11 @@ export const sendSpeakerRequestLodgingHttp = onRequest({
       });
       return;
     }
-    const htmlTemplate = String(
-      await loadRequestLodgingHtmlFromSnippets(db, location) || "",
-    ).trim();
+    const lodgingTemplate = await loadRequestLodgingHtmlFromSnippets(
+      db,
+      location,
+    );
+    const htmlTemplate = String(lodgingTemplate.html || "").trim();
     if (!htmlTemplate) {
       res.status(500).json({
         error: "Request lodging template is empty in " +
@@ -2935,16 +3002,25 @@ export const sendSpeakerRequestLodgingHttp = onRequest({
       settingsData,
       eventLabel,
     );
-    const subject = (eventLabel ?
-      eventLabel + " - Lodging request" :
-      "Lodging request").replace(/[\r\n]/g, " ");
-    const html = fillObservedEmailTokens(htmlTemplate, {
+    const lodgingTokens = {
       event: eventLabel,
       eventDates: eventDatesLabel,
       firstName,
       lastName,
       name: `${firstName} ${lastName}`.trim(),
-    });
+    };
+    const subject = emailSubjectFromTopic(
+      lodgingTemplate.topic,
+      lodgingTokens,
+    );
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "Requestlodging") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(htmlTemplate, lodgingTokens);
 
     const accessToken = await refreshGmailSpeakerSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
