@@ -4324,6 +4324,24 @@
             cursor: default;
         }
 
+        #emailer-editor #bulk-email-padlock-btn {
+            margin-left: auto;
+            cursor: pointer;
+        }
+
+        #emailer-editor #bulk-email-padlock-btn:hover:not(:disabled):not([aria-pressed='true']) {
+            filter: brightness(0.92);
+        }
+
+        body.backend-page #emailer-editor #bulk-email-padlock-btn[aria-pressed='true']:not(:disabled) {
+            background: #338a17;
+            color: #ffffff;
+        }
+
+        body.backend-page #emailer-editor #bulk-email-padlock-btn[aria-pressed='true']:not(:disabled):hover {
+            filter: brightness(1.08);
+        }
+
         #emailer-editor #bulk-email-actions-count {
             margin: 0 0 0 0.75rem;
             flex: 0 0 auto;
@@ -14713,6 +14731,14 @@
                                     </button>
                                 </div>
                             </div>
+                            <button type="button" class="add-speaker-button guest-editor-padlock-btn" id="bulk-email-padlock-btn" aria-label="Unlock bulk email" title="Unlock" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                    <path
+                                        fill="currentColor"
+                                        d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                    />
+                                </svg>
+                            </button>
                                 </div>
                             </div>
                             <div id="bulk-email-preset-buttons" class="bulk-email-preset-buttons" aria-live="polite"></div>
@@ -15661,6 +15687,7 @@
         let teamPadlockIsOpen = false;
         let emailerDraftFormActive = false;
         let emailerPadlockIsOpen = false;
+        let bulkEmailPadlockIsOpen = false;
         let emailerEditorBottomPane = 'bio';
         /** Selected contact id for `#emailer-contact-viewer` (from `tbs/Contacts`). */
         let emailerFormEditingDocId = '';
@@ -17192,6 +17219,11 @@
             contentPadlockIsOpen = false;
             texteditorPadlockIsOpen = false;
             programmePadlockIsOpen = false;
+            bulkEmailPadlockIsOpen = false;
+            if (typeof syncBulkEmailPadlockButtonUi === 'function') {
+                syncBulkEmailPadlockButtonUi();
+                if (typeof syncEmailerBulkPresetButtons === 'function') syncEmailerBulkPresetButtons();
+            }
             if (typeof syncGuestPadlockButtonUi === 'function') {
                 syncGuestPadlockButtonUi();
                 if (typeof syncGuestEditabilityFromPadlock === 'function') syncGuestEditabilityFromPadlock();
@@ -23937,8 +23969,27 @@
             return n;
         }
 
+        function syncBulkEmailPadlockButtonUi() {
+            var padlock = document.getElementById('bulk-email-padlock-btn');
+            if (!padlock) return;
+            var closedPath =
+                'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+            var openPath =
+                'M18 8h-8V6c0-1.63 1.32-2.95 2.95-2.95 1.28 0 2.39.83 2.8 2h2.1c-.47-2.28-2.49-4-4.9-4C10.24 1.05 8 3.29 8 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z';
+            var svg = padlock.querySelector('svg');
+            var path = svg ? svg.querySelector('path') : null;
+            if (path) path.setAttribute('d', bulkEmailPadlockIsOpen ? openPath : closedPath);
+            padlock.setAttribute(
+                'aria-label',
+                bulkEmailPadlockIsOpen ? 'Lock bulk email' : 'Unlock bulk email'
+            );
+            padlock.setAttribute('title', bulkEmailPadlockIsOpen ? 'Lock' : 'Unlock');
+            padlock.setAttribute('aria-pressed', bulkEmailPadlockIsOpen ? 'true' : 'false');
+        }
+
         function syncEmailerBulkPresetButtons() {
             var active =
+                bulkEmailPadlockIsOpen &&
                 emailerCheckedIdCount(emailerGuestsCheckedIds) +
                     emailerCheckedIdCount(emailerSpeakersCheckedIds) >
                 0;
@@ -23971,7 +24022,7 @@
                 var presetBtn = root.querySelector('.bulk-email-preset-btn[data-preset-field="' + escaped + '"]');
                 row = presetBtn && presetBtn.closest ? presetBtn.closest('.bulk-email-preset-row') : null;
             }
-            if (!row) {
+            if (!row || !bulkEmailPadlockIsOpen) {
                 btn.hidden = true;
                 if (root && root.parentNode && root.contains(btn)) {
                     root.parentNode.insertBefore(btn, root.nextSibling);
@@ -24136,6 +24187,7 @@
 
         function openSendBulkEmailsConfirm() {
             if (backendBlockIfReadonly()) return;
+            if (!bulkEmailPadlockIsOpen) return;
             if (sendBulkEmailsPhase === 'sending' || sendBulkEmailsPhase === 'confirm') return;
             var field = String(emailerBulkPresetSelectedField || '').trim();
             var item = field ? emailerBulkPresetByField[field] : null;
@@ -41531,6 +41583,20 @@
                     closeGuestBulkReminderConfirm(true);
                 });
             }
+            var bulkEmailPadlockBtn = document.getElementById('bulk-email-padlock-btn');
+            if (bulkEmailPadlockBtn && bulkEmailPadlockBtn.dataset.bound !== '1') {
+                bulkEmailPadlockBtn.dataset.bound = '1';
+                bulkEmailPadlockBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    if (backendBlockIfReadonly()) return;
+                    bulkEmailPadlockIsOpen = !bulkEmailPadlockIsOpen;
+                    syncBulkEmailPadlockButtonUi();
+                    syncEmailerBulkPresetButtons();
+                    if (!bulkEmailPadlockIsOpen && sendBulkEmailsPhase === 'confirm') closeSendBulkEmailsPopup();
+                });
+            }
+            syncBulkEmailPadlockButtonUi();
             var sendBulkEmailsBtn = document.getElementById('sendbulkemails');
             var sendBulkEmailsCancel = document.getElementById('sendbulkemails-cancel');
             var sendBulkEmailsOk = document.getElementById('sendbulkemails-ok');
