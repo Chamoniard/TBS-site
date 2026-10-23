@@ -4315,7 +4315,8 @@
 
         #emailer-editor .bulk-email-actions .contact-editor-empty,
         #emailer-editor #bulk-email-actions .emailer-editor-toolbar,
-        #emailer-editor #bulk-email-actions .emailer-editor-bottom {
+        #emailer-editor #bulk-email-actions .emailer-editor-bottom,
+        #emailer-editor #preview > .edit-contact-top .emailer-editor-toolbar {
             display: none !important;
         }
 
@@ -11119,6 +11120,28 @@
 
         body.backend-page button.speaker-delete-yes-btn:hover {
             background: #F71941 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #sendbulkemails-confirm button#sendbulkemails-cancel {
+            background: #F71941 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #sendbulkemails-confirm button#sendbulkemails-cancel:hover {
+            background: #F71941 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #sendbulkemails-confirm button#sendbulkemails-confirm-send,
+        body.backend-page #sendbulkemails-confirm button#sendbulkemails-ok {
+            background: #338a17 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #sendbulkemails-confirm button#sendbulkemails-confirm-send:hover,
+        body.backend-page #sendbulkemails-confirm button#sendbulkemails-ok:hover {
+            background: #338a17 !important;
             color: #ffffff !important;
         }
 
@@ -24052,6 +24075,29 @@
             return payload;
         }
 
+        function rememberBulkEmailLogLine(kind, id, line) {
+            var note = String(line || '').trim();
+            var key = String(id || '').trim();
+            if (!note || !key) return;
+            var fieldName = kind === 'speaker' ? 'speakerLog' : 'log';
+            var rosters = kind === 'speaker' ? [speakerRosterInMemory] : [guestsRosterInMemory, guestsRosterAllInMemory];
+            for (var r = 0; r < rosters.length; r++) {
+                var roster = rosters[r];
+                if (!Array.isArray(roster)) continue;
+                for (var i = 0; i < roster.length; i++) {
+                    var rec = roster[i];
+                    if (!rec || String(rec.id || '') !== key) continue;
+                    if (!Array.isArray(rec[fieldName]) || !rec[fieldName].length) continue;
+                    if (rec[fieldName].indexOf(note) < 0) rec[fieldName].push(note);
+                }
+            }
+            if (kind === 'speaker') {
+                if (String(speakerFormEditingDocId || '').trim() === key) syncSpeakerManagementLogPanel();
+                return;
+            }
+            if (String(guestFormEditingDocId || '').trim() === key) syncGuestManagementLogPanel();
+        }
+
         async function runSendBulkEmails(field, targets) {
             var sent = 0;
             var failed = 0;
@@ -24064,7 +24110,12 @@
                     'Sending ' + (i + 1) + ' of ' + targets.length + '…'
                 );
                 try {
-                    await postSendBulkEmail(field, targets[i]);
+                    var payload = await postSendBulkEmail(field, targets[i]);
+                    rememberBulkEmailLogLine(
+                        targets[i].kind,
+                        targets[i].id,
+                        payload && payload.logLine
+                    );
                     sent += 1;
                 } catch (err) {
                     failed += 1;
@@ -41497,7 +41548,11 @@
             }
             if (sendBulkEmailsOk) {
                 sendBulkEmailsOk.addEventListener('click', function () {
-                    if (sendBulkEmailsPhase === 'done') closeSendBulkEmailsPopup();
+                    if (sendBulkEmailsPhase !== 'done') return;
+                    emailerBulkPresetSelectedField = '';
+                    clearEmailerBulkPreview();
+                    syncEmailerBulkPresetButtons();
+                    closeSendBulkEmailsPopup();
                 });
             }
             if (sendBulkEmailsBackdrop) {

@@ -811,6 +811,56 @@ function speakerLogLodgingRequestedLine(): string {
 }
 
 /**
+ * Log lines stored on one field. Accepts an array or a single string.
+ * @param {Record<string, unknown>} data Person item data.
+ * @param {string} fieldName Log field name.
+ * @return {string[]} Existing log lines.
+ */
+function logLinesFromField(
+  data: Record<string, unknown>,
+  fieldName: string,
+): string[] {
+  const raw = data[fieldName];
+  if (Array.isArray(raw)) {
+    return raw
+      .map((entry) => String(entry ?? "").trim())
+      .filter(Boolean);
+  }
+  if (raw == null) return [];
+  const one = String(raw).trim();
+  return one ? [one] : [];
+}
+
+/**
+ * Guest Log or Speaker log, when that contact already has one.
+ * @param {string} kind guest or speaker.
+ * @param {Record<string, unknown>} data Person item data.
+ * @return {string} Field name, or empty when there is no log.
+ */
+function bulkEmailLogFieldName(
+  kind: string,
+  data: Record<string, unknown>,
+): string {
+  if (kind === "speaker") {
+    return Object.prototype.hasOwnProperty.call(data, "Speaker log") ?
+      "Speaker log" :
+      "";
+  }
+  if (Object.prototype.hasOwnProperty.call(data, "Log")) return "Log";
+  if (Object.prototype.hasOwnProperty.call(data, "log")) return "log";
+  return "";
+}
+
+/**
+ * Brief log line after one bulk e-mail.
+ * @param {string} field Pre-set field name.
+ * @return {string} e.g. `261024: Bulk e-mail MTACC2027 sent.`
+ */
+function bulkEmailSentLogLine(field: string): string {
+  return guestLogPrefixYyMmDd() + ": Bulk e-mail " + field + " sent.";
+}
+
+/**
  * Refresh a Gmail OAuth access token using the stored refresh token.
  * @return {Promise<string>} Access token.
  */
@@ -3666,6 +3716,35 @@ export const sendBulkEmailHttp = onRequest({
       html,
     });
 
+    let logLine = "";
+    const logField = bulkEmailLogFieldName(kind, person);
+    if (logField && logLinesFromField(person, logField).length) {
+      logLine = bulkEmailSentLogLine(field);
+      try {
+        let kept = false;
+        await db.runTransaction(async (tx) => {
+          kept = false;
+          const fresh = await tx.get(itemRef);
+          const freshData = (fresh.data() || {}) as Record<string, unknown>;
+          const lines = logLinesFromField(freshData, logField);
+          if (!lines.length) return;
+          kept = true;
+          if (lines.includes(logLine)) return;
+          lines.push(logLine);
+          tx.set(itemRef, {[logField]: lines}, {merge: true});
+        });
+        if (!kept) logLine = "";
+      } catch (logErr) {
+        logLine = "";
+        logger.error("sendBulkEmailHttp log update failed", {
+          field,
+          kind,
+          id,
+          logErr,
+        });
+      }
+    }
+
     logger.info("sendBulkEmailHttp ok", {
       field,
       kind,
@@ -3673,8 +3752,9 @@ export const sendBulkEmailHttp = onRequest({
       to: email,
       from: fromAddress,
       location,
+      logLine,
     });
-    res.status(200).json({ok: true, to: email, subject});
+    res.status(200).json({ok: true, to: email, subject, logLine});
   } catch (err) {
     logger.error("sendBulkEmailHttp failed", {field, kind, id, err});
     res.status(500).json({
