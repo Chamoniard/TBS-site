@@ -150,28 +150,6 @@ function escapeHtml(text: string): string {
 }
 
 /**
- * Read Current event from tbs/Settings.
- * @param {Firestore} db Firestore instance.
- * @return {Promise<string>} Current event label or empty string.
- */
-async function loadCurrentEventLabel(db: Firestore): Promise<string> {
-  const data = await loadTbsSettingsData(db);
-  const keys = [
-    "Current event",
-    "currentEvent",
-    "Current Event",
-    "CURRENT EVENT",
-  ];
-  for (const key of keys) {
-    if (Object.prototype.hasOwnProperty.call(data, key)) {
-      const v = String(data[key] || "").trim();
-      if (v) return v;
-    }
-  }
-  return "";
-}
-
-/**
  * Read tbs/Settings (event fields) plus Zermatt site settings.
  * Eventdates / Current event / Allevents live on the parent document.
  * @param {Firestore} db Firestore instance.
@@ -462,22 +440,56 @@ async function loadGuestGentleReminderTemplate(
 }
 
 /**
- * Fill guest reminder placeholders. Unknown tokens are left as written.
+ * Keys inside `{{ }}`, ignoring case, spaces, and underscores.
+ * @param {string} raw Token including braces.
+ * @return {string} Lookup key.
+ */
+function normalizeEmailToken(raw: string): string {
+  return String(raw || "").replace(/[^A-Za-z0-9]+/g, "").toLowerCase();
+}
+
+/**
+ * Replace every `{{ }}` token in an e-mail with a value already in hand.
+ * Unknown tokens are left as written.
  * @param {string} template HTML template.
- * @param {Record<string, string>} fields Replacement values.
+ * @param {Object} values Loaded event, dates, and recipient fields.
  * @return {string} HTML with known tokens replaced.
  */
-function fillGuestTemplateTokens(
+function fillObservedEmailTokens(
   template: string,
-  fields: Record<string, string>,
+  values: {
+    event?: string;
+    eventDates?: string;
+    firstName?: string;
+    lastName?: string;
+    name?: string;
+    invoiceUrl?: string;
+    invoiceNumber?: string;
+  },
 ): string {
-  let html = String(template || "");
-  const tokens = Object.keys(fields);
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
-    html = html.split(token).join(escapeHtml(fields[token] || ""));
-  }
-  return html;
+  const event = String(values.event || "");
+  const dates = String(values.eventDates || "");
+  const first = String(values.firstName || "");
+  const last = String(values.lastName || "");
+  const name = values.name != null ?
+    String(values.name) :
+    `${first} ${last}`.trim();
+  const byKey: Record<string, string> = {
+    event,
+    currentevent: event,
+    eventdate: dates,
+    eventdates: dates,
+    firstname: first,
+    lastname: last,
+    name,
+    stripeinvoiceurl: String(values.invoiceUrl || ""),
+    stripeinvoicenumber: String(values.invoiceNumber || ""),
+  };
+  return String(template || "").replace(/\{\{[^{}]*\}\}/g, (token) => {
+    const key = normalizeEmailToken(token);
+    if (!Object.prototype.hasOwnProperty.call(byKey, key)) return token;
+    return escapeHtml(byKey[key]);
+  });
 }
 
 /**
@@ -2219,7 +2231,8 @@ export const sendGuestInviteHttp = onRequest({
       return;
     }
 
-    const eventLabel = await loadCurrentEventLabel(db);
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
     if (!eventLabel) {
       res.status(500).json({error: "Current event is not set."});
       return;
@@ -2243,13 +2256,22 @@ export const sendGuestInviteHttp = onRequest({
     const firstName = String(
       data.Name || data.name || data["First name"] || data.firstName || "",
     ).trim();
+    const lastName = String(
+      data["Last name"] || data.lastName || data.LastName || "",
+    ).trim();
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
     const subject = (eventLabel ? eventLabel + " - Invitation" : "Invitation")
       .replace(/[\r\n]/g, " ");
-    const html = String(htmlTemplate)
-      .split("{{first_name}}")
-      .join(escapeHtml(firstName))
-      .split("{{Current event}}")
-      .join(escapeHtml(eventLabel));
+    const html = fillObservedEmailTokens(htmlTemplate, {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`.trim(),
+    });
 
     const accessToken = await refreshGmailSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2370,7 +2392,8 @@ export const sendGuestToReservesHttp = onRequest({
       return;
     }
 
-    const eventLabel = await loadCurrentEventLabel(db);
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
     if (!eventLabel) {
       res.status(500).json({error: "Current event is not set."});
       return;
@@ -2394,13 +2417,25 @@ export const sendGuestToReservesHttp = onRequest({
     }
 
     const guestName = pickGuestFirstAndLastName(data);
+    const firstName = String(
+      data.Name || data.name || data["First name"] || data.firstName || "",
+    ).trim();
+    const lastName = String(
+      data["Last name"] || data.lastName || data.LastName || "",
+    ).trim();
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
     const subject = (eventLabel + " - Waiting list")
       .replace(/[\r\n]/g, " ");
-    const html = String(htmlTemplate)
-      .split("{{Name}}")
-      .join(escapeHtml(guestName))
-      .split("{{Event}}")
-      .join(escapeHtml(eventLabel));
+    const html = fillObservedEmailTokens(htmlTemplate, {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: guestName,
+    });
 
     const accessToken = await refreshGmailSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2520,7 +2555,8 @@ export const sendGuestGentleReminderHttp = onRequest({
       return;
     }
 
-    const eventLabel = await loadCurrentEventLabel(db);
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
     if (!eventLabel) {
       res.status(500).json({error: "Current event is not set."});
       return;
@@ -2556,18 +2592,19 @@ export const sendGuestGentleReminderHttp = onRequest({
     const invoiceNumber = String(
       data["Stripe Invoice Number"] || "",
     ).trim();
-    const tokens: Record<string, string> = {
-      "{{first_name}}": firstName,
-      "{{First name}}": firstName,
-      "{{Name}}": guestName,
-      "{{Last name}}": lastName,
-      "{{Current event}}": eventLabel,
-      "{{current_event}}": eventLabel,
-      "{{Event}}": eventLabel,
-      "{{Stripe Invoice Url}}": invoiceUrl,
-      "{{Stripe Invoice Number}}": invoiceNumber,
-    };
-    const html = fillGuestTemplateTokens(template.html, tokens);
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
+    const html = fillObservedEmailTokens(template.html, {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: guestName,
+      invoiceUrl,
+      invoiceNumber,
+    });
     const subject = (eventLabel ? eventLabel + " - Reminder" : "Reminder")
       .replace(/[\r\n]/g, " ");
 
@@ -2730,13 +2767,14 @@ export const sendSpeakerInviteHttp = onRequest({
     const subject = (eventLabel ?
       eventLabel + " - Speaker invitation" :
       "Speaker invitation").replace(/[\r\n]/g, " ");
-    const html = htmlTemplate
-      .split("{{Event}}")
-      .join(escapeHtml(eventLabel))
-      .split("{{Name}}")
-      .join(escapeHtml(firstName))
-      .split("{{Eventdates}}")
-      .join(escapeHtml(eventDatesLabel));
+    const lastName = pickSpeakerLastName(data);
+    const html = fillObservedEmailTokens(htmlTemplate, {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: firstName,
+    });
 
     const accessToken = await refreshGmailSpeakerSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
@@ -2900,27 +2938,13 @@ export const sendSpeakerRequestLodgingHttp = onRequest({
     const subject = (eventLabel ?
       eventLabel + " - Lodging request" :
       "Lodging request").replace(/[\r\n]/g, " ");
-    const html = htmlTemplate
-      .split("{{Event}}")
-      .join(escapeHtml(eventLabel))
-      .split("{{Name}}")
-      .join(escapeHtml(firstName))
-      .split("{{firstname}}")
-      .join(escapeHtml(firstName))
-      .split("{{Firstname}}")
-      .join(escapeHtml(firstName))
-      .split("{{FirstName}}")
-      .join(escapeHtml(firstName))
-      .split("{{lastname}}")
-      .join(escapeHtml(lastName))
-      .split("{{Lastname}}")
-      .join(escapeHtml(lastName))
-      .split("{{LastName}}")
-      .join(escapeHtml(lastName))
-      .split("{{Eventdate}}")
-      .join(escapeHtml(eventDatesLabel))
-      .split("{{Eventdates}}")
-      .join(escapeHtml(eventDatesLabel));
+    const html = fillObservedEmailTokens(htmlTemplate, {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`.trim(),
+    });
 
     const accessToken = await refreshGmailSpeakerSendAccessToken();
     await sendGmailHtmlMessage(accessToken, {
