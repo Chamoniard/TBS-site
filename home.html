@@ -150,8 +150,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20260920-iphone-chrome-blue" as="style">
-    <link rel="stylesheet" href="styles.css?v=20260920-iphone-chrome-blue">
+    <link rel="preload" href="styles.css?v=20261024-no-pink-loader" as="style">
+    <link rel="stylesheet" href="styles.css?v=20261024-no-pink-loader">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -795,7 +795,6 @@
             justify-content: center;
             padding-bottom: 0 !important;
         }
-        html.speaker-bio-preview-mode #home-loading-screen,
         html.speaker-bio-preview-mode .header,
         html.speaker-bio-preview-mode .footer,
         html.speaker-bio-preview-mode .hero {
@@ -830,10 +829,7 @@
         }
     </style>
 </head>
-<body class="home-view loading">
-    <div id="home-loading-screen" class="home-loading-screen" aria-live="polite" aria-busy="true" aria-label="Loading page">
-        <img src="images/logo.png" alt="TBS Zermatt" class="home-loading-screen-logo" width="324" height="65" loading="eager" decoding="async">
-    </div>
+<body class="home-view">
     <header class="header">
         <nav class="navbar navbar--mobile-top">
             <div class="nav-container nav-container--mobile-top">
@@ -924,9 +920,396 @@
                     <h2 class="section-titles tbs27-card-subtitle">Hotel Alex, Zermatt</h2>
                 </div>
             </picture>
+            <div class="introslider-section home-hero-introslider-outer" role="region" aria-label="About">
+                <div class="introslider-inner-wrapper home-hero-introslider">
+                    <div class="introslider">
+                        <div class="about introslider-clickable" role="button" tabindex="0" aria-label="Scroll to event section">
+                            <div class="about-text">
+                                <div class="introslider-text">
+                                    <h3 class="section-titles about-title introslider-title">Event</h3>
+                                    <p>TBS is dedicated to the first hours management of critical illness — the physiology that drives it, the behaviour that shapes it, and the technologies that will change it.</p>
+                                </div>
+                            </div>
+                            <h3 class="section-titles featured-bottom-title introslider-title">Event</h3>
+                        </div>
+                        <div class="location introslider-clickable" role="button" tabindex="0" aria-label="Scroll to programme section">
+                            <div class="about-text">
+                                <div class="introslider-text">
+                                    <h3 class="section-titles about-title introslider-title">Location</h3>
+                                    <p>Held in Zermatt, Switzerland, as a setting that encourages presence, conversation, and reflection. The famous <a href="https://www.hotelalexzermatt.com/en/" target="_blank" rel="noopener noreferrer">Hotel Alex</a> is the venue and heart of the event.</p>
+                                </div>
+                            </div>
+                            <h3 class="section-titles featured-bottom-title introslider-title">Location</h3>
+                        </div>
+                        <div class="about-speakers introslider-clickable" role="button" tabindex="0" aria-label="Scroll to speakers section">
+                            <div class="about-text">
+                                <div class="introslider-text">
+                                    <h3 class="section-titles about-title introslider-title">Speakers</h3>
+                                    <p>The cutting edge of critical care, resuscitation and cognitive sciences. Asked to go above and beyond the studies and the guidelines.</p>
+                                </div>
+                            </div>
+                            <h3 class="section-titles featured-bottom-title introslider-title">Speakers</h3>
+                        </div>
+                        <div class="about-programme introslider-clickable" role="button" tabindex="0" aria-label="Scroll to programme section">
+                            <div class="about-text">
+                                <div class="introslider-text">
+                                    <h3 class="section-titles about-title introslider-title">Programme</h3>
+                                    <p>Four immersive days of expert talks, hands-on workshops and small group discussions.</p>
+                                </div>
+                            </div>
+                            <h3 class="section-titles featured-bottom-title introslider-title">Programme</h3>
+                        </div>
+                        <div class="pasttalks introslider-clickable">
+                            <div class="about-text">
+                                <div class="introslider-text">
+                                    <h3 class="section-titles about-title introslider-title">Past talks</h3>
+                                    <p>We are believers in the open access ethos and intend to bring TBS to a wider audience. Find all recorded talks here or on our social media.</p>
+                                </div>
+                            </div>
+                            <h3 class="section-titles featured-bottom-title introslider-title">Past talks</h3>
+                        </div>
+                        <div class="register introslider-clickable">
+                            <div class="about-text">
+                                <div class="introslider-text">
+                                    <h3 class="section-titles about-title introslider-title">Register</h3>
+                                    <p>Kept small to facilitate sustained interaction between participants. Attendance is limited. Participation is expected.</p>
+                                </div>
+                            </div>
+                            <h3 class="section-titles featured-bottom-title introslider-title">Register</h3>
+                        </div>
+                    </div>
+                    <div class="home-introslider-scrollbar" aria-hidden="true">
+                        <div class="home-introslider-scrollbar-track">
+                            <div class="home-introslider-scrollbar-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="introslider-indicators" aria-label="Slider position">
+                        <button type="button" class="introslider-dot" data-index="0" aria-label="Slide 1"></button>
+                        <button type="button" class="introslider-dot" data-index="1" aria-label="Slide 2"></button>
+                        <button type="button" class="introslider-dot" data-index="2" aria-label="Slide 3"></button>
+                        <button type="button" class="introslider-dot" data-index="3" aria-label="Slide 4"></button>
+                        <button type="button" class="introslider-dot" data-index="4" aria-label="Slide 5"></button>
+                        <button type="button" class="introslider-dot" data-index="5" aria-label="Slide 6"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="sponsors-section" role="region" aria-label="Sponsors">
+                <div class="sponsors-section-inner-wrapper">
+                    <h2 class="section-titles sponsors-section-title" id="home-sponsors-heading">Presented by</h2>
+                    <div class="sponsor-logos">
+                        <div class="sponsor-logo-slot">
+                            <img src="images/Sponsors/corpulsgold.png" alt="Corpuls" class="sponsors-logo-image" loading="lazy" decoding="async">
+                        </div>
+                        <div class="sponsor-logo-slot">
+                            <img src="images/Sponsors/hamiltongold.png" alt="Hamilton" class="sponsors-logo-image" loading="lazy" decoding="async">
+                        </div>
+                        <div class="sponsor-logo-slot sponsor-logo-slot--solo">
+                            <img src="images/Sponsors/heinegold.png" alt="Heine" class="sponsors-logo-image" loading="lazy" decoding="async">
+                        </div>
+                        <div class="sponsor-logo-slot">
+                            <img src="images/Sponsors/intersurgicalgold.png" alt="Intersurgical" class="sponsors-logo-image" loading="lazy" decoding="async">
+                        </div>
+                        <div class="sponsor-logo-slot">
+                            <img src="images/Sponsors/qinflowgold.png" alt="Qinflow" class="sponsors-logo-image" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="feed-section">
                 <div class="feed-section-inner-wrapper">
+                    <h2 class="section-titles" id="home-feed-latest-heading">Latest</h2>
+                    <div class="news-grid">
+                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
+                    </div>
                 </div>
+            </div>
+            <div class="programme-section" id="home-programme-title" role="region" aria-label="Programme">
+                <div class="programmeslider-innerwrapper">
+                    <div class="programme-slider">
+                        <div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true"></div>
+                    </div>
+                    <div class="home-introslider-scrollbar" aria-hidden="true">
+                        <div class="home-introslider-scrollbar-track">
+                            <div class="home-introslider-scrollbar-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="speaker-section" id="speakers-section" role="region" aria-label="Speakers">
+                <div class="speakers-inner-wrapper">
+                    <div class="speakerslider" aria-label="Speakers">
+                        <div class="speakerslider-track">
+                            <article class="speaker-card speaker-card--skeleton" aria-hidden="true"></article>
+                        </div>
+                    </div>
+                    <div class="home-introslider-scrollbar" aria-hidden="true">
+                        <div class="home-introslider-scrollbar-track">
+                            <div class="home-introslider-scrollbar-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="on-demand-section" role="region" aria-labelledby="home-on-demand-heading" hidden>
+                <div class="on-demand-inner-wrapper">
+                    <h2 class="section-titles on-demand-section-title" id="home-on-demand-heading">TBS ON-DEMAND</h2>
+                    <div class="on-demand-left" id="on-demand-left"></div>
+                    <div class="on-demand-right" id="on-demand-right"></div>
+                </div>
+            </div>
+            <div class="registration-section" role="region" aria-labelledby="home-registration-heading">
+                <div class="registration-section-inner-wrapper">
+                    <form class="registration-form" novalidate aria-label="Registration form">
+                        <h3 class="section-titles registration-section-title" id="home-registration-heading">Registration</h3>
+                        <p class="registration-manifesto">In order to facilitate interaction between participants TBS is intentionally kept small. Attendance is limited.</p>
+                        <div class="registration-to-reserves" id="registration-to-reserves" hidden></div>
+                        <div class="registration-form-row registration-form-row--two-up">
+                            <div class="registration-field">
+                                <label for="reg-first-name">First name <span class="registration-required-asterisk">*</span></label>
+                                <input id="reg-first-name" name="firstName" type="text" autocomplete="given-name" required>
+                            </div>
+                            <div class="registration-field">
+                                <label for="reg-last-name">Last name <span class="registration-required-asterisk">*</span></label>
+                                <input id="reg-last-name" name="lastName" type="text" autocomplete="family-name" required>
+                            </div>
+                        </div>
+                        <div class="registration-form-row registration-form-row--two-up">
+                            <div class="registration-field">
+                                <label for="reg-email">Email <span class="registration-required-asterisk">*</span></label>
+                                <input id="reg-email" name="email" type="email" autocomplete="email" required>
+                            </div>
+                            <div class="registration-field">
+                                <label for="reg-email-confirm">Confirm email <span class="registration-required-asterisk">*</span></label>
+                                <input id="reg-email-confirm" name="emailConfirm" type="email" autocomplete="email" required>
+                            </div>
+                        </div>
+                        <div class="registration-form-row registration-form-row--two-up">
+                            <div class="registration-field">
+                                <label for="reg-city-region">City/region <span class="registration-required-asterisk">*</span></label>
+                                <input id="reg-city-region" name="cityRegion" type="text" autocomplete="address-level2" required>
+                            </div>
+                            <div class="registration-field">
+                                <label for="reg-country">Country <span class="registration-required-asterisk">*</span></label>
+                                <select id="reg-country" name="country" autocomplete="country-name" required>
+                                    <option value="" disabled selected>Select country</option>
+                                    <option value="Other (Enter into bio below.)">Other (Enter into bio below.)</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Austria">Austria</option>
+                                    <option value="Belgium">Belgium</option>
+                                    <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                                    <option value="Bulgaria">Bulgaria</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Croatia">Croatia</option>
+                                    <option value="Czech Republic">Czech Republic</option>
+                                    <option value="Denmark">Denmark</option>
+                                    <option value="Estonia">Estonia</option>
+                                    <option value="Finland">Finland</option>
+                                    <option value="France">France</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="Greece">Greece</option>
+                                    <option value="Hungary">Hungary</option>
+                                    <option value="Iceland">Iceland</option>
+                                    <option value="India">India</option>
+                                    <option value="Ireland">Ireland</option>
+                                    <option value="Italy">Italy</option>
+                                    <option value="Jersey">Jersey</option>
+                                    <option value="Latvia">Latvia</option>
+                                    <option value="Lithuania">Lithuania</option>
+                                    <option value="Luxembourg">Luxembourg</option>
+                                    <option value="Monaco">Monaco</option>
+                                    <option value="Netherlands">Netherlands</option>
+                                    <option value="New Zeeland">New Zeeland</option>
+                                    <option value="Northern Ireland">Northern Ireland</option>
+                                    <option value="Norway">Norway</option>
+                                    <option value="Poland">Poland</option>
+                                    <option value="Portugal">Portugal</option>
+                                    <option value="Romania">Romania</option>
+                                    <option value="Saudi Arabia">Saudi Arabia</option>
+                                    <option value="Serbia">Serbia</option>
+                                    <option value="Slovakia">Slovakia</option>
+                                    <option value="Slovenia">Slovenia</option>
+                                    <option value="Spain">Spain</option>
+                                    <option value="Sweden">Sweden</option>
+                                    <option value="Switzerland">Switzerland</option>
+                                    <option value="UAE">UAE</option>
+                                    <option value="Ukraine">Ukraine</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="United States">United States</option>
+                                    <option value="South Africa">South Africa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="registration-form-row registration-form-row--two-up">
+                            <div class="registration-field">
+                                <label for="reg-employer-1">Employer 1 (Name/City) <span class="registration-required-asterisk">*</span></label>
+                                <input id="reg-employer-1" name="employer1" type="text" autocomplete="organization" required>
+                            </div>
+                            <div class="registration-field">
+                                <label for="reg-emplyer-2">Employer 2 (Name/City)</label>
+                                <input id="reg-emplyer-2" name="emplyer2" type="text" autocomplete="organization">
+                            </div>
+                        </div>
+                        <div class="registration-form-row registration-form-row--two-up">
+                            <div class="registration-field">
+                                <fieldset class="registration-fieldset" aria-label="Base medical speciality">
+                                    <legend>Base medical speciality <span class="registration-required-asterisk">*</span></legend>
+                                    <div class="registration-checkbox-group registration-checkbox-group--speciality">
+                                        <label class="registration-speciality-option" for="reg-speciality-anaesthesiology">
+                                            <input id="reg-speciality-anaesthesiology" name="baseSpeciality" type="checkbox" value="Anaesthesiology">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Anaesthesiology</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-speciality-critical-care">
+                                            <input id="reg-speciality-critical-care" name="baseSpeciality" type="checkbox" value="Critical Care">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Critical Care</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-speciality-emergency-medicine">
+                                            <input id="reg-speciality-emergency-medicine" name="baseSpeciality" type="checkbox" value="Emergency Medicine">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Emergency Medicine</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-speciality-internal-medicine">
+                                            <input id="reg-speciality-internal-medicine" name="baseSpeciality" type="checkbox" value="Internal Medicine">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Internal Medicine</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-speciality-paramedic">
+                                            <input id="reg-speciality-paramedic" name="baseSpeciality" type="checkbox" value="Paramedic">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Paramedic</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-speciality-nursing">
+                                            <input id="reg-speciality-nursing" name="baseSpeciality" type="checkbox" value="Nursing">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Nursing</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-speciality-other">
+                                            <input id="reg-speciality-other" name="baseSpeciality" type="checkbox" value="Other">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Other</span>
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="registration-field">
+                                <fieldset class="registration-fieldset" aria-label="Level of training">
+                                    <legend>Level of training <span class="registration-required-asterisk">*</span></legend>
+                                    <div class="registration-checkbox-group">
+                                        <label for="reg-level-consultant-physiscian">
+                                            <input id="reg-level-consultant-physiscian" name="trainingLevel" type="radio" value="Consultant physiscian">
+                                            <span>Consultant physiscian</span>
+                                        </label>
+                                        <label for="reg-level-registrar-physiscian">
+                                            <input id="reg-level-registrar-physiscian" name="trainingLevel" type="radio" value="Registrar physiscian">
+                                            <span>Registrar physiscian</span>
+                                        </label>
+                                        <label for="reg-level-specialist-paramedic">
+                                            <input id="reg-level-specialist-paramedic" name="trainingLevel" type="radio" value="Specialist paramedic">
+                                            <span>Specialist paramedic</span>
+                                        </label>
+                                        <label for="reg-level-paramedic-emt">
+                                            <input id="reg-level-paramedic-emt" name="trainingLevel" type="radio" value="Paramedic/EMT">
+                                            <span>Paramedic/EMT</span>
+                                        </label>
+                                        <label for="reg-level-specialist-nurse">
+                                            <input id="reg-level-specialist-nurse" name="trainingLevel" type="radio" value="Specialist nurse">
+                                            <span>Specialist nurse</span>
+                                        </label>
+                                        <label for="reg-level-nurse">
+                                            <input id="reg-level-nurse" name="trainingLevel" type="radio" value="Nurse">
+                                            <span>Nurse</span>
+                                        </label>
+                                        <label for="reg-level-other">
+                                            <input id="reg-level-other" name="trainingLevel" type="radio" value="Other">
+                                            <span>Other</span>
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="registration-form-row">
+                            <div class="registration-field">
+                                <fieldset class="registration-fieldset" aria-label="Clinical context">
+                                    <legend>Clinical context <span class="registration-required-asterisk">*</span></legend>
+                                    <div class="registration-checkbox-group registration-checkbox-group--speciality">
+                                        <label class="registration-speciality-option" for="reg-clinical-emergency-department">
+                                            <input id="reg-clinical-emergency-department" name="clinicalContext" type="checkbox" value="Emergency Department">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Emergency Department</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-clinical-icu">
+                                            <input id="reg-clinical-icu" name="clinicalContext" type="checkbox" value="Intensive Care Unit">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Intensive Care Unit</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-clinical-prehospital">
+                                            <input id="reg-clinical-prehospital" name="clinicalContext" type="checkbox" value="Prehospital">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Prehospital</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-clinical-operating-theatres">
+                                            <input id="reg-clinical-operating-theatres" name="clinicalContext" type="checkbox" value="Operating theatres">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Operating theatres</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-clinical-tactical-austere">
+                                            <input id="reg-clinical-tactical-austere" name="clinicalContext" type="checkbox" value="Tactical/Austere">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Tactical/Austere</span>
+                                        </label>
+                                        <label class="registration-speciality-option" for="reg-clinical-other">
+                                            <input id="reg-clinical-other" name="clinicalContext" type="checkbox" value="Other">
+                                            <span class="registration-speciality-box" aria-hidden="true"></span>
+                                            <span>Other</span>
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="registration-form-row">
+                            <div class="registration-field">
+                                <label for="reg-very-brief-bio">Very brief bio</label>
+                                <textarea id="reg-very-brief-bio" name="veryBriefBio" rows="4"></textarea>
+                            </div>
+                        </div>
+                        <div class="registration-form-row">
+                            <fieldset class="registration-fieldset" aria-label="Have you attended TBS in the past">
+                                <legend>Have you attended TBS in the past? <span class="registration-required-asterisk">*</span></legend>
+                                <div class="registration-checkbox-group">
+                                    <label for="reg-attended-tbs-yes">
+                                        <input id="reg-attended-tbs-yes" name="attendedTbsPast" type="radio" value="Yes" required>
+                                        <span>Yes</span>
+                                    </label>
+                                    <label for="reg-attended-tbs-no">
+                                        <input id="reg-attended-tbs-no" name="attendedTbsPast" type="radio" value="No">
+                                        <span>No</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="registration-form-row registration-form-row--actions">
+                            <div class="registration-success-check" hidden aria-hidden="true">
+                                <svg class="registration-success-check-icon" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false">
+                                    <circle class="registration-success-check-ring" cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="3"/>
+                                    <path class="registration-success-check-mark" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M18 33 L28 43 L46 22"/>
+                                </svg>
+                                <span class="visually-hidden">Application sent successfully</span>
+                            </div>
+                            <button type="submit" class="registration-submit-btn nav-register-pill" disabled aria-disabled="true">Apply</button>
+                            <p class="registration-smallprint">Submitting this form registers your interest in attending TBS. We'll be in touch shortly.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="home-section-divider-band" aria-hidden="true">
+                <picture class="event-section-divider-picture">
+                    <source media="(max-width: 768px)" srcset="images/narrowdivider.png">
+                    <img src="images/Sponsors/divider.png" alt="" class="event-section-divider" loading="lazy" decoding="async">
+                </picture>
             </div>
         </section>
         <section class="past-talks-section is-collapsed" hidden aria-hidden="true"></section>
@@ -981,6 +1364,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20261023-preset-value" defer></script>
+    <script src="script.js?v=20261024-no-pink-loader" defer></script>
 </body>
 </html>

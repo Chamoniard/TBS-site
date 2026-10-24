@@ -109,61 +109,6 @@ body.home-view a:active {
     text-decoration: none !important;
 }
 
-/* Loading state — no scroll until home init finishes (script removes .loading) */
-html.home-scroll-locked,
-html.home-scroll-locked body {
-    overflow: hidden !important;
-    height: 100%;
-}
-
-body.loading {
-    overflow: hidden !important;
-}
-
-/* Home: pale pink full-screen loader (fades out via .home-loading-screen.is-hidden) */
-body.home-view.loading {
-    opacity: 1;
-}
-
-body.home-view.loading::before,
-body.home-view.loading::after {
-    content: none;
-    display: none;
-}
-
-.home-loading-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 10001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--tbs-loading-pink);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transition:
-        opacity 0.45s ease,
-        visibility 0s linear 0s;
-}
-
-.home-loading-screen-logo {
-    width: auto;
-    height: auto;
-    max-width: min(80vw, 291.6px);
-    max-height: min(18vh, 64.8px);
-    object-fit: contain;
-}
-
-.home-loading-screen.is-hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-        opacity 0.45s ease,
-        visibility 0s linear 0.45s;
-}
-
 /* Non-home pages: keep legacy dim + message if body.loading is used elsewhere */
 body.loading:not(.home-view) {
     opacity: 0.7;
@@ -1314,28 +1259,36 @@ body.home-view .hero {
     position: relative; /* contain absolute prelock / overlays inside the column */
 }
 
-/* Sequential home load: poster first; script removes .home-stage-hidden once each prior band is ready */
-body.home-view .home-section > .home-stage-hidden {
-    display: none !important;
+/* Bands stay in the document flow. Hiding them must not collapse the page (that was the home CLS cluster). */
+body.home-view .home-section .home-stage-hidden {
+    visibility: hidden;
+    pointer-events: none;
 }
 
-/* Off-screen layout pass: measure introslider card heights before first visible paint (desktop) */
+/* Measure introslider card heights without lifting the band out of the flow. */
 @media (min-width: 769px) {
-    body.home-view .home-section > .introslider-inner-wrapper.home-introslider-prelock {
-        display: block !important;
-        position: absolute !important;
-        left: 0 !important;
-        right: 0 !important;
-        top: auto !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        z-index: -1 !important;
-        margin-top: 0;
-        overflow: hidden;
+    body.home-view .home-section .introslider-inner-wrapper.home-introslider-prelock {
+        visibility: hidden;
+        pointer-events: none;
     }
+}
+
+/* Sponsor logos reserve their row before the image file arrives. Script may set the same height. */
+body.home-view .home-section > .sponsors-section .sponsors-logo-image {
+    height: 50px;
+    width: auto;
+}
+
+@media (max-width: 768px) {
+    body.home-view .home-section > .sponsors-section .sponsors-logo-image {
+        height: 120px;
+    }
+}
+
+/* Latest skeletons match one news-card media row so the feed does not grow when records replace them. */
+body.home-view .home-section .feed-section-inner-wrapper .news-card--skeleton {
+    min-height: var(--news-media-height, calc(192px * 1.2 * 0.9 * 1.5 * 0.9));
+    background: #f4f4f5;
 }
 
 /* Match introslider whether it is a direct child (initial HTML) or inside .introslider-inner-wrapper (after feed JS) */
@@ -4303,7 +4256,7 @@ body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
     max-width: var(--home-programme-fit-width, var(--home-carousel-slide-width, 450px)) !important;
     aspect-ratio: auto !important;
     height: var(--home-programme-fit-height, auto) !important;
-    min-height: var(--home-programme-fit-height, calc(var(--home-carousel-slide-width, 450px) * 1920 / 1080)) !important;
+    min-height: max(var(--home-programme-fit-height, 0px), calc(var(--home-carousel-slide-width, 450px) * 1920 / 1080)) !important;
     max-height: var(--home-programme-fit-height, none) !important;
     align-self: stretch !important;
     overflow: hidden !important;

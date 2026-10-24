@@ -3660,7 +3660,6 @@ async function prepareHomeIntrosliderBeforeReveal(introWrap) {
     }
 
     introWrap.classList.remove('home-stage-hidden');
-    introWrap.classList.add('home-introslider-prelock');
     void introWrap.offsetHeight;
 
     try {
@@ -3814,14 +3813,17 @@ function mountHomeSectionIntoMain(main) {
 
     if (existingHome && existingPicture) {
         ensurePosterOverlaysOnPicture(existingPicture, existingHome);
-        Array.from(existingHome.children).forEach(function (child) {
-            if (child !== existingPicture) {
-                child.remove();
-            }
-        });
-        const bands = document.createElement('template');
-        bands.innerHTML = HOME_SECTION_BANDS_HTML;
-        existingPicture.after(bands.content);
+        /* Shells already in home.html stay put. Replacing them after first paint is the layout shift. */
+        if (!existingHome.querySelector(':scope > .introslider-section')) {
+            Array.from(existingHome.children).forEach(function (child) {
+                if (child !== existingPicture) {
+                    child.remove();
+                }
+            });
+            const bands = document.createElement('template');
+            bands.innerHTML = HOME_SECTION_BANDS_HTML;
+            existingPicture.after(bands.content);
+        }
     } else {
         const block = document.createElement('template');
         block.innerHTML =
@@ -3922,7 +3924,7 @@ function runHomeDeferredHydration(homeSection, ctx) {
 
 // Show the feed content (different from blog posts)
 async function showFeedContent() {
-    await ensureHomePasswordAccess();
+    const passwordAccess = ensureHomePasswordAccess();
     document.body.classList.add('home-view');
     setPastTalksOpenState(false);
     const main = document.querySelector('.everything');
@@ -3935,25 +3937,18 @@ async function showFeedContent() {
         
         const homeSection = mountHomeSectionIntoMain(main);
         setupRegistrationFormValidation(homeSection);
-        await syncHomeOnDemandSectionVisibility(homeSection);
+        void syncHomeOnDemandSectionVisibility(homeSection);
         void hydrateHomeOnDemandSection(homeSection).catch(function (err) {
             console.error('hydrateHomeOnDemandSection:', err);
         });
         const pictureEl = homeSection && homeSection.querySelector(':scope > picture');
         const introOuter = homeSection && homeSection.querySelector(':scope > .introslider-section');
         const introWrap = introOuter && introOuter.querySelector(':scope > .introslider-inner-wrapper');
-        const feedWrap = homeSection && homeSection.querySelector(':scope > .feed-section');
         const speakersWrap = homeSection && homeSection.querySelector(':scope > .speaker-section');
-        const onDemandWrap = homeSection && homeSection.querySelector(':scope > .on-demand-section');
         const regWrap = homeSection && homeSection.querySelector(':scope > .registration-section');
-        const regDivider = homeSection && homeSection.querySelector(':scope > .registration-section + .home-section-divider-band');
         mountHomeProgrammeSliderShell(homeSection);
         positionHomeSponsorsAfterIntroslider(homeSection);
         const sponsorsWrap = getHomeSponsorsInnerWrapper(homeSection);
-        const programmeWrap = homeSection && homeSection.querySelector(':scope > .programme-section');
-        [sponsorsWrap, introOuter, feedWrap, speakersWrap, onDemandWrap, regWrap, regDivider, programmeWrap].forEach((el) => {
-            if (el) el.classList.add('home-stage-hidden');
-        });
         const programmeReady = prefetchHomeProgrammeSliderData().then(function () {
             return hydrateHomeProgrammeSlider(homeSection);
         });
@@ -4053,7 +4048,6 @@ async function showFeedContent() {
         }
 
         try {
-            // Keep bands hidden until content is ready — do not reveal empty shells under the loader.
             setupHomeHeroIntrosliderPosterGap(8);
 
             const introReady = introWrap
@@ -4067,11 +4061,19 @@ async function showFeedContent() {
                 })
             ]);
 
-            await posterReady;
-            // Do not mountFeedSkeleton here — it wipes the feed if loadNewsFeed already painted.
+            /* Shells are already in the first layout. Hide the pink screen once the poster is up.
+               News, speakers, and programme keep filling those shells after. */
+            await Promise.race([
+                Promise.all([passwordAccess, posterReady]),
+                new Promise(function (resolve) {
+                    setTimeout(resolve, HOME_LOAD_POSTER_MAX_MS);
+                })
+            ]);
             wireSliderIndicators();
+            setHomePageLoading(false);
+            setupHomeViewNavbarScroll();
 
-            await runHomeDeferredHydration(homeSection, {
+            void runHomeDeferredHydration(homeSection, {
                 introReady: introReady,
                 introOuter: introOuter,
                 newsFeedPromise: newsFeedPromise,
@@ -4083,9 +4085,6 @@ async function showFeedContent() {
                 registrationManifestoPromise: registrationManifestoPromise,
                 registrationToReservesPromise: registrationToReservesPromise
             });
-
-            setHomePageLoading(false);
-            setupHomeViewNavbarScroll();
 
             if (typeof requestIdleCallback === 'function') {
                 requestIdleCallback(function () {
@@ -4410,6 +4409,9 @@ function showFeedLoadingState() {
     const feedContent = document.querySelector('.feed-section-inner-wrapper');
     if (!feedContent) {
         console.error('showFeedLoadingState - feedContent not found');
+        return;
+    }
+    if (feedContent.querySelector('.news-grid, .skeleton-cards, .feed-loading')) {
         return;
     }
     
@@ -5640,12 +5642,19 @@ function homeSpeakerIdsFromTbsParentData(data) {
 /**
  * @returns {Promise<Array<{ id: string, firstName: string, lastName: string, shortBio: string, longBio: string }>>}
  */
-async function fetchHomeSpeakersListFromFirebase(eventId) {
+async function fetchHomeSpeakersListFromFirebase(eventId, onProgress) {
     if (typeof firebase === 'undefined') return [];
     const resolvedEventId = String(eventId || currentHomeSiteEvent() || HOME_SITE_EVENT_DEFAULT || '').trim();
     const cacheKey = resolvedEventId || '__tbs_speakers__';
     const cached = firestoreHomeCache.speakersByEventId.get(cacheKey);
+    if (typeof onProgress === 'function') {
+        const entry = cached || { value: [], fetchedAt: 0, listeners: [] };
+        entry.listeners = Array.isArray(entry.listeners) ? entry.listeners : [];
+        entry.listeners.push(onProgress);
+        firestoreHomeCache.speakersByEventId.set(cacheKey, entry);
+    }
     if (isFreshFirestoreCacheEntry(cached) && Array.isArray(cached.value) && cached.value.length) {
+        if (typeof onProgress === 'function') onProgress(cached.value.slice());
         return cached.value;
     }
     if (cached && cached.promise) return cached.promise;
@@ -5666,9 +5675,7 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
             return fetchHomeSpeakersListFromEventSubcollection(resolvedEventId);
         }
         const list = [];
-        const chunkSize = 8;
-        for (let i = 0; i < ids.length; i += chunkSize) {
-            const chunk = ids.slice(i, i + chunkSize);
+        const loadSpeakerChunk = async function (chunk) {
             const snaps = await Promise.all(
                 chunk.map((rowId) => withTimeout(
                     db.collection('tbs').doc('Speakers').collection(rowId).doc('item').get(),
@@ -5679,16 +5686,40 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
                     return null;
                 }))
             );
+            const rows = [];
             for (let j = 0; j < chunk.length; j++) {
                 const rowId = chunk[j];
                 const docSnap = snaps[j];
                 if (!docSnap || !docSnap.exists) continue;
                 const d = docSnap.data() || {};
                 if (!homeSpeakerDocVisibleOnHome(d, resolvedEventId)) continue;
-                list.push(homeSpeakerRowFromFirestoreItem(rowId, d));
+                rows.push(homeSpeakerRowFromFirestoreItem(rowId, d));
             }
-        }
+            return rows;
+        };
+        const notifySpeakers = function (rows) {
+            const entry = firestoreHomeCache.speakersByEventId.get(cacheKey);
+            const listeners = entry && Array.isArray(entry.listeners) ? entry.listeners.slice() : [];
+            for (let li = 0; li < listeners.length; li++) {
+                try {
+                    listeners[li](rows.slice());
+                } catch (listenErr) {
+                    console.warn('home speakers progress', listenErr);
+                }
+            }
+        };
+        const firstIds = ids.slice(0, 24);
+        const restIds = ids.slice(24);
+        const firstRows = await loadSpeakerChunk(firstIds);
+        list.push.apply(list, firstRows);
         list.sort(compareHomeSpeakersForSort);
+        notifySpeakers(list);
+        if (restIds.length) {
+            const restRows = await loadSpeakerChunk(restIds);
+            list.push.apply(list, restRows);
+            list.sort(compareHomeSpeakersForSort);
+            notifySpeakers(list);
+        }
         if (list.length) return list;
         return fetchHomeSpeakersListFromEventSubcollection(resolvedEventId);
     } catch (e) {
@@ -5696,10 +5727,12 @@ async function fetchHomeSpeakersListFromFirebase(eventId) {
         return fetchHomeSpeakersListFromEventSubcollection(resolvedEventId);
     }
     })();
+    const priorSpeakerCache = firestoreHomeCache.speakersByEventId.get(cacheKey);
     firestoreHomeCache.speakersByEventId.set(cacheKey, {
         value: cached && Array.isArray(cached.value) ? cached.value : [],
         fetchedAt: cached ? Number(cached.fetchedAt || 0) : 0,
-        promise: promise
+        promise: promise,
+        listeners: priorSpeakerCache && Array.isArray(priorSpeakerCache.listeners) ? priorSpeakerCache.listeners : []
     });
     const value = await promise;
     const rows = Array.isArray(value) ? value : [];
@@ -6419,19 +6452,6 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
     }
     try {
         const eventId = currentHomeSiteEvent();
-        const speakersPromise = fetchHomeSpeakersListFromFirebase(eventId);
-        const settingsAndInfo = await Promise.all([
-            withTimeout(fetchHomeDisplaySpeakersFromFirestore(), 6000, 'Firestore displayspeakers').catch(
-                function () {
-                    return true;
-                }
-            ),
-            fetchHomeEventSpeakerInfoFromFirebase(eventId)
-        ]);
-        const displaySpeakers = settingsAndInfo[0];
-        const speakerinfoRaw = settingsAndInfo[1];
-        speakersWrapperEl.classList.toggle('home-carousel--minimal', !displaySpeakers);
-        const speakerinfoHtml = String(speakerinfoRaw || '').trim();
         const syntheticInfo = {
             id: '__speakerinfo__',
             firstName: '',
@@ -6439,29 +6459,63 @@ async function populateHomeSpeakersSliderFromFirebase(speakersWrapperEl) {
             shortBio: '',
             longBio: ''
         };
-
-        track.innerHTML = '';
-        speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
+        speakersWrapperEl._homeDisplaySpeakers = true;
+        speakersWrapperEl._homeFirstCardSpeakerInfoHtml = '';
         speakersWrapperEl._homeSpeakersExpanded = false;
-        appendHomeSpeakerinfoCard(track, speakerinfoHtml);
 
-        if (!displaySpeakers) {
+        const paintSpeakerCards = function (list) {
+            if (speakersWrapperEl._homeDisplaySpeakers === false) return;
+            const speakers = Array.isArray(list) ? list : [];
+            track.querySelectorAll(':scope > article.speaker-card:not(.speaker-card--speakerinfo)').forEach(function (el) {
+                el.remove();
+            });
+            speakers.forEach(function (s, i) {
+                appendHomeSpeakerCard(track, s, i + 1);
+            });
+            speakersWrapperEl._homeSpeakersList = [syntheticInfo].concat(speakers.slice());
+            padHomeSpeakerTrackToMinCards(track);
+            delete speakersWrapperEl.dataset.speakersScrollbarWired;
+            wireSpeakersSliderScrollbar();
+        };
+
+        const displayPromise = withTimeout(
+            fetchHomeDisplaySpeakersFromFirestore(),
+            6000,
+            'Firestore displayspeakers'
+        ).catch(function () {
+            return true;
+        });
+        void displayPromise.then(function (displaySpeakers) {
+            const show = displaySpeakers !== false;
+            speakersWrapperEl._homeDisplaySpeakers = show;
+            speakersWrapperEl.classList.toggle('home-carousel--minimal', !show);
+            if (show) return;
+            track.innerHTML = '';
+            appendHomeSpeakerinfoCard(track, speakersWrapperEl._homeFirstCardSpeakerInfoHtml || '');
             speakersWrapperEl._homeSpeakersList = [syntheticInfo];
             padHomeSpeakerTrackToMinCards(track);
-            return;
-        }
+        });
+        void fetchHomeEventSpeakerInfoFromFirebase(eventId).then(function (speakerinfoRaw) {
+            const speakerinfoHtml = String(speakerinfoRaw || '').trim();
+            speakersWrapperEl._homeFirstCardSpeakerInfoHtml = speakerinfoHtml;
+            let card = track.querySelector(':scope > article.speaker-card--speakerinfo');
+            if (!card) {
+                appendHomeSpeakerinfoCard(track, speakerinfoHtml);
+                card = track.lastElementChild;
+                if (card && track.firstChild !== card) track.insertBefore(card, track.firstChild);
+            } else {
+                const bioMain = card.querySelector('.speaker-card-bio-main');
+                if (bioMain) bioMain.innerHTML = buildHomeSpeakerInfoCardInnerHtml(speakerinfoHtml);
+            }
+        });
 
-        let speakers = await speakersPromise;
+        let speakers = await fetchHomeSpeakersListFromFirebase(eventId, paintSpeakerCards);
         if (!Array.isArray(speakers) || !speakers.length) {
             const cacheKey = eventId || '__tbs_speakers__';
             firestoreHomeCache.speakersByEventId.delete(cacheKey);
-            speakers = await fetchHomeSpeakersListFromFirebase(eventId);
+            speakers = await fetchHomeSpeakersListFromFirebase(eventId, paintSpeakerCards);
         }
-        speakersWrapperEl._homeSpeakersList = [syntheticInfo].concat(speakers.slice());
-        speakers.forEach(function (s, i) {
-            appendHomeSpeakerCard(track, s, i + 1);
-        });
-        padHomeSpeakerTrackToMinCards(track);
+        if (speakersWrapperEl._homeDisplaySpeakers !== false) paintSpeakerCards(speakers);
     } catch (err) {
         console.error('populateHomeSpeakersSliderFromFirebase', err);
         track.innerHTML = '';
@@ -6528,7 +6582,7 @@ function buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme) 
     const programmeSliderClassName =
         'programme-slider' + (displayProgramme ? '' : ' home-carousel--minimal');
     programmeSliderSection.innerHTML =
-        '<div class="programme-section home-stage-hidden" id="home-programme-title" role="region" aria-label="Programme">' +
+        '<div class="programme-section" id="home-programme-title" role="region" aria-label="Programme">' +
         '<div class="programmeslider-innerwrapper">' +
         '<div class="' +
         programmeSliderClassName +
@@ -6605,7 +6659,6 @@ function mountHomeProgrammeSliderShell(homeSection) {
     if (!homeSection || homeSection.querySelector(':scope > .programme-section')) return;
     const programmeSection = buildHomeProgrammeSectionElement([HOME_PROGRAMME_SHELL_SLIDE_HTML], true);
     if (!programmeSection) return;
-    programmeSection.classList.add('home-stage-hidden');
     insertHomeProgrammeSection(programmeSection, homeSection);
 }
 
@@ -8910,40 +8963,15 @@ if (typeof window !== 'undefined' && !window.__tbsHomeLocationStorageBound) {
     });
 }
 
-/** Lock document scroll while home page is loading; pale pink screen fades out when done. */
+/** Home no longer uses the pink loading screen. Clear any leftover lock from older markup. */
 function setHomePageLoading(isLoading) {
-    const on = !!isLoading;
-    document.body.classList.toggle('loading', on);
-    document.documentElement.classList.toggle('home-scroll-locked', on);
-
-    const screen = document.getElementById('home-loading-screen');
-    if (!screen) {
-        return;
-    }
-    if (on) {
-        screen.classList.remove('is-hidden');
-        screen.setAttribute('aria-hidden', 'false');
-        screen.setAttribute('aria-busy', 'true');
-        if (homeLoadingFailsafeTimer) {
-            clearTimeout(homeLoadingFailsafeTimer);
-        }
-        homeLoadingFailsafeTimer = setTimeout(function () {
-            homeLoadingFailsafeTimer = null;
-            console.warn('Home loading failsafe: dismissing pink loader after timeout.');
-            setHomePageLoading(false);
-        }, HOME_LOADING_FAILSAFE_MS);
-        return;
-    }
+    if (isLoading) return;
+    document.body.classList.remove('loading');
+    document.documentElement.classList.remove('home-scroll-locked');
     if (homeLoadingFailsafeTimer) {
         clearTimeout(homeLoadingFailsafeTimer);
         homeLoadingFailsafeTimer = null;
     }
-    screen.setAttribute('aria-busy', 'false');
-    screen.classList.add('is-hidden');
-    screen.setAttribute('aria-hidden', 'true');
-    requestAnimationFrame(function () {
-        scrollHomeToTop({ instant: true });
-    });
 }
 
 // Initialize the blog when page loads
@@ -8962,13 +8990,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.warn('warmHomePageFirestoreCache:', warmErr);
     }
 
-    try {
-        await ensureHomePasswordAccess();
-    } catch (passwordErr) {
-        console.error('ensureHomePasswordAccess:', passwordErr);
-    }
-
-    setHomePageLoading(true);
     // Setup initial event listeners first (non-blocking)
     setupEventListeners();
     setupNavbarTransparency();
