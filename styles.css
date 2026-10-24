@@ -2866,6 +2866,8 @@ body.home-view .home-section > .on-demand-section[hidden] {
 .home-section .speaker-card.speaker-card--speakerinfo > .speaker-card-inner-wrapper > .speaker-content {
     flex: 1 1 auto;
     min-width: 0;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .home-section .speaker-card.speaker-card--speakerinfo .speaker-card-bio {
@@ -6084,6 +6086,20 @@ h3.section-titles {
     text-transform: none;
 }
 
+/* Home band headings: Latest, Presented by, Speakers, Programme, Registration, On-demand. */
+body.home-view .home-section > .sponsors-section .sponsors-section-title,
+body.home-view .feed-section-inner-wrapper > h2.section-titles,
+body.home-view .home-section .speaker-card--speakerinfo .speakers-section-title,
+body.home-view .home-section .programme-info > .programme-info-title,
+body.home-view .home-section .programme-slider > .programme-info .about-title,
+body.home-view .home-section .programme-slider > .about .about-title,
+body.home-view .home-section > .on-demand-section .on-demand-section-title,
+body.home-view .home-section > .registration-section .registration-section-title,
+body.home-view .past-talks-section .past-talks-section-title,
+body.home-view .footer .footer-section-row > h3.post-title {
+    text-transform: uppercase !important;
+}
+
 /* Programme band: all h2 headings use `.section-titles` typography (not day-card gold/white styles) */
 .programme-section h2 {
     font-family: var(--title-font) !important;
@@ -6896,12 +6912,6 @@ h4 {
         border-radius: 0 !important;
     }
 
-    /* The info artwork has a white curve on its right edge. On a full-width phone card that curve sits on the seam. Crop it off. */
-    body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo::before {
-        background-position: left center;
-        background-size: 112% auto;
-    }
-
     .home-section > .speaker-section .speakers-inner-wrapper {
         padding-top: 0 !important;
         padding-bottom: 24px !important;
@@ -7519,6 +7529,11 @@ h4 {
         padding-right: 30px !important;
     }
 
+    body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
     .home-section .speakerslider-track > .speaker-card:last-child,
     .home-section .speakerslider-track > .speaker-card:only-child,
     .home-section .speakerslider-track > .speaker-placeholder:last-child,
@@ -7654,6 +7669,13 @@ h4 {
     body.home-view .home-section .speakerslider-track > .speaker-placeholder,
     body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
         filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.12));
+    }
+
+    /* Programme hides this blur on a dark card. On yellow it reads as a brown seam, so keep only the downward part. */
+    body.home-view .home-section .speakerslider-track > .speaker-card,
+    body.home-view .home-section .speakerslider-track > .speaker-placeholder,
+    body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo {
+        clip-path: inset(0 0 -16px 0);
     }
 
     body.home-view .home-section .programme-slider,
@@ -11885,6 +11907,13 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider .i
 .introslider :is(.introslider-title, .about-title.introslider-title, .featured-bottom-title) {
     font-family: var(--title-font) !important;
     letter-spacing: 0.02em;
+}
+
+body.home-view .home-section .introslider :is(
+    .about-title.introslider-title,
+    .featured-bottom-title.introslider-title
+):not(.featured-video-name) {
+    text-transform: uppercase !important;
 }
 
 /* Navbar tabs + Register pill (desktop header + mobile top pill) */
