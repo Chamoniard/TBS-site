@@ -11163,6 +11163,16 @@
             color: #ffffff !important;
         }
 
+        /* While a bulk send is running, the tab bar stays usable and the e-mailer panel does not. */
+        body.backend-page.bulk-email-sending .eventnavigation {
+            position: relative;
+            z-index: 10060;
+        }
+
+        body.backend-page.bulk-email-sending #emailer-editor {
+            pointer-events: none;
+        }
+
         .texteditor {
             display: none;
             margin-bottom: 0;
@@ -24043,31 +24053,73 @@
         }
 
         var sendBulkEmailsPhase = '';
+        var sendBulkEmailsAbort = false;
+        var sendBulkEmailsAbortController = null;
+        var sendBulkEmailsGapTimer = null;
+        var sendBulkEmailsGapResolve = null;
         var SENDBULKEMAILS_GAP_MS = 2000;
+
+        function emailerPanelIsOpen() {
+            var section = document.getElementById('emailer-editor');
+            return !!(section && section.classList.contains('is-open'));
+        }
+
+        function applySendBulkEmailsPopupOpen() {
+            var dlg = document.getElementById('sendbulkemails-confirm');
+            var phase = sendBulkEmailsPhase;
+            var active = phase === 'confirm' || phase === 'sending' || phase === 'done';
+            var open = active && (phase === 'confirm' || emailerPanelIsOpen());
+            if (dlg) {
+                dlg.hidden = !open;
+                dlg.setAttribute('aria-hidden', open ? 'false' : 'true');
+                dlg.setAttribute('aria-modal', phase === 'sending' ? 'false' : 'true');
+            }
+            document.body.classList.toggle('bulk-email-sending', phase === 'sending');
+        }
 
         function setSendBulkEmailsPopupPhase(phase, message) {
             sendBulkEmailsPhase = phase;
-            var dlg = document.getElementById('sendbulkemails-confirm');
             var titleEl = document.getElementById('sendbulkemails-confirm-title');
             var cancel = document.getElementById('sendbulkemails-cancel');
             var send = document.getElementById('sendbulkemails-confirm-send');
             var ok = document.getElementById('sendbulkemails-ok');
             if (titleEl && message != null) titleEl.textContent = message;
-            if (cancel) cancel.hidden = phase !== 'confirm';
+            if (cancel) cancel.hidden = phase !== 'confirm' && phase !== 'sending';
             if (send) {
                 send.hidden = phase !== 'confirm';
                 send.disabled = phase !== 'confirm';
             }
             if (ok) ok.hidden = phase !== 'done';
-            if (!dlg) return;
-            var open = phase === 'confirm' || phase === 'sending' || phase === 'done';
-            dlg.hidden = !open;
-            dlg.setAttribute('aria-hidden', open ? 'false' : 'true');
+            applySendBulkEmailsPopupOpen();
+            if (phase === 'sending' && cancel && emailerPanelIsOpen()) cancel.focus();
+            if (phase === 'done' && ok && emailerPanelIsOpen()) ok.focus();
         }
 
         function closeSendBulkEmailsPopup() {
             if (sendBulkEmailsPhase === 'sending') return;
             setSendBulkEmailsPopupPhase('', '');
+        }
+
+        function finishSendBulkEmailsGapWait() {
+            if (sendBulkEmailsGapTimer) {
+                clearTimeout(sendBulkEmailsGapTimer);
+                sendBulkEmailsGapTimer = null;
+            }
+            if (!sendBulkEmailsGapResolve) return;
+            var resolve = sendBulkEmailsGapResolve;
+            sendBulkEmailsGapResolve = null;
+            resolve();
+        }
+
+        function requestSendBulkEmailsAbort() {
+            if (sendBulkEmailsPhase !== 'sending' || sendBulkEmailsAbort) return;
+            sendBulkEmailsAbort = true;
+            finishSendBulkEmailsGapWait();
+            if (sendBulkEmailsAbortController) {
+                try {
+                    sendBulkEmailsAbortController.abort();
+                } catch (abortErr) {}
+            }
         }
 
         function emailerBulkSendTargets() {
@@ -24092,11 +24144,18 @@
 
         function waitSendBulkEmailsGap(ms) {
             return new Promise(function (resolve) {
-                setTimeout(resolve, ms);
+                if (sendBulkEmailsAbort) {
+                    resolve();
+                    return;
+                }
+                sendBulkEmailsGapResolve = resolve;
+                sendBulkEmailsGapTimer = setTimeout(function () {
+                    finishSendBulkEmailsGapWait();
+                }, ms);
             });
         }
 
-        async function postSendBulkEmail(field, target) {
+        async function postSendBulkEmail(field, target, signal) {
             var fnUrl =
                 'https://us-central1-' +
                 String(firebaseConfig.projectId || '').trim() +
@@ -24109,6 +24168,7 @@
                     kind: target.kind,
                     id: target.id,
                 }),
+                signal: signal,
             });
             var payload = {};
             try {
@@ -24153,15 +24213,25 @@
             var sent = 0;
             var failed = 0;
             var firstError = '';
+            sendBulkEmailsAbort = false;
             setSendBulkEmailsPopupPhase('sending', 'Sending 1 of ' + targets.length + '…');
             for (var i = 0; i < targets.length; i++) {
-                if (i > 0) await waitSendBulkEmailsGap(SENDBULKEMAILS_GAP_MS);
+                if (sendBulkEmailsAbort) break;
+                if (i > 0) {
+                    await waitSendBulkEmailsGap(SENDBULKEMAILS_GAP_MS);
+                    if (sendBulkEmailsAbort) break;
+                }
                 setSendBulkEmailsPopupPhase(
                     'sending',
                     'Sending ' + (i + 1) + ' of ' + targets.length + '…'
                 );
+                sendBulkEmailsAbortController = new AbortController();
                 try {
-                    var payload = await postSendBulkEmail(field, targets[i]);
+                    var payload = await postSendBulkEmail(
+                        field,
+                        targets[i],
+                        sendBulkEmailsAbortController.signal
+                    );
                     rememberBulkEmailLogLine(
                         targets[i].kind,
                         targets[i].id,
@@ -24169,11 +24239,15 @@
                     );
                     sent += 1;
                 } catch (err) {
+                    if (sendBulkEmailsAbort || (err && err.name === 'AbortError')) break;
                     failed += 1;
                     if (!firstError) {
                         firstError = err && err.message ? String(err.message) : 'Failed to send.';
                     }
+                } finally {
+                    sendBulkEmailsAbortController = null;
                 }
+                if (sendBulkEmailsAbort) break;
             }
             var result = 'Sent ' + sent + ' of ' + targets.length + '.';
             if (failed) {
@@ -24181,8 +24255,6 @@
                 if (firstError) result += ' ' + firstError;
             }
             setSendBulkEmailsPopupPhase('done', result);
-            var ok = document.getElementById('sendbulkemails-ok');
-            if (ok) ok.focus();
         }
 
         function openSendBulkEmailsConfirm() {
@@ -37132,6 +37204,7 @@
                 emailerEditorSection.classList.toggle('is-open', isEmailer);
                 emailerEditorSection.setAttribute('aria-hidden', isEmailer ? 'false' : 'true');
             }
+            applySendBulkEmailsPopupOpen();
             if (financesSection) {
                 financesSection.classList.toggle('is-open', isFinances);
                 financesSection.setAttribute('aria-hidden', isFinances ? 'false' : 'true');
@@ -37276,6 +37349,7 @@
             if (isFinances) {
                 void importFinancesInvoicesFromStripe({ showLoading: true });
             }
+            applySendBulkEmailsPopupOpen();
         }
 
         function updateBackendEditorVisibility() {
@@ -41610,6 +41684,7 @@
             if (sendBulkEmailsCancel) {
                 sendBulkEmailsCancel.addEventListener('click', function () {
                     if (sendBulkEmailsPhase === 'confirm') closeSendBulkEmailsPopup();
+                    else if (sendBulkEmailsPhase === 'sending') requestSendBulkEmailsAbort();
                 });
             }
             if (sendBulkEmailsOk) {
