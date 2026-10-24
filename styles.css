@@ -1285,10 +1285,71 @@ body.home-view .home-section > .sponsors-section .sponsors-logo-image {
     }
 }
 
-/* Latest skeletons match one news-card media row so the feed does not grow when records replace them. */
+/* YouTube-style placeholders: flat gray thumb and two lines, same box as the finished card. */
 body.home-view .home-section .feed-section-inner-wrapper .news-card--skeleton {
     min-height: var(--news-media-height, calc(192px * 1.2 * 0.9 * 1.5 * 0.9));
-    background: #f4f4f5;
+    background: #ffffff;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    pointer-events: none;
+}
+
+body.home-view .yt-placeholder-thumb {
+    background: #e5e5e5;
+    border-radius: 4px;
+}
+
+body.home-view .yt-placeholder-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+body.home-view .yt-placeholder-line {
+    height: 12px;
+    width: 88%;
+    background: #e5e5e5;
+    border-radius: 4px;
+}
+
+body.home-view .yt-placeholder-line--short {
+    width: 56%;
+}
+
+body.home-view .home-section .news-card--skeleton .yt-placeholder-thumb {
+    flex: 0 0 var(--news-media-width, calc(288px * 1.2 * 0.9 * 1.5 * 0.9));
+    width: var(--news-media-width, calc(288px * 1.2 * 0.9 * 1.5 * 0.9));
+    height: var(--news-media-height, calc(192px * 1.2 * 0.9 * 1.5 * 0.9));
+}
+
+body.home-view .home-section .news-card--skeleton .yt-placeholder-copy {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 12px 16px;
+}
+
+body.home-view .home-section .speaker-card--skeleton,
+body.home-view .home-section .programme-day-slide--skeleton {
+    display: flex !important;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 16px;
+    background: #ffffff !important;
+    pointer-events: none;
+}
+
+body.home-view .home-section .speaker-card--skeleton .yt-placeholder-thumb,
+body.home-view .home-section .programme-day-slide--skeleton .yt-placeholder-thumb {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+}
+
+body.home-view .home-section .speaker-card--skeleton .yt-placeholder-copy,
+body.home-view .home-section .programme-day-slide--skeleton .yt-placeholder-copy {
+    flex: 0 0 auto;
+    padding-top: 14px;
 }
 
 /* Match introslider whether it is a direct child (initial HTML) or inside .introslider-inner-wrapper (after feed JS) */
@@ -6835,6 +6896,12 @@ h4 {
         border-radius: 0 !important;
     }
 
+    /* The info artwork has a white curve on its right edge. On a full-width phone card that curve sits on the seam. Crop it off. */
+    body.home-view .home-section .speakerslider-track > .speaker-card--speakerinfo::before {
+        background-position: left center;
+        background-size: 112% auto;
+    }
+
     .home-section > .speaker-section .speakers-inner-wrapper {
         padding-top: 0 !important;
         padding-bottom: 24px !important;
@@ -6917,9 +6984,14 @@ h4 {
         max-width: var(--news-media-width);
         width: var(--news-media-width);
     }
-    .news-card-image {
-        height: auto;
-        min-height: 0;
+    .feed-section-inner-wrapper .news-card-image,
+    .home-section .feed-section-inner-wrapper .news-card-image {
+        align-self: flex-start !important;
+        flex-shrink: 0;
+        height: auto !important;
+        min-height: auto;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
     }
     .news-card-youtube-container {
         height: var(--news-media-height);
@@ -6929,8 +7001,10 @@ h4 {
         width: 100%;
         height: auto;
         max-height: none;
+        aspect-ratio: 16 / 9;
         object-fit: contain;
         object-position: center;
+        flex-shrink: 0;
     }
     .news-card .news-card-content,
     .feed-section-inner-wrapper .news-card .news-card-content,
@@ -7431,7 +7505,9 @@ h4 {
     }
 
     .home-section .speakerslider-track > .speaker-card:first-child,
-    .home-section .speakerslider-track > .speaker-placeholder:first-child {
+    .home-section .speakerslider-track > .speaker-placeholder:first-child,
+    .home-section .speakerslider-track > .speaker-card--speakerinfo + .speaker-card,
+    .home-section .speakerslider-track > .speaker-card--speakerinfo + .speaker-placeholder {
         border-left: none !important;
     }
 

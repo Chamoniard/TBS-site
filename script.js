@@ -4394,12 +4394,11 @@ function mountHomeSpeakersSkeleton(speakersWrapperEl) {
         article.className = 'speaker-card speaker-card--skeleton';
         article.setAttribute('aria-hidden', 'true');
         article.innerHTML =
-            '<div class="speaker-card-inner-wrapper">' +
-            '<div class="speaker-content">' +
-            '<div class="skeleton-title skeleton-title--speaker-name"></div>' +
-            '<div class="skeleton-text"></div>' +
-            '<div class="skeleton-text short"></div>' +
-            '</div></div>';
+            '<div class="yt-placeholder-thumb"></div>' +
+            '<div class="yt-placeholder-copy">' +
+            '<div class="yt-placeholder-line"></div>' +
+            '<div class="yt-placeholder-line yt-placeholder-line--short"></div>' +
+            '</div>';
         track.appendChild(article);
     }
 }
@@ -6569,10 +6568,10 @@ const PROGRAMME_INDEX_SLIDE_DEFAULTS = [
 
 const HOME_PROGRAMME_SHELL_SLIDE_HTML =
     '<div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true">' +
-    '<div class="programme-day-content programmestyle">' +
-    '<div class="skeleton-title"></div>' +
-    '<div class="skeleton-text"></div>' +
-    '<div class="skeleton-text short"></div>' +
+    '<div class="yt-placeholder-thumb"></div>' +
+    '<div class="yt-placeholder-copy">' +
+    '<div class="yt-placeholder-line"></div>' +
+    '<div class="yt-placeholder-line yt-placeholder-line--short"></div>' +
     '</div></div>';
 
 function buildHomeProgrammeSectionElement(programmeDaySlides, displayProgramme) {

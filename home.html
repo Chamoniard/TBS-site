@@ -150,8 +150,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20261024-no-pink-loader" as="style">
-    <link rel="stylesheet" href="styles.css?v=20261024-no-pink-loader">
+    <link rel="preload" href="styles.css?v=20261025-mobile-seams" as="style">
+    <link rel="stylesheet" href="styles.css?v=20261025-mobile-seams">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -1019,18 +1019,20 @@
                 <div class="feed-section-inner-wrapper">
                     <h2 class="section-titles" id="home-feed-latest-heading">Latest</h2>
                     <div class="news-grid">
-                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
-                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
-                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
-                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
-                        <article class="news-card news-card--skeleton" aria-hidden="true"></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
+                        <article class="news-card news-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
                     </div>
                 </div>
             </div>
             <div class="programme-section" id="home-programme-title" role="region" aria-label="Programme">
                 <div class="programmeslider-innerwrapper">
                     <div class="programme-slider">
-                        <div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true"></div>
+                        <div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></div>
+                        <div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></div>
+                        <div class="programme-day-slide programme-day-slide--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></div>
                     </div>
                     <div class="home-introslider-scrollbar" aria-hidden="true">
                         <div class="home-introslider-scrollbar-track">
@@ -1043,7 +1045,9 @@
                 <div class="speakers-inner-wrapper">
                     <div class="speakerslider" aria-label="Speakers">
                         <div class="speakerslider-track">
-                            <article class="speaker-card speaker-card--skeleton" aria-hidden="true"></article>
+                            <article class="speaker-card speaker-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
+                            <article class="speaker-card speaker-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
+                            <article class="speaker-card speaker-card--skeleton" aria-hidden="true"><div class="yt-placeholder-thumb"></div><div class="yt-placeholder-copy"><div class="yt-placeholder-line"></div><div class="yt-placeholder-line yt-placeholder-line--short"></div></div></article>
                         </div>
                     </div>
                     <div class="home-introslider-scrollbar" aria-hidden="true">
@@ -1364,6 +1368,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20261024-no-pink-loader" defer></script>
+    <script src="script.js?v=20261025-yt-placeholders" defer></script>
 </body>
 </html>
