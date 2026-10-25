@@ -323,6 +323,7 @@
             opacity: 0.45;
         }
 
+        body.backend-page.backend-readonly .guests-event-badge-btn,
         body.backend-page.backend-readonly .guests-invited-badge-btn,
         body.backend-page.backend-readonly .guests-read-badge-btn,
         body.backend-page.backend-readonly .guests-invoiced-badge-btn,
@@ -335,6 +336,7 @@
         body.backend-page.backend-readonly .speakers-programmed-badge-btn,
         body.backend-page.backend-readonly .speaker-roster-presented-btn,
         body.backend-page.backend-readonly .content-editor-badge-btn,
+        body.backend-page.backend-readonly .guests-event-option,
         body.backend-page.backend-readonly .guests-invited-option,
         body.backend-page.backend-readonly .guests-read-option,
         body.backend-page.backend-readonly .guests-invoiced-option,
@@ -9906,6 +9908,7 @@
             color: #ffffff;
         }
 
+        #guest-editor .guests-event-wrap,
         #guest-editor .guests-invited-wrap,
         #guest-editor .guests-read-wrap,
         #guest-editor .guests-invoiced-wrap,
@@ -9917,6 +9920,7 @@
             max-width: 100%;
         }
 
+        #guest-editor .guests-list-table .guests-event-badge-btn,
         #guest-editor .guests-list-table .guests-invited-badge-btn,
         #guest-editor .guests-list-table .guests-read-badge-btn,
         #guest-editor .guests-list-table .guests-invoiced-badge-btn,
@@ -9932,6 +9936,7 @@
             box-sizing: border-box;
         }
 
+        #guest-editor .guests-list-table .guests-event-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-invited-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-read-badge-btn.is-armed,
         #guest-editor .guests-list-table .guests-invoiced-badge-btn.is-armed,
@@ -9943,11 +9948,13 @@
             box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
         }
 
+        #guest-editor .guests-event-dropdown,
         #guest-editor .guests-invited-dropdown,
         #guest-editor .guests-read-dropdown,
         #guest-editor .guests-paid-dropdown,
         #guest-editor .guests-briefed-dropdown,
         #guest-editor .guests-cme-dropdown,
+        body.backend-page > ul.guests-event-dropdown,
         body.backend-page > ul.guests-invited-dropdown,
         body.backend-page > ul.guests-read-dropdown,
         body.backend-page > ul.guests-paid-dropdown,
@@ -9968,6 +9975,7 @@
             box-sizing: border-box;
         }
 
+        body.backend-page > ul.guests-event-dropdown,
         body.backend-page > ul.guests-invited-dropdown,
         body.backend-page > ul.guests-read-dropdown,
         body.backend-page > ul.guests-paid-dropdown,
@@ -9977,11 +9985,13 @@
             z-index: 20001;
         }
 
+        #guest-editor .guests-event-dropdown[hidden],
         #guest-editor .guests-invited-dropdown[hidden],
         #guest-editor .guests-read-dropdown[hidden],
         #guest-editor .guests-paid-dropdown[hidden],
         #guest-editor .guests-briefed-dropdown[hidden],
         #guest-editor .guests-cme-dropdown[hidden],
+        body.backend-page > ul.guests-event-dropdown[hidden],
         body.backend-page > ul.guests-invited-dropdown[hidden],
         body.backend-page > ul.guests-read-dropdown[hidden],
         body.backend-page > ul.guests-paid-dropdown[hidden],
@@ -10016,6 +10026,7 @@
             display: none !important;
         }
 
+        #guest-editor .guests-event-dropdown > li,
         #guest-editor .guests-invited-dropdown > li,
         #guest-editor .guests-read-dropdown > li,
         #guest-editor .guests-invoiced-dropdown > li,
@@ -10023,6 +10034,7 @@
         #guest-editor .guests-briefed-dropdown > li,
         #guest-editor .guests-cme-dropdown > li,
         body.backend-page > ul.guests-invoiced-dropdown > li,
+        body.backend-page > ul.guests-event-dropdown > li,
         body.backend-page > ul.guests-invited-dropdown > li,
         body.backend-page > ul.guests-read-dropdown > li,
         body.backend-page > ul.guests-paid-dropdown > li,
@@ -10032,6 +10044,7 @@
             padding: 0;
         }
 
+        #guest-editor .guests-event-dropdown .guests-event-option,
         #guest-editor .guests-invited-dropdown .guests-invited-option,
         #guest-editor .guests-read-dropdown .guests-read-option,
         #guest-editor .guests-invoiced-dropdown .guests-invoiced-option,
@@ -10039,6 +10052,7 @@
         #guest-editor .guests-briefed-dropdown .guests-briefed-option,
         #guest-editor .guests-cme-dropdown .guests-cme-option,
         body.backend-page > ul.guests-invoiced-dropdown .guests-invoiced-option,
+        body.backend-page > ul.guests-event-dropdown .guests-event-option,
         body.backend-page > ul.guests-invited-dropdown .guests-invited-option,
         body.backend-page > ul.guests-read-dropdown .guests-read-option,
         body.backend-page > ul.guests-paid-dropdown .guests-paid-option,
@@ -10074,11 +10088,13 @@
             box-shadow: none;
         }
 
+        #guest-editor .guests-event-dropdown .guests-event-option:hover,
         #guest-editor .guests-invited-dropdown .guests-invited-option:hover,
         #guest-editor .guests-read-dropdown .guests-read-option:hover,
         #guest-editor .guests-paid-dropdown .guests-paid-option:hover,
         #guest-editor .guests-briefed-dropdown .guests-briefed-option:hover,
         #guest-editor .guests-cme-dropdown .guests-cme-option:hover,
+        body.backend-page > ul.guests-event-dropdown .guests-event-option:hover,
         body.backend-page > ul.guests-invited-dropdown .guests-invited-option:hover,
         body.backend-page > ul.guests-read-dropdown .guests-read-option:hover,
         body.backend-page > ul.guests-paid-dropdown .guests-paid-option:hover,
@@ -15808,6 +15824,11 @@
         /** After prev/next guest: open **Guest management** strip if it was visible before navigation. */
         let guestEditorScrollToManagementOnNextPopulate = false;
         let guestEditorBottomPane = 'management';
+        /** Event column: first click arms badge (pink ring); second opens all events. */
+        var guestsEventArmedDocId = '';
+        var guestsEventDropdownOpenDocId = '';
+        /** Allevents (or this user's allowed events) for the guests Event pill. */
+        var guestsRosterAllevents = [];
         /** Invited column: first click arms badge (pink ring); second opens value dropdown. */
         var guestsInvitedArmedDocId = '';
         var guestsInvitedDropdownOpenDocId = '';
@@ -15822,7 +15843,7 @@
         /** Invoiced column: Yes / No / Direct / Cancel; same two-step interaction as Read. */
         var guestsInvoicedArmedDocId = '';
         var guestsInvoicedDropdownOpenDocId = '';
-        /** Paid column: Yes / No / Cancelled; same two-step interaction. */
+        /** Paid column: Yes / No / Pending / Overdue / First notice / Cancelled / Rollover. */
         var guestsPaidArmedDocId = '';
         var guestsPaidDropdownOpenDocId = '';
         /** Briefed column: Yes / No; same two-step interaction. */
@@ -28464,7 +28485,7 @@
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
-        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Cancelled'];
+        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Cancelled', 'Rollover'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_BRIEFED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -28966,7 +28987,7 @@
                     for (var c = 0; c < ids.length; c++) {
                         var choice = best[ids[c]];
                         var paidNow = String(choice.guest.paid || '').trim().toLowerCase();
-                        if (paidNow === 'first notice') continue;
+                        if (paidNow === 'first notice' || paidNow === 'rollover') continue;
                         if (String(choice.guest.paid || '').trim() === choice.label) continue;
                         choice.guest.paid = choice.label;
                         changes.push(choice.guest);
@@ -29074,7 +29095,7 @@
             var t = String(paidVal != null ? paidVal : '').trim();
             if (!t) return ' content-badge--guest-field-empty';
             var low = t.toLowerCase();
-            if (low === 'yes' || low === 'y' || low === 'true') {
+            if (low === 'yes' || low === 'y' || low === 'true' || low === 'rollover') {
                 return ' content-badge--guest-status-yes';
             }
             if (low === 'pending') return ' content-badge--guest-paid-pending';
@@ -29194,6 +29215,7 @@
         }
 
         function hideAllGuestRosterMenus() {
+            hideAllGuestsRosterDropdowns('guests-event-dropdown');
             hideAllGuestsRosterDropdowns('guests-invited-dropdown');
             hideAllGuestsRosterDropdowns('guests-read-dropdown');
             hideAllGuestsRosterDropdowns('guests-invoiced-dropdown');
@@ -29280,10 +29302,17 @@
             var becomingPaid =
                 String(value).trim().toLowerCase() === 'yes' &&
                 String(prev != null ? prev : '').trim().toLowerCase() !== 'yes';
+            var becomingRollover =
+                String(value).trim().toLowerCase() === 'rollover' &&
+                String(prev != null ? prev : '').trim().toLowerCase() !== 'rollover';
             var paidDate = becomingPaid ? guestPaidDateYyyyMmDd() : '';
-            var logLine = becomingPaid ? guestLogPaymentReceivedLine(paidDate) : '';
+            var logLine = becomingPaid
+                ? guestLogPaymentReceivedLine(paidDate)
+                : becomingRollover
+                  ? guestLogYyMmDdPrefix() + ': Rollover from a previous event. Already paid; no Stripe invoice.'
+                  : '';
             var patch = { Paid: value };
-            if (becomingPaid) {
+            if (becomingPaid || becomingRollover) {
                 var dbPre = getFirestore();
                 var itemRefPre = dbPre.collection('tbs').doc('Guests').collection(id).doc('item');
                 try {
@@ -29293,9 +29322,11 @@
                 } catch (ge) {
                     console.error('setGuestPaidField get:', ge);
                 }
-                patch['Paid date'] = paidDate;
                 patch.Log = prevLog.concat([logLine]);
-                rec.paidDate = paidDate;
+                if (becomingPaid) {
+                    patch['Paid date'] = paidDate;
+                    rec.paidDate = paidDate;
+                }
                 rec.log = patch.Log.slice();
             }
             rec.paid = value;
@@ -29432,6 +29463,123 @@
             if (low === 'reserve') return ' content-badge--guest-invited-reserve';
             if (low === 'sold out') return ' content-badge--guest-invited-soldout';
             return ' content-badge--guest-status-neutral';
+        }
+
+        function guestRosterEventChoices(currentLabel) {
+            var seen = Object.create(null);
+            var out = [];
+            function add(raw) {
+                var label = String(raw != null ? raw : '').trim();
+                if (!label || label === '-' || label === '—') return;
+                var key = label.toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push(label);
+            }
+            (guestsRosterAllevents || []).forEach(add);
+            add(current_event);
+            add(currentLabel);
+            return out;
+        }
+
+        function guestRosterEventCellHtml(docId, eventVal, isCancelled) {
+            var raw = String(eventVal != null ? eventVal : '').trim();
+            var displayText = raw || '—';
+            var badgeClass = isCancelled
+                ? 'content-badge content-badge--guest-cancelled'
+                : contentEventBadgeClassForLabel(raw);
+            var choices = guestRosterEventChoices(raw);
+            var opts = [];
+            for (var ei = 0; ei < choices.length; ei++) {
+                var eventValue = choices[ei];
+                opts.push(
+                    '<li role="none"><button type="button" class="guests-event-option" role="menuitem" data-event-value="' +
+                    escapeHtml(eventValue) +
+                    '">' +
+                    escapeHtml(eventValue) +
+                    '</button></li>'
+                );
+            }
+            return (
+                '<td class="guests-roster-tag-cell guests-event-cell">' +
+                '<div class="guests-event-wrap">' +
+                '<button type="button" class="' +
+                badgeClass +
+                ' guests-event-badge-btn" data-guests-id="' +
+                escapeHtml(docId) +
+                '" aria-haspopup="menu" aria-expanded="false" title="Event: first click selects row, second opens values" aria-label="Event: ' +
+                escapeHtml(displayText) +
+                '">' +
+                escapeHtml(displayText) +
+                '</button>' +
+                '<ul class="guests-event-dropdown" hidden role="menu">' +
+                opts.join('') +
+                '</ul></div></td>'
+            );
+        }
+
+        function clearGuestsEventUiState() {
+            guestsEventArmedDocId = '';
+            guestsEventDropdownOpenDocId = '';
+            document.querySelectorAll('#guest-editor .guests-event-badge-btn.is-armed').forEach(function(b) {
+                b.classList.remove('is-armed');
+            });
+            hideAllGuestsRosterDropdowns('guests-event-dropdown');
+            document.querySelectorAll('#guest-editor .guests-event-badge-btn').forEach(function(b) {
+                b.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        function detachGuestFromCurrentRosterIfEventMoved(rec) {
+            if (!rec || guestRecordEventMatchesCurrentEvent(rec)) return;
+            if (guestsRosterAllInMemory === guestsRosterInMemory) {
+                guestsRosterAllInMemory = guestsRosterInMemory.slice();
+            }
+            var id = String(rec.id || '').trim();
+            guestsRosterInMemory = (guestsRosterInMemory || []).filter(function (g) {
+                return String((g && g.id) || '').trim() !== id;
+            });
+        }
+
+        async function setGuestEventField(docId, value) {
+            var id = String(docId || '').trim();
+            var next = String(value != null ? value : '').trim();
+            if (!id || !next) return;
+            var rec = findGuestInMemory(id);
+            if (!rec) return;
+            var allowed = guestRosterEventChoices(rec.event);
+            if (allowed.indexOf(next) < 0) return;
+            var prev = rec.event;
+            rec.event = next;
+            guestsEventArmedDocId = '';
+            guestsEventDropdownOpenDocId = '';
+            detachGuestFromCurrentRosterIfEventMoved(rec);
+            renderGuestsRoster();
+            try {
+                var db = getFirestore();
+                await db
+                    .collection('tbs')
+                    .doc('Guests')
+                    .collection(id)
+                    .doc('item')
+                    .set({ Event: next }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Event = ' + next + '.');
+                }
+            } catch (err) {
+                console.error('setGuestEventField:', err);
+                rec.event = prev;
+                if (
+                    guestRecordEventMatchesCurrentEvent(rec) &&
+                    !rosterFindRecordById(guestsRosterInMemory, id)
+                ) {
+                    guestsRosterInMemory.push(rec);
+                }
+                renderGuestsRoster();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', err && err.message ? err.message : 'Failed to update Event.');
+                }
+            }
         }
 
         function guestRosterInvitedCellHtml(docId, invitedVal) {
@@ -30153,6 +30301,11 @@
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'yes';
         }
 
+        /** Paid at a previous event. There is no Stripe invoice for this guest. */
+        function guestPaidFieldIsRollover(paidVal) {
+            return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'rollover';
+        }
+
 
         /** Invited is the literal “Yes” (case-insensitive). */
         function guestInvitedFieldIsYes(invitedVal) {
@@ -30169,10 +30322,13 @@
             return String(invitedVal != null ? invitedVal : '').trim().toLowerCase() === 'reserve';
         }
 
-        /** `#invoicedisno`: **Invoiced** is No and **Invited** is Yes. */
+        /** `#invoicedisno`: **Invoiced** is No and **Invited** is Yes. Rollover guests already paid elsewhere. */
         function guestInvoicedisnoBlockShouldShow(g) {
             return Boolean(
-                g && guestInvoicedFieldIsNo(g.invoiced) && guestInvitedFieldIsYes(g.invited)
+                g &&
+                    !guestPaidFieldIsRollover(g.paid) &&
+                    guestInvoicedFieldIsNo(g.invoiced) &&
+                    guestInvitedFieldIsYes(g.invited)
             );
         }
 
@@ -30748,13 +30904,19 @@
             if (!btn) return;
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
+            var rollover = Boolean(g && guestPaidFieldIsRollover(g.paid));
             var invoicedDone = Boolean(g && guestInvoicedFieldIsYes(g.invoiced));
             var active = Boolean(
-                g && guestInvitedFieldIsYes(g.invited) && guestInvoicedFieldIsNo(g.invoiced)
+                g &&
+                    !rollover &&
+                    guestInvitedFieldIsYes(g.invited) &&
+                    guestInvoicedFieldIsNo(g.invoiced)
             );
             var canRun = active && guestPadlockIsOpen;
             var label;
-            if (invoicedDone) {
+            if (rollover) {
+                label = 'Rollover';
+            } else if (invoicedDone) {
                 var dateLabel = guestInvoicedDateLabelFromRecord(g) || '—';
                 label = 'Invoiced ' + dateLabel;
             } else {
@@ -30770,7 +30932,7 @@
                 btn.removeAttribute('disabled');
             }
             btn.classList.toggle('is-active', active);
-            btn.classList.toggle('is-done', invoicedDone);
+            btn.classList.toggle('is-done', invoicedDone || rollover);
         }
 
         /** Prefer stored Invoiced date; else parse latest “Stripe invoice finalized and sent” log. */
@@ -30829,8 +30991,12 @@
             var id = String(guestFormEditingDocId || '').trim();
             var g = id ? findGuestInMemory(id) : null;
             var paidDone = Boolean(g && guestPaidFieldIsYes(g.paid));
+            var rollover = Boolean(g && guestPaidFieldIsRollover(g.paid));
             var awaiting = Boolean(
-                g && guestInvoicedFieldIsYes(g.invoiced) && guestPaidFieldIsNo(g.paid)
+                g &&
+                    !rollover &&
+                    guestInvoicedFieldIsYes(g.invoiced) &&
+                    guestPaidFieldIsNo(g.paid)
             );
             var overdue = Boolean(g && guestPaidValueIsOverdue(g.paid));
             var firstNotice = Boolean(
@@ -30840,6 +31006,8 @@
             if (paidDone) {
                 var dateLabel = guestPaidDateLabelFromRecord(g);
                 label = dateLabel ? 'Payment received ' + dateLabel : 'Payment received';
+            } else if (rollover) {
+                label = 'Rollover';
             } else if (firstNotice) {
                 var reminderDate = guestFirstReminderDateLabelFromRecord(g) || '—';
                 label = 'First reminder sent ' + reminderDate;
@@ -30869,9 +31037,9 @@
             // Clickable while awaiting so missed webhooks can be backfilled.
             btn.disabled = !awaiting;
             btn.setAttribute('aria-disabled', awaiting ? 'false' : 'true');
-            btn.classList.toggle('is-awaiting-payment', awaiting && !paidDone);
+            btn.classList.toggle('is-awaiting-payment', awaiting && !paidDone && !rollover);
             btn.classList.toggle('is-active', false);
-            btn.classList.toggle('is-done', paidDone);
+            btn.classList.toggle('is-done', paidDone || rollover);
             var showReminder = Boolean(overdue && !paidDone);
             var reminderCanRun = showReminder && guestPadlockIsOpen;
             var reminderSide = document.getElementById('guest-workflow-reminder-side');
@@ -32233,6 +32401,8 @@
                 updateGuestsListHeadingDisplay();
                 return;
             }
+            guestsEventArmedDocId = '';
+            guestsEventDropdownOpenDocId = '';
             guestsInvitedArmedDocId = '';
             guestsInvitedDropdownOpenDocId = '';
             guestsReadArmedDocId = '';
@@ -32324,12 +32494,7 @@
                         var isWaitList = guestRosterIsWaitList(g);
                         var guestLabel = (String(g.name || '').trim() + ' ' + String(g.lastName || '').trim()).trim();
                         if (!guestLabel) guestLabel = '-';
-                        var eventLabel = String(g.event || '').trim();
-                        if (!eventLabel) eventLabel = '-';
                         var isCancelled = guestCancelledFieldIsYes(g.cancelled);
-                        var eventBadgeClass = isCancelled
-                            ? 'content-badge content-badge--guest-cancelled'
-                            : contentEventBadgeClassForLabel(eventLabel);
                         var guestSelected =
                             String(g.id || '').trim() === String(guestFormEditingDocId || '').trim();
                         html +=
@@ -32347,7 +32512,7 @@
                                 escapeHtml(guestLabel)
                             ) +
                             '</td>' +
-                            '<td class="guests-roster-tag-cell"><span class="' + eventBadgeClass + '">' + escapeHtml(eventLabel) + '</span></td>';
+                            guestRosterEventCellHtml(g.id, g.event, isCancelled);
                         if (isCancelled) {
                             html +=
                                 guestRosterCancelledPillHtml('Cancel') +
@@ -32488,6 +32653,12 @@
                 await syncEventLocationAndSiteSettings(current_event);
                 var settingsData = await fetchTbsSettingsFields(db, event_location);
                 applyGuestsFilterSettingsFromSettingsData(settingsData);
+                try {
+                    guestsRosterAllevents = await loadEventsForCurrentEventDropdown(db);
+                } catch (eventsErr) {
+                    console.warn('guestsRosterAllevents:', eventsErr);
+                    guestsRosterAllevents = [];
+                }
                 if (!String(current_event || '').trim()) {
                     guestsRosterInMemory = [];
                     guestsRosterAllInMemory = [];
@@ -40833,6 +41004,18 @@
             function guestRosterPillMenuSpecs() {
                 return [
                     {
+                        optionClass: 'guests-event-option',
+                        btnClass: 'guests-event-badge-btn',
+                        wrapClass: 'guests-event-wrap',
+                        dropdownClass: 'guests-event-dropdown',
+                        dataAttr: 'data-event-value',
+                        setField: setGuestEventField,
+                        getArmed: function() { return guestsEventArmedDocId; },
+                        setArmed: function(v) { guestsEventArmedDocId = v; },
+                        getOpen: function() { return guestsEventDropdownOpenDocId; },
+                        setOpen: function(v) { guestsEventDropdownOpenDocId = v; }
+                    },
+                    {
                         optionClass: 'guests-invited-option',
                         btnClass: 'guests-invited-badge-btn',
                         wrapClass: 'guests-invited-wrap',
@@ -41009,6 +41192,7 @@
                         return;
                     }
                     if (
+                        ev.target.closest('.guests-event-wrap') ||
                         ev.target.closest('.guests-invited-wrap') ||
                         ev.target.closest('.guests-read-wrap') ||
                         ev.target.closest('.guests-invoiced-wrap') ||
@@ -41046,11 +41230,13 @@
                     }
                 }
                 if (ev.target.closest('.guests-invoiced-dropdown')) return;
+                if (ev.target.closest('.guests-event-dropdown')) return;
                 if (ev.target.closest('.guests-invited-dropdown')) return;
                 if (ev.target.closest('.guests-read-dropdown')) return;
                 if (ev.target.closest('.guests-paid-dropdown')) return;
                 if (ev.target.closest('.guests-briefed-dropdown')) return;
                 if (ev.target.closest('.guests-cme-dropdown')) return;
+                if (ev.target.closest('.guests-event-wrap')) return;
                 if (ev.target.closest('.guests-invited-wrap')) return;
                 if (ev.target.closest('.guests-read-wrap')) return;
                 if (ev.target.closest('.guests-invoiced-wrap')) return;
@@ -41062,6 +41248,7 @@
                 if (ev.target.closest('.speakers-lodging-wrap')) return;
                 if (ev.target.closest('.speakers-bio-wrap')) return;
                 if (ev.target.closest('.speakers-programmed-wrap')) return;
+                clearGuestsEventUiState();
                 clearGuestsInvitedUiState();
                 clearGuestsReadUiState();
                 clearGuestsInvoicedUiState();

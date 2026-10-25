@@ -1346,14 +1346,15 @@ function paidLabelForOpenSendInvoice(
 /**
  * Paid labels that must not be rewritten from an open invoice.
  * @param {string} paid Stored Paid value.
- * @return {boolean} True for Yes, Cancelled, or First notice.
+ * @return {boolean} True for Yes, Cancelled, First notice, or Rollover.
  */
 function guestPaidLabelIsLocked(paid: string): boolean {
   const low = String(paid || "").trim().toLowerCase();
   return low === "yes" ||
     low === "cancelled" ||
     low === "canceled" ||
-    low === "first notice";
+    low === "first notice" ||
+    low === "rollover";
 }
 
 /**
@@ -1556,7 +1557,11 @@ async function applyStripePaidInvoiceToGuest(
     return {updated: false, alreadyPaid: false};
   }
   const data = snap.data() || {};
-  const alreadyPaid = String(data["Paid"] || "").trim().toLowerCase() === "yes";
+  const paidLow = String(data["Paid"] || "").trim().toLowerCase();
+  if (paidLow === "rollover") {
+    return {updated: false, alreadyPaid: true};
+  }
+  const alreadyPaid = paidLow === "yes";
   const storedInvoiceId = String(data["Stripe Invoice Id"] || "").trim();
   const incomingId = String(invoice.id || "").trim();
   if (storedInvoiceId && incomingId && storedInvoiceId !== incomingId) {
