@@ -180,7 +180,45 @@ async function initIndexPage() {
     await loadIndexStandbyFromFirestore();
 }
 
+function isIndexStandbyPreviewMode() {
+    try {
+        return new URLSearchParams(window.location.search).get('standby-preview') === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+function postIndexStandbyPreviewClose() {
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage({ type: 'tbs-website-snippet-preview-close' }, window.location.origin);
+}
+
+function bootIndexStandbyPreview() {
+    revealIndexPage();
+    window.addEventListener('message', function (ev) {
+        if (ev.origin !== window.location.origin) return;
+        if (!ev.data || ev.data.type !== 'tbs-website-snippet-preview') return;
+        applyIndexStandbyContent(ev.data.html);
+    });
+    document.addEventListener(
+        'click',
+        function (ev) {
+            const title = document.getElementById('index-standby-title');
+            if (title && title.contains(ev.target)) return;
+            postIndexStandbyPreviewClose();
+        },
+        true
+    );
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'tbs-website-snippet-preview-ready' }, window.location.origin);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    if (isIndexStandbyPreviewMode()) {
+        bootIndexStandbyPreview();
+        return;
+    }
     void initIndexPage();
 });
 

@@ -10861,6 +10861,74 @@
             color-scheme: normal;
         }
 
+        #website-snippet-preview-popup.speaker-bio-preview-popup {
+            overflow: auto;
+        }
+
+        #website-snippet-preview-popup .website-snippet-preview-layout {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 auto;
+            max-width: 100%;
+        }
+
+        #website-snippet-preview-popup .website-snippet-preview-devices {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+        }
+
+        #website-snippet-preview-desktop-btn,
+        #website-snippet-preview-phone-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: var(--backend-button-yellow);
+            color: #003153;
+            box-shadow: var(--backend-button-shadow);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        #website-snippet-preview-desktop-btn[hidden],
+        #website-snippet-preview-phone-btn[hidden] {
+            display: none !important;
+        }
+
+        #website-snippet-preview-popup .website-snippet-preview-stage {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 auto;
+            width: 1500px;
+            height: 480px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        #website-snippet-preview-popup .website-snippet-preview-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1500px;
+            height: 480px;
+            border: 0;
+            background: #ffffff;
+            transform: none;
+        }
+
         .speaker-delete-confirm[hidden],
         .guest-delete-confirm[hidden] {
             display: none !important;
@@ -11363,7 +11431,8 @@
             overflow: hidden;
         }
 
-        #texteditor #texteditor-render-heading #texteditor-render-email-btn {
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn,
+        #texteditor #texteditor-render-heading #texteditor-render-preview-btn {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -11382,15 +11451,22 @@
             cursor: pointer;
         }
 
-        #texteditor #texteditor-render-heading #texteditor-render-email-btn:hover:not(:disabled) {
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn:hover:not(:disabled),
+        #texteditor #texteditor-render-heading #texteditor-render-preview-btn:hover:not(:disabled) {
             filter: brightness(0.92);
         }
 
-        #texteditor #texteditor-render-heading #texteditor-render-email-btn:disabled {
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn:disabled,
+        #texteditor #texteditor-render-heading #texteditor-render-preview-btn:disabled {
             color: #94a3b8;
             box-shadow: none;
             cursor: not-allowed;
             filter: none;
+        }
+
+        #texteditor #texteditor-render-heading #texteditor-render-email-btn[hidden],
+        #texteditor #texteditor-render-heading #texteditor-render-preview-btn[hidden] {
+            display: none !important;
         }
 
         #texteditor .html-editor > .edit-preset-top.presets-list-heading.texteditor-pane-heading .selected-guestname-wrap,
@@ -13288,6 +13364,11 @@
                                 <button type="button" class="add-speaker-button" id="texteditor-render-email-btn" disabled aria-disabled="true" title="Select an e-mail pre-set" aria-label="Select an e-mail pre-set">
                                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                                         <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="add-speaker-button" id="texteditor-render-preview-btn" hidden disabled aria-disabled="true" title="Preview on the site" aria-label="Preview on the site">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                        <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                                     </svg>
                                 </button>
                             </div>
@@ -15588,6 +15669,32 @@
             title="Speaker card preview"
             src="about:blank"
         ></iframe>
+    </div>
+
+    <div
+        id="website-snippet-preview-popup"
+        class="speaker-bio-preview-popup"
+        hidden
+        aria-hidden="true"
+        role="dialog"
+        aria-modal="true"
+        aria-label="On-demand preview"
+    >
+        <div class="speaker-bio-preview-popup__backdrop" id="website-snippet-preview-popup-backdrop"></div>
+        <div class="website-snippet-preview-layout" id="website-snippet-preview-layout">
+            <div class="website-snippet-preview-stage" id="website-snippet-preview-stage">
+                <iframe
+                    id="website-snippet-preview-frame"
+                    class="website-snippet-preview-frame"
+                    title="On-demand preview"
+                    src="about:blank"
+                ></iframe>
+                <div class="website-snippet-preview-devices">
+                    <button type="button" class="website-snippet-preview-device-btn" id="website-snippet-preview-desktop-btn" hidden aria-pressed="true" title="Desktop, 1500 px" aria-label="Switch to desktop, 1500 px">🖥️</button>
+                    <button type="button" class="website-snippet-preview-device-btn" id="website-snippet-preview-phone-btn" aria-pressed="false" title="iPhone portrait" aria-label="Switch to iPhone portrait">📱</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="speaker-delete-confirm" class="speaker-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="speaker-delete-confirm-title">
@@ -20691,6 +20798,112 @@
                 return;
             }
             iframe.src = SPEAKER_BIO_PREVIEW_HOME_URL;
+        }
+
+        var WEBSITE_SNIPPET_PREVIEW_HOME_URL = 'home.html?website-snippet-preview=1';
+        var WEBSITE_SNIPPET_PREVIEW_WIDTH = 1500;
+        var WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH = 390;
+        var WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT = 844;
+        var websiteSnippetPreviewDevice = 'desktop';
+
+        function syncWebsiteSnippetPreviewDeviceButtons() {
+            var desktopOn = websiteSnippetPreviewDevice !== 'phone';
+            var desktopBtn = document.getElementById('website-snippet-preview-desktop-btn');
+            var phoneBtn = document.getElementById('website-snippet-preview-phone-btn');
+            if (desktopBtn) {
+                desktopBtn.hidden = desktopOn;
+                desktopBtn.setAttribute('aria-pressed', desktopOn ? 'true' : 'false');
+            }
+            if (phoneBtn) {
+                phoneBtn.hidden = !desktopOn;
+                phoneBtn.setAttribute('aria-pressed', desktopOn ? 'false' : 'true');
+            }
+        }
+
+        function setWebsiteSnippetPreviewDevice(device) {
+            websiteSnippetPreviewDevice = device === 'phone' ? 'phone' : 'desktop';
+            syncWebsiteSnippetPreviewDeviceButtons();
+            syncWebsiteSnippetPreviewScale();
+        }
+
+        function syncWebsiteSnippetPreviewScale() {
+            var stage = document.getElementById('website-snippet-preview-stage');
+            var iframe = document.getElementById('website-snippet-preview-frame');
+            if (!stage || !iframe) return;
+            if (websiteSnippetPreviewDevice === 'phone') {
+                stage.style.width = WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH + 'px';
+                stage.style.height = WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT + 'px';
+                iframe.style.width = WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH + 'px';
+                iframe.style.height = WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT + 'px';
+                iframe.style.transform = 'none';
+                return;
+            }
+            iframe.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
+            stage.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
+            var layoutHeight = 480;
+            try {
+                var doc = iframe.contentDocument;
+                if (doc && doc.documentElement) void doc.documentElement.offsetHeight;
+                var section = doc && doc.querySelector('.on-demand-section');
+                if (section) {
+                    var measured = Math.ceil(Math.max(section.scrollHeight, section.getBoundingClientRect().height));
+                    if (measured > 40) layoutHeight = measured;
+                }
+            } catch (err) {
+                layoutHeight = 480;
+            }
+            var maxHeight = Math.max(160, window.innerHeight - 96);
+            var stageHeight = Math.min(layoutHeight, maxHeight);
+            stage.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
+            stage.style.height = stageHeight + 'px';
+            iframe.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
+            iframe.style.height = stageHeight + 'px';
+            iframe.style.transform = 'none';
+        }
+
+        function websiteSnippetPreviewPayload() {
+            var ta = document.getElementById('texteditor-code');
+            return {
+                type: 'tbs-website-snippet-preview',
+                key: TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY,
+                html: ta ? String(ta.value || '') : ''
+            };
+        }
+
+        function sendWebsiteSnippetPreviewToFrame() {
+            var iframe = document.getElementById('website-snippet-preview-frame');
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage(websiteSnippetPreviewPayload(), window.location.origin);
+            requestAnimationFrame(function () {
+                requestAnimationFrame(syncWebsiteSnippetPreviewScale);
+            });
+        }
+
+        function closeWebsiteSnippetPreviewPopup() {
+            var popup = document.getElementById('website-snippet-preview-popup');
+            var iframe = document.getElementById('website-snippet-preview-frame');
+            if (popup) {
+                popup.hidden = true;
+                popup.setAttribute('aria-hidden', 'true');
+            }
+            if (iframe) iframe.src = 'about:blank';
+        }
+
+        function openWebsiteSnippetPreviewPopup() {
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            if (key !== TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY) return;
+            var popup = document.getElementById('website-snippet-preview-popup');
+            var iframe = document.getElementById('website-snippet-preview-frame');
+            if (!popup || !iframe) return;
+            syncWebsiteSnippetPreviewDeviceButtons();
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+            if (iframe.getAttribute('src') === WEBSITE_SNIPPET_PREVIEW_HOME_URL) {
+                sendWebsiteSnippetPreviewToFrame();
+                return;
+            }
+            iframe.src = WEBSITE_SNIPPET_PREVIEW_HOME_URL;
         }
 
         async function performDeleteSpeakerFromFirebase() {
@@ -34992,6 +35205,7 @@
         }
 
         function syncTexteditorRenderEmailButton() {
+            syncTexteditorRenderPreviewButton();
             var btn = document.getElementById('texteditor-render-email-btn');
             var ta = document.getElementById('texteditor-code');
             if (!btn) return;
@@ -35006,6 +35220,23 @@
             else if (!key || !html) label = 'Select an e-mail pre-set';
             btn.setAttribute('title', label);
             btn.setAttribute('aria-label', label);
+        }
+
+        function syncTexteditorRenderPreviewButton() {
+            var btn = document.getElementById('texteditor-render-preview-btn');
+            var emailBtn = document.getElementById('texteditor-render-email-btn');
+            var ta = document.getElementById('texteditor-code');
+            if (!btn) return;
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var website = texteditorSnippetIsWebsite(key);
+            var onDemand = key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY;
+            btn.hidden = !website;
+            btn.disabled = !onDemand;
+            btn.setAttribute('aria-disabled', onDemand ? 'false' : 'true');
+            var label = onDemand ? 'Preview On-demand' : 'Preview is not available yet';
+            btn.setAttribute('title', label);
+            btn.setAttribute('aria-label', label);
+            if (emailBtn) emailBtn.hidden = website;
         }
 
         function texteditorEmailSubject(html, key) {
@@ -39663,7 +39894,60 @@
                 }
                 if (data.type === 'tbs-speaker-bio-preview-close') {
                     closeSpeakerBioPreviewPopup();
+                    return;
                 }
+                if (data.type === 'tbs-website-snippet-preview-ready') {
+                    sendWebsiteSnippetPreviewToFrame();
+                    return;
+                }
+                if (data.type === 'tbs-website-snippet-preview-close') {
+                    closeWebsiteSnippetPreviewPopup();
+                }
+            });
+            var websiteSnippetPreviewBtn = document.getElementById('texteditor-render-preview-btn');
+            if (websiteSnippetPreviewBtn) {
+                websiteSnippetPreviewBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    if (websiteSnippetPreviewBtn.disabled || websiteSnippetPreviewBtn.hidden) return;
+                    openWebsiteSnippetPreviewPopup();
+                });
+            }
+            var websiteSnippetPreviewDesktopBtn = document.getElementById('website-snippet-preview-desktop-btn');
+            var websiteSnippetPreviewPhoneBtn = document.getElementById('website-snippet-preview-phone-btn');
+            if (websiteSnippetPreviewDesktopBtn) {
+                websiteSnippetPreviewDesktopBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    setWebsiteSnippetPreviewDevice('desktop');
+                });
+            }
+            if (websiteSnippetPreviewPhoneBtn) {
+                websiteSnippetPreviewPhoneBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    setWebsiteSnippetPreviewDevice('phone');
+                });
+            }
+            var websiteSnippetPreviewBackdrop = document.getElementById('website-snippet-preview-popup-backdrop');
+            if (websiteSnippetPreviewBackdrop) {
+                websiteSnippetPreviewBackdrop.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    closeWebsiteSnippetPreviewPopup();
+                });
+            }
+            var websiteSnippetPreviewFrame = document.getElementById('website-snippet-preview-frame');
+            if (websiteSnippetPreviewFrame) {
+                websiteSnippetPreviewFrame.addEventListener('load', function () {
+                    var popup = document.getElementById('website-snippet-preview-popup');
+                    if (!popup || popup.hidden) return;
+                    var src = websiteSnippetPreviewFrame.getAttribute('src') || '';
+                    if (src === 'about:blank') return;
+                    sendWebsiteSnippetPreviewToFrame();
+                });
+            }
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key !== 'Escape') return;
+                var popup = document.getElementById('website-snippet-preview-popup');
+                if (!popup || popup.hidden) return;
+                closeWebsiteSnippetPreviewPopup();
             });
             var prevSpeakerBtn = document.getElementById('previous-speaker');
             var nextSpeakerBtn = document.getElementById('next-speaker');

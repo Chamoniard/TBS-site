@@ -150,8 +150,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20261025-speaker-black" as="style">
-    <link rel="stylesheet" href="styles.css?v=20261025-speaker-black">
+    <link rel="preload" href="styles.css?v=20261025-image-border" as="style">
+    <link rel="stylesheet" href="styles.css?v=20261025-image-border">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -775,6 +775,9 @@
                 if (new URLSearchParams(location.search).get('speaker-bio-preview') === '1') {
                     document.documentElement.classList.add('speaker-bio-preview-mode');
                 }
+                if (new URLSearchParams(location.search).get('website-snippet-preview') === '1') {
+                    document.documentElement.classList.add('website-snippet-preview-mode');
+                }
             } catch (e) {}
         })();
     </script>
@@ -826,6 +829,40 @@
         }
         html.speaker-bio-preview-mode .home-introslider-scrollbar {
             display: none !important;
+        }
+        html.website-snippet-preview-mode,
+        html.website-snippet-preview-mode body {
+            background: #ffffff !important;
+            margin: 0 !important;
+            height: auto !important;
+            min-height: 100% !important;
+            overflow: auto !important;
+        }
+        html.website-snippet-preview-mode .home-loading-screen,
+        html.website-snippet-preview-mode .header,
+        html.website-snippet-preview-mode .footer {
+            display: none !important;
+        }
+        html.website-snippet-preview-mode a {
+            cursor: default !important;
+            pointer-events: none !important;
+        }
+        html.website-snippet-preview-mode body.home-view .everything,
+        html.website-snippet-preview-mode body.home-view .home-section {
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding-top: 0 !important;
+            background: #ffffff !important;
+        }
+        html.website-snippet-preview-mode .introslider,
+        html.website-snippet-preview-mode .introslider-inner-wrapper,
+        html.website-snippet-preview-mode .introslider > .about,
+        html.website-snippet-preview-mode .introslider > .location,
+        html.website-snippet-preview-mode .about-text {
+            height: auto !important;
+            max-height: none !important;
+            min-height: 0 !important;
+            overflow: visible !important;
         }
     </style>
 </head>
@@ -1060,8 +1097,15 @@
             <div class="on-demand-section" role="region" aria-labelledby="home-on-demand-heading" hidden>
                 <div class="on-demand-inner-wrapper">
                     <h2 class="section-titles on-demand-section-title" id="home-on-demand-heading">TBS ON-DEMAND</h2>
-                    <div class="on-demand-left" id="on-demand-left"></div>
-                    <div class="on-demand-right" id="on-demand-right"></div>
+                    <div class="on-demand-panel">
+                        <div class="on-demand-left" id="on-demand-left">
+                            <div class="on-demand-copy" id="on-demand-copy"></div>
+                        </div>
+                        <a class="cme-image" id="cme-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course">
+                            <img src="images/TBS26ondemand.jpg" alt="" width="1024" height="572">
+                        </a>
+                    </div>
+                    <a class="feed-load-more-btn on-demand-enroll-btn" id="on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>
                 </div>
             </div>
             <div class="registration-section" role="region" aria-labelledby="home-registration-heading">
@@ -1368,6 +1412,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20261025-past-talks-keep" defer></script>
+    <script src="script.js?v=20261025-preview-nolinks" defer></script>
 </body>
 </html>

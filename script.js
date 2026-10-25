@@ -2830,14 +2830,32 @@ async function hydrateHomeOnDemandSection(homeSection) {
         console.error('hydrateHomeOnDemandSection:', err);
         html = '';
     }
-    left.innerHTML = String(html || '').trim() ? wrapHomeRichHtml(html) : '';
+    setHomeOnDemandCopy(left, html);
+}
+
+function setHomeOnDemandCopy(left, html) {
+    if (!left) return;
+    let copy = left.querySelector('.on-demand-copy');
+    if (!copy) {
+        copy = document.createElement('div');
+        copy.className = 'on-demand-copy';
+        left.insertBefore(copy, left.firstChild);
+    }
+    copy.innerHTML = String(html || '').trim() ? wrapHomeRichHtml(html) : '';
 }
 const HOME_ON_DEMAND_SECTION_HTML = `
                 <div class="on-demand-section" role="region" aria-labelledby="home-on-demand-heading">
                     <div class="on-demand-inner-wrapper">
                         <h2 class="section-titles on-demand-section-title" id="home-on-demand-heading">TBS ON-DEMAND</h2>
-                        <div class="on-demand-left" id="on-demand-left"></div>
-                        <div class="on-demand-right" id="on-demand-right"></div>
+                        <div class="on-demand-panel">
+                            <div class="on-demand-left" id="on-demand-left">
+                                <div class="on-demand-copy" id="on-demand-copy"></div>
+                            </div>
+                            <a class="cme-image" id="cme-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course">
+                                <img src="images/TBS26ondemand.jpg" alt="" width="1024" height="572">
+                            </a>
+                        </div>
+                        <a class="feed-load-more-btn on-demand-enroll-btn" id="on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>
                     </div>
                 </div>
 `;
@@ -6224,6 +6242,149 @@ function fillHomeSpeakerCardBioMain(bioMain, speaker) {
     bioMain.innerHTML = content;
 }
 
+function isHomeWebsiteSnippetPreviewMode() {
+    try {
+        return new URLSearchParams(window.location.search).get('website-snippet-preview') === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+function postHomeWebsiteSnippetPreviewClose() {
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage({ type: 'tbs-website-snippet-preview-close' }, window.location.origin);
+}
+
+function websiteSnippetPreviewKind(key) {
+    const k = String(key || '');
+    if (k.indexOf(':home:eventinfo') !== -1) return 'event';
+    if (k.indexOf(':home:locationinfo') !== -1) return 'location';
+    if (k.indexOf(':home:programmeinfo') !== -1) return 'programme';
+    if (k.indexOf(':home:speakers') !== -1) return 'speakers';
+    if (k.indexOf(':home:register-to-waiting-list') !== -1) return 'waiting';
+    if (k.indexOf(':home:registration') !== -1) return 'registration';
+    if (k.indexOf(':home:on-demand') !== -1) return 'ondemand';
+    return '';
+}
+
+function websiteSnippetPreviewIntroCard(kind, html) {
+    const isLocation = kind === 'location';
+    const title = isLocation ? 'Location' : 'Event';
+    const cardClass = isLocation ? 'location' : 'about';
+    return (
+        '<div class="introslider-section home-hero-introslider-outer" role="region" aria-label="' + title + '">' +
+        '<div class="introslider-inner-wrapper home-hero-introslider">' +
+        '<div class="introslider">' +
+        '<div class="' + cardClass + '">' +
+        '<div class="about-text">' + wrapHomeRichHtml(html) + '</div>' +
+        '<h3 class="section-titles featured-bottom-title introslider-title">' + title + '</h3>' +
+        '</div></div></div></div>'
+    );
+}
+
+function renderHomeWebsiteSnippetPreview(payload) {
+    const root = document.getElementById('website-snippet-preview-root');
+    if (!root) return;
+    const kind = websiteSnippetPreviewKind(payload && payload.key);
+    const html = payload && payload.html != null ? String(payload.html) : '';
+    if (kind === 'event' || kind === 'location') {
+        root.innerHTML = websiteSnippetPreviewIntroCard(kind, html);
+        return;
+    }
+    if (kind === 'programme') {
+        root.innerHTML =
+            '<div class="programme-section" role="region" aria-label="Programme">' +
+            '<div class="programmeslider-innerwrapper">' +
+            '<div class="programme-slider">' +
+            wrapProgrammeInfoSlideHtml(html) +
+            '</div></div></div>';
+        return;
+    }
+    if (kind === 'speakers') {
+        root.innerHTML = HOME_SPEAKERS_SLIDER_HTML;
+        const track = root.querySelector('.speakerslider-track');
+        if (track) appendHomeSpeakerinfoCard(track, html);
+        return;
+    }
+    if (kind === 'registration' || kind === 'waiting') {
+        root.innerHTML = HOME_REGISTRATION_OUTER_HTML;
+        if (kind === 'registration') {
+            const manifesto = root.querySelector('p.registration-manifesto');
+            if (manifesto) manifesto.innerHTML = html;
+        } else {
+            applyHomeRegistrationToReserves(root, { show: true, html: html });
+        }
+        return;
+    }
+    if (kind === 'ondemand') {
+        root.innerHTML = HOME_ON_DEMAND_SECTION_HTML;
+        const left = root.querySelector('.on-demand-left');
+        if (left) setHomeOnDemandCopy(left, html);
+        disableHomeOnDemandCourseLinks(root);
+    }
+}
+
+function disableHomeOnDemandCourseLinks(root) {
+    if (!root) return;
+    root.querySelectorAll('a').forEach(function (el) {
+        el.removeAttribute('href');
+        el.removeAttribute('target');
+        el.removeAttribute('rel');
+        el.setAttribute('aria-disabled', 'true');
+        el.tabIndex = -1;
+    });
+}
+
+function bootHomeWebsiteSnippetPreviewMode() {
+    document.documentElement.classList.add('website-snippet-preview-mode');
+    document.body.classList.add('home-view', 'website-snippet-preview-mode');
+    document.body.classList.remove('loading');
+    const loading = document.getElementById('home-loading-screen');
+    if (loading) {
+        loading.classList.add('is-hidden');
+        loading.setAttribute('aria-hidden', 'true');
+        loading.setAttribute('aria-busy', 'false');
+    }
+    const robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute('content', 'noindex, nofollow');
+    const main = document.querySelector('.everything');
+    if (main) {
+        main.innerHTML = '<section class="home-section" id="website-snippet-preview-root"></section>';
+    }
+    window.addEventListener('message', function (ev) {
+        if (ev.origin !== window.location.origin) return;
+        if (!ev.data || ev.data.type !== 'tbs-website-snippet-preview') return;
+        renderHomeWebsiteSnippetPreview(ev.data);
+    });
+    document.addEventListener(
+        'click',
+        function (ev) {
+            const link = ev.target && ev.target.closest ? ev.target.closest('a') : null;
+            if (link) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                return;
+            }
+            const root = document.getElementById('website-snippet-preview-root');
+            if (root && ev.target === root) postHomeWebsiteSnippetPreviewClose();
+        },
+        true
+    );
+    document.addEventListener(
+        'auxclick',
+        function (ev) {
+            const link = ev.target && ev.target.closest ? ev.target.closest('a') : null;
+            if (!link) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+        },
+        true
+    );
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'tbs-website-snippet-preview-ready' }, window.location.origin);
+    }
+}
+
 function isHomeSpeakerBioPreviewMode() {
     try {
         return new URLSearchParams(window.location.search).get('speaker-bio-preview') === '1';
@@ -8997,6 +9158,10 @@ initPageScrollOnReload();
 document.addEventListener('DOMContentLoaded', async function() {
     if (isHomeSpeakerBioPreviewMode()) {
         bootHomeSpeakerBioPreviewMode();
+        return;
+    }
+    if (isHomeWebsiteSnippetPreviewMode()) {
+        bootHomeWebsiteSnippetPreviewMode();
         return;
     }
     scrollHomeToTop({ instant: true });
