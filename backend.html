@@ -787,6 +787,45 @@
             overflow: hidden;
         }
 
+        #settings-editor #settings-sections-heading .edit-guest-top-trailing {
+            gap: 0.5rem;
+        }
+
+        #settings-editor #settings-save-btn {
+            flex: 0 0 var(--backend-square-btn-size);
+            width: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: var(--backend-icon-btn-radius);
+            background: var(--backend-button-yellow);
+            color: #003153;
+            box-shadow: var(--backend-button-shadow);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+        }
+
+        #settings-editor #settings-save-btn:disabled,
+        #settings-editor #settings-save-btn:disabled:hover {
+            background: var(--backend-button-yellow);
+            color: #003153;
+            cursor: not-allowed;
+            filter: none;
+            opacity: 1;
+        }
+
+        #settings-editor #settings-save-btn svg {
+            display: block;
+            flex-shrink: 0;
+        }
+
         #settings-editor .page-preview-frame {
             position: absolute;
             top: 0;
@@ -13089,13 +13128,14 @@
                         <br>
                         <p class="texteditor-programme-heading">Website</p>
                         <div class="texteditor-selectors" id="texteditor-home-selectors" role="group" aria-label="Home page snippets">
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:standby" id="texteditor-home-standby-btn" aria-pressed="false">Stand by</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:eventinfo" id="texteditor-home-event-btn" aria-pressed="false">Event</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:locationinfo" id="texteditor-home-location-btn" aria-pressed="false">Location</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:programmeinfo" id="texteditor-home-programmeinfo-btn" aria-pressed="false">Programme infoslide</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:speakers" id="texteditor-home-speakers-btn" aria-pressed="false">Speakers infoslide</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:registration" id="texteditor-home-registration-btn" aria-pressed="false">Registration</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:register-to-waiting-list" id="texteditor-home-register-to-waiting-list-btn" aria-pressed="false">Register to waiting list</button>
-                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:standby" id="texteditor-home-standby-btn" aria-pressed="false">Stand by</button>
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:on-demand" id="texteditor-home-on-demand-btn" aria-pressed="false">On-demand</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -15423,7 +15463,13 @@
                                         <span class="edit-guest-name-first">Display sections</span>
                                     </div>
                                 </div>
-                                <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                                <div class="edit-guest-top-trailing">
+                                    <button type="button" class="texteditor-save-btn" id="settings-save-btn" disabled aria-disabled="true" title="Save" aria-label="Save">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div class="settings-site-toggle-row">
                                 <div class="settings-site-toggle-label-wrap">
@@ -24446,7 +24492,7 @@
                 FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD,
                 FIRESTORE_TBS_SNIPPETS_SCRAPBOOK_FIELD,
                 FIRESTORE_TBS_SNIPPETS_MTACC_2027_FIELD,
-                'CME-text',
+                FIRESTORE_TBS_SNIPPETS_CME_TEXT_FIELD,
                 'Post-eventinfo',
                 'Speakerinfo',
                 'waitinglist',
@@ -33998,6 +34044,7 @@
         var TBS_TEXTEDITOR_HOME_REGISTRATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:registration';
         var TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:programmeinfo';
         var TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:standby';
+        var TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:on-demand';
         var TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'home:register-to-waiting-list';
         var TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-invitation';
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
@@ -34012,6 +34059,7 @@
         var FIRESTORE_TBS_SNIPPETS_REGISTRATION_FIELD = 'Registration';
         var FIRESTORE_TBS_SNIPPETS_PROGRAMMEINFO_FIELD = 'Programmeinfo';
         var FIRESTORE_TBS_SNIPPETS_STANDBY_FIELD = 'Stand by';
+        var FIRESTORE_TBS_SNIPPETS_CME_TEXT_FIELD = 'CME-text';
         var FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD = 'Guest invitation';
         var FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD = 'Guest sent to reserves';
         var FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD = 'guests_gentle_reminder';
@@ -34089,6 +34137,16 @@
                     loadOk: 'Stand by loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/Stand by/Stand by.Value) into the editor.',
                     saveOk: 'Stand by saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/Stand by/Stand by.Value).',
                     saveErr: 'Failed to save Stand by to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_CME_TEXT_FIELD,
+                    metaLabel: 'Home — On-demand',
+                    loadOk: 'On-demand loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/CME-text/CME-text.Value) into the editor.',
+                    saveOk: 'On-demand saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/CME-text/CME-text.Value).',
+                    saveErr: 'Failed to save On-demand to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
