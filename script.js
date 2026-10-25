@@ -1215,6 +1215,14 @@ function showPostOnSamePage(post, options) {
     }
 }
 
+/** Past talks cards are already in the DOM, so a later visit can show them without new image tags. */
+function pastTalksGridIsMounted(section) {
+    if (!section) return false;
+    const grid = section.querySelector('#blogGrid');
+    if (!grid) return false;
+    return grid.querySelector('.blog-card, .no-posts') != null;
+}
+
 // Show the blog feed (original content)
 async function showBlogFeed(options) {
     document.body.classList.add('home-view');
@@ -1252,6 +1260,16 @@ async function showBlogFeed(options) {
         }
         
         setActiveNavView('past-talks');
+        if (pastTalksGridIsMounted(videoSection)) {
+            blogGrid = videoSection.querySelector('#blogGrid');
+            loadMoreBtn = videoSection.querySelector('#loadMoreBtn');
+            filterBtns = videoSection.querySelectorAll('.filter-btn:not(.topic-btn)');
+            scrollHomeToTop();
+            if (!options || options.skipHistoryPush !== true) {
+                pushHomeSectionHistory('past-talks');
+            }
+            return;
+        }
         videoSection.innerHTML = `
                 <div class="past-talks-wrapper">
                 <h2 class="section-titles past-talks-section-title">Past talks</h2>
