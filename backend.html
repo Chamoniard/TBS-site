@@ -8050,12 +8050,16 @@
         }
 
         #guest-editor .guests-list-heading .guests-roster-filter-note,
+        #guest-editor .guest-overwatch-body .guests-roster-filter-note,
         #content-editor .content-list-top .content-roster-filter-note {
             margin: 0;
             flex: 0 0 auto;
             align-self: center;
+            font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
             font-weight: 400;
+            font-style: normal;
+            line-height: 1.2;
             letter-spacing: normal;
             text-transform: none;
             color: #94a3b8;
@@ -8063,6 +8067,7 @@
         }
 
         #guest-editor .guests-list-heading .guests-roster-filter-note[hidden],
+        #guest-editor .guest-overwatch-body .guests-roster-filter-note[hidden],
         #content-editor .content-list-top .content-roster-filter-note[hidden] {
             display: none !important;
         }
@@ -14017,6 +14022,7 @@
                                             <div class="guests-cancelled-label">Cancelled:</div>
                                             <div class="guests-cancelled-count" id="guests-cancelled-count" aria-live="polite">0</div>
                                         </div>
+                                        <span class="guests-roster-filter-note" id="guests-status-row-total" aria-live="polite">(n=0)</span>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
                                     <div class="guest-overwatch-split-row" role="group" aria-label="Invoiced, direct bank, and not invoiced">
@@ -14034,6 +14040,7 @@
                                             <div class="guests-not-invoiced-label">Not invoiced:</div>
                                             <div class="guests-not-invoiced-count" id="guests-not-invoiced-count" aria-live="polite">0</div>
                                         </div>
+                                        <span class="guests-roster-filter-note" id="guests-invoice-row-total" aria-live="polite">(n=0)</span>
                                     </div>
                                     <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
                                     <div class="guest-overwatch-split-row" role="group" aria-label="Paid and not paid">
@@ -14046,6 +14053,7 @@
                                             <div class="guests-not-paid-label">Not paid:</div>
                                             <div class="guests-not-paid-count" id="guests-not-paid-count" aria-live="polite">0</div>
                                         </div>
+                                        <span class="guests-roster-filter-note" id="guests-paid-row-total" aria-live="polite">(n=0)</span>
                                     </div>
                                 </div>
                                 <div class="guest-overwatch-bulk" id="guest-overwatch-bulk" hidden aria-hidden="true">
@@ -19690,6 +19698,28 @@
             if (notPaidEl) notPaidEl.textContent = String(countGuestsNotPaidForCurrentEvent());
             var cancelledEl = document.getElementById('guests-cancelled-count');
             if (cancelledEl) cancelledEl.textContent = String(countGuestsCancelledForCurrentEvent());
+            setGuestsOverwatchRowTotal(
+                'guests-status-row-total',
+                countGuestsInvitedForCurrentEvent() +
+                    countGuestsReservesForCurrentEvent() +
+                    countGuestsCancelledForCurrentEvent()
+            );
+            setGuestsOverwatchRowTotal(
+                'guests-invoice-row-total',
+                countGuestsInvoicedForCurrentEvent() +
+                    countGuestsDirectForCurrentEvent() +
+                    countGuestsNotInvoicedForCurrentEvent()
+            );
+            setGuestsOverwatchRowTotal(
+                'guests-paid-row-total',
+                countGuestsPaidForCurrentEvent() + countGuestsNotPaidForCurrentEvent()
+            );
+        }
+
+        function setGuestsOverwatchRowTotal(id, n) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = '(n=' + n + ')';
         }
 
         async function openGuestsOverwatch() {
