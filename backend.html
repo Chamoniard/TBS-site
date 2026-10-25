@@ -309,7 +309,6 @@
         body.backend-page.backend-readonly #programme-delete-session-btn,
         body.backend-page.backend-readonly #settings-site .settings-site-toggle-option,
         body.backend-page.backend-readonly #settings-sections .settings-site-toggle-option[data-setting-key],
-        body.backend-page.backend-readonly #settings-goals .settings-goal-number,
         body.backend-page.backend-readonly .guest-workflow-step-btn,
         body.backend-page.backend-readonly .speaker-workflow-phase-btn,
         body.backend-page.backend-readonly .speaker-request-lodging-btn,
@@ -740,9 +739,68 @@
             display: none !important;
         }
 
+        .settings-layout {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            gap: 16px;
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .settings-layout[hidden] {
+            display: none !important;
+        }
+
+        #settings-editor .settings-columns {
+            flex: 1 1 0;
+            min-width: 0;
+            align-self: stretch;
+        }
+
+        #settings-editor .page-preview {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            align-self: stretch;
+            min-width: 0;
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            border: none;
+            border-radius: 5px;
+            box-shadow: none;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #settings-editor .page-preview-body {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        #settings-editor .page-preview-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 1500px;
+            height: 100%;
+            border: 0;
+            background: #ffffff;
+            transform-origin: top left;
+        }
+
         .settings-site,
-        .settings-sections,
-        .settings-goals {
+        .settings-sections {
             flex: 0 0 auto;
             border: none;
             border-radius: 5px;
@@ -937,36 +995,6 @@
             outline: 2px solid #003153;
             outline-offset: 2px;
             z-index: 1;
-        }
-
-        #settings-goals .settings-goal-number {
-            width: 4.5rem;
-            min-width: 4.5rem;
-            max-width: 4.5rem;
-            margin: 0;
-            padding: 0.35rem 0.5rem;
-            border: 1px solid #003153;
-            border-radius: 5px;
-            background: #ffffff;
-            color: #0f172a;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
-            line-height: 1.25;
-            box-sizing: border-box;
-            box-shadow: var(--backend-button-shadow);
-        }
-
-        #settings-goals .settings-goal-number:focus {
-            outline: 2px solid #003153;
-            outline-offset: 2px;
-        }
-
-        #settings-goals .settings-goal-number:disabled {
-            background: #e2e8f0;
-            color: #94a3b8;
-            cursor: not-allowed;
-            box-shadow: none;
         }
 
         .add-speaker-button,
@@ -15316,6 +15344,7 @@
                         aria-hidden="true"
                         aria-live="polite"
                         role="status"></p>
+                    <div class="settings-layout" id="settings-layout">
                     <div class="settings-columns" id="settings-columns">
                     <div class="settings-site" id="settings-site">
                         <div class="settings-site-toggles">
@@ -15470,34 +15499,26 @@
                             </div>
                         </div>
                     </div>
-                    <div class="settings-goals" id="settings-goals">
-                        <div class="settings-site-toggles">
-                            <div class="edit-guest-top guests-list-heading speakers-list-top" id="settings-goals-heading">
-                                <div class="edit-guest-top-spacer" aria-hidden="true"></div>
-                                <div class="selected-guestname-wrap">
-                                    <div class="selected-guestname" role="group" aria-label="Goals">
-                                        <span class="edit-guest-name-first">Goals</span>
-                                    </div>
-                                </div>
-                                <div class="edit-guest-top-trailing" aria-hidden="true"></div>
-                            </div>
-                            <div class="settings-site-toggle-row">
-                                <div class="settings-site-toggle-label-wrap">
-                                    <label class="settings-site-toggle-label" id="settings-goal-n-team-label" for="settings-goal-n-team">N Team</label>
-                                </div>
-                                <input
-                                    type="number"
-                                    id="settings-goal-n-team"
-                                    name="settings-goal-n-team"
-                                    class="settings-goal-number"
-                                    min="0"
-                                    step="1"
-                                    inputmode="numeric"
-                                    aria-labelledby="settings-goal-n-team-label"
-                                >
-                            </div>
-                        </div>
                     </div>
+                    <section class="page-preview" id="page-preview" aria-label="Site preview">
+                        <div class="edit-guest-top guests-list-heading speakers-list-top" id="page-preview-heading">
+                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
+                            <div class="selected-guestname-wrap">
+                                <div class="selected-guestname" role="group" aria-label="Site preview">
+                                    <span class="edit-guest-name-first">Site preview</span>
+                                </div>
+                            </div>
+                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
+                        </div>
+                        <div class="page-preview-body">
+                            <iframe
+                                id="page-preview-frame"
+                                class="page-preview-frame"
+                                title="Home page"
+                                src="about:blank"
+                            ></iframe>
+                        </div>
+                    </section>
                     </div>
                 </div>
             </section>
@@ -20879,8 +20900,6 @@
         var FIRESTORE_TBS_SETTINGS_REGISTRATION_OPEN_FIELD = 'registrationopen';
         var FIRESTORE_TBS_SETTINGS_WAITING_LIST_FIELD = 'Waiting_list';
         var FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD = 'passwordprotecthome';
-        /** Prefer `nteam` on the location doc (also accepts `N Team` aliases). */
-        var FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD = 'nteam';
         /** Document `tbs/Settings/{event_location}/{event_location}` field `filterguests` (JSON map of guests-table filters). */
         var FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD = 'filterguests';
         /** Section Yes/No fields created with default `Yes` when missing on the location doc. */
@@ -20895,7 +20914,6 @@
             FIRESTORE_TBS_SETTINGS_DISPLAY_REGISTRATION_FIELD,
         ];
         var siteSettingsSaveInFlight = false;
-        var settingsGoalNTeamLastSaved = null;
 
         /**
          * Site settings for the active `event_location`.
@@ -21314,9 +21332,6 @@
                 'passwordProtectHome',
                 normalizeSettingsYesNoUi(data[FIRESTORE_TBS_SETTINGS_PASSWORD_PROTECT_HOME_FIELD], false)
             );
-            setSettingsGoalNTeamUi(
-                coalesceFirestoreFieldValue(data, FIRESTORE_TBS_SETTINGS_NTEAM_FIELD_KEYS)
-            );
             syncWaitingListToggleEnabledFromUi();
         }
 
@@ -21325,73 +21340,6 @@
             var n = typeof value === 'number' ? value : parseInt(String(value).trim(), 10);
             if (!Number.isFinite(n) || n < 0) return null;
             return Math.floor(n);
-        }
-
-        function setSettingsGoalNTeamUi(value) {
-            var input = document.getElementById('settings-goal-n-team');
-            var n = normalizeSettingsGoalNumber(value);
-            settingsGoalNTeamLastSaved = n;
-            if (input) input.value = n == null ? '' : String(n);
-        }
-
-        async function saveSettingsGoalNTeamToFirestore(n) {
-            if (backenduserIsReadonly) throw backendReadonlyError();
-            if (!currentEventHasSettingsDoc) {
-                throw new Error(
-                    String(current_event || '').trim() + ' is not an upcoming event.'
-                );
-            }
-            var db = getFirestore();
-            var patch = {};
-            patch[FIRESTORE_TBS_SETTINGS_N_TEAM_FIELD] = n;
-            await tbsSettingsDocRef(db).set(patch, { merge: true });
-        }
-
-        async function onSettingsGoalNTeamCommit() {
-            if (backendBlockIfReadonly()) {
-                setSettingsGoalNTeamUi(settingsGoalNTeamLastSaved);
-                return;
-            }
-            var input = document.getElementById('settings-goal-n-team');
-            if (!input) return;
-            var raw = String(input.value || '').trim();
-            var n = raw === '' ? null : normalizeSettingsGoalNumber(raw);
-            if (raw !== '' && n == null) {
-                if (typeof showStatus === 'function') {
-                    showStatus('error', 'N Team must be a whole number of 0 or more.');
-                }
-                setSettingsGoalNTeamUi(settingsGoalNTeamLastSaved);
-                return;
-            }
-            if (n === settingsGoalNTeamLastSaved) {
-                setSettingsGoalNTeamUi(n);
-                return;
-            }
-            if (n == null) {
-                setSettingsGoalNTeamUi(settingsGoalNTeamLastSaved);
-                return;
-            }
-            if (siteSettingsSaveInFlight) return;
-            siteSettingsSaveInFlight = true;
-            try {
-                if (typeof showStatus === 'function') showStatus('loading', 'Saving goal…');
-                await saveSettingsGoalNTeamToFirestore(n);
-                settingsGoalNTeamLastSaved = n;
-                setSettingsGoalNTeamUi(n);
-                if (typeof showStatus === 'function') showStatus('success', 'Goal saved.');
-            } catch (err) {
-                console.error('saveSettingsGoalNTeamToFirestore:', err);
-                try {
-                    await loadSiteSettingsFromFirestore();
-                } catch (reloadErr) {
-                    console.error('loadSiteSettingsFromFirestore:', reloadErr);
-                }
-                if (typeof showStatus === 'function') {
-                    showStatus('error', err && err.message ? err.message : 'Failed to save goal.');
-                }
-            } finally {
-                siteSettingsSaveInFlight = false;
-            }
         }
 
         function coalesceFirestoreFieldValue(data, keys) {
@@ -26448,6 +26396,7 @@
                         showStatus('success', 'Site setting saved.');
                     }
                 }
+                reloadPagePreviewHome();
             } catch (err) {
                 console.error('saveSiteSettingToFirestore:', err);
                 try {
@@ -26554,9 +26503,14 @@
          */
         function setSettingsUpcomingEventVisibility(isUpcoming) {
             currentEventHasSettingsDoc = !!isUpcoming;
+            var layout = document.getElementById('settings-layout');
             var columns = document.getElementById('settings-columns');
             var msg = document.getElementById('settings-not-upcoming');
             var ev = String(current_event || '').trim() || '—';
+            if (layout) {
+                layout.hidden = !isUpcoming;
+                layout.setAttribute('aria-hidden', isUpcoming ? 'false' : 'true');
+            }
             if (columns) {
                 columns.hidden = !isUpcoming;
                 columns.setAttribute('aria-hidden', isUpcoming ? 'false' : 'true');
@@ -26585,6 +26539,59 @@
         function isSettingsEditorOpen() {
             var section = document.getElementById('settings-editor');
             return !!(section && section.classList.contains('is-open'));
+        }
+
+        var PAGE_PREVIEW_HOME_URL = 'home.html';
+        var PAGE_PREVIEW_SCREEN_WIDTH = 1500;
+
+        function syncPagePreviewScale() {
+            var body = document.querySelector('#settings-editor .page-preview-body');
+            var frame = document.getElementById('page-preview-frame');
+            if (!body || !frame) return;
+            var panelWidth = body.clientWidth;
+            var panelHeight = body.clientHeight;
+            if (panelWidth < 1 || panelHeight < 1) return;
+            var scale = panelWidth / PAGE_PREVIEW_SCREEN_WIDTH;
+            frame.style.width = PAGE_PREVIEW_SCREEN_WIDTH + 'px';
+            frame.style.height = panelHeight / scale + 'px';
+            frame.style.transformOrigin = 'top left';
+            frame.style.transform = 'scale(' + scale + ')';
+        }
+
+        function ensurePagePreviewScaleObserver() {
+            if (ensurePagePreviewScaleObserver.done) return;
+            var body = document.querySelector('#settings-editor .page-preview-body');
+            if (!body) return;
+            ensurePagePreviewScaleObserver.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    syncPagePreviewScale();
+                });
+                observer.observe(body);
+            } else {
+                window.addEventListener('resize', syncPagePreviewScale);
+            }
+        }
+
+        function loadPagePreviewHome() {
+            var frame = document.getElementById('page-preview-frame');
+            if (!frame) return;
+            ensurePagePreviewScaleObserver();
+            if (frame.getAttribute('data-home-loaded') !== '1') {
+                frame.src = PAGE_PREVIEW_HOME_URL;
+                frame.setAttribute('data-home-loaded', '1');
+            }
+            syncPagePreviewScale();
+            requestAnimationFrame(syncPagePreviewScale);
+        }
+
+        function reloadPagePreviewHome() {
+            var frame = document.getElementById('page-preview-frame');
+            if (!frame) return;
+            ensurePagePreviewScaleObserver();
+            frame.setAttribute('data-home-loaded', '1');
+            frame.src = PAGE_PREVIEW_HOME_URL;
+            syncPagePreviewScale();
         }
 
         /** Navbar: Zermatt keeps Prussian; Alaska uses near-black. */
@@ -37669,6 +37676,7 @@
                 void loadEmailerBulkPresetButtons();
             }
             if (isSettings) {
+                loadPagePreviewHome();
                 void syncEventLocationAndSiteSettings(current_event)
                     .then(function () {
                         showSettingsDisplayStatus();
@@ -39534,18 +39542,6 @@
                     }
                 });
             });
-            var settingsGoalNTeamInput = document.getElementById('settings-goal-n-team');
-            if (settingsGoalNTeamInput) {
-                settingsGoalNTeamInput.addEventListener('blur', function() {
-                    void onSettingsGoalNTeamCommit();
-                });
-                settingsGoalNTeamInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        settingsGoalNTeamInput.blur();
-                    }
-                });
-            }
             var addSpeakerBtn = document.getElementById('add-speaker-button');
             var addSpeakerForm = document.getElementById('speaker-editor-panel');
             if (addSpeakerBtn && addSpeakerForm) {
