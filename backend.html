@@ -549,6 +549,7 @@
         }
 
         /* Unselected tabs: transparent, no border, white label. */
+        .aspects .navigation #overview-toggle:not(.is-active),
         .aspects .navigation #speakers-toggle:not(.is-active),
         .aspects .navigation #guests-toggle:not(.is-active),
         .aspects .navigation #team-toggle:not(.is-active),
@@ -1693,7 +1694,7 @@
         }
 
         #guest-editor #guest-editor-actions .guest-workflow-step-arrow,
-        #guest-editor .guest-overwatch-body .guest-overwatch-step-arrow {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-step-arrow {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1708,7 +1709,7 @@
             pointer-events: none;
         }
 
-        #guest-editor .guest-overwatch-body .guest-overwatch-step-arrow {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-step-arrow {
             align-self: flex-start;
             width: 8rem;
             min-height: 1.875rem;
@@ -2483,8 +2484,8 @@
             min-width: max-content;
         }
 
-        #guest-editor .guest-overwatch-title,
-        #guest-editor .guest-overwatch-title > * {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-title,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-title > * {
             flex-wrap: nowrap;
             white-space: nowrap;
         }
@@ -2698,18 +2699,18 @@
         }
 
         /* Overwatch replaces the guest editor entirely in the viewer. */
-        #guest-editor .guest-viewer.guest-viewer--overwatch {
+        :is(#guest-editor, #overview-editor) .guest-viewer.guest-viewer--overwatch {
             background: transparent;
             position: relative;
         }
 
-        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-editor,
-        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-editor[hidden],
-        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-editor-empty {
+        :is(#guest-editor, #overview-editor) .guest-viewer.guest-viewer--overwatch > .guest-editor,
+        :is(#guest-editor, #overview-editor) .guest-viewer.guest-viewer--overwatch > .guest-editor[hidden],
+        :is(#guest-editor, #overview-editor) .guest-viewer.guest-viewer--overwatch > .guest-editor-empty {
             display: none !important;
         }
 
-        #guest-editor .guest-overwatch {
+        :is(#guest-editor, #overview-editor) .guest-overwatch {
             --guest-editor-shell-r: 8px;
             --guest-editor-bw: 1px;
             display: none !important;
@@ -2722,7 +2723,7 @@
             box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(15, 23, 42, 0.12);
         }
 
-        #guest-editor .guest-viewer.guest-viewer--overwatch > .guest-overwatch.is-open {
+        :is(#guest-editor, #overview-editor) .guest-viewer.guest-viewer--overwatch > .guest-overwatch.is-open {
             display: flex !important;
             position: absolute;
             inset: 0;
@@ -2733,7 +2734,7 @@
             min-height: 0;
         }
 
-        #guest-editor .guest-overwatch-title {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-title {
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -2756,7 +2757,7 @@
             background: #ffffff;
         }
 
-        #guest-editor .guest-overwatch-heading {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-heading {
             margin: 0;
             font: inherit;
             color: inherit;
@@ -2764,7 +2765,7 @@
             letter-spacing: inherit;
         }
 
-        #guest-editor .guest-overwatch-bulk-count {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-bulk-count {
             margin: 0;
             font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
@@ -2777,13 +2778,13 @@
             white-space: nowrap;
         }
 
-        #guest-editor .guest-overwatch-bulk-count[hidden],
-        #guest-editor .guest-overwatch-body[hidden],
-        #guest-editor .guest-overwatch-bulk[hidden] {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-bulk-count[hidden],
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body[hidden],
+        :is(#guest-editor, #overview-editor) .guest-overwatch-bulk[hidden] {
             display: none !important;
         }
 
-        #guest-editor .guest-overwatch-bulk {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-bulk {
             flex: 1 1 auto;
             min-height: 0;
             display: flex;
@@ -2830,7 +2831,7 @@
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
-        #guest-editor .guest-overwatch-body {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body {
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
@@ -2845,15 +2846,15 @@
             gap: 16px;
         }
 
-        #guest-editor .guest-overwatch-body .guests-registered,
-        #guest-editor .guest-overwatch-body .guests-invited,
-        #guest-editor .guest-overwatch-body .guests-reserves,
-        #guest-editor .guest-overwatch-body .guests-invoiced,
-        #guest-editor .guest-overwatch-body .guests-direct-transfer,
-        #guest-editor .guest-overwatch-body .guests-not-invoiced,
-        #guest-editor .guest-overwatch-body .guests-not-paid,
-        #guest-editor .guest-overwatch-body .guests-cancelled,
-        #guest-editor .guest-overwatch-body .guests-paid {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-registered,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-invited,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-reserves,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-invoiced,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-direct-transfer,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-invoiced,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-paid,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-cancelled,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-paid {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -2874,7 +2875,7 @@
             color: #ffffff;
         }
 
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -2886,15 +2887,15 @@
             box-sizing: border-box;
         }
 
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-registered,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invited,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-reserves,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-invoiced,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-invoiced,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-paid,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-not-paid,
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-row .guests-cancelled {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-registered,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-invited,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-reserves,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-invoiced,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-direct-transfer,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-not-invoiced,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-paid,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-not-paid,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-row .guests-cancelled {
             flex: 0 0 8rem;
             width: 8rem;
             min-width: 8rem;
@@ -2904,7 +2905,7 @@
             max-height: 5.75rem;
         }
 
-        #guest-editor .guest-overwatch-body .guest-overwatch-split-plus {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guest-overwatch-split-plus {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2919,36 +2920,36 @@
             user-select: none;
         }
 
-        #guest-editor .guest-overwatch-body .guests-direct-transfer,
-        #guest-editor .guest-overwatch-body .guests-reserves {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-direct-transfer,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-reserves {
             background: var(--backend-button-yellow);
             border-color: var(--backend-button-yellow);
             color: #003153;
         }
 
-        #guest-editor .guest-overwatch-body .guests-not-invoiced,
-        #guest-editor .guest-overwatch-body .guests-not-decided,
-        #guest-editor .guest-overwatch-body .guests-not-paid {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-invoiced,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-decided,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-paid {
             background: var(--backend-roster-status-no-bg);
             border-color: var(--backend-roster-status-no-bg);
             color: var(--backend-roster-status-no-color);
         }
 
-        #guest-editor .guest-overwatch-body .guests-cancelled {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-cancelled {
             background: var(--backend-roster-pill-black);
             border-color: var(--backend-roster-pill-black);
             color: #ffffff;
         }
 
-        #guest-editor .guest-overwatch-body .guests-registered-label,
-        #guest-editor .guest-overwatch-body .guests-invited-label,
-        #guest-editor .guest-overwatch-body .guests-reserves-label,
-        #guest-editor .guest-overwatch-body .guests-invoiced-label,
-        #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
-        #guest-editor .guest-overwatch-body .guests-not-invoiced-label,
-        #guest-editor .guest-overwatch-body .guests-not-paid-label,
-        #guest-editor .guest-overwatch-body .guests-cancelled-label,
-        #guest-editor .guest-overwatch-body .guests-paid-label {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-registered-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-invited-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-reserves-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-invoiced-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-direct-transfer-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-invoiced-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-paid-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-cancelled-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-paid-label {
             margin: 0 0 0.35rem;
             font-size: 0.875rem;
             font-weight: 600;
@@ -2956,20 +2957,20 @@
             color: #ffffff;
         }
 
-        #guest-editor .guest-overwatch-body .guests-direct-transfer-label,
-        #guest-editor .guest-overwatch-body .guests-reserves-label {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-direct-transfer-label,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-reserves-label {
             color: #003153;
         }
 
-        #guest-editor .guest-overwatch-body .guests-registered-count,
-        #guest-editor .guest-overwatch-body .guests-invited-count,
-        #guest-editor .guest-overwatch-body .guests-reserves-count,
-        #guest-editor .guest-overwatch-body .guests-invoiced-count,
-        #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
-        #guest-editor .guest-overwatch-body .guests-not-invoiced-count,
-        #guest-editor .guest-overwatch-body .guests-not-paid-count,
-        #guest-editor .guest-overwatch-body .guests-cancelled-count,
-        #guest-editor .guest-overwatch-body .guests-paid-count {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-registered-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-invited-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-reserves-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-invoiced-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-direct-transfer-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-invoiced-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-not-paid-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-cancelled-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-paid-count {
             margin: 0;
             font-size: 1.75rem;
             font-weight: 700;
@@ -2978,8 +2979,8 @@
             font-variant-numeric: tabular-nums;
         }
 
-        #guest-editor .guest-overwatch-body .guests-direct-transfer-count,
-        #guest-editor .guest-overwatch-body .guests-reserves-count {
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-direct-transfer-count,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-reserves-count {
             color: #003153;
         }
 
@@ -3490,12 +3491,64 @@
         /* Guest editor / management panel: match guests list border (#guest-editor .guests-list). */
         #guest-editor,
         .guest-overview-section,
-        .guest-overview-section.is-open {
+        .guest-overview-section.is-open,
+        #overview-editor,
+        #overview-editor.is-open {
             --editor-gunmetal-border: #e2e8f0;
             background: #e2e8f0;
             border: none;
             padding: 16px;
             position: relative;
+        }
+
+        #overview-editor {
+            display: none;
+            flex-direction: column;
+            box-sizing: border-box;
+            margin-bottom: 0;
+        }
+
+        #overview-editor.is-open {
+            display: flex;
+        }
+
+        /* Same 1:2 viewer/list split as the Guests tab, with the viewer on the left. */
+        #overview-editor .overview-track {
+            --guest-list-min: 0px;
+            --guest-viewer-min: 0px;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 16px;
+            flex: 1 1 auto;
+            min-height: 0;
+            width: max(100%, calc(1500px - 32px), calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
+            min-width: max(100%, calc(1500px - 32px), calc(var(--guest-list-min) + var(--guest-viewer-min) + 16px));
+            height: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        #overview-editor .overview-track-spacer {
+            flex: 2 1 0;
+            min-width: var(--guest-list-min, 0px);
+            min-height: 0;
+        }
+
+        #overview-editor .guest-viewer {
+            flex: 1 1 0;
+            min-width: var(--guest-viewer-min, 0px);
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            overflow: hidden;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
         }
 
         #emailer-editor,
@@ -7922,7 +7975,7 @@
         /* Guests + Speakers + Content + Programme: shared 50px header bar + matching padding. */
         #guest-editor .guests-list > .edit-guest-top.guests-list-heading,
         #guest-editor .guest-viewer > .guest-editor > .edit-guest-top,
-        #guest-editor .guest-overwatch-title,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-title,
         #speaker-editor .speaker-overwatch-title,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
         #speaker-editor .edit-speaker-top,
@@ -8050,7 +8103,7 @@
         }
 
         #guest-editor .guests-list-heading .guests-roster-filter-note,
-        #guest-editor .guest-overwatch-body .guests-roster-filter-note,
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-roster-filter-note,
         #content-editor .content-list-top .content-roster-filter-note {
             margin: 0;
             flex: 0 0 auto;
@@ -8067,7 +8120,7 @@
         }
 
         #guest-editor .guests-list-heading .guests-roster-filter-note[hidden],
-        #guest-editor .guest-overwatch-body .guests-roster-filter-note[hidden],
+        :is(#guest-editor, #overview-editor) .guest-overwatch-body .guests-roster-filter-note[hidden],
         #content-editor .content-list-top .content-roster-filter-note[hidden] {
             display: none !important;
         }
@@ -12092,6 +12145,7 @@
         /* One main panel fills space below the event strip; body does not scroll. */
         body.backend-page .texteditor,
         body.backend-page #speaker-editor,
+        body.backend-page #overview-editor,
         body.backend-page #guest-editor,
         body.backend-page #team-editor,
         body.backend-page #programme-editor,
@@ -12910,15 +12964,8 @@
                     </div>
                     <div class="aspects">
                         <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, team, programme, lodging, snippets, content, E-mailer, Finances, Settings, and Admin">
-                            <span
-                                class="backend-editor-link backend-editor-link--inactive"
-                                id="overview-toggle"
-                                role="button"
-                                aria-disabled="true"
-                                aria-expanded="false"
-                                tabindex="-1"
-                                title="Coming soon">Overview</span>
-                            <a href="#speaker-editor" class="backend-editor-link is-active" id="speakers-toggle" role="button" aria-expanded="true" aria-controls="speaker-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Speakers</a>
+                            <a href="#overview-editor" class="backend-editor-link is-active" id="overview-toggle" role="button" aria-expanded="true" aria-controls="overview-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Overview</a>
+                            <a href="#speaker-editor" class="backend-editor-link" id="speakers-toggle" role="button" aria-expanded="false" aria-controls="speaker-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Speakers</a>
                             <a href="#guest-editor" class="backend-editor-link" id="guests-toggle" role="button" aria-expanded="false" aria-controls="guest-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Guests</a>
                             <a href="#team-editor" class="backend-editor-link" id="team-toggle" role="button" aria-expanded="false" aria-controls="team-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Team</a>
                             <a href="#programme-editor" class="backend-editor-link" id="programme-toggle" role="button" aria-expanded="false" aria-controls="programme-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Programme</a>
@@ -13190,7 +13237,75 @@
                 </div>
             </section>
 
-            <section class="speakers-overview is-open" id="speaker-editor" aria-hidden="false" aria-label="Speakers" data-name="speaker-editor">
+            <section class="overview-section is-open" id="overview-editor" aria-hidden="false" aria-label="Overview" data-name="overview-editor">
+                <div class="overview-track" id="overview-track">
+                    <div class="guest-viewer guest-viewer--overwatch" id="overview-guest-viewer">
+                        <div class="guest-overwatch is-open" id="overview-guest-overwatch" aria-label="Guests">
+                            <div class="guest-overwatch-title">
+                                <h2 class="guest-overwatch-heading">Guests</h2>
+                            </div>
+                            <div class="guest-overwatch-body">
+                                <div class="guests-registered" aria-label="Registered guests">
+                                    <div class="guests-registered-label">Registered:</div>
+                                    <div class="guests-registered-count" id="overview-guests-registered-count" aria-live="polite">0</div>
+                                </div>
+                                <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
+                                <div class="guest-overwatch-split-row" role="group" aria-label="Invited, reserves, and cancelled">
+                                    <div class="guests-invited" aria-label="Invited guests">
+                                        <div class="guests-invited-label">Invited:</div>
+                                        <div class="guests-invited-count" id="overview-guests-invited-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                    <div class="guests-reserves" aria-label="Reserve guests">
+                                        <div class="guests-reserves-label">Reserves:</div>
+                                        <div class="guests-reserves-count" id="overview-guests-reserves-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                    <div class="guests-cancelled" aria-label="Cancelled guests">
+                                        <div class="guests-cancelled-label">Cancelled:</div>
+                                        <div class="guests-cancelled-count" id="overview-guests-cancelled-count" aria-live="polite">0</div>
+                                    </div>
+                                    <span class="guests-roster-filter-note" id="overview-guests-status-row-total" aria-live="polite">(n=0)</span>
+                                </div>
+                                <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
+                                <div class="guest-overwatch-split-row" role="group" aria-label="Invoiced, direct bank, and not invoiced">
+                                    <div class="guests-invoiced" aria-label="Invoiced guests">
+                                        <div class="guests-invoiced-label">Invoiced:</div>
+                                        <div class="guests-invoiced-count" id="overview-guests-invoiced-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                    <div class="guests-direct-transfer" aria-label="Direct bank guests">
+                                        <div class="guests-direct-transfer-label">Direct bank:</div>
+                                        <div class="guests-direct-transfer-count" id="overview-guests-direct-transfer-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                    <div class="guests-not-invoiced" aria-label="Invited guests not invoiced">
+                                        <div class="guests-not-invoiced-label">Not invoiced:</div>
+                                        <div class="guests-not-invoiced-count" id="overview-guests-not-invoiced-count" aria-live="polite">0</div>
+                                    </div>
+                                    <span class="guests-roster-filter-note" id="overview-guests-invoice-row-total" aria-live="polite">(n=0)</span>
+                                </div>
+                                <div class="guest-overwatch-step-arrow" aria-hidden="true">⬇</div>
+                                <div class="guest-overwatch-split-row" role="group" aria-label="Paid and not paid">
+                                    <div class="guests-paid" aria-label="Paid invoiced or direct-bank guests">
+                                        <div class="guests-paid-label">Paid:</div>
+                                        <div class="guests-paid-count" id="overview-guests-paid-count" aria-live="polite">0</div>
+                                    </div>
+                                    <div class="guest-overwatch-split-plus" aria-hidden="true">+</div>
+                                    <div class="guests-not-paid" aria-label="Unpaid invoiced or direct-bank guests">
+                                        <div class="guests-not-paid-label">Not paid:</div>
+                                        <div class="guests-not-paid-count" id="overview-guests-not-paid-count" aria-live="polite">0</div>
+                                    </div>
+                                    <span class="guests-roster-filter-note" id="overview-guests-paid-row-total" aria-live="polite">(n=0)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overview-track-spacer" aria-hidden="true"></div>
+                </div>
+            </section>
+
+            <section class="speakers-overview" id="speaker-editor" aria-hidden="true" aria-label="Speakers" data-name="speaker-editor">
                 <div class="speaker-pane-scrollbar" id="speaker-pane-scrollbar" hidden>
                     <div class="speaker-pane-scrollbar-thumb" id="speaker-pane-scrollbar-thumb"></div>
                 </div>
@@ -19525,20 +19640,26 @@
             return guestInvoicedFieldIsYes(g && g.invoiced) || guestInvoicedFieldIsDirect(g && g.invoiced);
         }
 
-        /** Paid=Yes among invoiced / direct-bank guests for Current event. */
+        /** Paid=Yes among invoiced / direct-bank guests, plus Rollover. Rollover already paid at a previous event. */
         function countGuestsPaidForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
             var n = 0;
             for (var i = 0; i < guestsRosterInMemory.length; i++) {
                 var g = guestsRosterInMemory[i];
+                if (!g || !guestRecordEventMatchesCurrentEvent(g)) continue;
+                if (guestCancelledFieldIsYes(g.cancelled)) continue;
+                if (guestPaidFieldIsRollover(g.paid)) {
+                    n++;
+                    continue;
+                }
                 if (!guestBelongsOnPaidStatusBar(g)) continue;
                 if (guestPaidFieldIsYes(g.paid)) n++;
             }
             return n;
         }
 
-        /** Invoiced=Yes for Current event. */
+        /** Invoiced=Yes, plus Rollover. Rollover counts as invoiced even with no Stripe invoice. */
         function countGuestsInvoicedForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
@@ -19547,12 +19668,12 @@
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
                 if (guestCancelledFieldIsYes(g.cancelled)) continue;
-                if (guestInvoicedFieldIsYes(g.invoiced)) n++;
+                if (guestInvoicedFieldIsYes(g.invoiced) || guestPaidFieldIsRollover(g.paid)) n++;
             }
             return n;
         }
 
-        /** Invoiced=Direct for Current event. */
+        /** Invoiced=Direct for Current event. Rollover is counted in Invoiced, not here. */
         function countGuestsDirectForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
@@ -19561,12 +19682,13 @@
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
                 if (guestCancelledFieldIsYes(g.cancelled)) continue;
+                if (guestPaidFieldIsRollover(g.paid)) continue;
                 if (guestInvoicedFieldIsDirect(g.invoiced)) n++;
             }
             return n;
         }
 
-        /** Invited=Yes and Invoiced=No for Current event. */
+        /** Invited=Yes and Invoiced=No for Current event. Rollover counts as invoiced. */
         function countGuestsNotInvoicedForCurrentEvent() {
             if (!String(current_event || '').trim()) return 0;
             if (!Array.isArray(guestsRosterInMemory)) return 0;
@@ -19575,6 +19697,7 @@
                 var g = guestsRosterInMemory[i];
                 if (!guestRecordEventMatchesCurrentEvent(g)) continue;
                 if (guestCancelledFieldIsYes(g.cancelled)) continue;
+                if (guestPaidFieldIsRollover(g.paid)) continue;
                 if (guestInvitedFieldIsYes(g.invited) && guestInvoicedFieldIsNo(g.invoiced)) n++;
             }
             return n;
@@ -19639,7 +19762,7 @@
                 if (!g || !guestRecordEventMatchesCurrentEvent(g)) continue;
                 if (guestCancelledFieldIsYes(g.cancelled)) continue;
                 if (!guestHasIssuedInvoice(g)) continue;
-                if (guestPaidFieldIsYes(g.paid)) continue;
+                if (guestPaidFieldIsYes(g.paid) || guestPaidFieldIsRollover(g.paid)) continue;
                 if (guestPaidIsCancelledPill(g.paid)) continue;
                 n++;
             }
@@ -19679,25 +19802,23 @@
             return n;
         }
 
+        function setGuestOverwatchCountText(id, text) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = text;
+            var overviewEl = document.getElementById('overview-' + id);
+            if (overviewEl) overviewEl.textContent = text;
+        }
+
         function updateGuestsOverwatchRegisteredCount() {
-            var registeredEl = document.getElementById('guests-registered-count');
-            if (registeredEl) registeredEl.textContent = String(countGuestsRegisteredForCurrentEvent());
-            var invitedEl = document.getElementById('guests-invited-count');
-            if (invitedEl) invitedEl.textContent = String(countGuestsInvitedForCurrentEvent());
-            var reservesEl = document.getElementById('guests-reserves-count');
-            if (reservesEl) reservesEl.textContent = String(countGuestsReservesForCurrentEvent());
-            var invoicedEl = document.getElementById('guests-invoiced-count');
-            if (invoicedEl) invoicedEl.textContent = String(countGuestsInvoicedForCurrentEvent());
-            var directEl = document.getElementById('guests-direct-transfer-count');
-            if (directEl) directEl.textContent = String(countGuestsDirectForCurrentEvent());
-            var notInvoicedEl = document.getElementById('guests-not-invoiced-count');
-            if (notInvoicedEl) notInvoicedEl.textContent = String(countGuestsNotInvoicedForCurrentEvent());
-            var paidEl = document.getElementById('guests-paid-count');
-            if (paidEl) paidEl.textContent = String(countGuestsPaidForCurrentEvent());
-            var notPaidEl = document.getElementById('guests-not-paid-count');
-            if (notPaidEl) notPaidEl.textContent = String(countGuestsNotPaidForCurrentEvent());
-            var cancelledEl = document.getElementById('guests-cancelled-count');
-            if (cancelledEl) cancelledEl.textContent = String(countGuestsCancelledForCurrentEvent());
+            setGuestOverwatchCountText('guests-registered-count', String(countGuestsRegisteredForCurrentEvent()));
+            setGuestOverwatchCountText('guests-invited-count', String(countGuestsInvitedForCurrentEvent()));
+            setGuestOverwatchCountText('guests-reserves-count', String(countGuestsReservesForCurrentEvent()));
+            setGuestOverwatchCountText('guests-invoiced-count', String(countGuestsInvoicedForCurrentEvent()));
+            setGuestOverwatchCountText('guests-direct-transfer-count', String(countGuestsDirectForCurrentEvent()));
+            setGuestOverwatchCountText('guests-not-invoiced-count', String(countGuestsNotInvoicedForCurrentEvent()));
+            setGuestOverwatchCountText('guests-paid-count', String(countGuestsPaidForCurrentEvent()));
+            setGuestOverwatchCountText('guests-not-paid-count', String(countGuestsNotPaidForCurrentEvent()));
+            setGuestOverwatchCountText('guests-cancelled-count', String(countGuestsCancelledForCurrentEvent()));
             setGuestsOverwatchRowTotal(
                 'guests-status-row-total',
                 countGuestsInvitedForCurrentEvent() +
@@ -19717,9 +19838,7 @@
         }
 
         function setGuestsOverwatchRowTotal(id, n) {
-            var el = document.getElementById(id);
-            if (!el) return;
-            el.textContent = '(n=' + n + ')';
+            setGuestOverwatchCountText(id, '(n=' + n + ')');
         }
 
         async function openGuestsOverwatch() {
@@ -37320,6 +37439,7 @@
             const isProgramme = panel === 'programme';
             const isLodging = panel === 'lodging';
             const isEmailer = panel === 'emailer';
+            const isOverview = panel === 'overview';
             const texteditorSection = document.getElementById('texteditor');
             const leavingPresets =
                 texteditorSection &&
@@ -37338,7 +37458,9 @@
                     !isTeam &&
                     !isProgramme &&
                     !isLodging &&
-                    !isEmailer);
+                    !isEmailer &&
+                    !isOverview);
+            const overviewSection = document.getElementById('overview-editor');
             const speakerEditorSection = document.getElementById('speaker-editor');
             const guestEditorSection = document.getElementById('guest-editor');
             const teamEditorSection = document.getElementById('team-editor');
@@ -37363,6 +37485,7 @@
             const financesSection = document.getElementById('finances-editor');
             const settingsSection = document.getElementById('settings-editor');
             const editorToggle = document.getElementById('texteditor-toggle');
+            const overviewToggle = document.getElementById('overview-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');
             const teamToggle = document.getElementById('team-toggle');
@@ -37376,6 +37499,10 @@
             if (texteditorSection) {
                 texteditorSection.classList.toggle('is-open', isEditor);
                 texteditorSection.setAttribute('aria-hidden', isEditor ? 'false' : 'true');
+            }
+            if (overviewSection) {
+                overviewSection.classList.toggle('is-open', isOverview);
+                overviewSection.setAttribute('aria-hidden', isOverview ? 'false' : 'true');
             }
             if (speakerEditorSection) {
                 speakerEditorSection.classList.toggle('is-open', isSpeakers);
@@ -37417,6 +37544,10 @@
             if (editorToggle) {
                 editorToggle.setAttribute('aria-expanded', isEditor ? 'true' : 'false');
                 editorToggle.classList.toggle('is-active', isEditor);
+            }
+            if (overviewToggle) {
+                overviewToggle.setAttribute('aria-expanded', isOverview ? 'true' : 'false');
+                overviewToggle.classList.toggle('is-active', isOverview);
             }
             if (speakersToggle) {
                 speakersToggle.setAttribute('aria-expanded', isSpeakers ? 'true' : 'false');
@@ -37498,6 +37629,11 @@
                     console.error('openSpeakersOverwatch on Speakers tab:', err);
                 });
                 scheduleSpeakerPaneLayout();
+            }
+            if (isOverview) {
+                void loadAndRenderGuestsTable().then(function () {
+                    updateGuestsOverwatchRegisteredCount();
+                });
             }
             if (isGuests) {
                 void loadAndRenderGuestsTable();
@@ -37641,8 +37777,13 @@
                     texteditorSection.setAttribute('aria-hidden', 'true');
                 }
                 if (speakerEditorSection) {
-                    speakerEditorSection.classList.add('is-open');
-                    speakerEditorSection.setAttribute('aria-hidden', 'false');
+                    speakerEditorSection.classList.remove('is-open');
+                    speakerEditorSection.setAttribute('aria-hidden', 'true');
+                }
+                var overviewSectionNoEvent = document.getElementById('overview-editor');
+                if (overviewSectionNoEvent) {
+                    overviewSectionNoEvent.classList.add('is-open');
+                    overviewSectionNoEvent.setAttribute('aria-hidden', 'false');
                 }
                 if (contentEditorSection) {
                     contentEditorSection.classList.remove('is-open');
@@ -37677,8 +37818,13 @@
                     editorToggle.classList.remove('is-active');
                 }
                 if (speakersToggle) {
-                    speakersToggle.setAttribute('aria-expanded', 'true');
-                    speakersToggle.classList.add('is-active');
+                    speakersToggle.setAttribute('aria-expanded', 'false');
+                    speakersToggle.classList.remove('is-active');
+                }
+                var overviewToggleNoEvent = document.getElementById('overview-toggle');
+                if (overviewToggleNoEvent) {
+                    overviewToggleNoEvent.setAttribute('aria-expanded', 'true');
+                    overviewToggleNoEvent.classList.add('is-active');
                 }
                 if (contentToggle) {
                     contentToggle.setAttribute('aria-expanded', 'false');
@@ -39233,6 +39379,7 @@
             }
             initCurrentEventPicker();
             const texteditorToggle = document.getElementById('texteditor-toggle');
+            const overviewToggle = document.getElementById('overview-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
             const guestsToggle = document.getElementById('guests-toggle');
             const programmeToggle = document.getElementById('programme-toggle');
@@ -39243,6 +39390,12 @@
                     e.preventDefault();
                     if (!selectedevent || !String(selectedevent).trim()) return;
                     setBackendPanel('editor');
+                });
+            }
+            if (overviewToggle) {
+                overviewToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setBackendPanel('overview');
                 });
             }
             if (speakersToggle) {
@@ -42303,7 +42456,7 @@
             }, 0);
             syncGuestEditorToolbarForBottomScroll();
             syncSpeakerEditorToolbarForBottomScroll();
-            setBackendPanel('speakers');
+            setBackendPanel('overview');
             document.addEventListener('click', function(e) {
                 var slotEl = e.target.closest('.programme-day-slot');
                 if (slotEl) {
