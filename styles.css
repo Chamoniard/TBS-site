@@ -2593,7 +2593,9 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     gap: 16px;
     min-width: 0;
     box-sizing: border-box;
+    align-items: start;
     background: #ffffff;
+    border: none;
     border-radius: 5px;
     padding: 16px;
 }
@@ -2612,7 +2614,8 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-    height: 100%;
+    height: auto;
+    align-self: start;
     background: transparent;
     border-radius: 0;
     padding: 0;
@@ -2633,10 +2636,13 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 .home-section > .on-demand-section .cme-image {
     display: block;
+    align-self: start;
     background: transparent;
     overflow: visible;
     border: none;
     border-radius: 0;
+    outline: none;
+    box-shadow: none;
     cursor: pointer;
 }
 
@@ -2644,10 +2650,13 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     display: block;
     width: 100%;
     height: auto;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
     border: none;
     border-radius: 0;
+    outline: none;
+    box-shadow: none;
+    pointer-events: none;
 }
 
 .home-section > .on-demand-section .on-demand-left .home-rich-html {

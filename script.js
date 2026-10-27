@@ -2839,6 +2839,28 @@ async function hydrateHomeOnDemandSection(homeSection) {
     setHomeOnDemandCopy(left, html);
 }
 
+/** Image uses the Enroll control: same address, and a click follows that button. */
+function bindHomeOnDemandImageToEnroll(root) {
+    const scope = root && root.querySelector ? root : document;
+    const imageLink = scope.querySelector('.cme-image');
+    const enroll = scope.querySelector('.on-demand-enroll-btn');
+    if (!imageLink || !enroll || imageLink.dataset.enrollBound === '1') return;
+    imageLink.dataset.enrollBound = '1';
+    const href = enroll.getAttribute('href');
+    if (href) imageLink.setAttribute('href', href);
+    const target = enroll.getAttribute('target');
+    if (target) imageLink.setAttribute('target', target);
+    const rel = enroll.getAttribute('rel');
+    if (rel) imageLink.setAttribute('rel', rel);
+    imageLink.addEventListener('click', function (e) {
+        if (e.defaultPrevented) return;
+        if (e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        enroll.click();
+    });
+}
+
 function setHomeOnDemandCopy(left, html) {
     if (!left) return;
     let copy = left.querySelector('.on-demand-copy');
@@ -2856,12 +2878,12 @@ const HOME_ON_DEMAND_SECTION_HTML = `
                         <div class="on-demand-panel">
                             <div class="on-demand-left" id="on-demand-left">
                                 <div class="on-demand-copy" id="on-demand-copy"></div>
+                                <a class="feed-load-more-btn on-demand-enroll-btn" id="on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>
                             </div>
                             <a class="cme-image" id="cme-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course">
                                 <img src="images/TBS26ondemand-course.webp?v=20261027-v4" alt="" width="1024" height="1024" decoding="async">
                             </a>
                         </div>
-                        <a class="feed-load-more-btn on-demand-enroll-btn" id="on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>
                     </div>
                 </div>
 `;
@@ -3980,6 +4002,7 @@ async function showFeedContent() {
         const homeSection = mountHomeSectionIntoMain(main);
         setupRegistrationFormValidation(homeSection);
         void syncHomeOnDemandSectionVisibility(homeSection);
+        bindHomeOnDemandImageToEnroll(homeSection);
         void hydrateHomeOnDemandSection(homeSection).catch(function (err) {
             console.error('hydrateHomeOnDemandSection:', err);
         });
@@ -6326,6 +6349,7 @@ function renderHomeWebsiteSnippetPreview(payload) {
         root.innerHTML = HOME_ON_DEMAND_SECTION_HTML;
         const left = root.querySelector('.on-demand-left');
         if (left) setHomeOnDemandCopy(left, html);
+        bindHomeOnDemandImageToEnroll(root);
         disableHomeOnDemandCourseLinks(root);
     }
 }
