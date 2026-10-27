@@ -950,7 +950,17 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 .header .nav-register-mobile-bar .nav-register-pill,
 .nav-register-mobile-bar .nav-register-pill {
     background-color: #FFD700 !important;
+    background-image: linear-gradient(
+        105deg,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0) 65%
+    );
+    background-repeat: no-repeat;
+    background-size: 220% 100%;
+    background-position: 130% 0;
     color: #003153 !important;
+    animation: nav-earn-cme-shimmer 2.5s ease-in-out 1;
 }
 
 .navbar .nav-register-pill:hover,
@@ -1051,7 +1061,11 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .nav-earn-cme-pill {
+    .nav-earn-cme-pill,
+    .navbar .nav-register-pill,
+    .navbar .nav-item-register-desktop .nav-link[data-view="register"],
+    .nav-register-mobile-bar .nav-register-pill,
+    .home-section > .on-demand-section .on-demand-enroll-btn.is-enroll-shimmer {
         animation: none;
         background-image: none;
     }
@@ -2613,7 +2627,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     padding: 24px 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
 }
 
 @media (min-width: 769px) {
@@ -2672,10 +2686,10 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     min-width: 0;
     box-sizing: border-box;
     align-items: start;
-    background: #ffffff;
+    background: transparent;
     border: none;
     border-radius: 5px;
-    padding: 16px;
+    padding: 0;
 }
 
 .home-section > .on-demand-section .on-demand-left,
@@ -2710,6 +2724,20 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     width: var(--tbs-action-btn-width);
     min-width: var(--tbs-action-btn-width);
     max-width: var(--tbs-action-btn-width);
+}
+
+/* One shimmer pass, added when the button first enters the viewport after home load. */
+.home-section > .on-demand-section .on-demand-enroll-btn.is-enroll-shimmer {
+    background-image: linear-gradient(
+        105deg,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0) 65%
+    );
+    background-repeat: no-repeat;
+    background-size: 220% 100%;
+    background-position: 130% 0;
+    animation: nav-earn-cme-shimmer 2.5s ease-in-out 1;
 }
 
 .home-section > .on-demand-section .cme-image {
@@ -7332,12 +7360,18 @@ h4 {
     }
 
     .feed-section-inner-wrapper > h2.section-titles,
-    .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title,
-    .home-section > .on-demand-section .on-demand-inner-wrapper > h2.section-titles.on-demand-section-title {
+    .home-section > .registration-section .registration-form > h3.section-titles.registration-section-title {
         padding-top: 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
         padding-bottom: 4px !important;
+    }
+
+    .home-section > .on-demand-section .on-demand-inner-wrapper > h2.section-titles.on-demand-section-title {
+        padding-top: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-bottom: 0 !important;
     }
 
     .home-section > .introslider-inner-wrapper.home-hero-introslider .introslider-section-title {

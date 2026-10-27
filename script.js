@@ -2861,6 +2861,40 @@ function bindHomeOnDemandImageToEnroll(root) {
     });
 }
 
+/** Play the Enroll shimmer once, after home content is in place and the button is on screen. */
+function armHomeEnrollShimmerWhenVisible(root) {
+    const scope = root && root.querySelector ? root : document;
+    const btn = scope.querySelector('.on-demand-enroll-btn');
+    if (!btn || btn.dataset.enrollShimmerArmed === '1') return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    btn.dataset.enrollShimmerArmed = '1';
+
+    const play = function () {
+        if (btn.dataset.enrollShimmered === '1') return;
+        btn.dataset.enrollShimmered = '1';
+        btn.classList.add('is-enroll-shimmer');
+        btn.addEventListener('animationend', function onEnd(ev) {
+            if (ev.animationName !== 'nav-earn-cme-shimmer') return;
+            btn.removeEventListener('animationend', onEnd);
+            btn.classList.remove('is-enroll-shimmer');
+        });
+    };
+
+    if (typeof IntersectionObserver !== 'function') {
+        play();
+        return;
+    }
+
+    const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            play();
+            observer.disconnect();
+        });
+    }, { threshold: 0.6 });
+    observer.observe(btn);
+}
+
 function setHomeOnDemandCopy(left, html) {
     if (!left) return;
     let copy = left.querySelector('.on-demand-copy');
@@ -3941,6 +3975,9 @@ function runHomeDeferredHydration(homeSection, ctx) {
         if (speakersWrap) finalizeHomeSpeakersSection(speakersWrap);
         wireSliderIndicators();
         scheduleFitHomeProgrammeCardsToContent();
+        requestAnimationFrame(function () {
+            armHomeEnrollShimmerWhenVisible(homeSection);
+        });
     };
 
     // Registration copy can finish after unlock — do not block scroll on it.
@@ -4164,6 +4201,7 @@ async function showFeedContent() {
             console.error('showFeedContent home paint', homePaintErr);
             revealStuckHomeStageBands(homeSection);
             setHomePageLoading(false);
+            armHomeEnrollShimmerWhenVisible(homeSection);
         }
     }
 }
