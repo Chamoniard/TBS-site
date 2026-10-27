@@ -11900,13 +11900,7 @@ body.login-page .auth-title {
         box-sizing: border-box;
     }
     .video-layout > .morevideos {
-        order: 1;
-        position: static;
-        width: 100%;
-        height: auto !important;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 24px;
+        display: none !important;
     }
 
     .morevideos,
