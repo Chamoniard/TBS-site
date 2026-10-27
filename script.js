@@ -30,6 +30,8 @@ const firestoreHomeCache = {
     programmeBandIntroSnippets: { value: '', fetchedAt: 0, promise: null },
     /** `tbs/Pre-sets/{event-location}/{event-location}/CME-text/CME-text` field `Value`. */
     onDemandCmeText: { value: '', location: '', fetchedAt: 0, promise: null },
+    /** `tbs/Pre-sets/{event_location}/{event_location}/Ondemandreminder/Ondemandreminder` field `Value`. */
+    onDemandReminder: { value: '', location: '', fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `Displayspeakers` / `displayspeakers` (`Yes` / `No`). */
     siteSettingsDisplaySpeakers: { value: true, fetchedAt: 0, promise: null },
     /** Derived from `siteSettingsFields`: `displayprogramme` (`Yes` / `No`). */
@@ -1154,7 +1156,7 @@ function showPostOnSamePage(post, options) {
                 </div>
             </div>
             ${formattedContent ? `<div class="post-content">${formattedContent}</div>` : '<div class="post-content"><p>No content available for this post.</p></div>'}
-                    <a href="https://www.youtube.com/@TBSZermatt" target="_blank" rel="noopener" class="youtubereminder" style="background-color: #BFF0FF !important; text-decoration: none;"><span class="youtubereminder-text">Find all recorded content from TBS on our Youtube channel.</span><span class="youtubereminder-icon" aria-hidden="true"><i class="fab fa-youtube"></i></span></a>
+                    <div class="ondemandreminder" hidden><span class="ondemandreminder-text"></span><a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a></div>
                     </div>
                 </div>
                 <div class="morevideos">
@@ -1192,6 +1194,7 @@ function showPostOnSamePage(post, options) {
         viewerSection.hidden = false;
         viewerSection.setAttribute('aria-hidden', 'false');
         viewerSection.innerHTML = viewerInnerHTML;
+        void hydrateViewerOnDemandReminder(viewerSection);
 
         initMobileViewerYouTubePlayer(viewerSection);
         
@@ -5060,6 +5063,81 @@ const HOME_SNIPPETS_EVENTINFO_FIELD = 'Eventinfo';
 const HOME_SNIPPETS_PROGRAMMEINFO_FIELD = 'Programmeinfo';
 /** On-demand left column: Firestore `tbs/Pre-sets/{event_location}/{event_location}/CME-text/CME-text` field `Value`. */
 const HOME_SNIPPETS_CME_TEXT_FIELD = 'CME-text';
+/** Video viewer reminder: Firestore `tbs/Pre-sets/{event_location}/{event_location}/Ondemandreminder/Ondemandreminder` field `Value`. */
+const HOME_SNIPPETS_ON_DEMAND_REMINDER_FIELD = 'Ondemandreminder';
+
+/** `Value` on `tbs/Pre-sets/{event_location}/{event_location}/Ondemandreminder/Ondemandreminder`. */
+async function fetchHomeOnDemandReminderFromFirebase() {
+    if (typeof firebase === 'undefined') return '';
+    const location = currentHomeEventLocation();
+    const cached = firestoreHomeCache.onDemandReminder;
+    if (cached && cached.location === location && isFreshFirestoreCacheEntry(cached)) {
+        return typeof cached.value === 'string' ? cached.value : '';
+    }
+    if (cached && cached.location === location && cached.promise) {
+        const html = await cached.promise;
+        return typeof html === 'string' ? html : '';
+    }
+
+    const promise = (async function () {
+        try {
+            const db = getFirestore();
+            const snap = await withTimeout(
+                tbsPresetValueDocRef(db, HOME_SNIPPETS_ON_DEMAND_REMINDER_FIELD, location).get(),
+                10000,
+                'Firestore tbs/Pre-sets/' + location + '/' + location + '/Ondemandreminder/Ondemandreminder Value'
+            );
+            const data = snap.exists ? snap.data() || {} : {};
+            const raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD] != null ? data[FIRESTORE_TBS_PRESET_VALUE_FIELD] : '';
+            return raw != null ? String(raw) : '';
+        } catch (e) {
+            console.warn('[home snippets Ondemandreminder]', e);
+            return '';
+        }
+    })();
+
+    firestoreHomeCache.onDemandReminder = {
+        value: cached && cached.location === location && typeof cached.value === 'string' ? cached.value : '',
+        location: location,
+        fetchedAt: cached && cached.location === location ? Number(cached.fetchedAt || 0) : 0,
+        promise: promise
+    };
+
+    const value = await promise;
+    firestoreHomeCache.onDemandReminder = {
+        value: typeof value === 'string' ? value : '',
+        location: location,
+        fetchedAt: Date.now(),
+        promise: null
+    };
+    return typeof value === 'string' ? value : '';
+}
+
+function setViewerOnDemandReminder(viewerSection, html) {
+    if (!viewerSection || !viewerSection.querySelector) return;
+    const box = viewerSection.querySelector('.ondemandreminder');
+    const text = box && box.querySelector('.ondemandreminder-text');
+    if (!box || !text) return;
+    const value = String(html || '').trim();
+    if (!value) {
+        text.innerHTML = '';
+        box.hidden = true;
+        return;
+    }
+    text.innerHTML = wrapHomeRichHtml(value);
+    box.hidden = false;
+}
+
+async function hydrateViewerOnDemandReminder(viewerSection) {
+    let html = '';
+    try {
+        html = await fetchHomeOnDemandReminderFromFirebase();
+    } catch (err) {
+        console.error('hydrateViewerOnDemandReminder:', err);
+        html = '';
+    }
+    setViewerOnDemandReminder(viewerSection, html);
+}
 /** localStorage key for Programme intro snippet (must match backend `data-snippet-key`). */
 const TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY = 'tbsBackend:texteditor:home:programmeinfo';
 /** ISO date per slider day card; `html` is read from `tbs/Programme/{event}/days/{ISO}/Programme` (same as backend Pre-sets). */
@@ -6347,6 +6425,7 @@ function websiteSnippetPreviewKind(key) {
     if (k.indexOf(':home:speakers') !== -1) return 'speakers';
     if (k.indexOf(':home:register-to-waiting-list') !== -1) return 'waiting';
     if (k.indexOf(':home:registration') !== -1) return 'registration';
+    if (k.indexOf(':home:on-demand-reminder') !== -1) return 'ondemandreminder';
     if (k.indexOf(':home:on-demand') !== -1) return 'ondemand';
     return '';
 }
@@ -6398,6 +6477,18 @@ function renderHomeWebsiteSnippetPreview(payload) {
         } else {
             applyHomeRegistrationToReserves(root, { show: true, html: html });
         }
+        return;
+    }
+    if (kind === 'ondemandreminder') {
+        const body = String(html || '').trim();
+        const inner = body ? wrapHomeRichHtml(body) : '';
+        root.innerHTML =
+            '<div class="video-layout">' +
+            '<div class="viewing">' +
+            '<div class="viewing-main-col">' +
+            '<div class="ondemandreminder"><span class="ondemandreminder-text">' + inner + '</span>' +
+            '<a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a></div>' +
+            '</div></div></div>';
         return;
     }
     if (kind === 'ondemand') {

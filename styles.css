@@ -1301,18 +1301,14 @@ body.home-view .hero {
 .hero-social-links a i.fab.fa-youtube,
 .footer-section .hero-social-links a i.fab.fa-youtube,
 .home-social-row-container .social-links a i.fab.fa-youtube,
-.home-section .introslider .social-links a i.fab.fa-youtube,
-.viewing .youtubereminder-icon i.fab.fa-youtube,
-.viewing .youtubereminder-icon .fab.fa-youtube {
+.home-section .introslider .social-links a i.fab.fa-youtube {
     color: var(--tbs-pink) !important;
 }
 
 .hero-social-links a:hover i.fab.fa-youtube,
 .footer-section .hero-social-links a:hover i.fab.fa-youtube,
 .home-social-row-container .social-links a:hover i.fab.fa-youtube,
-.home-section .introslider .social-links a:hover i.fab.fa-youtube,
-.viewing .youtubereminder-icon:hover i.fab.fa-youtube,
-.viewing .youtubereminder-icon:hover .fab.fa-youtube {
+.home-section .introslider .social-links a:hover i.fab.fa-youtube {
     color: var(--tbs-pink-soft) !important;
 }
 
@@ -10824,12 +10820,12 @@ h4 {
     line-height: 1.3 !important;
 }
 
-/* Light blue container in viewing (same width as post-content) */
-.viewing .youtubereminder {
+/* Pale pink reminder in viewing (same width as post-content) */
+.viewing .ondemandreminder {
     width: 100%;
     min-height: 4rem;
     flex-shrink: 0;
-    background-color: #BFF0FF !important;
+    background-color: var(--tbs-loading-pink, #fce7f3) !important;
     margin-top: 0;
     margin-bottom: 0;
     padding: 8px;
@@ -10838,30 +10834,19 @@ h4 {
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 1rem;
     font-size: 1rem;
     font-weight: 300;
 }
-.viewing .youtubereminder-text {
+.viewing .ondemandreminder .on-demand-enroll-btn {
+    flex: 0 0 auto;
+    align-self: center;
+    margin-left: auto;
+}
+.viewing .ondemandreminder-text {
     flex: 1;
     color: #000000;
-}
-.viewing .youtubereminder-icon,
-.viewing .youtubereminder-icon .fab,
-.viewing .youtubereminder-icon .fab.fa-youtube {
-    flex-shrink: 0;
-    color: var(--tbs-pink) !important;
-    font-size: 2.6rem;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.viewing .youtubereminder-icon:hover,
-.viewing .youtubereminder-icon:hover .fab,
-.viewing .youtubereminder-icon:hover .fab.fa-youtube {
-    color: var(--tbs-pink-soft) !important;
 }
 
 .action-btn {
@@ -11823,7 +11808,7 @@ body.login-page .auth-title {
     .viewing {
         margin-right: 0;
     }
-    .viewing .youtubereminder {
+    .viewing .ondemandreminder {
         margin-bottom: 16px;
         margin-left: 8px;
         margin-right: 8px;
