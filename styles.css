@@ -2931,7 +2931,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     min-height: 0;
     max-height: none;
     align-self: flex-start;
-    padding: 16px;
+    padding: 24px 16px 16px;
     text-align: left;
     overflow-x: hidden;
     overflow-y: auto;
@@ -3210,7 +3210,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     flex-direction: column;
     align-items: stretch;
     background-color: transparent;
-    padding: 8px;
+    padding: 0;
     border-radius: 5px;
     box-sizing: border-box;
     overflow: visible;
@@ -3259,14 +3259,16 @@ body.home-view .home-section > .on-demand-section[hidden] {
 .home-section .speaker-card .speaker-card-name {
     flex-shrink: 0;
     font-family: var(--title-font);
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: #000000;
     margin: 0;
     padding: 0;
     border: none;
-    line-height: 1.25;
-    text-align: center;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-align: left;
     width: 100%;
 }
 
@@ -6270,6 +6272,7 @@ h3.section-titles {
 body.home-view .home-section > .sponsors-section .sponsors-section-title,
 body.home-view .feed-section-inner-wrapper > h2.section-titles,
 body.home-view .home-section .speaker-card--speakerinfo .speakers-section-title,
+body.home-view .home-section .speaker-card:not(.speaker-card--tba) .speaker-card-name,
 body.home-view .home-section .programme-info > .programme-info-title,
 body.home-view .home-section .programme-slider > .programme-info .about-title,
 body.home-view .home-section .programme-slider > .about .about-title,
@@ -7423,8 +7426,9 @@ h4 {
         text-align: center !important;
     }
 
-    /* Speakers intro card: section title */
-    .home-section .speaker-card--speakerinfo .speakers-section-title {
+    /* Speakers intro card: section title and speaker names */
+    .home-section .speaker-card--speakerinfo .speakers-section-title,
+    .home-section .speaker-card:not(.speaker-card--tba) .speaker-card-name {
         text-align: center !important;
     }
 
@@ -12135,7 +12139,6 @@ body.home-view :is(
     .introslider-section-title,
     .event-section-title,
     .on-demand-section-title,
-    .speaker-card-name:not(.home-carousel-tba-title),
     .speaker-card-long-bio-title,
     .featured-location-title,
     .featured-programme-title,
