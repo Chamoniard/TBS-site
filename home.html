@@ -150,8 +150,8 @@
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
     </script>
-    <link rel="preload" href="styles.css?v=20261027-ondemand-enroll" as="style">
-    <link rel="stylesheet" href="styles.css?v=20261027-ondemand-enroll">
+    <link rel="preload" href="styles.css?v=20261027-earn-cme-width" as="style">
+    <link rel="stylesheet" href="styles.css?v=20261027-earn-cme-width">
     <style>
         /* Home layout: after styles.css so full-width / 1400px column rules win */
         body.home-view .everything,
@@ -405,7 +405,7 @@
                 margin-left: auto !important;
                 margin-right: auto !important;
                 padding-top: 24px !important;
-                padding-bottom: 24px !important;
+                padding-bottom: 40px !important;
                 padding-left: 16px !important;
                 padding-right: 0 !important;
                 border: none !important;
@@ -572,9 +572,10 @@
             .nav-register-mobile-bar {
                 display: flex !important;
                 align-items: center !important;
-                justify-content: center !important;
+                justify-content: flex-end !important;
                 flex-shrink: 0 !important;
                 margin-left: auto !important;
+                gap: 8px !important;
             }
             .nav-register-mobile-top {
                 display: none !important;
@@ -706,6 +707,7 @@
                 justify-content: center !important;
                 align-items: center !important;
             }
+            .navbar--mobile-top .nav-menu.active .nav-item-earn-cme-desktop,
             .navbar--mobile-top .nav-menu.active .nav-item-register-desktop {
                 display: flex !important;
                 justify-content: center !important;
@@ -713,9 +715,10 @@
             }
             .navbar--mobile-top .nav-menu.active .nav-link,
             .navbar--mobile-top .nav-menu.active .mobile-top-tab-link {
-                font-family: 'Montserrat', sans-serif !important;
-                font-size: 1.25rem !important;
-                font-weight: 500 !important;
+                font-family: var(--title-font) !important;
+                font-size: 1.5rem !important;
+                font-weight: 600 !important;
+                letter-spacing: 0.02em !important;
                 color: #003153 !important;
                 width: 100% !important;
                 padding: 12px 8px !important;
@@ -734,14 +737,16 @@
             .navbar--mobile-top .nav-menu.active .mobile-top-tab-link.active {
                 font-weight: 600 !important;
             }
-            .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill {
+            .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill,
+            .navbar--mobile-top .nav-menu.active .nav-item-earn-cme-desktop .nav-earn-cme-pill {
                 background: transparent !important;
                 background-color: transparent !important;
                 box-shadow: none !important;
                 border: none !important;
-                font-size: 1rem !important;
                 margin: 0 !important;
                 padding: 12px 4px !important;
+                animation: none !important;
+                color: #003153 !important;
             }
             .home-section .feed-section-inner-wrapper h3.post-title,
             .feed-section-inner-wrapper h3.post-title {
@@ -900,6 +905,9 @@
                     <li class="nav-item nav-past-mobile">
                         <span class="nav-link mobile-top-tab-link" data-view="past-talks" style="cursor: pointer;">Talks</span>
                     </li>
+                    <li class="nav-item nav-item-earn-cme-desktop">
+                        <button type="button" class="nav-link nav-earn-cme-pill" data-view="on-demand">Earn CME</button>
+                    </li>
                     <li class="nav-item nav-item-register-desktop">
                         <span class="nav-link nav-register-pill" data-view="register" style="cursor: pointer;">Register</span>
                     </li>
@@ -911,6 +919,7 @@
                     </li>
                 </ul>
                 <div class="nav-register-mobile-bar">
+                    <button type="button" class="nav-link nav-earn-cme-pill" data-view="on-demand">Earn CME</button>
                     <button type="button" class="nav-link nav-register-pill" data-view="register" aria-label="Register for TBS">Register</button>
                 </div>
             </div>
@@ -1412,6 +1421,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="script.js?v=20261027-ondemand-enroll" defer></script>
+    <script src="script.js?v=20261027-earn-cme" defer></script>
 </body>
 </html>

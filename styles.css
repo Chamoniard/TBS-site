@@ -979,6 +979,84 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     outline: none;
 }
 
+/* Navbar Earn CME: Register pill shape, Enroll pink. Soft shimmer for 5s after load. */
+.nav-earn-cme-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: var(--title-font);
+    letter-spacing: 0.02em;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    background-color: var(--tbs-pink) !important;
+    background-image: linear-gradient(
+        105deg,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0) 65%
+    );
+    background-repeat: no-repeat;
+    background-size: 220% 100%;
+    background-position: 130% 0;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 5px;
+    min-height: 33px;
+    padding: 6px 12px;
+    margin: 0;
+    white-space: nowrap;
+    box-sizing: border-box;
+    width: 6.2rem;
+    min-width: 6.2rem;
+    max-width: 6.2rem;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1.2;
+    text-align: center;
+    box-shadow: var(--tbs-action-btn-shadow);
+    animation: nav-earn-cme-shimmer 2.5s ease-in-out 2;
+}
+
+.navbar .nav-earn-cme-pill,
+.navbar .nav-register-pill,
+.navbar .nav-item-register-desktop .nav-link[data-view="register"],
+.nav-register-mobile-bar .nav-register-pill {
+    width: 6.2rem;
+    min-width: 6.2rem;
+    max-width: 6.2rem;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.nav-earn-cme-pill:hover,
+.nav-earn-cme-pill:focus,
+.nav-earn-cme-pill:focus-visible,
+.nav-earn-cme-pill.active,
+.navbar .nav-link.nav-earn-cme-pill.active {
+    background-color: var(--tbs-pink-soft) !important;
+    color: #ffffff !important;
+    outline: none;
+}
+
+@keyframes nav-earn-cme-shimmer {
+    0% {
+        background-position: 130% 0;
+    }
+    100% {
+        background-position: -30% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav-earn-cme-pill {
+        animation: none;
+        background-image: none;
+    }
+}
+
 @media (min-width: 769px) {
     .navbar .nav-register-pill,
     .nav-item-register-desktop .nav-link[data-view="register"],
@@ -2552,7 +2630,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         margin-right: auto;
         padding-top: 24px;
         padding-right: 0;
-        padding-bottom: 24px;
+        padding-bottom: 40px;
         padding-left: 16px;
         border: none;
     }
@@ -9708,7 +9786,8 @@ h4 {
     .nav-register-mobile-bar {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-end;
+        gap: 8px;
         flex-shrink: 0;
         margin-left: auto;
         z-index: 10045;
@@ -9730,6 +9809,7 @@ h4 {
         display: none !important;
     }
 
+    .nav-item-earn-cme-desktop,
     .nav-item-register-desktop,
     .nav-past-desktop {
         display: none;
@@ -9869,6 +9949,7 @@ h4 {
         align-items: center;
     }
 
+    .navbar--mobile-top .nav-menu.active > .nav-item-earn-cme-desktop,
     .navbar--mobile-top .nav-menu.active > .nav-item-register-desktop {
         display: flex !important;
         justify-content: center;
@@ -9878,8 +9959,9 @@ h4 {
     .navbar--mobile-top .nav-menu.active .nav-link,
     .navbar--mobile-top .nav-menu.active .mobile-top-tab-link {
         font-family: var(--title-font) !important;
-        font-size: 1.25rem !important;
-        font-weight: 500;
+        font-size: 1.5rem !important;
+        font-weight: 600;
+        letter-spacing: 0.02em;
         color: #003153 !important;
         width: 100%;
         padding: 12px 8px;
@@ -9902,17 +9984,19 @@ h4 {
         font-weight: 600 !important;
     }
 
-    .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill {
+    .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill,
+    .navbar--mobile-top .nav-menu.active .nav-item-earn-cme-desktop .nav-earn-cme-pill {
         background: transparent !important;
         background-color: transparent !important;
         box-shadow: none !important;
         border: none !important;
-        font-size: 1rem !important;
         margin: 0;
         min-height: 0;
         height: auto;
         max-height: none;
         padding: 12px 4px;
+        animation: none !important;
+        color: #003153 !important;
     }
 
     .navbar--mobile-top .nav-menu.active .nav-item-register-desktop .nav-register-pill:hover,
@@ -10228,6 +10312,7 @@ h4 {
     }
 
     .nav-past-desktop,
+    .nav-item-earn-cme-desktop,
     .nav-item-register-desktop {
         display: flex !important;
     }

@@ -4168,6 +4168,23 @@ async function showFeedContent() {
     }
 }
 
+/** Earn CME nav: load home (if needed), show on-demand, and scroll to that section. */
+async function goToHomeOnDemand(e) {
+    if (e) e.preventDefault();
+    const instantJump = document.body.classList.contains('past-talks-open');
+    setPastTalksOpenState(false);
+    collapseViewerAndPastTalksForHome();
+    if (!document.body.classList.contains('home-view')) {
+        await showFeedContent();
+    }
+    const homeSection = document.querySelector('.home-section');
+    if (homeSection) applyHomeOnDemandSectionVisibility(homeSection, true);
+    setActiveNavView('on-demand');
+    requestAnimationFrame(function () {
+        scrollHomeTargetIntoView(document.getElementById('home-on-demand-heading'), { instant: instantJump });
+    });
+}
+
 /** Register nav / introslider Register slide: load home (if needed) and scroll to the Registration title. */
 async function goToHomeRegistration(e) {
     if (e) e.preventDefault();
@@ -7912,6 +7929,10 @@ async function setupNavigationListeners() {
 
     bindViewLinks('speakers', async function(e) {
         await goToHomeSpeakers(e);
+    });
+
+    bindViewLinks('on-demand', async function(e) {
+        await goToHomeOnDemand(e);
     });
 
     bindViewLinks('register', async function(e) {
