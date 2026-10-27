@@ -12089,6 +12089,62 @@
             max-width: 100%;
         }
 
+        /* On-demand: lay out at 1500px, then scale to the render pane. */
+        #texteditor .texteditor-ondemand-scale-host {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1500px;
+            transform-origin: top left;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage .home-section {
+            width: 1500px;
+            max-width: none;
+            margin: 0;
+            background: transparent;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage .on-demand-section {
+            display: block !important;
+            width: 1500px;
+            max-width: none;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage .on-demand-inner-wrapper {
+            width: 1400px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 24px;
+            padding-right: 0;
+            padding-bottom: 40px;
+            padding-left: 16px;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage .on-demand-panel {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            align-items: stretch;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage .on-demand-section-title {
+            font-family: var(--title-font);
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: #003153;
+        }
+
+        #texteditor .texteditor-ondemand-scale-stage a {
+            pointer-events: none;
+        }
+
         .renderbox--idle .texteditor-render-html:empty {
             min-height: 120px;
         }
@@ -13216,7 +13272,7 @@
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:speakers" id="texteditor-home-speakers-btn" aria-pressed="false">Speakers infoslide</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:registration" id="texteditor-home-registration-btn" aria-pressed="false">Registration</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:register-to-waiting-list" id="texteditor-home-register-to-waiting-list-btn" aria-pressed="false">Register to waiting list</button>
-                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:on-demand" id="texteditor-home-on-demand-btn" aria-pressed="false">On-demand</button>
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:on-demand" id="texteditor-home-on-demand-btn" aria-pressed="false">TBS on-demand</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -13373,7 +13429,7 @@
                                 </button>
                                 <button type="button" class="add-speaker-button" id="texteditor-render-preview-btn" hidden disabled aria-disabled="true" title="Preview on the site" aria-label="Preview on the site">
                                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                                        <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                        <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                                     </svg>
                                 </button>
                             </div>
@@ -15682,7 +15738,7 @@
         aria-hidden="true"
         role="dialog"
         aria-modal="true"
-        aria-label="On-demand preview"
+        aria-label="TBS on-demand preview"
     >
         <div class="speaker-bio-preview-popup__backdrop" id="website-snippet-preview-popup-backdrop"></div>
         <div class="website-snippet-preview-layout" id="website-snippet-preview-layout">
@@ -15690,7 +15746,7 @@
                 <iframe
                     id="website-snippet-preview-frame"
                     class="website-snippet-preview-frame"
-                    title="On-demand preview"
+                    title="TBS on-demand preview"
                     src="about:blank"
                 ></iframe>
                 <div class="website-snippet-preview-devices">
@@ -34458,10 +34514,10 @@
             if (key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_CME_TEXT_FIELD,
-                    metaLabel: 'Home — On-demand',
-                    loadOk: 'On-demand loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/CME-text/CME-text.Value) into the editor.',
-                    saveOk: 'On-demand saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/CME-text/CME-text.Value).',
-                    saveErr: 'Failed to save On-demand to Firestore.',
+                    metaLabel: 'Home — TBS on-demand',
+                    loadOk: 'TBS on-demand loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/CME-text/CME-text.Value) into the editor.',
+                    saveOk: 'TBS on-demand saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/CME-text/CME-text.Value).',
+                    saveErr: 'Failed to save TBS on-demand to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -35342,7 +35398,7 @@
             btn.hidden = !website;
             btn.disabled = !onDemand;
             btn.setAttribute('aria-disabled', onDemand ? 'false' : 'true');
-            var label = onDemand ? 'Preview On-demand' : 'Preview is not available yet';
+            var label = onDemand ? 'Preview TBS on-demand' : 'Preview is not available yet';
             btn.setAttribute('title', label);
             btn.setAttribute('aria-label', label);
             if (emailBtn) emailBtn.hidden = website;
@@ -35576,6 +35632,62 @@
             return String(html != null ? html : '').split('{{current_event}}').join(value);
         }
 
+        var TEXTEDITOR_ONDEMAND_PREVIEW_WIDTH = 1500;
+
+        function wrapOnDemandPreviewForRender(html) {
+            var body = String(html != null ? html : '').trim();
+            if (body && body.indexOf('home-rich-html') === -1) {
+                body = '<div class="home-rich-html">' + body + '</div>';
+            }
+            return (
+                '<div class="texteditor-ondemand-scale-host">' +
+                '<div class="texteditor-ondemand-scale-stage">' +
+                '<div class="home-section">' +
+                '<div class="on-demand-section texteditor-ondemand-preview">' +
+                '<div class="on-demand-inner-wrapper">' +
+                '<h2 class="section-titles on-demand-section-title">TBS ON-DEMAND</h2>' +
+                '<div class="on-demand-panel">' +
+                '<div class="on-demand-left">' +
+                '<div class="on-demand-copy">' + body + '</div>' +
+                '<a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>' +
+                '</div>' +
+                '<a class="cme-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course">' +
+                '<img src="images/TBS26ondemand-course.webp?v=20261027-v4" alt="" width="1024" height="1024" decoding="async">' +
+                '</a>' +
+                '</div></div></div></div></div></div>'
+            );
+        }
+
+        function syncTexteditorOnDemandPreviewScale() {
+            var host = document.querySelector('#texteditor-render-html .texteditor-ondemand-scale-host');
+            var stage = host && host.querySelector('.texteditor-ondemand-scale-stage');
+            var box = document.getElementById('texteditor-render-html');
+            if (!host || !stage || !box) return;
+            var avail = box.clientWidth;
+            if (avail < 1) return;
+            var scale = avail / TEXTEDITOR_ONDEMAND_PREVIEW_WIDTH;
+            stage.style.width = TEXTEDITOR_ONDEMAND_PREVIEW_WIDTH + 'px';
+            stage.style.transformOrigin = 'top left';
+            stage.style.transform = 'scale(' + scale + ')';
+            var nextHeight = Math.ceil(stage.offsetHeight * scale) + 'px';
+            if (host.style.height !== nextHeight) host.style.height = nextHeight;
+        }
+
+        function ensureTexteditorOnDemandPreviewScaleObserver() {
+            if (ensureTexteditorOnDemandPreviewScaleObserver.done) return;
+            var box = document.getElementById('texteditor-render-html');
+            if (!box) return;
+            ensureTexteditorOnDemandPreviewScaleObserver.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    syncTexteditorOnDemandPreviewScale();
+                });
+                observer.observe(box);
+            } else {
+                window.addEventListener('resize', syncTexteditorOnDemandPreviewScale);
+            }
+        }
+
         function texteditorPreviewHtmlForRender(raw, storageKey) {
             var html = texteditorRenderWithCurrentEvent(raw);
             var key = storageKey || '';
@@ -35584,6 +35696,9 @@
             }
             if (key === TBS_TEXTEDITOR_HOME_SPEAKERS_LS_KEY) {
                 return wrapSpeakerInfoPreviewForRender(html);
+            }
+            if (key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY) {
+                return wrapOnDemandPreviewForRender(html);
             }
             if (!parseEventProgrammeKey(key)) {
                 return html;
@@ -35622,6 +35737,15 @@
             } catch (err) {
                 console.warn('Text editor preview:', err);
                 el.textContent = raw;
+            }
+            if (key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY) {
+                ensureTexteditorOnDemandPreviewScaleObserver();
+                var previewImg = el.querySelector('.texteditor-ondemand-scale-stage img');
+                if (previewImg && !previewImg.complete) {
+                    previewImg.addEventListener('load', syncTexteditorOnDemandPreviewScale, { once: true });
+                }
+                syncTexteditorOnDemandPreviewScale();
+                requestAnimationFrame(syncTexteditorOnDemandPreviewScale);
             }
         }
 

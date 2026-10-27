@@ -2651,6 +2651,16 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
     .home-section > .on-demand-section .on-demand-panel {
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .home-section > .on-demand-section .on-demand-left {
+        align-self: stretch;
+        height: auto;
+    }
+
+    .home-section > .on-demand-section .on-demand-enroll-btn {
+        margin-top: auto;
     }
 }
 
@@ -2707,7 +2717,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
     align-items: flex-start;
     gap: 16px;
     height: auto;
-    align-self: start;
+    align-self: stretch;
     background: transparent;
     border-radius: 0;
     padding: 0;
@@ -2721,6 +2731,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 .home-section > .on-demand-section .on-demand-enroll-btn {
     align-self: center;
     flex: 0 0 auto;
+    margin-top: auto;
     width: var(--tbs-action-btn-width);
     min-width: var(--tbs-action-btn-width);
     max-width: var(--tbs-action-btn-width);
@@ -2754,8 +2765,10 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
 
 .home-section > .on-demand-section .cme-image img {
     display: block;
-    width: 100%;
+    width: 76.5%;
     height: auto;
+    margin-left: auto;
+    margin-right: auto;
     object-fit: contain;
     object-position: center;
     border: none;
@@ -9969,10 +9982,10 @@ h4 {
 
     .navbar--mobile-top .nav-menu.active .nav-menu-logo-img {
         display: block;
-        width: auto;
+        width: 90vw;
+        max-width: 90vw;
         height: auto;
-        max-width: min(72vw, 260px);
-        max-height: 52px;
+        max-height: none;
         object-fit: contain;
         filter: none;
     }
