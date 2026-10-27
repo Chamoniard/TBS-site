@@ -2852,7 +2852,7 @@ const HOME_ON_DEMAND_SECTION_HTML = `
                                 <div class="on-demand-copy" id="on-demand-copy"></div>
                             </div>
                             <a class="cme-image" id="cme-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course">
-                                <img src="images/TBS26ondemand.jpg" alt="" width="1024" height="572">
+                                <img src="images/TBS26ondemand-course.jpg" alt="" width="1024" height="1024">
                             </a>
                         </div>
                         <a class="feed-load-more-btn on-demand-enroll-btn" id="on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>
