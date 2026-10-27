@@ -2754,6 +2754,12 @@ function applyHomeOnDemandSectionVisibility(homeSection, visible) {
     if (show) {
         section.removeAttribute('hidden');
         section.setAttribute('aria-hidden', 'false');
+        section.querySelectorAll('img').forEach(function (img) {
+            var src = img.getAttribute('src');
+            if (!src || (img.complete && img.naturalWidth > 0)) return;
+            img.loading = 'eager';
+            img.src = src;
+        });
     } else {
         section.setAttribute('hidden', '');
         section.setAttribute('aria-hidden', 'true');
@@ -2852,7 +2858,7 @@ const HOME_ON_DEMAND_SECTION_HTML = `
                                 <div class="on-demand-copy" id="on-demand-copy"></div>
                             </div>
                             <a class="cme-image" id="cme-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course">
-                                <img src="images/TBS26ondemand-course.jpg" alt="" width="1024" height="1024">
+                                <img src="images/TBS26ondemand-course.webp" alt="" width="1024" height="1024" decoding="async">
                             </a>
                         </div>
                         <a class="feed-load-more-btn on-demand-enroll-btn" id="on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a>

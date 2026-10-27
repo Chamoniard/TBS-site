@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const PORT = Number(process.env.PORT || process.argv.find((a) => a.startsWith('--port='))?.slice(7) || 8080);
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '::';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -131,7 +131,7 @@ server.on('error', (err) => {
   process.exit(1);
 });
 
-server.listen(PORT, HOST, () => {
+server.listen({ port: PORT, host: HOST, ipv6Only: false }, () => {
   console.log('Serving (node) from:');
   console.log(' ', ROOT);
   console.log('Open:');

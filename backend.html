@@ -15957,8 +15957,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script src="auth-common.js?v=20260902-backend-users-login"></script>
-    <script src="backend-auth.js?v=20260902-backend-users-login"></script>
+    <script src="auth-common.js?v=20261027-popup-login"></script>
+    <script src="backend-auth.js?v=20261027-popup-login"></script>
     <script>
         // Firebase configuration (tbs-app-e2062) – Programme days + slots
         const firebaseConfig = {
@@ -21046,7 +21046,9 @@
             try {
                 var discovered = await discoverSpeakerRowIdsViaItemCollectionGroup(db);
                 if (discovered.length) {
-                    await db.collection('tbs').doc('Speakers').set({ speakerIds: discovered }, { merge: true });
+                    void db.collection('tbs').doc('Speakers').set({ speakerIds: discovered }, { merge: true }).catch(function (writeErr) {
+                        console.warn('speakerIds manifest', writeErr);
+                    });
                 }
                 return dedupeContentRowIds(discovered);
             } catch (cgErr) {
@@ -21388,18 +21390,52 @@
          * @param {FirebaseFirestore.Firestore} db
          * @param {string=} locationOpt Defaults to global `event_location`.
          */
+        var backendSettingsFieldCache = Object.create(null);
+        var backendSettingsFieldInflight = Object.create(null);
+
+        function backendSettingsFieldCacheKey(loc) {
+            return String(loc || '').trim() || '\0parent';
+        }
+
+        function clearBackendSettingsFieldCache() {
+            backendSettingsFieldCache = Object.create(null);
+            backendSettingsFieldInflight = Object.create(null);
+        }
+
+        function rememberBackendSettingsFields(loc, data) {
+            var key = backendSettingsFieldCacheKey(loc);
+            backendSettingsFieldCache[key] = data && typeof data === 'object' ? Object.assign({}, data) : {};
+            return Object.assign({}, backendSettingsFieldCache[key]);
+        }
+
         async function fetchTbsSettingsFields(db, locationOpt) {
             var loc = String(
                 locationOpt != null ? locationOpt : event_location || ''
             ).trim();
-            var dest = {};
-            if (loc) {
-                var destSnap = await tbsSettingsLocationDocRef(db, loc).get();
-                dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
+            var key = backendSettingsFieldCacheKey(loc);
+            if (Object.prototype.hasOwnProperty.call(backendSettingsFieldCache, key)) {
+                return Object.assign({}, backendSettingsFieldCache[key]);
             }
-            var parentSnap = await tbsSettingsRootDocRef(db).get();
-            var parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
-            return overlayTbsEventSettingsFromParent(dest, parent);
+            if (backendSettingsFieldInflight[key]) {
+                var pending = await backendSettingsFieldInflight[key];
+                return Object.assign({}, pending);
+            }
+            backendSettingsFieldInflight[key] = (async function () {
+                var dest = {};
+                if (loc) {
+                    var destSnap = await tbsSettingsLocationDocRef(db, loc).get();
+                    dest = destSnap && destSnap.exists ? destSnap.data() || {} : {};
+                }
+                var parentSnap = await tbsSettingsRootDocRef(db).get();
+                var parent = parentSnap && parentSnap.exists ? parentSnap.data() || {} : {};
+                return overlayTbsEventSettingsFromParent(dest, parent);
+            })();
+            try {
+                var data = await backendSettingsFieldInflight[key];
+                return rememberBackendSettingsFields(loc, data);
+            } finally {
+                delete backendSettingsFieldInflight[key];
+            }
         }
 
         function tbsSettingsFirestoreFieldForSettingKey(settingKey) {
@@ -21450,7 +21486,7 @@
             }
             if (!Object.keys(patch).length) return out;
             await tbsSettingsDocRef(db, loc).set(patch, { merge: true });
-            return Object.assign(out, patch);
+            return rememberBackendSettingsFields(loc, Object.assign(out, patch));
         }
 
         /** UI toggle value `yes` | `no` from Firestore scalar. */
@@ -26609,6 +26645,8 @@
                 patch[field] = settingsYesNoUiToFirestore(yesNoUi);
             }
             await tbsSettingsDocRef(db).set(patch, { merge: true });
+            clearBackendSettingsFieldCache();
+            backendSiteSettingsSyncedFor = '';
         }
 
         async function onSettingsSiteToggleClick(btn) {
@@ -26879,6 +26917,8 @@
             return event_location;
         }
 
+        var backendSiteSettingsSyncedFor = '';
+
         /**
          * Resolve event_location for the current (or given) event, then refresh Settings UI
          * from tbs/Settings/{event_location}/{event_location}.
@@ -26888,6 +26928,7 @@
          */
         async function syncEventLocationAndSiteSettings(eventName) {
             var ev = String(eventName != null ? eventName : current_event || '').trim();
+            if (backendSiteSettingsSyncedFor === ev) return;
             var db = getFirestore();
             var exists = false;
             try {
@@ -26902,6 +26943,7 @@
                 siteWaitingListIsYes = false;
                 updateBackendNavbarForEventLocation();
                 syncGuestWorkflowSendToReservesButton();
+                backendSiteSettingsSyncedFor = ev;
                 return;
             }
             await syncEventLocationFromSettings(ev);
@@ -26910,6 +26952,7 @@
             } catch (err) {
                 console.error('syncEventLocationAndSiteSettings loadSiteSettings:', err);
             }
+            backendSiteSettingsSyncedFor = ev;
         }
 
         function tbsBackendUsersCollectionRef(db) {
@@ -27253,6 +27296,8 @@
             }
             if (currentEventSwitchInFlight) return;
             currentEventSwitchInFlight = true;
+            clearBackendSettingsFieldCache();
+            backendSiteSettingsSyncedFor = '';
             try {
                 if (typeof showStatus === 'function') {
                     showStatus('loading', 'Switching current event to ' + next + '…');
@@ -29464,6 +29509,7 @@
                 );
             }
             var db = getFirestore();
+            clearBackendSettingsFieldCache();
             var patch = {};
             patch[FIRESTORE_TBS_SETTINGS_FILTERGUESTS_FIELD] = guestsFilterIsActive(normalized)
                 ? normalized
@@ -32990,12 +33036,11 @@
         /**
          * Guests whose Event field is exactly current_event, or an array that contains it.
          * Returns null when every query fails so the caller can fall back.
+         * Field-name variants run together instead of one after another.
          */
         async function queryCurrentEventGuestRecords(db) {
             var want = String(current_event || '').trim();
             if (!want) return [];
-            var seen = Object.create(null);
-            var list = [];
             var specs = [
                 ['Event', '=='],
                 ['event', '=='],
@@ -33005,21 +33050,24 @@
                 ['Event', 'array-contains'],
                 ['event', 'array-contains'],
             ];
+            var results = await Promise.all(specs.map(function (spec) {
+                return db.collectionGroup('item').where(spec[0], spec[1], want).get().then(function (snap) {
+                    return { ok: true, snap: snap };
+                }).catch(function (err) {
+                    console.warn('queryCurrentEventGuestRecords:', spec[0], spec[1], err);
+                    return { ok: false, snap: null };
+                });
+            }));
             var anyOk = false;
-            for (var i = 0; i < specs.length; i++) {
-                try {
-                    var snap = await db
-                        .collectionGroup('item')
-                        .where(specs[i][0], specs[i][1], want)
-                        .get();
-                    anyOk = true;
-                    snap.forEach(function (doc) {
-                        pushCurrentEventGuestFromItemDoc(doc, seen, list);
-                    });
-                } catch (err) {
-                    console.warn('queryCurrentEventGuestRecords:', specs[i][0], specs[i][1], err);
-                }
-            }
+            var seen = Object.create(null);
+            var list = [];
+            results.forEach(function (result) {
+                if (!result.ok || !result.snap) return;
+                anyOk = true;
+                result.snap.forEach(function (doc) {
+                    pushCurrentEventGuestFromItemDoc(doc, seen, list);
+                });
+            });
             return anyOk ? list : null;
         }
 
@@ -33045,7 +33093,7 @@
 
         /**
          * Load guest rows for current_event into guestsRosterInMemory.
-         * @param {{ force?: boolean, showLoading?: boolean }} opts
+         * @param {{ force?: boolean, showLoading?: boolean, deferStripe?: boolean }} opts
          */
         async function fetchAllGuestsIntoMemory(opts) {
             opts = opts || {};
@@ -33060,16 +33108,18 @@
             guestsRosterAllInMemory = [];
             try {
                 var db = getFirestore();
-                var guestsParentSnap = await db.collection('tbs').doc('Guests').get();
-                var parentSettingsSnap = await tbsSettingsRootDocRef(db).get();
-                var parentSettingsData =
-                    parentSettingsSnap && parentSettingsSnap.exists
-                        ? parentSettingsSnap.data() || {}
-                        : {};
-                applyBackendUserCurrentEventFromSettings(
-                    guestCoalesceCurrentEventField(parentSettingsData)
-                );
-                await syncEventLocationAndSiteSettings(current_event);
+                var eventNow = String(current_event || '').trim();
+                if (backendSiteSettingsSyncedFor !== eventNow) {
+                    var parentSettingsSnap = await tbsSettingsRootDocRef(db).get();
+                    var parentSettingsData =
+                        parentSettingsSnap && parentSettingsSnap.exists
+                            ? parentSettingsSnap.data() || {}
+                            : {};
+                    applyBackendUserCurrentEventFromSettings(
+                        guestCoalesceCurrentEventField(parentSettingsData)
+                    );
+                    await syncEventLocationAndSiteSettings(current_event);
+                }
                 var settingsData = await fetchTbsSettingsFields(db, event_location);
                 applyGuestsFilterSettingsFromSettingsData(settingsData);
                 try {
@@ -33087,7 +33137,8 @@
                     return;
                 }
                 var list = await queryCurrentEventGuestRecords(db);
-                if (!list || !list.length) {
+                if (list == null) {
+                    var guestsParentSnap = await db.collection('tbs').doc('Guests').get();
                     list = await fetchCurrentEventGuestsByKnownIds(db, guestsParentSnap);
                 }
                 applyRosterSelectedYesSnapshot(list, guestSelectedSnap);
@@ -33106,7 +33157,7 @@
                 rememberRosterSelectedYes(guestsRosterNameCheckedIds, []);
             }
             renderGuestsRoster();
-            if (guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
+            if (!opts.deferStripe && guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
                 alignGuestRosterWithStripeOverdue();
             }
         }
@@ -33139,6 +33190,74 @@
             renderGuestsRoster();
         }
 
+        /**
+         * Speakers for the current event, plus Potential.
+         * Returns null when every query fails so the caller can fall back to per-id reads.
+         */
+        async function querySpeakersForCurrentEvent(db) {
+            var want = String(current_event || '').trim();
+            if (!want) return [];
+            var specs = [
+                ['event', '==', want],
+                ['Event', '==', want],
+                ['event', '==', 'Potential'],
+                ['Event', '==', 'Potential'],
+                ['event', '==', 'potential'],
+                ['Event', '==', 'potential'],
+            ];
+            var results = await Promise.all(specs.map(function (spec) {
+                return db.collectionGroup('item').where(spec[0], spec[1], spec[2]).get().then(function (snap) {
+                    return { ok: true, snap: snap };
+                }).catch(function (err) {
+                    console.warn('querySpeakersForCurrentEvent:', spec[0], spec[1], spec[2], err);
+                    return { ok: false, snap: null };
+                });
+            }));
+            var anyOk = false;
+            var seen = Object.create(null);
+            var list = [];
+            results.forEach(function (result) {
+                if (!result.ok || !result.snap) return;
+                anyOk = true;
+                result.snap.forEach(function (doc) {
+                    var rowId = speakerRowIdFromSpeakersItemDoc(doc);
+                    if (!rowId || seen[rowId]) return;
+                    var rec = speakerRecordFromTbsItemDoc(rowId, doc.data() || {});
+                    if (rosterRecordEventMatchesCurrentEvent(rec) || speakerEventIsPotential(rec)) {
+                        seen[rowId] = true;
+                        list.push(rec);
+                    }
+                });
+            });
+            return anyOk ? list : null;
+        }
+
+        async function fetchSpeakerRecordsByKnownIds(db) {
+            var ids = await listSpeakerIdsUnderTbsSpeakers(db);
+            var list = [];
+            if (!ids.length) return list;
+            var chunkSize = 40;
+            for (var i = 0; i < ids.length; i += chunkSize) {
+                var chunk = ids.slice(i, i + chunkSize);
+                var snaps = await Promise.all(
+                    chunk.map(function (rowId) {
+                        return tbsSpeakerItemRef(db, rowId).get();
+                    })
+                );
+                for (var j = 0; j < chunk.length; j++) {
+                    var rowId = chunk[j];
+                    var snap = snaps[j];
+                    if (snap && snap.exists) {
+                        var rec = speakerRecordFromTbsItemDoc(rowId, snap.data() || {});
+                        if (rosterRecordEventMatchesCurrentEvent(rec) || speakerEventIsPotential(rec)) {
+                            list.push(rec);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+
         async function fetchSpeakersForSelectedEvent() {
             var speakerSelectedSnap = rosterSelectedYesSnapshot(speakerRosterInMemory);
             speakerDirtyDocIds = Object.create(null);
@@ -33150,10 +33269,13 @@
             speakerRosterLoadedForEvent = '';
             try {
                 var db = getFirestore();
-                applyBackendUserCurrentEventFromSettings(
-                    backenduserHasAllEventAccess ? await loadCurrentEventFromTbsSettings(db) : ''
-                );
-                await syncEventLocationAndSiteSettings(current_event);
+                var eventNow = String(current_event || '').trim();
+                if (backendSiteSettingsSyncedFor !== eventNow) {
+                    applyBackendUserCurrentEventFromSettings(
+                        backenduserHasAllEventAccess ? await loadCurrentEventFromTbsSettings(db) : ''
+                    );
+                    await syncEventLocationAndSiteSettings(current_event);
+                }
                 try {
                     speakerRosterAllevents = await loadEventsForCurrentEventDropdown(db);
                 } catch (evErr) {
@@ -33164,33 +33286,9 @@
                     renderSpeakerRoster();
                     return;
                 }
-                var ids = await listSpeakerIdsUnderTbsSpeakers(db);
-                if (!ids.length) {
-                    speakerRosterInMemory = [];
-                    speakerRosterLoadedForEvent = String(current_event || '').trim();
-                    rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
-                    renderSpeakerRoster();
-                    return;
-                }
-                var list = [];
-                var chunkSize = 12;
-                for (var i = 0; i < ids.length; i += chunkSize) {
-                    var chunk = ids.slice(i, i + chunkSize);
-                    var snaps = await Promise.all(
-                        chunk.map(function (rowId) {
-                            return tbsSpeakerItemRef(db, rowId).get();
-                        })
-                    );
-                    for (var j = 0; j < chunk.length; j++) {
-                        var rowId = chunk[j];
-                        var snap = snaps[j];
-                        if (snap && snap.exists) {
-                            var rec = speakerRecordFromTbsItemDoc(rowId, snap.data() || {});
-                            if (rosterRecordEventMatchesCurrentEvent(rec) || speakerEventIsPotential(rec)) {
-                                list.push(rec);
-                            }
-                        }
-                    }
+                var list = await querySpeakersForCurrentEvent(db);
+                if (list == null) {
+                    list = await fetchSpeakerRecordsByKnownIds(db);
                 }
                 applyRosterSelectedYesSnapshot(list, speakerSelectedSnap);
                 rememberRosterSelectedYes(speakersRosterNameCheckedIds, list);
@@ -34695,6 +34793,13 @@
             document.querySelectorAll('#texteditor .texteditor-selectors').forEach(function (container) {
                 wrapTexteditorPresetButtonsInTable(container);
             });
+        }
+
+        function loadFirstProgrammeDayIntoTexteditorIfEmpty() {
+            if (!programmeState || !programmeState.dayDates || !programmeState.dayDates.length) return;
+            var ta = document.getElementById('texteditor-code');
+            if (ta && String(ta.dataset.storageKey || '').trim()) return;
+            loadProgrammeDayHtmlForTexteditor(programmeState.dayDates[0]);
         }
 
         async function loadProgrammeDayHtmlForTexteditor(dateStr, alias) {
@@ -37919,6 +38024,7 @@
                 invalidateIndexProgrammeCache();
                 syncRenderboxIdleState();
                 scheduleTexteditorPaneLayout();
+                loadFirstProgrammeDayIntoTexteditorIfEmpty();
             }
             if (isContent) {
                 loadAndRenderContentTable();
@@ -39430,16 +39536,20 @@
                 programmeState.programmeCollectionKey = resolvedKey;
                 programmeState.programmeCollectionMissing = false;
                 programmeState.dayDates = await listTbsProgrammeIsoDayIds(db, resolvedKey);
-                if (programmeState.dayDates.length) {
-                    await persistTbsProgrammeDayIdsManifest(db, resolvedKey, programmeState.dayDates);
-                } else {
-                    await ensureTbsProgrammeEventKeyOnRoot(db, resolvedKey);
+                var manifestWrite = programmeState.dayDates.length
+                    ? persistTbsProgrammeDayIdsManifest(db, resolvedKey, programmeState.dayDates)
+                    : ensureTbsProgrammeEventKeyOnRoot(db, resolvedKey);
+                var dayIds = programmeState.dayDates;
+                for (var dxi = 0; dxi < dayIds.length; dxi++) {
+                    programmeState.days[dayIds[dxi]] = [];
                 }
-                for (var dxi = 0; dxi < programmeState.dayDates.length; dxi++) {
-                    var id = programmeState.dayDates[dxi];
-                    programmeState.days[id] = [];
-                    var tbsSnap = await tbsProgrammeDayCollection(db, id, resolvedKey).doc('Programme').get();
-                    var tbsData = tbsSnap.exists ? (tbsSnap.data() || {}) : {};
+                var daySnaps = await Promise.all(dayIds.map(function (dayId) {
+                    return tbsProgrammeDayCollection(db, dayId, resolvedKey).doc('Programme').get();
+                }));
+                for (var dxj = 0; dxj < dayIds.length; dxj++) {
+                    var id = dayIds[dxj];
+                    var tbsSnap = daySnaps[dxj];
+                    var tbsData = tbsSnap && tbsSnap.exists ? (tbsSnap.data() || {}) : {};
                     programmeState.htmlDateByDay[id] = tbsData.html != null ? String(tbsData.html) : '';
                     programmeState.nameDateByDay[id] = (tbsData.name != null && String(tbsData.name).trim() !== '')
                         ? String(tbsData.name)
@@ -39447,13 +39557,17 @@
                     programmeState.dayNameByDay[id] = tbsData['day-name'] != null ? String(tbsData['day-name']).trim() : '';
                 }
                 await loadProgrammeSessionsByDay(db, programmeState.dayDates);
+                void Promise.resolve(manifestWrite).catch(function (manifestErr) {
+                    console.warn('programme day manifest', manifestErr);
+                });
                 syncProgrammePersistedSnapshotFromState();
                 syncProgrammePersistedDayNamesFromState();
                 renderGridFromState();
                 updateSaveButtonState();
                 rebuildTexteditorProgrammeButtons();
-                if (programmeState.dayDates && programmeState.dayDates.length > 0) {
-                    loadProgrammeDayHtmlForTexteditor(programmeState.dayDates[0]);
+                var texteditorSectionEl = document.getElementById('texteditor');
+                if (texteditorSectionEl && texteditorSectionEl.classList.contains('is-open')) {
+                    loadFirstProgrammeDayIntoTexteditorIfEmpty();
                 }
             } catch (err) {
                 console.error('Failed to load programme from Firestore:', err);
@@ -39646,7 +39760,7 @@
         }
 
 
-        window.addEventListener('load', async function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             if (window.__backendAuthReady) {
                 await window.__backendAuthReady;
             }
@@ -39679,6 +39793,39 @@
                 }
             }
             initCurrentEventPicker();
+            setBackendPageLoading(true);
+            var backendStartupDataPromise = (async function () {
+                try {
+                    await syncSelectedAndCurrentEventFromSettings();
+                    applyEmailerLaunchEventFilters();
+                    updateBackendEditorVisibility();
+                    updateEditSpeakerNameHeading();
+                    updateAddSpeakerSaveButtonState();
+                    updateContentSaveButtonState();
+                    function updateBackendStartupLoadStatus(errorMessage) {
+                        if (errorMessage) showStatus('error', errorMessage);
+                    }
+                    backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({ deferStripe: true })
+                        .catch(function (err) {
+                            console.error('Guests preload failed:', err);
+                            updateBackendStartupLoadStatus('Failed to load guests from Firestore.');
+                            throw err;
+                        });
+                    var speakersPreload = fetchSpeakersForSelectedEvent()
+                        .catch(function (err) {
+                            console.error('Speakers preload failed:', err);
+                            updateBackendStartupLoadStatus('Failed to load speakers from Firestore.');
+                            throw err;
+                        });
+                    await Promise.all([backendGuestsPreloadPromise, speakersPreload]);
+                    backendStatusTickerLines = [
+                        'Loaded ' + (String(current_event || selectedevent || '').trim() || 'event')
+                    ];
+                    refreshBackendStatusTicker();
+                } catch (startupErr) {
+                    console.error('Backend startup failed:', startupErr);
+                }
+            })();
             const texteditorToggle = document.getElementById('texteditor-toggle');
             const overviewToggle = document.getElementById('overview-toggle');
             const speakersToggle = document.getElementById('speakers-toggle');
@@ -42735,63 +42882,18 @@
                 texteditorMiscellaneousSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
             }
 
-            setBackendPageLoading(true);
-            try {
-            await syncSelectedAndCurrentEventFromSettings();
-            applyEmailerLaunchEventFilters();
-            updateBackendEditorVisibility();
-            updateEditSpeakerNameHeading();
-            updateAddSpeakerSaveButtonState();
-            updateContentSaveButtonState();
-            var startupLoaded = { guests: false, programme: false, speakers: false };
-            function updateBackendStartupLoadStatus(errorMessage) {
-                if (errorMessage) {
-                    showStatus('error', errorMessage);
-                }
-            }
-            function markStartupLoaded(key) {
-                startupLoaded[key] = true;
-            }
-            backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({})
-                .then(function () {
-                    markStartupLoaded('guests');
-                })
-                .catch(function (err) {
-                    console.error('Guests preload failed:', err);
-                    updateBackendStartupLoadStatus('Failed to load guests from Firestore.');
-                    throw err;
-                });
-            await Promise.all([
-                loadProgrammeFromFirestore(selectedevent)
-                    .then(function () {
-                        markStartupLoaded('programme');
-                    })
-                    .catch(function (err) {
-                        console.error('Programme preload failed:', err);
-                        updateBackendStartupLoadStatus('Failed to load programme from Firestore.');
-                        throw err;
-                    }),
-                fetchSpeakersForSelectedEvent()
-                    .then(function () {
-                        markStartupLoaded('speakers');
-                    })
-                    .catch(function (err) {
-                        console.error('Speakers preload failed:', err);
-                        updateBackendStartupLoadStatus('Failed to load speakers from Firestore.');
-                        throw err;
-                    }),
-                backendGuestsPreloadPromise
-            ]);
-            backendStatusTickerLines = [
-                'Loaded ' + (String(current_event || selectedevent || '').trim() || 'event')
-            ];
-            refreshBackendStatusTicker();
-            } catch (startupErr) {
-                console.error('Backend startup failed:', startupErr);
-            } finally {
-                setBackendPageLoading(false);
-            }
+            await backendStartupDataPromise;
+            setBackendPageLoading(false);
             window.setTimeout(function () {
+                void loadProgrammeFromFirestore(selectedevent).catch(function (err) {
+                    console.error('Programme preload failed:', err);
+                    if (typeof showStatus === 'function') {
+                        showStatus('error', 'Failed to load programme from Firestore.');
+                    }
+                });
+                if (guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
+                    alignGuestRosterWithStripeOverdue();
+                }
                 void loadAndRenderTeamTable({ silent: true }).catch(function (err) {
                     console.error('Team table background load:', err);
                 });

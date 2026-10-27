@@ -18,21 +18,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
     try {
         TbsAuth.initFirebaseApp();
+        var redirectResultReady = TbsAuth.getAuth().getRedirectResult().then(function (result) {
+            return result || null;
+        }).catch(function (err) {
+            console.error(err);
+            var msg = err && err.message ? err.message : 'Google sign-in failed.';
+            showAuthMessage(msg, 'error');
+            if (signInBtn) signInBtn.disabled = false;
+            return null;
+        });
         TbsAuth.getAuth().onAuthStateChanged(function (user) {
-            if (!user) return;
-            if (TbsAuth.shouldSkipGoogleAuth()) return;
-            TbsAuth.assertListedBackendUser(user)
-                .then(function (ok) {
-                    if (ok) {
-                        window.location.replace(TbsAuth.getPostLoginRedirectUrl());
-                        return;
-                    }
-                    return TbsAuth.getAuth().signOut();
-                })
-                .catch(function (err) {
-                    console.error(err);
-                    return TbsAuth.getAuth().signOut();
-                });
+            redirectResultReady.then(function () {
+                if (!user) return;
+                if (TbsAuth.shouldSkipGoogleAuth()) return;
+                return TbsAuth.assertListedBackendUser(user)
+                    .then(function (ok) {
+                        if (ok) {
+                            window.location.replace(TbsAuth.getPostLoginRedirectUrl());
+                            return;
+                        }
+                        showAuthMessage('This Google account is not authorized for the TBS backend.', 'error');
+                        if (signInBtn) signInBtn.disabled = false;
+                        return TbsAuth.getAuth().signOut();
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                        showAuthMessage(
+                            err && err.message ? err.message : 'Could not verify backend user access.',
+                            'error'
+                        );
+                        if (signInBtn) signInBtn.disabled = false;
+                        return TbsAuth.getAuth().signOut();
+                    });
+            });
         });
     } catch (err) {
         console.error(err);
