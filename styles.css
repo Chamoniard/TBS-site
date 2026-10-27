@@ -989,7 +989,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     outline: none;
 }
 
-/* Navbar Earn CME: Register pill shape, Enroll pink. Soft shimmer for 5s after load. */
+/* Navbar Earn CME: Register pill shape, Enroll pink. One shimmer pass after load. */
 .nav-earn-cme-pill {
     display: inline-flex;
     align-items: center;
@@ -1027,7 +1027,7 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     line-height: 1.2;
     text-align: center;
     box-shadow: var(--tbs-action-btn-shadow);
-    animation: nav-earn-cme-shimmer 2.5s ease-in-out 2;
+    animation: nav-earn-cme-shimmer 2.5s ease-in-out 1;
 }
 
 .navbar .nav-earn-cme-pill,
