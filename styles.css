@@ -20,14 +20,21 @@ html {
     /* Pull first band up over fixed poster so introslider gradient can fade from the image */
     --home-poster-content-pull: 330px;
     --home-poster-mobile-height: 217.2727272727vw;
-    /* Hero introslider band (same bridge as former poster-event-spacer) */
+    /* Distance the introslider overlaps the fixed poster. Transparent only there; solid Prussian below so page white does not show through the glass. */
+    --introslider-poster-overlap: max(0px, 217.2727272727vw - max(217.2727272727vw - 330px, 100dvh, 100vh));
     --introslider-section-gradient: linear-gradient(
         to bottom,
-        transparent 0%,
-        rgba(0, 49, 83, 0.45) 35%,
-        rgba(0, 49, 83, 0.82) 68%,
-        #003153 100%
+        transparent 0,
+        rgba(0, 49, 83, 0.45) calc(var(--introslider-poster-overlap) * 0.35),
+        rgba(0, 49, 83, 0.82) calc(var(--introslider-poster-overlap) * 0.68),
+        #003153 var(--introslider-poster-overlap)
     );
+}
+
+@media (min-width: 769px) {
+    :root {
+        --introslider-poster-overlap: max(0px, min(330px, 19.1304347826vw) - 200px);
+    }
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -1829,7 +1836,7 @@ body.home-view .home-section > .speaker-section {
         border-right: none !important;
         border-bottom: none !important;
         border-radius: 0 !important;
-        box-shadow: var(--introslider-nav-glass-shadow) !important;
+        box-shadow: none !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
     }
@@ -5335,7 +5342,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
     min-height: var(--home-introslider-card-height, auto);
     background: #003153 !important;
     border-radius: 5px !important;
-    box-shadow: var(--introslider-card-shadow, var(--tbs-action-btn-shadow)) !important;
+    box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border: 1px solid #D1D5DB !important;
@@ -5482,6 +5489,7 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
         border-left: none !important;
         border-right: none !important;
         border-bottom: none !important;
+        box-shadow: none !important;
     }
 
     body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable,
@@ -10621,7 +10629,7 @@ h4 {
     padding: 0;
     outline: none;
     box-sizing: border-box;
-    transform: scale(1.01);
+    transform: none;
     transform-origin: center center;
 }
 
@@ -10661,6 +10669,7 @@ h4 {
 .viewer-section-inner-wrapper {
     background: #ffffff;
     padding: 16px;
+    padding-bottom: 24px;
     box-sizing: border-box;
     border-radius: 5px;
 }
@@ -10845,25 +10854,70 @@ h4 {
     background-color: var(--tbs-loading-pink, #fce7f3) !important;
     margin-top: 0;
     margin-bottom: 0;
-    padding: 8px;
+    padding: 24px 8px;
     border: 1px solid #d1d5db;
     border-radius: 5px;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: flex-start;
-    gap: 1rem;
+    gap: 16px;
     font-size: 1rem;
     font-weight: 300;
+}
+.viewing .ondemandreminder-main {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
 }
 .viewing .ondemandreminder .on-demand-enroll-btn {
     flex: 0 0 auto;
     align-self: center;
-    margin-left: auto;
+    margin-left: 0;
+    width: var(--tbs-action-btn-width);
+    min-width: var(--tbs-action-btn-width);
+    max-width: var(--tbs-action-btn-width);
 }
 .viewing .ondemandreminder-text {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
     color: #000000;
+}
+.viewing .ondemandreminder-image {
+    flex: 0 0 auto;
+    width: min(42%, 320px);
+    display: block;
+    align-self: flex-start;
+    line-height: 0;
+}
+.viewing .ondemandreminder-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 1300px) {
+    .viewing .ondemandreminder-main {
+        flex-direction: column;
+    }
+
+    .viewing .ondemandreminder-image {
+        width: min(100%, 320px);
+        align-self: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .viewing .ondemandreminder .on-demand-enroll-btn {
+        width: 75vw;
+        min-width: 75vw;
+        max-width: 75vw;
+    }
 }
 
 .action-btn {
@@ -11098,6 +11152,13 @@ h4 {
         z-index: 1;
     }
 
+    .post-video--thumbnail-first .post-video-thumbnail,
+    .morevideos-card-image img,
+    .past-talks-section .blog-card-thumbnail,
+    .news-card-thumbnail {
+        object-fit: contain;
+    }
+
     .post-video--thumbnail-first.post-video--playing .post-video-thumbnail-btn {
         display: none;
     }
@@ -11108,14 +11169,9 @@ h4 {
         z-index: 2;
     }
 
-    .post-video .video-container iframe {
-        transform: scale(1.16);
-        transform-origin: center center;
-    }
-
+    .post-video .video-container iframe,
     .news-card-youtube-embed iframe {
-        transform: scale(1.22);
-        transform-origin: center center;
+        transform: none;
     }
 }
 
@@ -11155,24 +11211,28 @@ h4 {
 
     body.past-talks-open .post-video {
         position: fixed;
-        inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
-            env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+        inset: 0;
         z-index: 10060;
         width: auto;
         height: auto;
         margin: 0;
+        overflow: hidden;
+        background: #000000;
         box-shadow: none !important;
+        container-type: size;
     }
 
     body.past-talks-open .post-video .video-container {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
+        top: 50%;
+        left: 50%;
+        width: min(100cqw, calc(100cqh * 16 / 9));
+        height: min(100cqh, calc(100cqw * 9 / 16));
         padding-bottom: 0 !important;
         max-width: none;
         border-radius: 0 !important;
         box-shadow: none !important;
+        transform: translate(-50%, -50%);
     }
 
     body.past-talks-open .post-video .video-container iframe,
@@ -11701,10 +11761,11 @@ body.login-page .auth-title {
 
 /* More videos container */
 .morevideos {
-    background-color: #F5F5F5;
+    background-color: #ffffff;
     padding: 0 0 0.25rem 0;
     border-radius: 5px;
-    border: 1px solid #cbd5e0;
+    border: none;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -11764,11 +11825,12 @@ body.login-page .auth-title {
 
 /* Individual morevideos card */
 .morevideos-card {
-    background: #FAFAFA;
+    background: #ffffff;
     border-radius: 5px;
     padding: 0;
     cursor: pointer;
-    border: 1px solid #ddd;
+    border: none;
+    box-shadow: none;
 }
 
 
@@ -11816,16 +11878,21 @@ body.login-page .auth-title {
     width: 100%;
 }
 
-/* Video viewer: on mobile, single column – viewing then morevideos (horizontal scroll) */
+/* Video viewer: on mobile, single column – talk, then morevideos, then the reminder */
 @media (max-width: 768px) {
     .video-layout {
         display: flex;
         flex-direction: column;
     }
+    .viewing,
+    .viewing-main-col {
+        display: contents;
+    }
     .viewing {
         margin-right: 0;
     }
     .viewing .ondemandreminder {
+        order: 2;
         margin-bottom: 16px;
         margin-left: 8px;
         margin-right: 8px;
@@ -11833,12 +11900,13 @@ body.login-page .auth-title {
         box-sizing: border-box;
     }
     .video-layout > .morevideos {
+        order: 1;
         position: static;
         width: 100%;
         height: auto !important;
         margin-left: 0;
         margin-right: 0;
-        margin-bottom: 0.5rem;
+        margin-bottom: 24px;
     }
 
     .morevideos,
@@ -11865,6 +11933,10 @@ body.login-page .auth-title {
         flex: 0 0 auto;
         min-width: calc(180px * 1.2);
         max-width: calc(180px * 1.2);
+    }
+
+    .morevideos-card-image img {
+        object-fit: contain;
     }
 }
 
@@ -11962,6 +12034,7 @@ body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > 
         border-left: none !important;
         border-right: none !important;
         border-bottom: none !important;
+        box-shadow: none !important;
     }
 }
 
@@ -12325,7 +12398,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         border-right: none !important;
         border-bottom: none !important;
         border-radius: 0 !important;
-        box-shadow: var(--introslider-nav-glass-shadow) !important;
+        box-shadow: none !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
         position: relative !important;
@@ -12343,7 +12416,7 @@ body.home-view .home-section > picture .poster-maintitles .tbs27-card-subtitle {
         border-bottom: none !important;
         outline: none !important;
         transform: translateY(calc(-1 * var(--introslider-hover-lift)));
-        box-shadow: 0 8px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.14) !important;
+        box-shadow: none !important;
     }
 
     /* Dot indicators — fixed at bottom of slider band; cards scroll underneath (script.js) */

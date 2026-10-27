@@ -484,7 +484,8 @@ function youTubeWatchUrlToEmbedUrl(watchUrl) {
 }
 
 /**
- * Embed URL params. Viewer (`minimalUi`): rel=0, modestbranding=1, controls=0, fewer overlays.
+ * Embed URL params. Viewer (`captionsOff`) forces captions off.
+ * Controls stay at YouTube's defaults: progress bar, play, volume, fullscreen, keyboard.
  * `enablejsapi` when the card end listener needs it.
  */
 function youTubeEmbedUrlWithParams(embedUrl, options) {
@@ -502,10 +503,9 @@ function youTubeEmbedUrlWithParams(embedUrl, options) {
     p.set('playsinline', '1');
     p.set('iv_load_policy', '3');
     p.set('cc_load_policy', '0');
-    if (opts.minimalUi) {
-        p.set('controls', '0');
-        p.set('fs', '0');
-        p.set('disablekb', '1');
+    if (opts.captionsOff) {
+        // 0 follows the viewer's YouTube preference. 3 forces captions off.
+        p.set('cc_load_policy', '3');
     }
     if (opts.enableJsApi !== false) {
         p.set('enablejsapi', '1');
@@ -529,10 +529,10 @@ function buildViewerYouTubeHtml(post) {
 
     const embedUrl = youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, {
         enableJsApi: false,
-        minimalUi: true,
+        captionsOff: true,
     });
     const iframeAllow =
-        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
 
     if (isMobileBottomNavbarLayout()) {
         const thumbUrl = getYouTubeThumbnailUrlForPost(post, videoId);
@@ -579,7 +579,7 @@ function activateMobileViewerYouTube(postVideoEl) {
 
     let embedUrl = youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, {
         enableJsApi: false,
-        minimalUi: true,
+        captionsOff: true,
     });
     try {
         const url = new URL(embedUrl, window.location.href);
@@ -1156,7 +1156,7 @@ function showPostOnSamePage(post, options) {
                 </div>
             </div>
             ${formattedContent ? `<div class="post-content">${formattedContent}</div>` : '<div class="post-content"><p>No content available for this post.</p></div>'}
-                    <div class="ondemandreminder" hidden><span class="ondemandreminder-text"></span><a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a></div>
+                    <div class="ondemandreminder" hidden><div class="ondemandreminder-main"><span class="ondemandreminder-text"></span><a class="ondemandreminder-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course"><img src="images/TBS26ondemand-course.webp?v=20261027-v4" alt="" width="1024" height="1024" decoding="async"></a></div><a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a></div>
                     </div>
                 </div>
                 <div class="morevideos">
@@ -2930,7 +2930,7 @@ const HOME_REGISTRATION_OUTER_HTML = `
                 <div class="registration-section" role="region" aria-labelledby="home-registration-heading">
                     <div class="registration-section-inner-wrapper">
                             <form class="registration-form" novalidate aria-label="Registration form">
-                                <h3 class="section-titles registration-section-title" id="home-registration-heading">Registration</h3>
+                                <h3 class="section-titles registration-section-title" id="home-registration-heading">Register</h3>
                                 <p class="registration-manifesto">In order to facilitate interaction between participants TBS is intentionally kept small. Attendance is limited.</p>
                                 <div class="registration-to-reserves" id="registration-to-reserves" hidden></div>
                                 <div class="registration-form-row registration-form-row--two-up">
@@ -6486,7 +6486,8 @@ function renderHomeWebsiteSnippetPreview(payload) {
             '<div class="video-layout">' +
             '<div class="viewing">' +
             '<div class="viewing-main-col">' +
-            '<div class="ondemandreminder"><span class="ondemandreminder-text">' + inner + '</span>' +
+            '<div class="ondemandreminder"><div class="ondemandreminder-main"><span class="ondemandreminder-text">' + inner + '</span>' +
+            '<a class="ondemandreminder-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course"><img src="images/TBS26ondemand-course.webp?v=20261027-v4" alt="" width="1024" height="1024" decoding="async"></a></div>' +
             '<a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a></div>' +
             '</div></div></div>';
         return;

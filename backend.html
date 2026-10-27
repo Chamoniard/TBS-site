@@ -20909,32 +20909,42 @@
             if (websiteSnippetPreviewDevice === 'phone') {
                 stage.style.width = WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH + 'px';
                 stage.style.height = WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT + 'px';
+                iframe.style.left = '0px';
                 iframe.style.width = WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH + 'px';
                 iframe.style.height = WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT + 'px';
                 iframe.style.transform = 'none';
                 return;
             }
             iframe.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
+            iframe.style.left = '0px';
             stage.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
             var layoutHeight = 480;
+            var previewWidth = WEBSITE_SNIPPET_PREVIEW_WIDTH;
             try {
                 var doc = iframe.contentDocument;
                 if (doc && doc.documentElement) void doc.documentElement.offsetHeight;
-                var section = doc && (
-                    doc.querySelector('.on-demand-section') ||
-                    doc.querySelector('.video-layout') ||
-                    doc.querySelector('.ondemandreminder')
-                );
+                var onDemandSection = doc && doc.querySelector('.on-demand-section');
+                var reminder = doc && doc.querySelector('.ondemandreminder');
+                var section = onDemandSection || (doc && doc.querySelector('.video-layout')) || reminder;
                 if (section) {
                     var measured = Math.ceil(Math.max(section.scrollHeight, section.getBoundingClientRect().height));
                     if (measured > 40) layoutHeight = measured;
                 }
+                if (reminder && !onDemandSection) {
+                    var reminderRect = reminder.getBoundingClientRect();
+                    var reminderWidth = Math.ceil(reminderRect.width);
+                    if (reminderWidth > 40) {
+                        previewWidth = reminderWidth;
+                        iframe.style.left = (-reminderRect.left) + 'px';
+                    }
+                }
             } catch (err) {
                 layoutHeight = 480;
+                previewWidth = WEBSITE_SNIPPET_PREVIEW_WIDTH;
             }
             var maxHeight = Math.max(160, window.innerHeight - 96);
             var stageHeight = Math.min(layoutHeight, maxHeight);
-            stage.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
+            stage.style.width = previewWidth + 'px';
             stage.style.height = stageHeight + 'px';
             iframe.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
             iframe.style.height = stageHeight + 'px';
@@ -35683,7 +35693,8 @@
                 '<div class="video-layout texteditor-ondemand-reminder-preview">' +
                 '<div class="viewing">' +
                 '<div class="viewing-main-col">' +
-                '<div class="ondemandreminder"><span class="ondemandreminder-text">' + body + '</span>' +
+                '<div class="ondemandreminder"><div class="ondemandreminder-main"><span class="ondemandreminder-text">' + body + '</span>' +
+                '<a class="ondemandreminder-image" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer" aria-label="The Big Sick on-demand course"><img src="images/TBS26ondemand-course.webp?v=20261027-v4" alt="" width="1024" height="1024" decoding="async"></a></div>' +
                 '<a class="feed-load-more-btn on-demand-enroll-btn" href="https://courses.ccme.org/education/the-big-sick" target="_blank" rel="noopener noreferrer">Enroll</a></div>' +
                 '</div></div></div></div></div>'
             );
