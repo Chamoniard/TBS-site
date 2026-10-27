@@ -5483,6 +5483,11 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
         border-right: none !important;
         border-bottom: none !important;
     }
+
+    body.home-view .home-section .introslider-inner-wrapper.home-hero-introslider > .introslider > .introslider-clickable,
+    .home-section .introslider > .introslider-clickable {
+        padding-top: 24px !important;
+    }
 }
 
 @media (min-width: 769px) {
