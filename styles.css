@@ -11254,6 +11254,17 @@ h4 {
     }
 }
 
+/* Once the thumbnail has been pressed, keep it off the player at every width. */
+.post-video--thumbnail-first.post-video--playing .post-video-thumbnail-btn {
+    display: none !important;
+}
+
+.post-video--thumbnail-first.post-video--playing .post-video-iframe--preload {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 2;
+}
+
 /* Home: password gate when `tbs/Settings.passwordprotecthome` is Yes */
 body.home-password-locked .header,
 body.home-password-locked .everything,

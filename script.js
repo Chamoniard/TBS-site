@@ -528,7 +528,7 @@ function buildViewerYouTubeHtml(post) {
     if (!videoId) return '';
 
     const embedUrl = youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, {
-        enableJsApi: false,
+        enableJsApi: true,
         captionsOff: true,
     });
     const iframeAllow =
@@ -546,9 +546,7 @@ function buildViewerYouTubeHtml(post) {
                         <iframe class="post-video-iframe post-video-iframe--preload"
                                 title="YouTube video player"
                                 src="${embedUrl}"
-                                loading="lazy"
                                 tabindex="-1"
-                                aria-hidden="true"
                                 frameborder="0"
                                 allow="${iframeAllow}"
                                 allowfullscreen>
@@ -571,29 +569,80 @@ function buildViewerYouTubeHtml(post) {
             `;
 }
 
-function activateMobileViewerYouTube(postVideoEl) {
-    if (!postVideoEl) return;
-    const iframe = postVideoEl.querySelector('.post-video-iframe');
-    const videoId = postVideoEl.getAttribute('data-youtube-id');
-    if (!iframe || !videoId) return;
-
-    let embedUrl = youTubeEmbedUrlWithParams(`https://www.youtube.com/embed/${videoId}`, {
-        enableJsApi: false,
-        captionsOff: true,
-    });
+function postViewerYouTubeCommand(iframe, func) {
+    const win = iframe && iframe.contentWindow;
+    if (!win) return;
     try {
-        const url = new URL(embedUrl, window.location.href);
-        url.searchParams.set('autoplay', '1');
-        embedUrl = url.toString();
+        win.postMessage(JSON.stringify({
+            event: 'command',
+            func: func,
+            args: [],
+            channel: 'widget'
+        }), '*');
     } catch (e) {
-        /* keep embedUrl */
+        /* ignore */
     }
-    if (iframe.getAttribute('src') !== embedUrl) {
-        iframe.setAttribute('src', embedUrl);
+}
+
+/** YouTube ignores playVideo until the parent subscribes with a listening handshake. */
+function subscribeViewerYouTube(iframe) {
+    const win = iframe && iframe.contentWindow;
+    if (!win) return;
+    try {
+        win.postMessage(JSON.stringify({
+            event: 'listening',
+            id: 1,
+            channel: 'widget'
+        }), '*');
+    } catch (e) {
+        /* ignore */
     }
-    iframe.removeAttribute('aria-hidden');
+}
+
+function viewerYouTubeIframeForSource(source) {
+    if (!source) return null;
+    const frames = document.querySelectorAll('.post-video--thumbnail-first .post-video-iframe');
+    for (let i = 0; i < frames.length; i++) {
+        if (frames[i].contentWindow === source) return frames[i];
+    }
+    return null;
+}
+
+function ensureViewerYouTubePlayRelay() {
+    if (window.__tbsViewerYtPlayRelay) return;
+    window.__tbsViewerYtPlayRelay = true;
+    window.addEventListener('message', function (ev) {
+        if (String(ev.origin || '').indexOf('youtube.com') === -1) return;
+        let data = ev.data;
+        if (typeof data === 'string') {
+            try {
+                data = JSON.parse(data);
+            } catch (e) {
+                return;
+            }
+        }
+        if (!data || data.event !== 'onReady') return;
+        const iframe = viewerYouTubeIframeForSource(ev.source);
+        const postVideo = iframe && iframe.closest('.post-video');
+        if (!postVideo || postVideo.dataset.playRequested !== '1') return;
+        postVideo.dataset.playRequested = 'sent';
+        postViewerYouTubeCommand(iframe, 'playVideo');
+    });
+}
+
+function activateMobileViewerYouTube(postVideoEl) {
+    if (!postVideoEl || postVideoEl.classList.contains('post-video--playing')) return;
+    const iframe = postVideoEl.querySelector('.post-video-iframe');
+    if (!iframe) return;
+
+    // Keep the preloaded player. Changing src reloads YouTube after the tap
+    // and it falls back to its own thumbnail.
     iframe.removeAttribute('tabindex');
+    postVideoEl.dataset.playRequested = '1';
     postVideoEl.classList.add('post-video--playing');
+    void iframe.offsetWidth;
+    subscribeViewerYouTube(iframe);
+    postViewerYouTubeCommand(iframe, 'playVideo');
 }
 
 function initMobileViewerYouTubePlayer(viewerRoot) {
@@ -606,11 +655,34 @@ function initMobileViewerYouTubePlayer(viewerRoot) {
     const postVideo = root.querySelector('.post-video--thumbnail-first');
     if (!postVideo || postVideo.dataset.viewerYoutubeInit === '1') return;
     postVideo.dataset.viewerYoutubeInit = '1';
+    ensureViewerYouTubePlayRelay();
+
+    const iframe = postVideo.querySelector('.post-video-iframe');
+    if (iframe && iframe.dataset.ytListeningBound !== '1') {
+        iframe.dataset.ytListeningBound = '1';
+        const kick = function () {
+            subscribeViewerYouTube(iframe);
+        };
+        iframe.addEventListener('load', kick);
+        kick();
+    }
 
     const playBtn = postVideo.querySelector('.post-video-thumbnail-btn');
     if (!playBtn) return;
 
-    playBtn.addEventListener('click', () => activateMobileViewerYouTube(postVideo));
+    playBtn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        activateMobileViewerYouTube(postVideo);
+    });
+}
+
+function viewerAlreadyPlayingSamePost(post) {
+    const videoId = extractYouTubeId(post && post.youtubeUrl);
+    if (!videoId) return false;
+    const current = document.querySelector(
+        '.everything > .viewer-section:not(.is-collapsed):not([hidden]) .post-video--playing'
+    );
+    return !!(current && current.getAttribute('data-youtube-id') === videoId);
 }
 
 /** Stop YouTube/HTML5 playback in the video viewer so audio does not continue after leaving. */
@@ -1169,6 +1241,15 @@ function showPostOnSamePage(post, options) {
     `;
     
     const main = document.querySelector('.everything');
+    if (viewerAlreadyPlayingSamePost(post)) {
+        if (!options || options.skipHistoryPush !== true) {
+            pushHomeSectionHistory('viewer', {
+                postId: post && post.id != null ? String(post.id) : '',
+                post: historyPostSnapshot(post)
+            });
+        }
+        return;
+    }
     if (main) {
         const pastTalksSection = main.querySelector(':scope > .past-talks-section');
         if (pastTalksSection) {
