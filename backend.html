@@ -7518,12 +7518,6 @@
             display: block;
         }
 
-        #guest-editor .guests-list-table tbody td.guests-roster-name-cell.is-cancelled,
-        #guest-editor .guests-list-table tbody tr:hover td.guests-roster-name-cell.is-cancelled,
-        #guest-editor .guests-list-table tbody tr.is-selected td.guests-roster-name-cell.is-cancelled {
-            color: #94a3b8;
-        }
-
         #team-editor .team-list-table thead th {
             text-align: center;
         }
@@ -10959,19 +10953,27 @@
         .guest-delete-confirm__box {
             position: relative;
             background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             padding: 1.25rem 1.5rem;
             max-width: 22rem;
             width: 100%;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
 
         .guest-delete-confirm__box p {
             margin: 0;
-            font-size: 1rem;
-            line-height: 1.45;
-            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-align: center;
+            text-transform: uppercase;
+            color: #000000;
         }
 
         .guest-delete-confirm__actions {
@@ -11051,8 +11053,8 @@
             height: auto;
             max-height: none;
             overflow: visible;
-            background: #d9effc;
-            border: 1px solid #71C7FE;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 10px;
             padding: 1.15rem 1.25rem 1rem;
             box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
@@ -11060,12 +11062,49 @@
             font-family: 'Inter', sans-serif;
         }
 
+        #speakers-filter-popup .guests-filter-popup__box {
+            max-height: calc(100vh - 2rem);
+            overflow: auto;
+        }
+
         .guests-filter-popup__title {
             margin: 0 0 1rem;
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #003153;
-            line-height: 1.3;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-align: center;
+            text-transform: uppercase;
+            color: #000000;
+        }
+
+        #backend-tooltip {
+            position: fixed;
+            z-index: 12000;
+            max-width: min(22rem, calc(100vw - 16px));
+            margin: 0;
+            padding: 0.45rem 0.7rem;
+            border: 1px solid #e7a8c4;
+            border-radius: 5px;
+            background: #f8d0e3;
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            font-style: normal;
+            line-height: 1.35;
+            letter-spacing: normal;
+            text-transform: none;
+            text-align: left;
+            white-space: normal;
+            pointer-events: none;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+        }
+
+        #backend-tooltip[hidden] {
+            display: none !important;
         }
 
         .guests-filter-popup__fields {
@@ -11160,6 +11199,35 @@
             box-shadow: var(--backend-button-shadow, none);
         }
 
+        body.backend-page #roster-export-popup .guests-filter-popup__actions {
+            justify-content: flex-end;
+        }
+
+        body.backend-page #roster-export-popup .roster-export-cancel-btn,
+        body.backend-page #roster-export-popup .roster-export-download-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25;
+            border-radius: 6px;
+            padding: 0.45rem 0.9rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            box-shadow: var(--backend-button-shadow, none);
+        }
+
+        body.backend-page #roster-export-popup .roster-export-cancel-btn {
+            background: #F71941;
+            color: #ffffff;
+            border-color: #F71941;
+        }
+
+        body.backend-page #roster-export-popup .roster-export-download-btn {
+            background: #338a17;
+            color: #ffffff;
+            border-color: #338a17;
+        }
+
         .guest-application-review[hidden] {
             display: none !important;
         }
@@ -11188,6 +11256,7 @@
             width: min(40rem, 100%);
             max-height: min(90vh, 44rem);
             background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 12px;
             box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
             overflow: hidden;
@@ -11205,10 +11274,14 @@
         .guest-application-review__title {
             margin: 0 0 1rem;
             font-family: 'Inter', sans-serif;
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #0f172a;
-            line-height: 1.3;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-align: center;
+            text-transform: uppercase;
+            color: #000000;
         }
 
         .guest-application-review__grid {
@@ -11303,19 +11376,27 @@
         .speaker-delete-confirm__box {
             position: relative;
             background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             padding: 1.25rem 1.5rem;
             max-width: 22rem;
             width: 100%;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
 
         .speaker-delete-confirm__box p {
             margin: 0;
-            font-size: 1rem;
-            line-height: 1.45;
-            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-align: center;
+            text-transform: uppercase;
+            color: #000000;
         }
 
         .speaker-delete-confirm__actions {
@@ -13565,14 +13646,20 @@
                                         <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                     </svg>
                                 </button>
-                                    <button type="button" class="add-speaker-button" id="filter-speakers" disabled aria-disabled="true" aria-label="Filter speakers (inactive)" title="Filter (inactive)">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                        </svg>
-                                    </button>
                                     <button type="button" class="add-speaker-button" id="speakers-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-speakers" aria-label="Filter speakers" title="Filter speakers">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                        <span class="filter-guests-active-mark" id="filter-speakers-active-mark" hidden aria-hidden="true">!</span>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="export-speakers-btn" aria-label="Export speakers" title="Export speakers">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
                                         </svg>
                                     </button>
                             </div>
@@ -13898,12 +13985,6 @@
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-guests" aria-label="Filter guests" title="Filter guests">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                        </svg>
-                                        <span class="filter-guests-active-mark" id="filter-guests-active-mark" hidden aria-hidden="true">!</span>
-                                    </button>
                                     <button type="button" class="add-speaker-button" id="guests-overwatch-btn" aria-label="Overwatch" title="Overwatch" aria-pressed="false">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
@@ -13912,6 +13993,17 @@
                                     <button type="button" class="add-speaker-button" id="sync-guest-payments-btn" aria-label="Sync Stripe payments" title="Sync Stripe payments">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-guests" aria-label="Filter guests" title="Filter guests">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                        <span class="filter-guests-active-mark" id="filter-guests-active-mark" hidden aria-hidden="true">!</span>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="export-guests-btn" aria-label="Export guests" title="Export guests">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
                                         </svg>
                                     </button>
                                 </div>
@@ -14398,7 +14490,7 @@
                                     </div>
                                 </div>
                                 <div class="guest-overwatch-bulk" id="guest-overwatch-bulk" hidden aria-hidden="true">
-                                    <button type="button" class="guest-bulk-first-reminder-btn" id="guest-bulk-first-reminder-btn" disabled aria-disabled="true">Payment overdue. Send first reminder</button>
+                                    <button type="button" class="guest-bulk-first-reminder-btn" id="guest-bulk-first-reminder-btn" disabled aria-disabled="true">Send first payment reminder e-mail</button>
                                 </div>
                             </div>
                         </div>
@@ -14439,6 +14531,11 @@
                                     <button type="button" class="add-speaker-button" id="add-team-button" aria-label="Add team member" title="Add team member">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="add-speaker-button" id="export-team-btn" aria-label="Export team" title="Export team">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
                                         </svg>
                                     </button>
                                 </div>
@@ -15054,7 +15151,7 @@
                                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button filter-guests-btn" id="emailer-filter-button" aria-label="Filter guests" title="Filter guests" disabled aria-disabled="true">
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="emailer-filter-button" aria-label="Filter guests" title="Filter guests">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                                         </svg>
@@ -15903,6 +16000,47 @@
         </div>
     </div>
 
+    <div id="speakers-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="speakers-filter-popup-title">
+        <div class="guests-filter-popup__backdrop" id="speakers-filter-popup-backdrop"></div>
+        <div class="guests-filter-popup__box">
+            <h2 class="guests-filter-popup__title" id="speakers-filter-popup-title">Filter speakers</h2>
+            <div class="guests-filter-popup__fields" id="speakers-filter-fields"></div>
+            <div class="guests-filter-popup__actions">
+                <button type="button" class="guests-filter-clear-btn" id="speakers-filter-clear">Clear</button>
+                <button type="button" class="guests-filter-apply-btn" id="speakers-filter-apply">Filter</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="roster-export-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="roster-export-popup-title">
+        <div class="guests-filter-popup__backdrop" id="roster-export-popup-backdrop"></div>
+        <div class="guests-filter-popup__box">
+            <h2 class="guests-filter-popup__title" id="roster-export-popup-title">Exporting 0 guests</h2>
+            <div class="guests-filter-popup__fields">
+                <div class="guests-filter-popup__field">
+                    <div class="guests-filter-popup__checks" id="roster-export-fields" role="group" aria-label="Data to export"></div>
+                </div>
+                <div class="guests-filter-popup__field">
+                    <span class="guests-filter-popup__field-title" id="roster-export-format-label">Export as</span>
+                    <div class="guests-filter-popup__checks" role="radiogroup" aria-labelledby="roster-export-format-label">
+                        <label class="guests-filter-popup__check" for="roster-export-format-html">
+                            <input type="radio" name="roster-export-format" id="roster-export-format-html" value="html" checked>
+                            HTML
+                        </label>
+                        <label class="guests-filter-popup__check" for="roster-export-format-csv">
+                            <input type="radio" name="roster-export-format" id="roster-export-format-csv" value="csv">
+                            CSV
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="guests-filter-popup__actions">
+                <button type="button" class="roster-export-cancel-btn" id="roster-export-cancel">Cancel</button>
+                <button type="button" class="roster-export-download-btn" id="roster-export-download">Download</button>
+            </div>
+        </div>
+    </div>
+
     <div id="emailer-guests-filter-popup" class="guests-filter-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="emailer-guests-filter-popup-title">
         <div class="guests-filter-popup__backdrop" id="emailer-guests-filter-popup-backdrop"></div>
         <div class="guests-filter-popup__box">
@@ -16051,6 +16189,10 @@
         var speakerRosterLoadedForEvent = '';
         /** Speakers heading view: '' current-event speakers, or 'ideas'. */
         var speakersRosterView = '';
+        var speakersFilterSettings = {
+            all: emptySpeakersFilterSettings(),
+            ideas: emptySpeakersFilterSettings()
+        };
         /** In-memory roster for Guests tab. */
         let guestsRosterInMemory = [];
         let guestsRosterAllInMemory = [];
@@ -19776,9 +19918,9 @@
             var reminderBtn = document.getElementById('guest-bulk-first-reminder-btn');
             if (panel) {
                 panel.classList.toggle('is-bulk', bulk);
-                panel.setAttribute('aria-label', bulk ? 'Bulk actions' : 'Guest overview');
+                panel.setAttribute('aria-label', bulk ? 'Bulk workflow actions' : 'Guest overview');
             }
-            if (titleEl) titleEl.textContent = bulk ? 'BULK ACTIONS' : 'Overview';
+            if (titleEl) titleEl.textContent = bulk ? 'BULK WORKFLOW ACTIONS' : 'Overview';
             if (countEl) {
                 countEl.hidden = !bulk;
                 countEl.setAttribute('aria-hidden', bulk ? 'false' : 'true');
@@ -23758,16 +23900,15 @@
             var btn = document.getElementById('emailer-filter-button');
             var mark = document.getElementById('emailer-filter-active-mark');
             var speakersView = emailerRosterView === 'speakers';
-            var ready = speakersView
-                ? !!emailerSpeakersMemoryLoaded
-                : emailerRosterView === 'guests' && !!emailerGuestsMemoryLoaded;
+            var guestsView = emailerRosterView === 'guests';
+            var canFilter = guestsView || speakersView;
             var active = speakersView
                 ? emailerSpeakersFilterIsActive(emailerSpeakersFilterSettings)
-                : emailerGuestsFilterIsActive(emailerGuestsFilterSettings);
+                : guestsView && emailerGuestsFilterIsActive(emailerGuestsFilterSettings);
             var noun = speakersView ? 'speakers' : 'guests';
             if (btn) {
-                btn.disabled = !ready;
-                btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+                btn.disabled = !canFilter;
+                btn.setAttribute('aria-disabled', canFilter ? 'false' : 'true');
                 btn.setAttribute('aria-label', active ? 'Filter ' + noun + ' (filter active)' : 'Filter ' + noun);
                 btn.title = active ? 'Filter ' + noun + ' (filter active)' : 'Filter ' + noun;
             }
@@ -23920,7 +24061,7 @@
 
         async function openEmailerGuestsFilterPopup() {
             closeEmailerSpeakersFilterPopup();
-            if (emailerRosterView !== 'guests' || !emailerGuestsMemoryLoaded) return;
+            if (emailerRosterView !== 'guests') return;
             await ensureEmailerFilterEvents();
             populateEmailerGuestsFilterPopupForm();
             var popup = document.getElementById('emailer-guests-filter-popup');
@@ -24430,7 +24571,7 @@
 
         async function openEmailerSpeakersFilterPopup() {
             closeEmailerGuestsFilterPopup();
-            if (emailerRosterView !== 'speakers' || !emailerSpeakersMemoryLoaded) return;
+            if (emailerRosterView !== 'speakers') return;
             await ensureEmailerFilterEvents();
             populateEmailerSpeakersFilterPopupForm();
             var popup = document.getElementById('emailer-speakers-filter-popup');
@@ -29362,6 +29503,355 @@
             popup.setAttribute('aria-hidden', 'true');
         }
 
+        var ROSTER_EXPORT_FIELDS = {
+            guests: [
+                { key: 'name', label: 'Guest name' },
+                { key: 'event', label: 'Event' },
+                { key: 'read', label: 'Read' },
+                { key: 'invited', label: 'Invited' },
+                { key: 'invoiced', label: 'Invoiced' },
+                { key: 'paid', label: 'Paid' },
+                { key: 'briefed', label: 'Briefed' },
+                { key: 'attended', label: 'Attended' },
+                { key: 'cme', label: 'CME sent' }
+            ],
+            speakers: [
+                { key: 'name', label: 'Speaker name' },
+                { key: 'event', label: 'Event' },
+                { key: 'status', label: 'Status' },
+                { key: 'lodging', label: 'Lodging' },
+                { key: 'bio', label: 'Bio' },
+                { key: 'titles', label: 'Titles' },
+                { key: 'programmed', label: 'Programmed' },
+                { key: 'brief', label: 'Brief' },
+                { key: 'presented', label: 'Presented' },
+                { key: 'cme', label: 'CME' },
+                { key: 'travel', label: 'Travel' },
+                { key: 'expenses', label: 'Expenses' }
+            ],
+            team: [
+                { key: 'name', label: 'Name' },
+                { key: 'event', label: 'Event' },
+                { key: 'team', label: 'Team' },
+                { key: 'lodging', label: 'Lodging' },
+                { key: 'email', label: 'E-mail' }
+            ]
+        };
+        var rosterExportChecked = {};
+
+        function rosterExportSelectionKey(kind) {
+            if (kind === 'speakers' && String(speakersRosterView || '') === 'ideas') return 'speakers-ideas';
+            if (kind === 'speakers' || kind === 'team') return kind;
+            return 'guests';
+        }
+
+        function rosterExportFieldsFor(kind) {
+            var fields = ROSTER_EXPORT_FIELDS[kind] || ROSTER_EXPORT_FIELDS.guests;
+            if (kind === 'speakers' && String(speakersRosterView || '') === 'ideas') {
+                return fields.concat([{ key: 'topic', label: 'Topic' }]);
+            }
+            return fields;
+        }
+
+        function renderRosterExportFields(kind) {
+            var box = document.getElementById('roster-export-fields');
+            if (!box) return;
+            var selectionKey = rosterExportSelectionKey(kind);
+            var fields = rosterExportFieldsFor(kind);
+            if (!rosterExportChecked[selectionKey]) {
+                rosterExportChecked[selectionKey] = {};
+                for (var i = 0; i < fields.length; i++) {
+                    rosterExportChecked[selectionKey][fields[i].key] = true;
+                }
+            }
+            box.setAttribute('data-export-kind', selectionKey);
+            var html = '';
+            for (var j = 0; j < fields.length; j++) {
+                var field = fields[j];
+                var inputId = 'roster-export-field-' + kind + '-' + field.key;
+                var checked = rosterExportChecked[selectionKey][field.key] !== false;
+                html +=
+                    '<label class="guests-filter-popup__check" for="' +
+                    inputId +
+                    '">' +
+                    '<input type="checkbox" id="' +
+                    inputId +
+                    '" data-export-key="' +
+                    field.key +
+                    '"' +
+                    (checked ? ' checked' : '') +
+                    '>' +
+                    escapeHtml(field.label) +
+                    '</label>';
+            }
+            box.innerHTML = html;
+        }
+
+        /** Rows currently shown in that table, including its filter and view. */
+        function rosterExportVisibleCount(kind) {
+            if (kind === 'speakers') {
+                return speakerRosterRowsAfterFilter().length;
+            }
+            if (kind === 'team') {
+                return Array.isArray(teamRosterInMemory) ? teamRosterInMemory.length : 0;
+            }
+            return guestsRosterRowsAfterFilter().length;
+        }
+
+        function rosterExportItemLabel(kind, count) {
+            var one = count === 1;
+            if (kind === 'speakers') return one ? 'speaker' : 'speakers';
+            if (kind === 'team') return one ? 'team member' : 'team members';
+            return one ? 'guest' : 'guests';
+        }
+
+        function closeRosterExportPopup() {
+            var popup = document.getElementById('roster-export-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function openRosterExportPopup(kind) {
+            var popup = document.getElementById('roster-export-popup');
+            var title = document.getElementById('roster-export-popup-title');
+            if (!popup) return;
+            var exportCount = rosterExportVisibleCount(kind);
+            if (title) {
+                title.textContent = 'Exporting ' + exportCount + ' ' + rosterExportItemLabel(kind, exportCount);
+            }
+            renderRosterExportFields(kind);
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+        }
+
+        function rosterExportKindFromSelectionKey(selectionKey) {
+            if (selectionKey === 'speakers' || selectionKey === 'speakers-ideas') return 'speakers';
+            if (selectionKey === 'team') return 'team';
+            return 'guests';
+        }
+
+        function rosterExportRecords(selectionKey) {
+            if (selectionKey === 'team') {
+                var team = Array.isArray(teamRosterInMemory) ? teamRosterInMemory : [];
+                return team.filter(function (member) {
+                    return member && String(member.id || '').trim();
+                });
+            }
+            if (selectionKey === 'speakers' || selectionKey === 'speakers-ideas') {
+                return speakerRosterRowsAfterFilter();
+            }
+            return guestsRosterRowsAfterFilter();
+        }
+
+        function rosterExportSelectedColumns() {
+            var box = document.getElementById('roster-export-fields');
+            if (!box) return [];
+            var inputs = box.querySelectorAll('input[data-export-key]');
+            var columns = [];
+            for (var i = 0; i < inputs.length; i++) {
+                if (!inputs[i].checked) continue;
+                var key = inputs[i].getAttribute('data-export-key');
+                var label = inputs[i].parentNode ? String(inputs[i].parentNode.textContent || '').trim() : key;
+                columns.push({ key: key, label: label || key });
+            }
+            return columns;
+        }
+
+        function rosterExportDash(value) {
+            var text = String(value == null ? '' : value).trim();
+            return text || '—';
+        }
+
+        function rosterExportGuestValue(guest, key) {
+            var cancelled = guestCancelledFieldIsYes(guest.cancelled);
+            if (key === 'name') {
+                var guestLabel = (String(guest.name || '').trim() + ' ' + String(guest.lastName || '').trim()).trim();
+                return guestLabel || '-';
+            }
+            if (key === 'event') return rosterExportDash(guest.event);
+            if (
+                cancelled &&
+                (key === 'read' ||
+                    key === 'invited' ||
+                    key === 'invoiced' ||
+                    key === 'paid' ||
+                    key === 'briefed' ||
+                    key === 'attended' ||
+                    key === 'cme')
+            ) {
+                return 'Cancel';
+            }
+            if (key === 'read') return rosterExportDash(guest.read);
+            if (key === 'invited') return rosterExportDash(guest.invited);
+            if (key === 'invoiced') return rosterExportDash(guest.invoiced);
+            if (key === 'paid') return rosterExportDash(guest.paid);
+            if (key === 'briefed') return rosterExportDash(guest.briefed);
+            if (key === 'attended') return guest.attended ? 'Yes' : 'No';
+            if (key === 'cme') {
+                var status = guest.cmeStatus;
+                var cmeLabel =
+                    status === 'Sent' || status === 'Ready' || status === 'No CME'
+                        ? status
+                        : normalizeGuestCmeStatusDisplay(status);
+                return rosterExportDash(cmeLabel);
+            }
+            return '';
+        }
+
+        function rosterExportSpeakerValue(speaker, key) {
+            if (key === 'name') {
+                var speakerLabel = (String(speaker.firstName || '').trim() + ' ' + String(speaker.lastName || '').trim()).trim();
+                if (!speakerLabel) speakerLabel = String(speaker.id || '').trim();
+                return speakerLabel || '-';
+            }
+            if (key === 'event') {
+                var eventLabel = String(speaker.event != null ? speaker.event : '').trim();
+                return eventLabel || '-';
+            }
+            if (key === 'status') return normalizeSpeakerInviteStatus(speaker.inviteStatus);
+            if (key === 'topic') return String(speaker.topic1 != null ? speaker.topic1 : '').trim();
+            if (key === 'lodging') return normalizeSpeakerLodging(speaker.lodging);
+            if (key === 'bio') return normalizeSpeakerBioStatus(speaker.bioStatus);
+            if (key === 'titles') return normalizeSpeakerTitlesStatus(speaker.titlesStatus);
+            if (key === 'programmed') return normalizeSpeakerBioPublish(speaker.bioPublish);
+            if (key === 'brief') return normalizeSpeakerBrief(speaker.brief);
+            if (key === 'presented') return normalizeSpeakerPresented(speaker.presented);
+            if (key === 'cme') return normalizeSpeakerCme(speaker.cme);
+            if (key === 'travel') return normalizeSpeakerTravel(speaker.travel);
+            if (key === 'expenses') return normalizeSpeakerRefunded(speaker.refunded);
+            return '';
+        }
+
+        function rosterExportTeamValue(member, key) {
+            if (key === 'name') {
+                return (String(member.firstName || '').trim() + ' ' + String(member.lastName || '').trim()).trim();
+            }
+            if (key === 'event') return rosterExportDash(member.event);
+            if (key === 'team') return rosterExportDash(member.team);
+            if (key === 'lodging') return rosterExportDash(normalizeTeamLodging(member.lodging));
+            if (key === 'email') return String(member.email || '').trim();
+            return '';
+        }
+
+        function rosterExportCellValue(kind, record, key) {
+            if (kind === 'speakers') return rosterExportSpeakerValue(record, key);
+            if (kind === 'team') return rosterExportTeamValue(record, key);
+            return rosterExportGuestValue(record, key);
+        }
+
+        function rosterExportCsvCell(value) {
+            var text = String(value == null ? '' : value);
+            if (/[",\r\n]/.test(text)) return '"' + text.replace(/"/g, '""') + '"';
+            return text;
+        }
+
+        function rosterExportBuildCsv(headers, rows) {
+            var lines = [headers.map(rosterExportCsvCell).join(',')];
+            for (var r = 0; r < rows.length; r++) {
+                lines.push(rows[r].map(rosterExportCsvCell).join(','));
+            }
+            return '\uFEFF' + lines.join('\r\n');
+        }
+
+        function rosterExportHtmlText(value) {
+            return escapeHtml(value == null ? '' : String(value)).replace(/\r\n|\n|\r/g, '<br>');
+        }
+
+        function rosterExportBuildHtml(title, headers, rows) {
+            var tableStyle =
+                'border-collapse:collapse;width:100%;background:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#0f172a;';
+            var headStyle =
+                'text-align:left;padding:8px 10px;border:1px solid #cbd5e1;background:#f1f5f9;font-weight:700;color:#0f172a;';
+            var cellStyle =
+                'text-align:left;padding:8px 10px;border:1px solid #cbd5e1;background:#ffffff;vertical-align:top;color:#0f172a;';
+            var html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>';
+            html += rosterExportHtmlText(title);
+            html += '</title>\n</head>\n<body bgcolor="#ffffff" style="margin:0;padding:16px;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">\n';
+            html += '<p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#0f172a;">';
+            html += rosterExportHtmlText(title);
+            html += '</p>\n<table cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="' + tableStyle + '">\n<thead>\n<tr>';
+            for (var h = 0; h < headers.length; h++) {
+                html += '<th bgcolor="#f1f5f9" style="' + headStyle + '">' + rosterExportHtmlText(headers[h]) + '</th>';
+            }
+            html += '</tr>\n</thead>\n<tbody>\n';
+            for (var r = 0; r < rows.length; r++) {
+                html += '<tr>';
+                for (var c = 0; c < rows[r].length; c++) {
+                    html += '<td bgcolor="#ffffff" style="' + cellStyle + '">' + rosterExportHtmlText(rows[r][c]) + '</td>';
+                }
+                html += '</tr>\n';
+            }
+            html += '</tbody>\n</table>\n</body>\n</html>\n';
+            return html;
+        }
+
+        function rosterExportFilename(selectionKey, extension) {
+            var base = 'guests';
+            if (selectionKey === 'speakers') base = 'speakers';
+            else if (selectionKey === 'speakers-ideas') base = 'speaker-ideas';
+            else if (selectionKey === 'team') base = 'team';
+            var now = new Date();
+            var month = String(now.getMonth() + 1);
+            var day = String(now.getDate());
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+            return base + '-' + now.getFullYear() + '-' + month + '-' + day + '.' + extension;
+        }
+
+        function rosterExportSaveFile(filename, mimeType, contents) {
+            var blob = new Blob([contents], { type: mimeType });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(function () {
+                URL.revokeObjectURL(url);
+            }, 1000);
+        }
+
+        function downloadRosterExport() {
+            var fields = document.getElementById('roster-export-fields');
+            var selectionKey = fields ? fields.getAttribute('data-export-kind') || 'guests' : 'guests';
+            var columns = rosterExportSelectedColumns();
+            if (!columns.length) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'Select at least one field to download.');
+                }
+                return;
+            }
+            var kind = rosterExportKindFromSelectionKey(selectionKey);
+            var records = rosterExportRecords(selectionKey);
+            var headers = columns.map(function (column) {
+                return column.label;
+            });
+            var rows = [];
+            for (var i = 0; i < records.length; i++) {
+                var row = [];
+                for (var c = 0; c < columns.length; c++) {
+                    row.push(rosterExportCellValue(kind, records[i], columns[c].key));
+                }
+                rows.push(row);
+            }
+            var titleEl = document.getElementById('roster-export-popup-title');
+            var title = titleEl ? String(titleEl.textContent || '').trim() : 'Export';
+            var formatInput = document.querySelector('#roster-export-popup input[name="roster-export-format"]:checked');
+            var format = formatInput && formatInput.value === 'csv' ? 'csv' : 'html';
+            var filename = rosterExportFilename(selectionKey, format === 'csv' ? 'csv' : 'html');
+            var mimeType = format === 'csv' ? 'text/csv;charset=utf-8' : 'text/html;charset=utf-8';
+            var contents = format === 'csv'
+                ? rosterExportBuildCsv(headers, rows)
+                : rosterExportBuildHtml(title || 'Export', headers, rows);
+            rosterExportSaveFile(filename, mimeType, contents);
+            closeRosterExportPopup();
+            if (typeof showStatus === 'function') {
+                showStatus('success', filename + ' downloaded.');
+            }
+        }
+
         function openGuestsFilterPopup() {
             populateGuestsFilterPopupForm();
             var popup = document.getElementById('guests-filter-popup');
@@ -32701,9 +33191,21 @@
             syncGuestsBulkActionsView();
         }
 
+        /** Drop checkmarks and open roster menus so a toolbar button can run on its own. */
+        function releaseGuestToolbarForNormalUse() {
+            setGuestsRosterChecksForView(false);
+            clearGuestsEventUiState();
+            clearGuestsInvitedUiState();
+            clearGuestsReadUiState();
+            clearGuestsInvoicedUiState();
+            clearGuestsPaidUiState();
+            clearGuestsBriefedUiState();
+            clearGuestsCmeUiState();
+        }
+
         function setSpeakersRosterChecksForView(nextOn) {
             if (backenduserIsReadonly) return;
-            var rows = speakerRosterRowsForView();
+            var rows = speakerRosterRowsAfterFilter();
             var changed = applyRosterSelectedToRows(
                 rows,
                 nextOn,
@@ -32832,7 +33334,7 @@
             );
             syncRosterCheckAllButton(
                 document.getElementById('speaker-roster-items'),
-                speakerRosterRowsForView(),
+                speakerRosterRowsAfterFilter(),
                 'speakers'
             );
         }
@@ -33057,9 +33559,7 @@
                             '" data-guests-id="' +
                             escapeHtml(g.id) +
                             '">' +
-                            '<td class="guests-roster-name-cell' +
-                            (isCancelled ? ' is-cancelled' : '') +
-                            '">' +
+                            '<td class="guests-roster-name-cell">' +
                             rosterNameInnerHtml(
                                 guestRosterNameCheckHtml(g.id),
                                 escapeHtml(guestLabel)
@@ -33420,6 +33920,256 @@
             }
         }
 
+        function emptySpeakersFilterSettings() {
+            return {
+                name: [],
+                event: [],
+                status: [],
+                lodging: [],
+                bio: [],
+                titles: [],
+                programmed: [],
+                brief: [],
+                presented: [],
+                cme: [],
+                travel: [],
+                expenses: [],
+                topic: []
+            };
+        }
+
+        function speakerFilterViewKey() {
+            return speakersRosterView === 'ideas' ? 'ideas' : 'all';
+        }
+
+        function speakerFilterCategories() {
+            if (speakersRosterView === 'ideas') {
+                return [
+                    { key: 'event', label: 'Event' },
+                    { key: 'status', label: 'Status' },
+                    { key: 'topic', label: 'Topic' }
+                ];
+            }
+            return [
+                { key: 'event', label: 'Event' },
+                { key: 'status', label: 'Status' },
+                { key: 'lodging', label: 'Lodging' },
+                { key: 'bio', label: 'Bio' },
+                { key: 'titles', label: 'Titles' },
+                { key: 'programmed', label: 'Programmed' },
+                { key: 'brief', label: 'Brief' },
+                { key: 'presented', label: 'Presented' },
+                { key: 'cme', label: 'CME' },
+                { key: 'travel', label: 'Travel' },
+                { key: 'expenses', label: 'Expenses' }
+            ];
+        }
+
+        function speakerRosterDisplayName(rec) {
+            var label = (
+                String(rec && rec.firstName != null ? rec.firstName : '').trim() +
+                ' ' +
+                String(rec && rec.lastName != null ? rec.lastName : '').trim()
+            ).trim();
+            if (!label) label = String(rec && rec.id != null ? rec.id : '').trim();
+            return label || '—';
+        }
+
+        function speakerFilterValue(rec, key) {
+            if (!rec) return '';
+            if (key === 'name') return speakerRosterDisplayName(rec);
+            if (key === 'event') {
+                var eventLabel = String(rec.event != null ? rec.event : '').trim();
+                return eventLabel || '-';
+            }
+            if (key === 'status') return normalizeSpeakerInviteStatus(rec.inviteStatus);
+            if (key === 'lodging') return normalizeSpeakerLodging(rec.lodging);
+            if (key === 'bio') return normalizeSpeakerBioStatus(rec.bioStatus);
+            if (key === 'titles') return normalizeSpeakerTitlesStatus(rec.titlesStatus);
+            if (key === 'programmed') return normalizeSpeakerBioPublish(rec.bioPublish);
+            if (key === 'brief') return normalizeSpeakerBrief(rec.brief);
+            if (key === 'presented') return normalizeSpeakerPresented(rec.presented);
+            if (key === 'cme') return normalizeSpeakerCme(rec.cme);
+            if (key === 'travel') return normalizeSpeakerTravel(rec.travel);
+            if (key === 'expenses') return normalizeSpeakerRefunded(rec.refunded);
+            if (key === 'topic') {
+                var topic = String(rec.topic1 != null ? rec.topic1 : '').trim();
+                return topic || '—';
+            }
+            return '';
+        }
+
+        function speakerFilterMenuValues(key) {
+            if (key === 'status') return SPEAKER_INVITE_STATUS_VALUES.slice();
+            if (key === 'lodging') return SPEAKER_LODGING_VALUES.slice();
+            if (key === 'bio') return SPEAKER_BIO_STATUS_VALUES.slice();
+            if (key === 'titles') return SPEAKER_TITLES_VALUES.slice();
+            if (key === 'programmed') return SPEAKER_BIO_PUBLISH_VALUES.slice();
+            if (key === 'brief') return SPEAKER_BRIEF_VALUES.slice();
+            if (key === 'presented') return SPEAKER_PRESENTED_VALUES.slice();
+            if (key === 'cme') return SPEAKER_CME_VALUES.slice();
+            if (key === 'travel') return SPEAKER_TRAVEL_VALUES.slice();
+            if (key === 'expenses') return SPEAKER_REFUNDED_VALUES.slice();
+            return [];
+        }
+
+        function speakerFilterOptionValues(key) {
+            var rows = speakerRosterRowsForView();
+            if (key === 'name' || key === 'topic') {
+                var seenName = Object.create(null);
+                var names = [];
+                for (var i = 0; i < rows.length; i++) {
+                    var name = speakerFilterValue(rows[i], key);
+                    var nameKey = name.toLowerCase();
+                    if (!name || seenName[nameKey]) continue;
+                    seenName[nameKey] = true;
+                    names.push(name);
+                }
+                names.sort(function (a, b) {
+                    return a.localeCompare(b);
+                });
+                return names;
+            }
+            if (key === 'event') {
+                var events = speakerRosterEventChoices();
+                var seenEvent = Object.create(null);
+                for (var e = 0; e < events.length; e++) seenEvent[String(events[e]).toLowerCase()] = true;
+                for (var r = 0; r < rows.length; r++) {
+                    var shown = speakerFilterValue(rows[r], 'event');
+                    if (!shown || seenEvent[shown.toLowerCase()]) continue;
+                    seenEvent[shown.toLowerCase()] = true;
+                    events.push(shown);
+                }
+                return events;
+            }
+            var menu = speakerFilterMenuValues(key);
+            var seen = Object.create(null);
+            for (var m = 0; m < menu.length; m++) seen[String(menu[m]).toLowerCase()] = true;
+            for (var n = 0; n < rows.length; n++) {
+                var extra = speakerFilterValue(rows[n], key);
+                if (!extra || seen[extra.toLowerCase()]) continue;
+                seen[extra.toLowerCase()] = true;
+                menu.push(extra);
+            }
+            return menu;
+        }
+
+        function speakersFilterForView() {
+            var key = speakerFilterViewKey();
+            if (!speakersFilterSettings[key]) speakersFilterSettings[key] = emptySpeakersFilterSettings();
+            return speakersFilterSettings[key];
+        }
+
+        function speakersFilterIsActive(filter) {
+            var f = filter || speakersFilterForView();
+            var cats = speakerFilterCategories();
+            for (var i = 0; i < cats.length; i++) {
+                if (guestsFilterSelectedList(f[cats[i].key]).length) return true;
+            }
+            return false;
+        }
+
+        function speakerMatchesFilter(rec, filter) {
+            var f = filter || speakersFilterForView();
+            if (!speakersFilterIsActive(f)) return true;
+            if (!rec) return false;
+            var cats = speakerFilterCategories();
+            for (var i = 0; i < cats.length; i++) {
+                var key = cats[i].key;
+                if (!guestFilterValueInList(speakerFilterValue(rec, key), f[key])) return false;
+            }
+            return true;
+        }
+
+        function syncSpeakerFilterButton() {
+            var btn = document.getElementById('filter-speakers');
+            var mark = document.getElementById('filter-speakers-active-mark');
+            var active = speakersFilterIsActive();
+            if (btn) {
+                btn.disabled = false;
+                btn.setAttribute('aria-disabled', 'false');
+                btn.setAttribute('aria-label', active ? 'Filter speakers (filter active)' : 'Filter speakers');
+                btn.title = active ? 'Filter speakers (filter active)' : 'Filter speakers';
+            }
+            if (mark) {
+                mark.hidden = !active;
+                mark.setAttribute('aria-hidden', active ? 'false' : 'true');
+            }
+        }
+
+        function populateSpeakerFilterFields() {
+            var box = document.getElementById('speakers-filter-fields');
+            if (!box) return;
+            var cats = speakerFilterCategories();
+            var settings = speakersFilterForView();
+            var html = '';
+            for (var i = 0; i < cats.length; i++) {
+                var cat = cats[i];
+                var labelId = 'speakers-filter-' + cat.key + '-label';
+                html +=
+                    '<div class="guests-filter-popup__field">' +
+                    '<span class="guests-filter-popup__field-title" id="' +
+                    labelId +
+                    '">' +
+                    escapeHtml(cat.label) +
+                    '</span>' +
+                    '<div class="guests-filter-popup__checks" id="speakers-filter-' +
+                    cat.key +
+                    '" role="group" aria-labelledby="' +
+                    labelId +
+                    '" data-filter-key="' +
+                    cat.key +
+                    '"></div></div>';
+            }
+            box.innerHTML = html;
+            for (var j = 0; j < cats.length; j++) {
+                fillGuestsFilterChecks(
+                    document.getElementById('speakers-filter-' + cats[j].key),
+                    speakerFilterOptionValues(cats[j].key),
+                    settings[cats[j].key]
+                );
+            }
+        }
+
+        function readSpeakerFilterFields() {
+            var out = emptySpeakersFilterSettings();
+            var cats = speakerFilterCategories();
+            for (var i = 0; i < cats.length; i++) {
+                var key = cats[i].key;
+                var el = document.getElementById('speakers-filter-' + key);
+                if (!el) continue;
+                var boxes = el.querySelectorAll('input[type="checkbox"]:checked');
+                var picked = [];
+                for (var b = 0; b < boxes.length; b++) {
+                    var v = String(boxes[b].value || '').trim();
+                    if (v) picked.push(v);
+                }
+                out[key] = picked;
+            }
+            return out;
+        }
+
+        function closeSpeakersFilterPopup() {
+            var popup = document.getElementById('speakers-filter-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function openSpeakersFilterPopup() {
+            populateSpeakerFilterFields();
+            var popup = document.getElementById('speakers-filter-popup');
+            if (!popup) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+        }
+
+        function applySpeakersFilterSettings(next) {
+            speakersFilterSettings[speakerFilterViewKey()] = next || emptySpeakersFilterSettings();
+            syncSpeakerFilterButton();
+            renderSpeakerRoster();
+        }
+
         function speakerRosterRowsForView() {
             var src = Array.isArray(speakerRosterInMemory) ? speakerRosterInMemory : [];
             var ideas = speakersRosterView === 'ideas';
@@ -33431,10 +34181,29 @@
             return out;
         }
 
+        function speakerRosterRowsAfterFilter() {
+            var rows = speakerRosterRowsForView();
+            var filter = speakersFilterForView();
+            if (!speakersFilterIsActive(filter)) return rows;
+            var matched = [];
+            for (var i = 0; i < rows.length; i++) {
+                if (speakerMatchesFilter(rows[i], filter)) matched.push(rows[i]);
+            }
+            return matched;
+        }
+
         function syncSpeakersRosterFilterNote() {
             var note = document.getElementById('speakers-roster-filter-note');
             if (!note) return;
-            note.textContent = '(n=' + speakerRosterRowsForView().length + ')';
+            var shown = speakerRosterRowsAfterFilter().length;
+            note.hidden = false;
+            note.setAttribute('aria-hidden', 'false');
+            if (!speakersFilterIsActive()) {
+                note.textContent = '(n=' + shown + ')';
+                scheduleSpeakerPaneLayout();
+                return;
+            }
+            note.textContent = '(Filtered ' + shown + ' out of ' + speakerRosterRowsForView().length + ')';
             scheduleSpeakerPaneLayout();
         }
 
@@ -33470,7 +34239,7 @@
         function updateSpeakerNavButtons() {
             var prevBtn = document.getElementById('previous-speaker');
             var nextBtn = document.getElementById('next-speaker');
-            var visible = speakerRosterRowsForView();
+            var visible = speakerRosterRowsAfterFilter();
             var n = visible.length;
             var id = String(speakerFormEditingDocId || '').trim();
             var idx = -1;
@@ -33497,7 +34266,7 @@
 
         function navigateSpeakerInRoster(delta) {
             syncAddSpeakerFormToMemoryIfEditing();
-            var visible = speakerRosterRowsForView();
+            var visible = speakerRosterRowsAfterFilter();
             if (!visible.length) return;
             var id = String(speakerFormEditingDocId || '').trim();
             var idx = -1;
@@ -33600,7 +34369,7 @@
                 '<th scope="col">' +
                 rosterNameHeaderHtml(
                     'Speaker name',
-                    rosterRowsAllSelected(speakerRosterRowsForView()),
+                    rosterRowsAllSelected(speakerRosterRowsAfterFilter()),
                     'speakers'
                 ) +
                 '</th>' +
@@ -33629,11 +34398,14 @@
                     '</td>' +
                     '</tr>';
             } else {
-            var visibleSpeakers = speakerRosterRowsForView();
+            var viewSpeakers = speakerRosterRowsForView();
+            var visibleSpeakers = speakerRosterRowsAfterFilter();
             if (!visibleSpeakers.length) {
-                var emptyViewMsg = speakersRosterView === 'ideas'
-                    ? 'No speaker ideas.'
-                    : 'No speakers listed for this event.';
+                var emptyViewMsg = !viewSpeakers.length
+                    ? (speakersRosterView === 'ideas'
+                        ? 'No speaker ideas.'
+                        : 'No speakers listed for this event.')
+                    : 'No speakers match the current filter.';
                 html += '<tr class="speaker-roster-row">' +
                     '<td class="speaker-roster-empty" colspan="' +
                     colCount +
@@ -33733,6 +34505,7 @@
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
             extendRosterTableBorders(itemsEl);
+            syncSpeakerFilterButton();
             syncSpeakerRosterSelectionHighlight();
             updateAddSpeakerDeleteButtonState();
             updateSpeakerNavButtons();
@@ -40719,11 +41492,25 @@
                     setSpeakersRosterView('ideas');
                 });
             }
+            var guestsActionsEl = document.getElementById('guests-actions');
+            if (guestsActionsEl) {
+                guestsActionsEl.addEventListener('click', function (ev) {
+                    var toolbarBtn = ev.target.closest('button');
+                    if (!toolbarBtn || !guestsActionsEl.contains(toolbarBtn)) return;
+                    if (toolbarBtn.disabled || toolbarBtn.getAttribute('aria-disabled') === 'true') return;
+                    releaseGuestToolbarForNormalUse();
+                }, true);
+            }
             var guestsOverwatchBtn = document.getElementById('guests-overwatch-btn');
             if (guestsOverwatchBtn) {
                 guestsOverwatchBtn.addEventListener('click', function (ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
+                    if (guestsOverwatchOpen) {
+                        closeGuestsOverwatch();
+                        setGuestEditorEmptyState(!String(guestFormEditingDocId || '').trim());
+                        return;
+                    }
                     openGuestsOverwatch().catch(function (err) {
                         console.error('guests-overwatch-btn:', err);
                     });
@@ -40737,6 +41524,97 @@
                     openGuestsFilterPopup();
                 });
             }
+            var filterSpeakersBtn = document.getElementById('filter-speakers');
+            if (filterSpeakersBtn) {
+                filterSpeakersBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openSpeakersFilterPopup();
+                });
+            }
+            var speakersFilterBackdrop = document.getElementById('speakers-filter-popup-backdrop');
+            if (speakersFilterBackdrop) {
+                speakersFilterBackdrop.addEventListener('click', function () {
+                    closeSpeakersFilterPopup();
+                });
+            }
+            var speakersFilterApplyBtn = document.getElementById('speakers-filter-apply');
+            if (speakersFilterApplyBtn) {
+                speakersFilterApplyBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    var next = readSpeakerFilterFields();
+                    applySpeakersFilterSettings(next);
+                    closeSpeakersFilterPopup();
+                    if (typeof showStatus === 'function') {
+                        showStatus('success', speakersFilterIsActive(next) ? 'Speaker filter applied.' : 'Speaker filter cleared.');
+                    }
+                });
+            }
+            var speakersFilterClearBtn = document.getElementById('speakers-filter-clear');
+            if (speakersFilterClearBtn) {
+                speakersFilterClearBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    applySpeakersFilterSettings(emptySpeakersFilterSettings());
+                    populateSpeakerFilterFields();
+                    if (typeof showStatus === 'function') {
+                        showStatus('success', 'Speaker filter cleared.');
+                    }
+                });
+            }
+            [
+                ['export-guests-btn', 'guests'],
+                ['export-speakers-btn', 'speakers'],
+                ['export-team-btn', 'team']
+            ].forEach(function (pair) {
+                var exportBtn = document.getElementById(pair[0]);
+                if (!exportBtn) return;
+                exportBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openRosterExportPopup(pair[1]);
+                });
+            });
+            var rosterExportBackdrop = document.getElementById('roster-export-popup-backdrop');
+            if (rosterExportBackdrop) {
+                rosterExportBackdrop.addEventListener('click', function () {
+                    closeRosterExportPopup();
+                });
+            }
+            var rosterExportCancelBtn = document.getElementById('roster-export-cancel');
+            if (rosterExportCancelBtn) {
+                rosterExportCancelBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    closeRosterExportPopup();
+                });
+            }
+            var rosterExportDownloadBtn = document.getElementById('roster-export-download');
+            if (rosterExportDownloadBtn) {
+                rosterExportDownloadBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    downloadRosterExport();
+                });
+            }
+            var rosterExportFields = document.getElementById('roster-export-fields');
+            if (rosterExportFields) {
+                rosterExportFields.addEventListener('change', function (ev) {
+                    var input = ev.target;
+                    if (!input || input.getAttribute('data-export-key') == null) return;
+                    var kind = rosterExportFields.getAttribute('data-export-kind') || 'guests';
+                    if (!rosterExportChecked[kind]) rosterExportChecked[kind] = {};
+                    rosterExportChecked[kind][input.getAttribute('data-export-key')] = !!input.checked;
+                });
+            }
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key !== 'Escape') return;
+                var speakersFilterPopup = document.getElementById('speakers-filter-popup');
+                if (speakersFilterPopup && !speakersFilterPopup.hidden) {
+                    closeSpeakersFilterPopup();
+                    return;
+                }
+                var exportPopup = document.getElementById('roster-export-popup');
+                if (!exportPopup || exportPopup.hidden) return;
+                closeRosterExportPopup();
+            });
             var guestsRosterSearchInput = document.getElementById('guests-roster-search');
             if (guestsRosterSearchInput) {
                 guestsRosterSearchInput.addEventListener('input', function () {
@@ -41765,6 +42643,7 @@
                     emailerPadlockIsOpen = !emailerPadlockIsOpen;
                     syncEmailerPadlockButtonUi();
                     syncEmailerEditabilityFromPadlock();
+                    syncEmailerFilterButton();
                 });
             }
             setEmailerViewerEmptyState(true);
@@ -42719,6 +43598,7 @@
                     bulkEmailPadlockIsOpen = !bulkEmailPadlockIsOpen;
                     syncBulkEmailPadlockButtonUi();
                     syncEmailerBulkPresetButtons();
+                    syncEmailerFilterButton();
                     if (!bulkEmailPadlockIsOpen && sendBulkEmailsPhase === 'confirm') closeSendBulkEmailsPopup();
                 });
             }
@@ -43324,6 +44204,131 @@
             updateProgrammeDeleteButtonState();
         });
 
+    </script>
+    <script>
+        (function () {
+            var SHOW_DELAY_MS = 1000;
+            var tip = document.createElement('div');
+            tip.id = 'backend-tooltip';
+            tip.setAttribute('role', 'tooltip');
+            tip.hidden = true;
+            document.body.appendChild(tip);
+
+            var timer = 0;
+            var pendingEl = null;
+            var currentEl = null;
+
+            function liveTitle(el) {
+                if (!el || !el.getAttribute) return '';
+                return String(el.getAttribute('title') || '').trim();
+            }
+
+            function storedTitle(el) {
+                if (!el || !el.getAttribute) return '';
+                return String(el.getAttribute('data-backend-tip') || '').trim();
+            }
+
+            function rememberTitle(el) {
+                var live = liveTitle(el);
+                if (!live) return storedTitle(el);
+                el.setAttribute('data-backend-tip', live);
+                el.removeAttribute('title');
+                return live;
+            }
+
+            function restoreTitle(el) {
+                if (!el || liveTitle(el) || !storedTitle(el)) return;
+                el.setAttribute('title', storedTitle(el));
+            }
+
+            function hideTip() {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = 0;
+                }
+                tip.hidden = true;
+                tip.textContent = '';
+                restoreTitle(currentEl);
+                restoreTitle(pendingEl);
+                currentEl = null;
+                pendingEl = null;
+            }
+
+            function placeTip(el) {
+                var rect = el.getBoundingClientRect();
+                var tipRect = tip.getBoundingClientRect();
+                var left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+                var top = rect.bottom + 8;
+                if (left < 8) left = 8;
+                if (left + tipRect.width > window.innerWidth - 8) {
+                    left = Math.max(8, window.innerWidth - 8 - tipRect.width);
+                }
+                if (top + tipRect.height > window.innerHeight - 8) {
+                    top = rect.top - tipRect.height - 8;
+                }
+                if (top < 8) top = 8;
+                tip.style.left = left + 'px';
+                tip.style.top = top + 'px';
+            }
+
+            function showTip(el, text) {
+                currentEl = el;
+                pendingEl = el;
+                tip.textContent = text;
+                tip.hidden = false;
+                placeTip(el);
+            }
+
+            function tipElFromPoint(x, y) {
+                var stack = document.elementsFromPoint(x, y);
+                for (var i = 0; i < stack.length; i++) {
+                    var el = stack[i];
+                    if (!el || el === tip) continue;
+                    if (liveTitle(el) || storedTitle(el)) return el;
+                }
+                return null;
+            }
+
+            function aimAt(el) {
+                if (!el) {
+                    hideTip();
+                    return;
+                }
+                if (el === currentEl || el === pendingEl) {
+                    var fresh = liveTitle(el);
+                    if (fresh) {
+                        el.setAttribute('data-backend-tip', fresh);
+                        el.removeAttribute('title');
+                        if (!tip.hidden && el === currentEl) {
+                            tip.textContent = fresh;
+                            placeTip(el);
+                        }
+                    }
+                    return;
+                }
+                hideTip();
+                var text = rememberTitle(el);
+                if (!text) return;
+                pendingEl = el;
+                timer = setTimeout(function () {
+                    timer = 0;
+                    if (pendingEl !== el) return;
+                    showTip(el, storedTitle(el) || text);
+                }, SHOW_DELAY_MS);
+            }
+
+            document.addEventListener('pointermove', function (e) {
+                aimAt(tipElFromPoint(e.clientX, e.clientY));
+            });
+            document.addEventListener('pointerdown', hideTip);
+            document.addEventListener('focusin', function (e) {
+                var el = e.target && e.target.closest ? e.target.closest('[title], [data-backend-tip]') : null;
+                aimAt(el);
+            });
+            document.addEventListener('focusout', hideTip);
+            document.addEventListener('scroll', hideTip, true);
+            window.addEventListener('blur', hideTip);
+        })();
     </script>
 </body>
 </html>
