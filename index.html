@@ -26,6 +26,7 @@
     <script>
         (function () {
             try {
+                if (new URLSearchParams(window.location.search).get('standby-preview') === '1') return;
                 var raw = localStorage.getItem('tbs:index:standby');
                 var parts = raw ? String(raw).split('|') : [];
                 var cachedAt = Number(parts[1] || 0);

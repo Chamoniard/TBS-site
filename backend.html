@@ -11746,17 +11746,17 @@
             box-sizing: border-box;
         }
 
-        /* Pre-sets column (left rail): fixed to its longest unwrapped row. */
+        /* Pre-sets : HTML : render = 1.5 : 4.25 : 4.25 of the pane row. */
         .select-pre-set {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             justify-content: flex-start;
             gap: 0;
-            flex: 0 0 auto;
-            width: max-content;
-            min-width: max-content;
-            max-width: max-content;
+            flex: 1.5 1.5 0;
+            width: auto;
+            min-width: 0;
+            max-width: none;
             min-height: 0;
             align-self: stretch;
             overflow: hidden;
@@ -11835,9 +11835,9 @@
             gap: 0;
             background: #ffffff;
             border-radius: 0 0 5px 5px;
-            width: max-content;
-            min-width: 100%;
-            overflow-x: hidden;
+            width: 100%;
+            min-width: 0;
+            overflow-x: auto;
             overflow-y: auto;
             -webkit-overflow-scrolling: auto;
             overscroll-behavior: contain;
@@ -11851,11 +11851,12 @@
             flex-wrap: nowrap;
             align-items: stretch;
             gap: 0;
-            min-width: max-content;
             width: max-content;
+            min-width: 100%;
             flex: 0 0 auto;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         #texteditor .select-pre-set-body .texteditor-programme-heading {
@@ -11879,6 +11880,42 @@
             width: max-content;
             min-width: 100%;
             white-space: nowrap;
+        }
+
+        #texteditor .select-pre-set-body .texteditor-bulk-emails-heading {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.4rem;
+            width: 100%;
+        }
+
+        #texteditor #add-bulkemail {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            margin: 0 0 0 auto;
+            padding: 0;
+            width: calc(1.1rem * 1.3);
+            height: calc(1.1rem * 1.3);
+            min-width: calc(1.1rem * 1.3);
+            min-height: calc(1.1rem * 1.3);
+            max-width: calc(1.1rem * 1.3);
+            max-height: calc(1.1rem * 1.3);
+            border: none;
+            border-radius: 50%;
+            box-shadow: var(--backend-button-shadow);
+            line-height: 0;
+            font-size: 0;
+        }
+
+        #texteditor #add-bulkemail svg {
+            display: block;
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
         }
 
         #texteditor .select-pre-set-body .texteditor-selectors {
@@ -11935,7 +11972,7 @@
 
         #texteditor .texteditor-panes > .html-editor,
         #texteditor .texteditor-panes > .renderbox {
-            flex: 3 3 0;
+            flex: 4.25 4.25 0;
             background-color: #71C7FE;
             border: 1px solid #e2e8f0;
             border-radius: 5px;
@@ -12124,6 +12161,22 @@
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             color: #0f172a;
+        }
+
+        .renderbox.renderbox--standby .texteditor-render-surface,
+        .renderbox.renderbox--standby .texteditor-render-html {
+            padding: 0;
+            overflow: hidden;
+            background: #003153;
+        }
+
+        .texteditor-standby-frame {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            border: 0;
+            background: #003153;
         }
 
         .texteditor-render-surface .texteditor-render-html a {
@@ -13367,7 +13420,7 @@
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:programmeinfo" id="texteditor-home-programmeinfo-btn" aria-pressed="false">Programme infoslide</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:speakers" id="texteditor-home-speakers-btn" aria-pressed="false">Speakers infoslide</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:registration" id="texteditor-home-registration-btn" aria-pressed="false">Registration</button>
-                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:register-to-waiting-list" id="texteditor-home-register-to-waiting-list-btn" aria-pressed="false">Register to waiting list</button>
+                            <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:register-to-waiting-list" id="texteditor-home-register-to-waiting-list-btn" aria-pressed="false">Registration - Booked out</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:on-demand" id="texteditor-home-on-demand-btn" aria-pressed="false">TBS on-demand</button>
                             <button type="button" class="texteditor-day-btn texteditor-snippet-btn" data-snippet-key="tbsBackend:texteditor:home:on-demand-reminder" id="texteditor-home-on-demand-reminder-btn" aria-pressed="false">On-demand reminder</button>
                         </div>
@@ -13440,7 +13493,14 @@
                     </div>
                     <div class="texteditor-programme-toolbar">
                         <br>
-                        <p class="texteditor-programme-heading">Bulk e-mails</p>
+                        <p class="texteditor-programme-heading texteditor-bulk-emails-heading">
+                            <span>Bulk e-mails</span>
+                            <button type="button" id="add-bulkemail" name="add-bulkemail" aria-label="Add bulk e-mail" title="Add bulk e-mail">
+                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                </svg>
+                            </button>
+                        </p>
                         <div
                             class="texteditor-selectors"
                             id="texteditor-bulk-email-selectors"
@@ -21044,52 +21104,83 @@
             syncWebsiteSnippetPreviewScale();
         }
 
+        function texteditorMagnifierPreviewLabel(key) {
+            if (key === TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY) return 'Preview Stand by';
+            if (key === TBS_TEXTEDITOR_HOME_PROGRAMMEINFO_LS_KEY) return 'Preview Programme info';
+            if (key === TBS_TEXTEDITOR_HOME_SPEAKERS_LS_KEY) return 'Preview Speaker info';
+            if (key === TBS_TEXTEDITOR_HOME_REGISTRATION_LS_KEY) return 'Preview Registration';
+            if (key === TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY) return 'Preview Registration - Booked out';
+            if (key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY) return 'Preview TBS on-demand';
+            if (key === TBS_TEXTEDITOR_HOME_ON_DEMAND_REMINDER_LS_KEY) return 'Preview On-demand reminder';
+            return '';
+        }
+
+        function websiteSnippetPreviewUrlForKey(key) {
+            if (key === TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY) return 'index.html?standby-preview=1';
+            return WEBSITE_SNIPPET_PREVIEW_HOME_URL;
+        }
+
         function syncWebsiteSnippetPreviewScale() {
             var stage = document.getElementById('website-snippet-preview-stage');
             var iframe = document.getElementById('website-snippet-preview-frame');
             if (!stage || !iframe) return;
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var standby = key === TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY;
+            var stageBg = standby ? '#003153' : '#ffffff';
             if (websiteSnippetPreviewDevice === 'phone') {
                 stage.style.width = WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH + 'px';
                 stage.style.height = WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT + 'px';
+                stage.style.background = stageBg;
                 iframe.style.left = '0px';
                 iframe.style.width = WEBSITE_SNIPPET_PREVIEW_PHONE_WIDTH + 'px';
                 iframe.style.height = WEBSITE_SNIPPET_PREVIEW_PHONE_HEIGHT + 'px';
+                iframe.style.background = stageBg;
                 iframe.style.transform = 'none';
                 return;
             }
             iframe.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
             iframe.style.left = '0px';
             stage.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
-            var layoutHeight = 480;
+            var layoutHeight = standby ? Math.max(520, window.innerHeight - 96) : 480;
             var previewWidth = WEBSITE_SNIPPET_PREVIEW_WIDTH;
-            try {
-                var doc = iframe.contentDocument;
-                if (doc && doc.documentElement) void doc.documentElement.offsetHeight;
-                var onDemandSection = doc && doc.querySelector('.on-demand-section');
-                var reminder = doc && doc.querySelector('.ondemandreminder');
-                var section = onDemandSection || (doc && doc.querySelector('.video-layout')) || reminder;
-                if (section) {
-                    var measured = Math.ceil(Math.max(section.scrollHeight, section.getBoundingClientRect().height));
-                    if (measured > 40) layoutHeight = measured;
-                }
-                if (reminder && !onDemandSection) {
-                    var reminderRect = reminder.getBoundingClientRect();
-                    var reminderWidth = Math.ceil(reminderRect.width);
-                    if (reminderWidth > 40) {
-                        previewWidth = reminderWidth;
-                        iframe.style.left = (-reminderRect.left) + 'px';
+            if (!standby) {
+                try {
+                    var doc = iframe.contentDocument;
+                    if (doc && doc.documentElement) void doc.documentElement.offsetHeight;
+                    var onDemandSection = doc && doc.querySelector('.on-demand-section');
+                    var reminder = doc && doc.querySelector('.ondemandreminder');
+                    var section = onDemandSection || reminder || (doc && (
+                        doc.querySelector('.programme-section') ||
+                        doc.querySelector('.speaker-section') ||
+                        doc.querySelector('.registration-section') ||
+                        doc.querySelector('.video-layout')
+                    ));
+                    if (section) {
+                        var measured = Math.ceil(Math.max(section.scrollHeight, section.getBoundingClientRect().height));
+                        if (measured > 40) layoutHeight = measured;
                     }
+                    if (reminder && !onDemandSection) {
+                        var reminderRect = reminder.getBoundingClientRect();
+                        var reminderWidth = Math.ceil(reminderRect.width);
+                        if (reminderWidth > 40) {
+                            previewWidth = reminderWidth;
+                            iframe.style.left = (-reminderRect.left) + 'px';
+                        }
+                    }
+                } catch (err) {
+                    layoutHeight = 480;
+                    previewWidth = WEBSITE_SNIPPET_PREVIEW_WIDTH;
                 }
-            } catch (err) {
-                layoutHeight = 480;
-                previewWidth = WEBSITE_SNIPPET_PREVIEW_WIDTH;
             }
             var maxHeight = Math.max(160, window.innerHeight - 96);
             var stageHeight = Math.min(layoutHeight, maxHeight);
             stage.style.width = previewWidth + 'px';
             stage.style.height = stageHeight + 'px';
+            stage.style.background = stageBg;
             iframe.style.width = WEBSITE_SNIPPET_PREVIEW_WIDTH + 'px';
             iframe.style.height = stageHeight + 'px';
+            iframe.style.background = stageBg;
             iframe.style.transform = 'none';
         }
 
@@ -21125,18 +21216,19 @@
         function openWebsiteSnippetPreviewPopup() {
             var ta = document.getElementById('texteditor-code');
             var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
-            if (key !== TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY && key !== TBS_TEXTEDITOR_HOME_ON_DEMAND_REMINDER_LS_KEY) return;
+            if (!texteditorMagnifierPreviewLabel(key)) return;
             var popup = document.getElementById('website-snippet-preview-popup');
             var iframe = document.getElementById('website-snippet-preview-frame');
             if (!popup || !iframe) return;
+            var previewUrl = websiteSnippetPreviewUrlForKey(key);
             syncWebsiteSnippetPreviewDeviceButtons();
             popup.hidden = false;
             popup.setAttribute('aria-hidden', 'false');
-            if (iframe.getAttribute('src') === WEBSITE_SNIPPET_PREVIEW_HOME_URL) {
+            if (iframe.getAttribute('src') === previewUrl) {
                 sendWebsiteSnippetPreviewToFrame();
                 return;
             }
-            iframe.src = WEBSITE_SNIPPET_PREVIEW_HOME_URL;
+            iframe.src = previewUrl;
         }
 
         async function performDeleteSpeakerFromFirebase() {
@@ -35339,10 +35431,10 @@
             if (key === TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
-                    metaLabel: 'Home — Register to waiting list',
-                    loadOk: 'Register to waiting list loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/Sendtoreserves/Sendtoreserves.Value) into the editor.',
-                    saveOk: 'Register to waiting list saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/Sendtoreserves/Sendtoreserves.Value).',
-                    saveErr: 'Failed to save Register to waiting list to Firestore.',
+                    metaLabel: 'Home — Registration - Booked out',
+                    loadOk: 'Registration - Booked out loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/Sendtoreserves/Sendtoreserves.Value) into the editor.',
+                    saveOk: 'Registration - Booked out saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/Sendtoreserves/Sendtoreserves.Value).',
+                    saveErr: 'Failed to save Registration - Booked out to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -36106,6 +36198,7 @@
             wrap.classList.toggle('renderbox--preset-email', presetEmail && !idle);
             wrap.classList.toggle('renderbox--programme-info', presetProgrammeInfo && !idle);
             wrap.classList.toggle('renderbox--speaker-info', presetSpeakerInfo && !idle);
+            wrap.classList.toggle('renderbox--standby', key === TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY && !idle);
             if (idle) {
                 flushTexteditorStorageNow();
                 ta.value = '';
@@ -36209,15 +36302,12 @@
             if (!btn) return;
             var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
             var website = texteditorSnippetIsWebsite(key);
-            var onDemand = key === TBS_TEXTEDITOR_HOME_ON_DEMAND_LS_KEY;
-            var onDemandReminder = key === TBS_TEXTEDITOR_HOME_ON_DEMAND_REMINDER_LS_KEY;
-            var canPreview = onDemand || onDemandReminder;
+            var label = texteditorMagnifierPreviewLabel(key);
+            var canPreview = !!label;
             btn.hidden = !website;
             btn.disabled = !canPreview;
             btn.setAttribute('aria-disabled', canPreview ? 'false' : 'true');
-            var label = 'Preview is not available yet';
-            if (onDemand) label = 'Preview TBS on-demand';
-            else if (onDemandReminder) label = 'Preview On-demand reminder';
+            if (!label) label = 'Preview is not available yet';
             btn.setAttribute('title', label);
             btn.setAttribute('aria-label', label);
             if (emailBtn) emailBtn.hidden = website;
@@ -36525,6 +36615,135 @@
             }
         }
 
+        var texteditorRegistrationSectionHtml = '';
+        var texteditorRegistrationSectionPromise = null;
+        var texteditorRegistrationPreviewGen = 0;
+
+        function isTexteditorRegistrationSectionKey(key) {
+            return key === TBS_TEXTEDITOR_HOME_REGISTRATION_LS_KEY ||
+                key === TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY;
+        }
+
+        function fetchTexteditorRegistrationSectionHtml() {
+            if (texteditorRegistrationSectionHtml) return Promise.resolve(texteditorRegistrationSectionHtml);
+            if (texteditorRegistrationSectionPromise) return texteditorRegistrationSectionPromise;
+            texteditorRegistrationSectionPromise = fetch('home.html', { cache: 'no-store' })
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Could not load the registration section.');
+                    return res.text();
+                })
+                .then(function (html) {
+                    var doc = new DOMParser().parseFromString(html, 'text/html');
+                    var section = doc.querySelector('.registration-section');
+                    texteditorRegistrationSectionHtml = section ? section.outerHTML : '';
+                    texteditorRegistrationSectionPromise = null;
+                    return texteditorRegistrationSectionHtml;
+                })
+                .catch(function (err) {
+                    texteditorRegistrationSectionPromise = null;
+                    throw err;
+                });
+            return texteditorRegistrationSectionPromise;
+        }
+
+        function fetchTexteditorRegistrationManifestoHtml() {
+            var db = getFirestore();
+            return tbsPresetValueDocRef(db, FIRESTORE_TBS_SNIPPETS_REGISTRATION_FIELD).get().then(function (snap) {
+                var data = snap.exists ? (snap.data() || {}) : {};
+                var raw = data[FIRESTORE_TBS_PRESET_VALUE_FIELD];
+                return raw != null ? String(raw) : '';
+            });
+        }
+
+        function registrationSectionPreviewHtml(sectionHtml, snippetHtml, key, manifestoHtml) {
+            var doc = new DOMParser().parseFromString(
+                '<div id="tbs-reg-preview-root">' + String(sectionHtml || '') + '</div>',
+                'text/html'
+            );
+            var root = doc.getElementById('tbs-reg-preview-root');
+            var section = root && root.querySelector('.registration-section');
+            if (!section) return texteditorRenderWithCurrentEvent(snippetHtml);
+            section.querySelectorAll('[id]').forEach(function (el) {
+                el.id = 'texteditor-reg-preview-' + el.id;
+            });
+            section.querySelectorAll('[for]').forEach(function (el) {
+                var f = el.getAttribute('for');
+                if (f) el.setAttribute('for', 'texteditor-reg-preview-' + f);
+            });
+            var labelled = section.querySelectorAll('[aria-labelledby]');
+            for (var i = 0; i < labelled.length; i++) {
+                var labelId = labelled[i].getAttribute('aria-labelledby');
+                if (labelId) labelled[i].setAttribute('aria-labelledby', 'texteditor-reg-preview-' + labelId);
+            }
+            var snippet = texteditorRenderWithCurrentEvent(snippetHtml);
+            var manifesto = section.querySelector('p.registration-manifesto');
+            var reserves = section.querySelector('.registration-to-reserves');
+            if (key === TBS_TEXTEDITOR_HOME_REGISTRATION_LS_KEY) {
+                if (manifesto) manifesto.innerHTML = snippet;
+                if (reserves) {
+                    reserves.hidden = true;
+                    reserves.innerHTML = '';
+                }
+            } else {
+                if (manifesto && String(manifestoHtml || '').trim()) {
+                    manifesto.innerHTML = texteditorRenderWithCurrentEvent(manifestoHtml);
+                }
+                if (reserves) {
+                    reserves.hidden = false;
+                    reserves.removeAttribute('hidden');
+                    reserves.innerHTML = snippet;
+                }
+            }
+            return '<div class="home-section">' + section.outerHTML + '</div>';
+        }
+
+        var TEXTEDITOR_STANDBY_PREVIEW_URL = 'index.html?standby-preview=1';
+
+        function sendTexteditorStandbyPreviewToFrame() {
+            var ta = document.getElementById('texteditor-code');
+            var frame = document.getElementById('texteditor-standby-frame');
+            if (!ta || !frame || !frame.contentWindow) return;
+            if ((ta.dataset.storageKey || '') !== TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY) return;
+            frame.contentWindow.postMessage({
+                type: 'tbs-website-snippet-preview',
+                key: TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY,
+                html: ta.value != null ? String(ta.value) : ''
+            }, window.location.origin);
+        }
+
+        function syncTexteditorStandbyPreview() {
+            texteditorRegistrationPreviewGen += 1;
+            var el = document.getElementById('texteditor-render-html');
+            if (!el) return;
+            var frame = document.getElementById('texteditor-standby-frame');
+            if (!frame || frame.getAttribute('src') !== TEXTEDITOR_STANDBY_PREVIEW_URL) {
+                el.innerHTML = '<iframe id="texteditor-standby-frame" class="texteditor-standby-frame" title="Stand by" src="' + TEXTEDITOR_STANDBY_PREVIEW_URL + '"></iframe>';
+                return;
+            }
+            sendTexteditorStandbyPreviewToFrame();
+        }
+
+        function syncTexteditorRegistrationSectionPreview(raw, key) {
+            var gen = ++texteditorRegistrationPreviewGen;
+            var el = document.getElementById('texteditor-render-html');
+            if (!el) return;
+            var waiting = key === TBS_TEXTEDITOR_HOME_REGISTER_TO_WAITING_LIST_LS_KEY;
+            Promise.all([
+                fetchTexteditorRegistrationSectionHtml(),
+                waiting ? fetchTexteditorRegistrationManifestoHtml().catch(function () { return ''; }) : Promise.resolve('')
+            ]).then(function (parts) {
+                if (gen !== texteditorRegistrationPreviewGen) return;
+                var ta = document.getElementById('texteditor-code');
+                if (!ta || (ta.dataset.storageKey || '') !== key) return;
+                var live = ta.value != null ? ta.value : raw;
+                el.innerHTML = registrationSectionPreviewHtml(parts[0], live, key, parts[1]);
+            }).catch(function (err) {
+                console.warn('Registration section preview:', err);
+                if (gen !== texteditorRegistrationPreviewGen) return;
+                el.innerHTML = texteditorRenderWithCurrentEvent(raw);
+            });
+        }
+
         function texteditorPreviewHtmlForRender(raw, storageKey) {
             var html = texteditorRenderWithCurrentEvent(raw);
             var key = storageKey || '';
@@ -36572,6 +36791,15 @@
             if (!ta || !el) return;
             var key = ta.dataset.storageKey || '';
             var raw = ta.value != null ? ta.value : '';
+            if (key === TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY) {
+                syncTexteditorStandbyPreview();
+                return;
+            }
+            if (isTexteditorRegistrationSectionKey(key)) {
+                syncTexteditorRegistrationSectionPreview(raw, key);
+                return;
+            }
+            texteditorRegistrationPreviewGen += 1;
             try {
                 el.innerHTML = texteditorPreviewHtmlForRender(raw, key);
             } catch (err) {
@@ -41011,11 +41239,18 @@
                     closeSpeakerBioPreviewPopup();
                     return;
                 }
+                var standbyFrame = document.getElementById('texteditor-standby-frame');
+                var fromStandbyFrame = !!(standbyFrame && ev.source === standbyFrame.contentWindow);
                 if (data.type === 'tbs-website-snippet-preview-ready') {
+                    if (fromStandbyFrame) {
+                        sendTexteditorStandbyPreviewToFrame();
+                        return;
+                    }
                     sendWebsiteSnippetPreviewToFrame();
                     return;
                 }
                 if (data.type === 'tbs-website-snippet-preview-close') {
+                    if (fromStandbyFrame) return;
                     closeWebsiteSnippetPreviewPopup();
                 }
             });
