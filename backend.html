@@ -11458,6 +11458,62 @@
             color: #ffffff !important;
         }
 
+        #add-bulkemail-popup .guest-delete-confirm__box {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+            width: min(22rem, 100%);
+        }
+
+        #add-bulkemail-popup label {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.3;
+            color: #0f172a;
+        }
+
+        #add-bulkemail-name {
+            width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            padding: 0.45rem 0.6rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        #add-bulkemail-popup .guest-delete-confirm__actions {
+            margin-top: 0;
+        }
+
+        body.backend-page #add-bulkemail-cancel {
+            background: #F71941 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #add-bulkemail-cancel:hover:not(:disabled) {
+            background: #F71941 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #add-bulkemail-create {
+            background: #338a17 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #add-bulkemail-create:hover:not(:disabled) {
+            background: #338a17 !important;
+            color: #ffffff !important;
+        }
+
         /* While a bulk send is running, the tab bar stays usable and the e-mailer panel does not. */
         body.backend-page.bulk-email-sending .eventnavigation {
             position: relative;
@@ -15970,6 +16026,18 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" class="speaker-delete-cancel-btn" id="guest-bulk-reminder-cancel">Cancel</button>
                 <button type="button" class="speaker-delete-yes-btn" id="guest-bulk-reminder-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-bulkemail-popup" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="add-bulkemail-popup-title">
+        <div class="guest-delete-confirm__backdrop" id="add-bulkemail-popup-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <label id="add-bulkemail-popup-title" for="add-bulkemail-name">Name?</label>
+            <input type="text" id="add-bulkemail-name" name="add-bulkemail-name" autocomplete="off" />
+            <div class="guest-delete-confirm__actions">
+                <button type="button" id="add-bulkemail-cancel">Cancel</button>
+                <button type="button" id="add-bulkemail-create">Create</button>
             </div>
         </div>
     </div>
@@ -21548,6 +21616,16 @@
         function tbsPresetValueDocRef(db, fieldName) {
             var field = String(fieldName || '').trim();
             return tbsPresetsZermattDocRef(db).collection(field).doc(field);
+        }
+
+        function tbsPresetValueDocRefForEditor(db, spec) {
+            var field = spec && spec.field != null ? String(spec.field).trim() : '';
+            if (spec && spec.locationScoped) {
+                var parent = tbsPresetsLocationDocRef(db);
+                if (!parent) throw new Error('Missing event location.');
+                return parent.collection(field).doc(field);
+            }
+            return tbsPresetValueDocRef(db, field);
         }
 
         async function rememberTbsPresetFieldName(db, fieldName, locationOpt) {
@@ -27265,6 +27343,7 @@
                 updateBackendNavbarForEventLocation();
                 syncGuestWorkflowSendToReservesButton();
                 backendSiteSettingsSyncedFor = ev;
+                void loadTexteditorBulkEmailLinks();
                 return;
             }
             await syncEventLocationFromSettings(ev);
@@ -27274,6 +27353,7 @@
                 console.error('syncEventLocationAndSiteSettings loadSiteSettings:', err);
             }
             backendSiteSettingsSyncedFor = ev;
+            void loadTexteditorBulkEmailLinks();
         }
 
         function tbsBackendUsersCollectionRef(db) {
@@ -35348,6 +35428,27 @@
          * } | null}
          */
         function homeSnippetFirestoreSpecForKey(key) {
+            var bulkPrefix = TBS_TEXTEDITOR_LS_PREFIX + 'preset:bulk:';
+            if (String(key || '').indexOf(bulkPrefix) === 0) {
+                var bulkField = '';
+                try {
+                    bulkField = decodeURIComponent(String(key).slice(bulkPrefix.length));
+                } catch (bulkDecodeErr) {
+                    bulkField = String(key).slice(bulkPrefix.length);
+                }
+                bulkField = String(bulkField || '').trim();
+                if (!bulkField) return null;
+                var loc = String(event_location || '').trim() || '…';
+                return {
+                    field: bulkField,
+                    locationScoped: true,
+                    metaLabel: 'Bulk e-mails — ' + bulkField,
+                    loadOk: bulkField + ' loaded from Firestore (tbs/Pre-sets/' + loc + '/' + loc + '/' + bulkField + '/' + bulkField + '.Value) into the editor.',
+                    saveOk: bulkField + ' saved to Firestore (tbs/Pre-sets/' + loc + '/' + loc + '/' + bulkField + '/' + bulkField + '.Value).',
+                    saveErr: 'Failed to save ' + bulkField + ' to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
             if (key === TBS_TEXTEDITOR_HOME_EVENT_INFO_LS_KEY) {
                 return {
                     field: FIRESTORE_TBS_SNIPPETS_EVENTINFO_FIELD,
@@ -35523,7 +35624,7 @@
             try {
                 var db = getFirestore();
                 var snap = spec.target === 'tbs-snippets'
-                    ? await tbsPresetValueDocRef(db, spec.field).get()
+                    ? await tbsPresetValueDocRefForEditor(db, spec).get()
                     : await db.collection('events').doc(selectedevent).get();
                 var d = snap.exists ? (snap.data() || {}) : {};
                 var raw = spec.target === 'tbs-snippets'
@@ -35758,6 +35859,234 @@
             });
         }
 
+        var texteditorBulkEmailLoadSerial = 0;
+
+        function texteditorBulkEmailSnippetKey(fieldName) {
+            return TBS_TEXTEDITOR_LS_PREFIX + 'preset:bulk:' + encodeURIComponent(String(fieldName || '').trim());
+        }
+
+        function bulkEmailStarterHtml() {
+            return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
+                '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
+                '  <head>\n' +
+                '    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />\n' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n' +
+                '    <title>\n' +
+                '      TBS Zermatt – Payment Reminder\n' +
+                '    </title>\n' +
+                '  </head>\n' +
+                '  <body style="margin:0; padding:0; background-color:#f4f4f4; font-family:Georgia, \'Times New Roman\', serif;">\n' +
+                '    <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">\n' +
+                '      A short reminder about your outstanding {{current_event}} registration invoice.\n' +
+                '    </div>\n' +
+                '    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">\n' +
+                '      <tr>\n' +
+                '        <td align="center" style="padding:30px 10px;">\n' +
+                '          <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border:1px solid #ddd;">\n' +
+                '            <tr>\n' +
+                '              <td align="center" style="padding:30px 40px 20px 40px; background-color:#ffffff;">\n' +
+                '                <img src="https://res.cloudinary.com/dn8y0w7bn/image/upload/v1708687348/PrimaryLogoMailhead.png" width="500" border="0" style="display:block; max-width:100%; height:auto; border:0;" alt="TBS Zermatt" />\n' +
+                '              </td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '              <td align="center" style="padding:10px 40px 30px 40px;">\n' +
+                '                <h1 style="margin:0; font-family:Georgia, \'Times New Roman\', serif; font-size:22px; font-weight:normal; letter-spacing:3px; text-transform:uppercase; color:#1a1a1a; border-top:1px solid #ccc; border-bottom:1px solid #ccc; padding:14px 0;">\n' +
+                '                  TITLE\n' +
+                '                </h1>\n' +
+                '              </td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '              <td style="padding:0 40px 30px 40px; font-family:Georgia, \'Times New Roman\', serif; font-size:15px; line-height:1.8; color:#222222;">\n' +
+                '                <p style="margin:0 0 18px 0;">\n' +
+                '                  <b>Dear All,</b>\n' +
+                '                </p>\n' +
+                '                <p style="margin:0 0 18px 0;">\n' +
+                '                  &lt;Text&gt;\n' +
+                '                </p>\n' +
+                '                <p style="margin:0;">\n' +
+                '                  <b>Sincerely,</b><br />\n' +
+                '                  The TBS Organisers\n' +
+                '                </p>\n' +
+                '              </td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '              <td align="center" style="padding:20px 40px 30px 40px; border-top:1px solid #e0e0e0;">\n' +
+                '                <img src="https://res.cloudinary.com/dn8y0w7bn/image/upload/v1706045808/Minilogo.png" width="80" border="0" style="display:block; max-width:100%; height:auto; border:0;" alt="TBS" />\n' +
+                '              </td>\n' +
+                '            </tr>\n' +
+                '          </table>\n' +
+                '        </td>\n' +
+                '      </tr>\n' +
+                '    </table>\n' +
+                '  </body>\n' +
+                '</html>';
+        }
+
+        function renderTexteditorBulkEmailLinks(items) {
+            var root = document.getElementById('texteditor-bulk-email-selectors');
+            if (!root) return;
+            var activeBtn = root.querySelector('.texteditor-snippet-btn.is-active');
+            var active = activeBtn ? (activeBtn.getAttribute('data-snippet-key') || '') : '';
+            var list = Array.isArray(items) ? items.slice() : [];
+            list.sort(function (a, b) {
+                return String(a.label || a.field || '').localeCompare(String(b.label || b.field || ''), undefined, {
+                    sensitivity: 'base'
+                });
+            });
+            var seen = Object.create(null);
+            var html = '';
+            function addButton(field, label, key) {
+                if (!field || seen[field]) return;
+                seen[field] = true;
+                var on = key === active;
+                html +=
+                    '<button type="button" class="texteditor-day-btn texteditor-snippet-btn' +
+                    (on ? ' is-active' : '') +
+                    '" data-snippet-key="' +
+                    escapeHtml(key) +
+                    '" aria-pressed="' +
+                    (on ? 'true' : 'false') +
+                    '">' +
+                    escapeHtml(label) +
+                    '</button>';
+            }
+            for (var i = 0; i < list.length; i++) {
+                var field = String(list[i] && list[i].field != null ? list[i].field : '').trim();
+                var label = field === FIRESTORE_TBS_SNIPPETS_MTACC_2027_FIELD ? 'MTACC 2027 invite' : field;
+                addButton(field, label, texteditorBulkEmailSnippetKey(field));
+            }
+            addButton(
+                FIRESTORE_TBS_SNIPPETS_MTACC_2027_FIELD,
+                'MTACC 2027 invite',
+                TBS_TEXTEDITOR_PRESET_MTACC_2027_INVITE_LS_KEY
+            );
+            root.innerHTML = html;
+            wrapTexteditorPresetButtonsInTable(root);
+        }
+
+        async function loadTexteditorBulkEmailLinks() {
+            var root = document.getElementById('texteditor-bulk-email-selectors');
+            if (!root) return;
+            var loc = String(event_location || '').trim();
+            if (!loc) {
+                renderTexteditorBulkEmailLinks([]);
+                return;
+            }
+            var serial = ++texteditorBulkEmailLoadSerial;
+            try {
+                var db = getFirestore();
+                var parent = tbsPresetsLocationDocRef(db, loc);
+                if (!parent) return;
+                var names = await listEmailerPresetFieldNames(loc);
+                if (serial !== texteditorBulkEmailLoadSerial) return;
+                var items = [];
+                var chunkSize = 12;
+                for (var i = 0; i < names.length; i += chunkSize) {
+                    var chunk = names.slice(i, i + chunkSize);
+                    var snaps = await Promise.all(
+                        chunk.map(function (fieldName) {
+                            return parent.collection(fieldName).doc(fieldName).get();
+                        })
+                    );
+                    if (serial !== texteditorBulkEmailLoadSerial) return;
+                    for (var j = 0; j < chunk.length; j++) {
+                        var snap = snaps[j];
+                        if (!snap || !snap.exists) continue;
+                        if (!emailerPresetIsBulkEmail(snap.data() || {})) continue;
+                        items.push({ field: chunk[j], label: chunk[j] });
+                    }
+                }
+                if (serial !== texteditorBulkEmailLoadSerial) return;
+                renderTexteditorBulkEmailLinks(items);
+            } catch (err) {
+                console.error('loadTexteditorBulkEmailLinks:', err);
+            }
+        }
+
+        function openAddBulkEmailPopup() {
+            if (backendBlockIfReadonly()) return;
+            if (!String(event_location || '').trim()) {
+                if (typeof showStatus === 'function') showStatus('error', 'Select an event first.');
+                return;
+            }
+            var popup = document.getElementById('add-bulkemail-popup');
+            var input = document.getElementById('add-bulkemail-name');
+            if (!popup || !input) return;
+            input.value = '';
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+            input.focus();
+        }
+
+        function closeAddBulkEmailPopup() {
+            var popup = document.getElementById('add-bulkemail-popup');
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function setAddBulkEmailPopupBusy(busy) {
+            var cancel = document.getElementById('add-bulkemail-cancel');
+            var create = document.getElementById('add-bulkemail-create');
+            var input = document.getElementById('add-bulkemail-name');
+            [cancel, create, input].forEach(function (el) {
+                if (!el) return;
+                el.disabled = !!busy;
+                if (el.tagName === 'BUTTON') el.setAttribute('aria-disabled', busy ? 'true' : 'false');
+            });
+        }
+
+        async function createBulkEmailPresetFromPopup() {
+            if (backendBlockIfReadonly()) return;
+            var input = document.getElementById('add-bulkemail-name');
+            var name = input ? String(input.value || '').trim() : '';
+            if (!name || name.indexOf('/') !== -1 || name === '.' || name === '..') {
+                if (typeof showStatus === 'function') showStatus('error', 'Enter a name for the bulk e-mail.');
+                if (input) input.focus();
+                return;
+            }
+            var loc = String(event_location || '').trim();
+            if (!loc) {
+                if (typeof showStatus === 'function') showStatus('error', 'Select an event first.');
+                return;
+            }
+            setAddBulkEmailPopupBusy(true);
+            try {
+                var db = getFirestore();
+                var parent = tbsPresetsLocationDocRef(db, loc);
+                if (!parent) throw new Error('Missing event location.');
+                var ref = parent.collection(name).doc(name);
+                var existing = await ref.get();
+                if (existing && existing.exists) {
+                    if (typeof showStatus === 'function') {
+                        showStatus('error', 'A pre-set named ' + name + ' already exists.');
+                    }
+                    return;
+                }
+                var payload = {};
+                payload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = '{{Event}} - ';
+                payload[FIRESTORE_TBS_PRESET_TYPE_FIELD] = 'e-mail';
+                payload[FIRESTORE_TBS_PRESET_WHERE_FIELD] = 'bulk_e-mails';
+                payload[FIRESTORE_TBS_PRESET_VALUE_FIELD] = bulkEmailStarterHtml();
+                await ref.set(payload);
+                await rememberTbsPresetFieldName(db, name, loc);
+                closeAddBulkEmailPopup();
+                await loadTexteditorBulkEmailLinks();
+                void loadEmailerBulkPresetButtons();
+                await loadHomeSnippetFromFirestoreIntoEditor(texteditorBulkEmailSnippetKey(name));
+                if (typeof showStatus === 'function') {
+                    showStatus('success', name + ' created in tbs/Pre-sets/' + loc + '/' + loc + '.');
+                }
+            } catch (err) {
+                console.error('createBulkEmailPresetFromPopup:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', (err && err.message) || 'Failed to create the bulk e-mail.');
+                }
+            } finally {
+                setAddBulkEmailPopupBusy(false);
+            }
+        }
+
         function loadFirstProgrammeDayIntoTexteditorIfEmpty() {
             if (!programmeState || !programmeState.dayDates || !programmeState.dayDates.length) return;
             var ta = document.getElementById('texteditor-code');
@@ -35962,9 +36291,13 @@
             try {
                 var payload = {};
                 payload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = topic;
-                await tbsPresetValueDocRef(getFirestore(), spec.field).set(payload, { merge: true });
+                await tbsPresetValueDocRefForEditor(getFirestore(), spec).set(payload, { merge: true });
                 try {
-                    await rememberTbsPresetFieldName(getFirestore(), spec.field, 'Zermatt');
+                    await rememberTbsPresetFieldName(
+                        getFirestore(),
+                        spec.field,
+                        spec.locationScoped ? event_location : 'Zermatt'
+                    );
                 } catch (indexErr) {
                     console.warn('rememberTbsPresetFieldName:', indexErr);
                 }
@@ -36103,9 +36436,13 @@
                         if (texteditorPresetIsEmailType()) {
                             valuePayload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = texteditorEmailTopicValue();
                         }
-                        await tbsPresetValueDocRef(dbHome, homeSpec.field).set(valuePayload, { merge: true });
+                        await tbsPresetValueDocRefForEditor(dbHome, homeSpec).set(valuePayload, { merge: true });
                         try {
-                            await rememberTbsPresetFieldName(dbHome, homeSpec.field, 'Zermatt');
+                            await rememberTbsPresetFieldName(
+                                dbHome,
+                                homeSpec.field,
+                                homeSpec.locationScoped ? event_location : 'Zermatt'
+                            );
                         } catch (indexErr) {
                             console.warn('rememberTbsPresetFieldName:', indexErr);
                         }
@@ -44182,6 +44519,46 @@
             var texteditorBulkEmailSelectorsEl = document.getElementById('texteditor-bulk-email-selectors');
             if (texteditorBulkEmailSelectorsEl) {
                 texteditorBulkEmailSelectorsEl.addEventListener('click', onTexteditorSnippetSelectorsClick);
+            }
+            var addBulkEmailBtn = document.getElementById('add-bulkemail');
+            if (addBulkEmailBtn) {
+                addBulkEmailBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    openAddBulkEmailPopup();
+                });
+            }
+            var addBulkEmailCancel = document.getElementById('add-bulkemail-cancel');
+            if (addBulkEmailCancel) {
+                addBulkEmailCancel.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    closeAddBulkEmailPopup();
+                });
+            }
+            var addBulkEmailCreate = document.getElementById('add-bulkemail-create');
+            if (addBulkEmailCreate) {
+                addBulkEmailCreate.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    void createBulkEmailPresetFromPopup();
+                });
+            }
+            var addBulkEmailBackdrop = document.getElementById('add-bulkemail-popup-backdrop');
+            if (addBulkEmailBackdrop) {
+                addBulkEmailBackdrop.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    closeAddBulkEmailPopup();
+                });
+            }
+            var addBulkEmailName = document.getElementById('add-bulkemail-name');
+            if (addBulkEmailName) {
+                addBulkEmailName.addEventListener('keydown', function (ev) {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        void createBulkEmailPresetFromPopup();
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        closeAddBulkEmailPopup();
+                    }
+                });
             }
             var texteditorMiscellaneousSelectorsEl = document.getElementById('texteditor-miscellaneous-selectors');
             if (texteditorMiscellaneousSelectorsEl) {
