@@ -10956,8 +10956,8 @@
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             padding: 1.25rem 1.5rem;
-            max-width: 22rem;
-            width: 100%;
+            width: max-content;
+            max-width: calc(100vw - 2rem);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             font-family: 'Inter', sans-serif;
             box-sizing: border-box;
@@ -10973,12 +10973,13 @@
             letter-spacing: normal;
             text-align: center;
             text-transform: uppercase;
+            white-space: nowrap;
             color: #000000;
         }
 
         .guest-delete-confirm__actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             gap: 0.5rem;
             margin-top: 1.25rem;
         }
@@ -11379,8 +11380,8 @@
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             padding: 1.25rem 1.5rem;
-            max-width: 22rem;
-            width: 100%;
+            width: max-content;
+            max-width: calc(100vw - 2rem);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             font-family: 'Inter', sans-serif;
             box-sizing: border-box;
@@ -11396,12 +11397,13 @@
             letter-spacing: normal;
             text-align: center;
             text-transform: uppercase;
+            white-space: nowrap;
             color: #000000;
         }
 
         .speaker-delete-confirm__actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             gap: 0.5rem;
             margin-top: 1.25rem;
         }
@@ -11510,6 +11512,36 @@
         }
 
         body.backend-page #add-bulkemail-create:hover:not(:disabled) {
+            background: #338a17 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #texteditor-unsaved-discard {
+            background: #F71941 !important;
+            color: #ffffff !important;
+            border: none;
+            padding: 0.45rem 1rem;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        body.backend-page #texteditor-unsaved-discard:hover:not(:disabled) {
+            background: #F71941 !important;
+            color: #ffffff !important;
+        }
+
+        body.backend-page #texteditor-unsaved-save {
+            background: #338a17 !important;
+            color: #ffffff !important;
+            border: none;
+            padding: 0.45rem 1rem;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        body.backend-page #texteditor-unsaved-save:hover:not(:disabled) {
             background: #338a17 !important;
             color: #ffffff !important;
         }
@@ -11651,7 +11683,8 @@
             box-sizing: border-box;
         }
 
-        #texteditor .texteditor-pane-heading .texteditor-padlock-btn {
+        #texteditor .texteditor-pane-heading .texteditor-padlock-btn,
+        #texteditor .texteditor-pane-heading #texteditor-undo-btn {
             flex: 0 0 var(--backend-square-btn-size);
             width: var(--backend-square-btn-size);
             min-width: var(--backend-square-btn-size);
@@ -11661,19 +11694,26 @@
             max-height: var(--backend-square-btn-size);
             border-radius: var(--backend-icon-btn-radius);
             padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        #texteditor .texteditor-pane-heading .texteditor-padlock-btn svg {
+        #texteditor .texteditor-pane-heading .texteditor-padlock-btn svg,
+        #texteditor .texteditor-pane-heading #texteditor-undo-btn svg {
             flex-shrink: 0;
+            display: block;
         }
 
-        #texteditor .texteditor-pane-heading .texteditor-padlock-btn:disabled {
+        #texteditor .texteditor-pane-heading .texteditor-padlock-btn:disabled,
+        #texteditor .texteditor-pane-heading #texteditor-undo-btn:disabled {
             opacity: 0.45;
             cursor: not-allowed;
             filter: none;
         }
 
-        #texteditor .texteditor-pane-heading .texteditor-padlock-btn:disabled:hover {
+        #texteditor .texteditor-pane-heading .texteditor-padlock-btn:disabled:hover,
+        #texteditor .texteditor-pane-heading #texteditor-undo-btn:disabled:hover {
             filter: none;
         }
 
@@ -13372,7 +13412,7 @@
                         <img src="images/backendlogo.png?v=20260605-backendlogo-v3" alt="Backend logo" class="eventnavigation-logo" />
                     </div>
                     <div class="aspects">
-                        <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, team, programme, lodging, snippets, content, E-mailer, Finances, Settings, and Admin">
+                        <nav class="navigation navigation--no-event" id="backend-navigation" aria-label="Overview, speakers, guests, team, programme, lodging, snippets, Media content, E-mailer, Finances, Site settings, and Admin">
                             <a href="#overview-editor" class="backend-editor-link is-active" id="overview-toggle" role="button" aria-expanded="true" aria-controls="overview-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Overview</a>
                             <a href="#speaker-editor" class="backend-editor-link" id="speakers-toggle" role="button" aria-expanded="false" aria-controls="speaker-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Speakers</a>
                             <a href="#guest-editor" class="backend-editor-link" id="guests-toggle" role="button" aria-expanded="false" aria-controls="guest-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Guests</a>
@@ -13380,7 +13420,7 @@
                             <a href="#programme-editor" class="backend-editor-link" id="programme-toggle" role="button" aria-expanded="false" aria-controls="programme-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Programme</a>
                             <a href="#lodging-editor" class="backend-editor-link" id="lodging-toggle" role="button" aria-expanded="false" aria-controls="lodging-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Lodging</a>
                             <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
-                            <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Content</a>
+                            <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Media content</a>
                             <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
                             <span
                                 class="backend-editor-link backend-editor-link--inactive"
@@ -13390,7 +13430,7 @@
                                 aria-expanded="false"
                                 tabindex="-1"
                                 title="Coming soon">Finances</span>
-                            <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Settings</a>
+                            <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Site settings</a>
                             <span
                                 class="backend-editor-link backend-editor-link--inactive"
                                 id="admin-toggle"
@@ -13608,6 +13648,11 @@
                                             fill="currentColor"
                                             d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
                                         />
+                                    </svg>
+                                </button>
+                                <button type="button" class="add-speaker-button" id="texteditor-undo-btn" aria-label="Nothing to undo" title="Nothing to undo" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
                                     </svg>
                                 </button>
                                 <button type="button" class="texteditor-save-btn" id="texteditor-save-btn" disabled aria-disabled="true" title="Save pre-set" aria-label="Save pre-set">
@@ -15012,7 +15057,7 @@
                 </div>
             </section>
 
-            <section class="content-editor-section" id="content-editor" aria-hidden="true" aria-label="Content" data-name="content-editor">
+            <section class="content-editor-section" id="content-editor" aria-hidden="true" aria-label="Media content" data-name="content-editor">
                 <div class="content-pane-scrollbar" id="content-pane-scrollbar" hidden>
                     <div class="content-pane-scrollbar-thumb" id="content-pane-scrollbar-thumb"></div>
                 </div>
@@ -16038,6 +16083,17 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" id="add-bulkemail-cancel">Cancel</button>
                 <button type="button" id="add-bulkemail-create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="texteditor-unsaved-popup" class="guest-delete-confirm" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="texteditor-unsaved-popup-title">
+        <div class="guest-delete-confirm__backdrop" id="texteditor-unsaved-popup-backdrop"></div>
+        <div class="guest-delete-confirm__box">
+            <p id="texteditor-unsaved-popup-title">Save changes to this pre-set?</p>
+            <div class="guest-delete-confirm__actions">
+                <button type="button" id="texteditor-unsaved-discard">Don't save</button>
+                <button type="button" id="texteditor-unsaved-save">Save</button>
             </div>
         </div>
     </div>
@@ -35612,7 +35668,14 @@
             return null;
         }
 
-        async function loadHomeSnippetFromFirestoreIntoEditor(key) {
+        async function loadHomeSnippetFromFirestoreIntoEditor(key, opts) {
+            opts = opts || {};
+            if (!opts.skipUnsavedGuard && texteditorPresetIsDirty()) {
+                promptTexteditorUnsavedChanges(function () {
+                    void loadHomeSnippetFromFirestoreIntoEditor(key, { skipUnsavedGuard: true });
+                });
+                return true;
+            }
             var spec = homeSnippetFirestoreSpecForKey(key);
             if (!spec) return false;
             if (spec.target === 'event' && !selectedevent) {
@@ -36094,7 +36157,14 @@
             loadProgrammeDayHtmlForTexteditor(programmeState.dayDates[0]);
         }
 
-        async function loadProgrammeDayHtmlForTexteditor(dateStr, alias) {
+        async function loadProgrammeDayHtmlForTexteditor(dateStr, alias, opts) {
+            opts = opts || {};
+            if (!opts.skipUnsavedGuard && texteditorPresetIsDirty()) {
+                promptTexteditorUnsavedChanges(function () {
+                    void loadProgrammeDayHtmlForTexteditor(dateStr, alias, { skipUnsavedGuard: true });
+                });
+                return;
+            }
             if (!selectedevent) return;
             var html = '';
             var key;
@@ -36136,7 +36206,7 @@
                 key = texteditorStorageKeyForProgrammeDay(selectedevent, dateStr);
                 label = alias || (programmeState.nameDateByDay && programmeState.nameDateByDay[dateStr]) || dateStr;
             }
-            updateTexteditorCodeEditor(html, key, label);
+            updateTexteditorCodeEditor(html, key, label, { forceHtml: true });
             var ta = document.getElementById('texteditor-code');
             if (ta) {
                 if (alias && alias !== 'programme-intro') ta.dataset.programmeAlias = alias;
@@ -36168,8 +36238,8 @@
             if (btn.classList.contains('is-autosaving')) {
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
-                btn.setAttribute('title', 'Autosaving');
-                btn.setAttribute('aria-label', 'Autosaving');
+                btn.setAttribute('title', 'Saving');
+                btn.setAttribute('aria-label', 'Saving');
                 return;
             }
             var dirty = Boolean(key && ta.value !== texteditorLastSavedSnapshot);
@@ -36229,6 +36299,162 @@
             updateTexteditorSaveButtonState();
             updateTexteditorSyncButtonState();
             syncTexteditorEmailTopicRow();
+            updateTexteditorUndoButtonState();
+        }
+
+        var TEXTEDITOR_UNDO_LIMIT = 50;
+        var TEXTEDITOR_UNDO_PAUSE_MS = 300;
+        var texteditorUndoStack = [];
+        var texteditorUndoTip = null;
+        var texteditorUndoTimer = null;
+        var texteditorUndoApplying = false;
+
+        function texteditorUndoSnapshot() {
+            var ta = document.getElementById('texteditor-code');
+            return {
+                html: ta ? String(ta.value != null ? ta.value : '') : '',
+                topic: texteditorPresetIsEmailType() ? texteditorEmailTopicValue() : ''
+            };
+        }
+
+        function texteditorUndoSnapshotsEqual(a, b) {
+            if (!a || !b) return false;
+            return a.html === b.html && a.topic === b.topic;
+        }
+
+        function texteditorUndoCanUse() {
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            if (!key || !texteditorPadlockIsOpen || backenduserIsReadonly) return false;
+            if (texteditorUndoTimer) return true;
+            var current = texteditorUndoSnapshot();
+            if (texteditorUndoTip && !texteditorUndoSnapshotsEqual(current, texteditorUndoTip)) return true;
+            return texteditorUndoStack.length > 0;
+        }
+
+        function updateTexteditorUndoButtonState() {
+            var btn = document.getElementById('texteditor-undo-btn');
+            if (!btn) return;
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            var can = texteditorUndoCanUse();
+            btn.disabled = !can;
+            btn.setAttribute('aria-disabled', can ? 'false' : 'true');
+            var label = 'Undo';
+            if (!key) label = 'Select a pre-set to undo';
+            else if (!texteditorPadlockIsOpen) label = 'Unlock to undo';
+            else if (!can) label = 'Nothing to undo';
+            btn.setAttribute('title', label);
+            btn.setAttribute('aria-label', label);
+        }
+
+        function resetTexteditorUndoHistory() {
+            if (texteditorUndoTimer) {
+                clearTimeout(texteditorUndoTimer);
+                texteditorUndoTimer = null;
+            }
+            texteditorUndoStack = [];
+            texteditorUndoTip = texteditorUndoSnapshot();
+            texteditorUndoApplying = false;
+            updateTexteditorUndoButtonState();
+        }
+
+        function texteditorUndoAdoptCurrent() {
+            if (texteditorUndoTimer) {
+                clearTimeout(texteditorUndoTimer);
+                texteditorUndoTimer = null;
+            }
+            texteditorUndoTip = texteditorUndoSnapshot();
+            updateTexteditorUndoButtonState();
+        }
+
+        function scheduleTexteditorUndoCapture() {
+            if (texteditorUndoApplying || !texteditorPadlockIsOpen || backenduserIsReadonly) return;
+            var ta = document.getElementById('texteditor-code');
+            if (!ta || !ta.dataset.storageKey) return;
+            if (!texteditorUndoTip) texteditorUndoTip = texteditorUndoSnapshot();
+            if (texteditorUndoTimer) clearTimeout(texteditorUndoTimer);
+            texteditorUndoTimer = setTimeout(function () {
+                texteditorUndoTimer = null;
+                commitTexteditorUndoPause();
+            }, TEXTEDITOR_UNDO_PAUSE_MS);
+            updateTexteditorUndoButtonState();
+        }
+
+        function commitTexteditorUndoPause() {
+            if (texteditorUndoApplying) return;
+            var current = texteditorUndoSnapshot();
+            if (!texteditorUndoTip) {
+                texteditorUndoTip = current;
+                updateTexteditorUndoButtonState();
+                return;
+            }
+            if (texteditorUndoSnapshotsEqual(current, texteditorUndoTip)) {
+                updateTexteditorUndoButtonState();
+                return;
+            }
+            texteditorUndoStack.push(texteditorUndoTip);
+            if (texteditorUndoStack.length > TEXTEDITOR_UNDO_LIMIT) {
+                texteditorUndoStack.splice(0, texteditorUndoStack.length - TEXTEDITOR_UNDO_LIMIT);
+            }
+            texteditorUndoTip = current;
+            updateTexteditorUndoButtonState();
+        }
+
+        function applyTexteditorUndoSnapshot(snap) {
+            var ta = document.getElementById('texteditor-code');
+            if (!ta || !snap) return;
+            texteditorUndoApplying = true;
+            try {
+                ta.value = snap.html != null ? String(snap.html) : '';
+                if (texteditorPresetIsEmailType()) {
+                    var input = document.getElementById('texteditor-email-topic-input');
+                    if (input) input.value = snap.topic != null ? String(snap.topic) : '';
+                }
+                texteditorUndoTip = texteditorUndoSnapshot();
+                scheduleTexteditorPreviewSync();
+                updateTexteditorSaveButtonState();
+                syncTexteditorRenderEmailButton();
+                var end = ta.value.length;
+                try {
+                    ta.setSelectionRange(end, end);
+                } catch (selErr) {
+                    /* ignore */
+                }
+            } finally {
+                texteditorUndoApplying = false;
+            }
+            updateTexteditorUndoButtonState();
+        }
+
+        function undoTexteditorSource() {
+            if (backendBlockIfReadonly()) return;
+            if (!texteditorPadlockIsOpen) return;
+            var ta = document.getElementById('texteditor-code');
+            if (!ta || !ta.dataset.storageKey) return;
+            if (texteditorUndoTimer) {
+                clearTimeout(texteditorUndoTimer);
+                texteditorUndoTimer = null;
+            }
+            var current = texteditorUndoSnapshot();
+            if (texteditorUndoTip && !texteditorUndoSnapshotsEqual(current, texteditorUndoTip)) {
+                applyTexteditorUndoSnapshot(texteditorUndoTip);
+                return;
+            }
+            if (!texteditorUndoStack.length) {
+                updateTexteditorUndoButtonState();
+                return;
+            }
+            applyTexteditorUndoSnapshot(texteditorUndoStack.pop());
+        }
+
+        function texteditorUndoKeydown(ev) {
+            if (!ev || ev.shiftKey || ev.altKey) return;
+            if (!(ev.metaKey || ev.ctrlKey)) return;
+            if (String(ev.key || '').toLowerCase() !== 'z') return;
+            if (!texteditorPadlockIsOpen || backenduserIsReadonly) return;
+            ev.preventDefault();
+            undoTexteditorSource();
         }
 
         function flushTexteditorStorageNow() {
@@ -36268,13 +36494,7 @@
         }
 
         function scheduleTexteditorEmailTopicAutosave() {
-            if (backenduserIsReadonly || !texteditorPresetIsEmailType()) return;
-            cancelTexteditorTopicAutosaveTimer();
-            if (!texteditorEmailTopicDirty()) return;
-            texteditorTopicAutosaveTimer = setTimeout(function () {
-                texteditorTopicAutosaveTimer = null;
-                void saveTexteditorEmailTopicNow();
-            }, TEXTEDITOR_FIREBASE_AUTOSAVE_MS);
+            /* E-mail topics are written to Firestore only from the Source save button. */
         }
 
         async function saveTexteditorEmailTopicNow() {
@@ -36341,40 +36561,19 @@
                 btn.classList.remove('texteditor-save-btn--saved');
                 btn.disabled = true;
                 btn.setAttribute('aria-disabled', 'true');
-                btn.setAttribute('title', 'Autosaving');
-                btn.setAttribute('aria-label', 'Autosaving');
+                btn.setAttribute('title', 'Saving');
+                btn.setAttribute('aria-label', 'Saving');
             } else {
                 updateTexteditorSaveButtonState();
             }
         }
 
         function scheduleTexteditorFirebaseAutosave() {
-            if (backenduserIsReadonly) return;
-            var ta = document.getElementById('texteditor-code');
-            if (!ta) return;
-            var key = String(ta.dataset.storageKey || '').trim();
-            if (!texteditorKeyHasFirebaseTarget(key)) return;
-            if (ta.value === texteditorLastSavedSnapshot && !texteditorEmailTopicDirty()) return;
-            cancelTexteditorFirebaseAutosaveTimer();
-            texteditorFirebaseAutosaveTimer = setTimeout(function () {
-                texteditorFirebaseAutosaveTimer = null;
-                void saveTexteditorSourceToFirebase({ autosave: true });
-            }, TEXTEDITOR_FIREBASE_AUTOSAVE_MS);
+            /* Pre-sets are written to Firestore only from the Source save button. */
         }
 
         function flushTexteditorFirebaseIfDirty() {
-            cancelTexteditorFirebaseAutosaveTimer();
-            cancelTexteditorTopicAutosaveTimer();
-            var ta = document.getElementById('texteditor-code');
-            if (!ta) return;
-            var key = String(ta.dataset.storageKey || '').trim();
-            if (!key) return;
-            if (ta.value === texteditorLastSavedSnapshot && !texteditorEmailTopicDirty()) return;
-            void saveTexteditorSourceToFirebase({
-                autosave: true,
-                key: key,
-                html: ta.value
-            });
+            /* Pre-sets are written to Firestore only from the Source save button. */
         }
 
         /**
@@ -36394,6 +36593,7 @@
                 html = texteditorHtmlPreparedForSave(key, html);
                 if (opts.html == null && String(ta.dataset.storageKey || '') === key && ta.value !== html) {
                     ta.value = html;
+                    texteditorUndoAdoptCurrent();
                     syncTexteditorPreviewFromCode();
                 }
             }
@@ -36515,6 +36715,57 @@
             }
         }
 
+        async function saveCurrentTexteditorSource() {
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey;
+            if (!ta || !key || backenduserIsReadonly) return false;
+            if (texteditorFirebaseSaveInFlight) return false;
+            var pretty = texteditorHtmlPreparedForSave(key, ta.value);
+            if (pretty !== ta.value) {
+                ta.value = pretty;
+                texteditorUndoAdoptCurrent();
+                syncTexteditorPreviewFromCode();
+            }
+            if (
+                ta.value === texteditorLastSavedSnapshot &&
+                !texteditorEmailTopicDirty() &&
+                texteditorKeyHasFirebaseTarget(key)
+            ) {
+                spinTexteditorSaveButton();
+                return true;
+            }
+            if (texteditorKeyHasFirebaseTarget(key)) {
+                var saved = await saveTexteditorSourceToFirebase({ autosave: false });
+                if (saved) {
+                    spinTexteditorSaveButton();
+                    updateTexteditorSaveButtonState();
+                }
+                return !!saved;
+            }
+            try {
+                localStorage.setItem(key, ta.value);
+            } catch (err) {
+                console.warn('Text editor save:', err);
+                return false;
+            }
+            texteditorLastSavedSnapshot = ta.value;
+            if (texteditorPresetIsEmailType()) {
+                texteditorPresetTopicSaved = texteditorEmailTopicValue();
+            }
+            spinTexteditorSaveButton();
+            updateTexteditorSaveButtonState();
+            var day = programmeDayFromTexteditorKey(key);
+            if (day) {
+                invalidateIndexProgrammeCache();
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved for this site. Reload the homepage to see the programme slider use your HTML.');
+                }
+            } else if (typeof showStatus === 'function') {
+                showStatus('info', 'Saved to browser storage for this activity.');
+            }
+            return true;
+        }
+
         function programmeDayFromTexteditorKey(key) {
             if (!key || typeof key !== 'string') return null;
             var m = key.match(/:programme:(tuesday|wednesday|thursday|friday)$/);
@@ -36537,7 +36788,6 @@
             wrap.classList.toggle('renderbox--speaker-info', presetSpeakerInfo && !idle);
             wrap.classList.toggle('renderbox--standby', key === TBS_TEXTEDITOR_HOME_STANDBY_LS_KEY && !idle);
             if (idle) {
-                flushTexteditorStorageNow();
                 ta.value = '';
                 delete ta.dataset.storageKey;
                 if (renderEl) renderEl.innerHTML = '';
@@ -36566,6 +36816,97 @@
 
         function texteditorEmailTopicDirty() {
             return texteditorPresetIsEmailType() && texteditorEmailTopicValue() !== texteditorPresetTopicSaved;
+        }
+
+        var texteditorUnsavedContinue = null;
+        var texteditorUnsavedBusy = false;
+
+        function texteditorPresetIsDirty() {
+            var ta = document.getElementById('texteditor-code');
+            var key = ta && ta.dataset.storageKey ? String(ta.dataset.storageKey) : '';
+            if (!key) return false;
+            if (String(ta.value) !== String(texteditorLastSavedSnapshot)) return true;
+            return texteditorEmailTopicDirty();
+        }
+
+        function setTexteditorUnsavedPopupBusy(busy) {
+            texteditorUnsavedBusy = !!busy;
+            ['texteditor-unsaved-discard', 'texteditor-unsaved-save'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.disabled = !!busy;
+                el.setAttribute('aria-disabled', busy ? 'true' : 'false');
+            });
+        }
+
+        function closeTexteditorUnsavedPopup() {
+            var popup = document.getElementById('texteditor-unsaved-popup');
+            texteditorUnsavedContinue = null;
+            setTexteditorUnsavedPopupBusy(false);
+            if (!popup) return;
+            popup.hidden = true;
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function promptTexteditorUnsavedChanges(continueFn) {
+            if (typeof continueFn !== 'function') return;
+            if (texteditorUnsavedBusy) return;
+            if (!texteditorPresetIsDirty()) {
+                continueFn();
+                return;
+            }
+            texteditorUnsavedContinue = continueFn;
+            var popup = document.getElementById('texteditor-unsaved-popup');
+            if (!popup) return;
+            if (!popup.hidden) return;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+            var saveBtn = document.getElementById('texteditor-unsaved-save');
+            if (saveBtn) saveBtn.focus();
+        }
+
+        function discardTexteditorUnsavedChanges() {
+            var ta = document.getElementById('texteditor-code');
+            if (ta) {
+                ta.value = texteditorLastSavedSnapshot;
+                var key = ta.dataset.storageKey;
+                if (key) {
+                    try {
+                        localStorage.setItem(key, ta.value);
+                    } catch (err) {
+                        console.warn('Text editor discard:', err);
+                    }
+                }
+            }
+            if (texteditorPresetIsEmailType()) {
+                var input = document.getElementById('texteditor-email-topic-input');
+                if (input) input.value = texteditorPresetTopicSaved;
+            }
+            scheduleTexteditorPreviewSync();
+            updateTexteditorSaveButtonState();
+            syncTexteditorRenderEmailButton();
+            resetTexteditorUndoHistory();
+        }
+
+        function discardTexteditorUnsavedAndContinue() {
+            if (texteditorUnsavedBusy) return;
+            var next = texteditorUnsavedContinue;
+            discardTexteditorUnsavedChanges();
+            closeTexteditorUnsavedPopup();
+            if (typeof next === 'function') next();
+        }
+
+        async function saveTexteditorUnsavedAndContinue() {
+            if (texteditorUnsavedBusy) return;
+            setTexteditorUnsavedPopupBusy(true);
+            var saved = await saveCurrentTexteditorSource();
+            if (!saved) {
+                setTexteditorUnsavedPopupBusy(false);
+                return;
+            }
+            var next = texteditorUnsavedContinue;
+            closeTexteditorUnsavedPopup();
+            if (typeof next === 'function') next();
         }
 
         function setTexteditorPresetMeta(type, topic) {
@@ -37339,10 +37680,6 @@
             var ta = document.getElementById('texteditor-code');
             if (!ta) return;
             texteditorProgrammeFirebaseSavedUi = false;
-            flushTexteditorFirebaseIfDirty();
-            if (!opts.forceHtml) {
-                flushTexteditorStorageNow();
-            }
             var nextKey = storageKey || '';
             var isEventProgrammeKey = nextKey.indexOf(':event:') !== -1 && nextKey.indexOf(':programme:') !== -1;
             /* Event programme HTML is authoritative from Firestore; do not override with localStorage on load/switch. */
@@ -37382,6 +37719,7 @@
             }
             texteditorLastSavedSnapshot = ta.value;
             texteditorPadlockIsOpen = false;
+            resetTexteditorUndoHistory();
             syncTexteditorPadlockButtonUi();
             syncTexteditorEditabilityFromPadlock();
             updateTexteditorSyncButtonState();
@@ -37517,27 +37855,16 @@
                 topicInput.dataset.persistenceBound = '1';
                 topicInput.addEventListener('input', function () {
                     updateTexteditorSaveButtonState();
-                    scheduleTexteditorEmailTopicAutosave();
+                    scheduleTexteditorUndoCapture();
                 });
-                topicInput.addEventListener('change', function () {
-                    void saveTexteditorEmailTopicNow();
-                });
-                topicInput.addEventListener('blur', function () {
-                    void saveTexteditorEmailTopicNow();
-                });
+                topicInput.addEventListener('keydown', texteditorUndoKeydown);
             }
+            ta.addEventListener('keydown', texteditorUndoKeydown);
             ta.addEventListener('input', function() {
+                scheduleTexteditorUndoCapture();
                 scheduleTexteditorPreviewSync();
                 updateTexteditorSaveButtonState();
                 syncTexteditorRenderEmailButton();
-                var key = ta.dataset.storageKey;
-                if (!key) return;
-                try {
-                    localStorage.setItem(key, ta.value);
-                } catch (err) {
-                    console.warn('Text editor save:', err);
-                }
-                scheduleTexteditorFirebaseAutosave();
             });
         }
 
@@ -39379,8 +39706,11 @@
                 texteditorSection &&
                 texteditorSection.classList.contains('is-open') &&
                 !isEditor;
-            if (leavingPresets) {
-                flushTexteditorFirebaseIfDirty();
+            if (leavingPresets && texteditorPresetIsDirty()) {
+                promptTexteditorUnsavedChanges(function () {
+                    setBackendPanel(panel);
+                });
+                return;
             }
             const isSpeakers =
                 panel === 'speakers' ||
@@ -44357,15 +44687,18 @@
             initTexteditorCodeInputPersistence();
             document.addEventListener('visibilitychange', function () {
                 if (document.visibilityState === 'hidden') {
-                    flushTexteditorFirebaseIfDirty();
                     flushEmailerContactsFirebaseIfDirty();
                     flushTeamFirebaseIfDirty();
                 }
             });
             window.addEventListener('pagehide', function () {
-                flushTexteditorFirebaseIfDirty();
                 flushEmailerContactsFirebaseIfDirty();
                 flushTeamFirebaseIfDirty();
+            });
+            window.addEventListener('beforeunload', function (ev) {
+                if (!texteditorPresetIsDirty()) return;
+                ev.preventDefault();
+                ev.returnValue = '';
             });
             var texteditorPadlockBtn = document.getElementById('texteditor-padlock-btn');
             if (texteditorPadlockBtn) {
@@ -44374,13 +44707,22 @@
                     ev.preventDefault();
                     if (texteditorPadlockBtn.disabled) return;
                     if (backendBlockIfReadonly()) return;
-                    if (texteditorPadlockIsOpen) void saveTexteditorEmailTopicNow();
                     texteditorPadlockIsOpen = !texteditorPadlockIsOpen;
                     syncTexteditorPadlockButtonUi();
                     syncTexteditorEditabilityFromPadlock();
                 });
                 syncTexteditorPadlockButtonUi();
                 syncTexteditorEditabilityFromPadlock();
+            }
+            var texteditorUndoBtn = document.getElementById('texteditor-undo-btn');
+            if (texteditorUndoBtn) {
+                texteditorUndoBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    if (texteditorUndoBtn.disabled) return;
+                    undoTexteditorSource();
+                });
+                updateTexteditorUndoButtonState();
             }
             var texteditorRenderEmailBtn = document.getElementById('texteditor-render-email-btn');
             if (texteditorRenderEmailBtn) {
@@ -44399,56 +44741,52 @@
                     var key = ta && ta.dataset.storageKey;
                     if (!ta || !key || !texteditorPadlockIsOpen || backenduserIsReadonly) return;
                     if (texteditorSaveBtn.classList.contains('is-autosaving')) return;
-                    cancelTexteditorFirebaseAutosaveTimer();
-                    var pretty = texteditorHtmlPreparedForSave(key, ta.value);
-                    if (pretty !== ta.value) {
-                        ta.value = pretty;
-                        syncTexteditorPreviewFromCode();
-                    }
-                    if (
-                        ta.value === texteditorLastSavedSnapshot &&
-                        !texteditorEmailTopicDirty() &&
-                        texteditorKeyHasFirebaseTarget(key)
-                    ) {
-                        spinTexteditorSaveButton();
-                        return;
-                    }
-                    var saved = await saveTexteditorSourceToFirebase({ autosave: false });
-                    if (saved) {
-                        spinTexteditorSaveButton();
-                        updateTexteditorSaveButtonState();
-                        return;
-                    }
-                    if (!texteditorKeyHasFirebaseTarget(key)) {
-                        try {
-                            localStorage.setItem(key, ta.value);
-                        } catch (err) {
-                            console.warn('Text editor save:', err);
-                            return;
-                        }
-                        texteditorLastSavedSnapshot = ta.value;
-                        spinTexteditorSaveButton();
-                        updateTexteditorSaveButtonState();
-                        var day = programmeDayFromTexteditorKey(key);
-                        if (day) {
-                            invalidateIndexProgrammeCache();
-                            if (typeof showStatus === 'function') {
-                                showStatus('success', 'Saved for this site. Reload the homepage to see the programme slider use your HTML.');
-                            }
-                        } else if (typeof showStatus === 'function') {
-                            showStatus('info', 'Saved to browser storage for this activity.');
-                        }
-                    }
+                    await saveCurrentTexteditorSource();
                 });
             }
+            var texteditorUnsavedDiscard = document.getElementById('texteditor-unsaved-discard');
+            if (texteditorUnsavedDiscard) {
+                texteditorUnsavedDiscard.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    discardTexteditorUnsavedAndContinue();
+                });
+            }
+            var texteditorUnsavedSave = document.getElementById('texteditor-unsaved-save');
+            if (texteditorUnsavedSave) {
+                texteditorUnsavedSave.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    void saveTexteditorUnsavedAndContinue();
+                });
+            }
+            var texteditorUnsavedBackdrop = document.getElementById('texteditor-unsaved-popup-backdrop');
+            if (texteditorUnsavedBackdrop) {
+                texteditorUnsavedBackdrop.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (texteditorUnsavedBusy) return;
+                    closeTexteditorUnsavedPopup();
+                });
+            }
+            document.addEventListener('keydown', function (ev) {
+                var popup = document.getElementById('texteditor-unsaved-popup');
+                if (!popup || popup.hidden) return;
+                if (ev.key !== 'Escape') return;
+                ev.preventDefault();
+                if (texteditorUnsavedBusy) return;
+                closeTexteditorUnsavedPopup();
+            });
             var texteditorSyncBtn = document.getElementById('texteditor-sync-btn');
             if (texteditorSyncBtn) {
                 texteditorSyncBtn.addEventListener('click', function(ev) {
                     ev.stopPropagation();
                     ev.preventDefault();
                     if (texteditorSyncBtn.disabled) return;
-                    syncTexteditorSourceFromFirebase().catch(function(err) {
-                        console.error('texteditor-sync-btn:', err);
+                    promptTexteditorUnsavedChanges(function () {
+                        syncTexteditorSourceFromFirebase().catch(function (err) {
+                            console.error('texteditor-sync-btn:', err);
+                        });
                     });
                 });
             }
@@ -44469,7 +44807,10 @@
                     }
                     if (!found) return;
                     var progKey = TBS_TEXTEDITOR_LS_PREFIX + 'programme:' + found;
-                    updateTexteditorCodeEditor(panel.outerHTML, progKey, 'programme-' + found + ' (preview)');
+                    var progHtml = panel.outerHTML;
+                    promptTexteditorUnsavedChanges(function () {
+                        updateTexteditorCodeEditor(progHtml, progKey, 'programme-' + found + ' (preview)');
+                    });
                 });
             }
             var texteditorSelectorsEl = document.getElementById('texteditor-selectors');
@@ -44489,18 +44830,21 @@
                 if (!btn || btn.disabled) return;
                 var key = btn.getAttribute('data-snippet-key') || '';
                 if (!key) return;
-                loadHomeSnippetFromFirestoreIntoEditor(key).then(function(loadedHome) {
-                    if (loadedHome) return;
-                    document.querySelectorAll('#texteditor-selectors .texteditor-day-btn').forEach(function(b) {
-                        b.classList.remove('is-active');
-                        b.setAttribute('aria-pressed', 'false');
+                var label = String(btn.textContent || '').trim();
+                promptTexteditorUnsavedChanges(function () {
+                    loadHomeSnippetFromFirestoreIntoEditor(key, { skipUnsavedGuard: true }).then(function (loadedHome) {
+                        if (loadedHome) return;
+                        document.querySelectorAll('#texteditor-selectors .texteditor-day-btn').forEach(function (b) {
+                            b.classList.remove('is-active');
+                            b.setAttribute('aria-pressed', 'false');
+                        });
+                        document.querySelectorAll('.texteditor-snippet-btn').forEach(function (b) {
+                            var on = (b.getAttribute('data-snippet-key') || '') === key;
+                            b.classList.toggle('is-active', on);
+                            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                        });
+                        updateTexteditorCodeEditor('', key, label);
                     });
-                    document.querySelectorAll('.texteditor-snippet-btn').forEach(function(b) {
-                        var on = (b.getAttribute('data-snippet-key') || '') === key;
-                        b.classList.toggle('is-active', on);
-                        b.setAttribute('aria-pressed', on ? 'true' : 'false');
-                    });
-                    updateTexteditorCodeEditor('', key, String(btn.textContent || '').trim());
                 });
             }
 
