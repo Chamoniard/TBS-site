@@ -169,7 +169,8 @@
 
         body.backend-page button.add-speaker-button,
         body.backend-page button.add-content-btn,
-        body.backend-page button.add-lodging-btn {
+        body.backend-page button.add-lodging-btn,
+        body.backend-page button.finances-toolbar-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -188,10 +189,23 @@
 
         body.backend-page button.add-speaker-button:disabled,
         body.backend-page button.add-content-btn:disabled,
-        body.backend-page button.add-lodging-btn:disabled {
+        body.backend-page button.add-lodging-btn:disabled,
+        body.backend-page button.finances-toolbar-btn:disabled {
             background: var(--backend-button-yellow);
             border: none;
             color: #94a3b8;
+        }
+
+        body.backend-page button.finances-toolbar-btn.finances-delete-btn,
+        body.backend-page button.finances-toolbar-btn.finances-delete-btn:hover:not(:disabled),
+        body.backend-page button.finances-toolbar-btn.finances-delete-btn:disabled {
+            background: #F71941;
+            color: #ffffff;
+        }
+
+        body.backend-page button.finances-toolbar-btn.finances-delete-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
         }
 
         body.backend-page button.texteditor-save-btn {
@@ -316,7 +330,9 @@
         body.backend-page.backend-readonly #guest-send-invite-btn,
         body.backend-page.backend-readonly #guest-send-invoice-btn,
         body.backend-page.backend-readonly #speaker-send-formal-invite-btn,
-        body.backend-page.backend-readonly #finances-import-invoices-btn {
+        body.backend-page.backend-readonly #finances-financials-import-btn,
+        body.backend-page.backend-readonly #finances-items-add-btn,
+        body.backend-page.backend-readonly #finances-detail-delete-btn {
             pointer-events: none;
             cursor: not-allowed;
             opacity: 0.45;
@@ -511,6 +527,10 @@
             border: none !important;
             border-radius: 5px 5px 0 0 !important;
             box-shadow: none !important;
+        }
+
+        #finances-toggle[hidden] {
+            display: none !important;
         }
 
         /* Placeholder tabs (Overview, Finances, Admin) until their panels are built */
@@ -1043,7 +1063,8 @@
 
         .add-speaker-button,
         .add-content-btn,
-        .add-lodging-btn {
+        .add-lodging-btn,
+        .finances-toolbar-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1311,7 +1332,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
+        #finances-editor .finances-panel > .finances-heading .finances-heading-actions {
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -1759,6 +1780,18 @@
             border-color: #338a17;
             color: #ffffff;
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn[aria-disabled='true'] {
+            background: #f1f5f9;
+            border: 1px solid #c5cdd4;
+            color: #94a3b8;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            cursor: not-allowed;
+            animation: none;
+            transform: none;
         }
 
         body.backend-page button.guest-editor-padlock-btn.is-angry-shake {
@@ -2291,8 +2324,8 @@
         #guest-editor .guests-list .guests-roster-list,
         #speaker-editor .speakers-list .speaker-roster-list,
         #content-editor .content-list .content-list-scroll,
-        #finances-editor .finances-panel .guests-roster-list,
-        #finances-editor .finances-panel .finances-panel-body {
+        #finances-editor .finances-panel .finances-roster,
+        #finances-editor .finances-panel .finances-detail-body {
             flex: 1 1 0;
             min-height: 0;
         }
@@ -2331,7 +2364,7 @@
         #content-editor .content-roster-table,
         #guest-editor .guests-list-table,
         #team-editor .team-list-table,
-        #finances-editor .guests-list-table,
+        #finances-editor .finances-table,
         #speaker-editor .speakers-roster-table,
         #programme-editor .programme-speakers-table,
         #texteditor .texteditor-preset-table {
@@ -2348,7 +2381,7 @@
         #content-editor .content-roster-table thead th,
         #guest-editor .guests-list-table thead th,
         #team-editor .team-list-table thead th,
-        #finances-editor .guests-list-table thead th,
+        #finances-editor .finances-table thead th,
         #speaker-editor .speakers-roster-table thead th,
         #programme-editor .programme-speakers-table thead th {
             background: #ffffff;
@@ -2362,7 +2395,7 @@
         #content-editor .content-roster-table tbody td,
         #guest-editor .guests-list-table tbody td,
         #team-editor .team-list-table tbody td,
-        #finances-editor .guests-list-table tbody td,
+        #finances-editor .finances-table tbody td,
         #speaker-editor .speakers-roster-table tbody td,
         #programme-editor .programme-speakers-table tbody td,
         #texteditor .texteditor-preset-table tbody td {
@@ -3508,6 +3541,8 @@
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-to-reserves-sep[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-send-reminder-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-reminder-side[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-second-reminder-btn[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-second-reminder-side[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-send-invite-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #readisno[hidden],
         body.backend-page #guest-editor #guest-editor-actions #invitedisno[hidden],
@@ -5470,17 +5505,17 @@
 
         #finances-editor,
         #finances-editor .finances-panel,
-        #finances-editor .finances-panel-body {
+        #finances-editor .finances-detail-body {
             font-family: 'Inter', sans-serif;
         }
 
-        #finances-editor .finances-panel-body {
+        #finances-editor .finances-detail-body {
             font-size: 0.875rem;
             font-weight: 500;
             color: #0f172a;
         }
 
-        #finances-editor .finances-panel .finances-panel-body {
+        #finances-editor .finances-panel .finances-detail-body {
             flex: 1 1 0;
             min-height: 0;
             background: #ffffff;
@@ -5490,9 +5525,9 @@
 
         #finances-editor .finances-overview {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: stretch;
-            gap: 16px;
+            gap: 0;
             margin-top: 0;
             min-width: 0;
             flex: 1 1 0;
@@ -5503,8 +5538,41 @@
             box-sizing: border-box;
         }
 
+        #finances-editor .finances-bottom-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 0;
+            flex: 1 1 auto;
+            min-height: 0;
+            min-width: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #finances-editor .finances-bottom-row::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        #finances-editor .finances-bottom-track {
+            --finances-pane-min: 0px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(var(--finances-pane-min), 1fr));
+            grid-template-rows: minmax(0, 1fr);
+            align-items: stretch;
+            gap: 16px;
+            flex: none;
+            width: max(100%, calc(var(--finances-pane-min) * 3 + 32px));
+            min-width: max(100%, calc(var(--finances-pane-min) * 3 + 32px));
+            min-height: 0;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
         #finances-editor .finances-panel {
-            flex: 1 1 0;
             min-width: 0;
             min-height: 0;
             height: 100%;
@@ -5518,7 +5586,21 @@
             box-sizing: border-box;
         }
 
-        #finances-editor .finances-panel .guests-roster-list {
+        #finances-editor .finances-panel > .finances-heading {
+            height: var(--backend-panel-header-height);
+            min-height: var(--backend-panel-header-height);
+            max-height: var(--backend-panel-header-height);
+            padding: var(--backend-panel-header-pad-y) var(--backend-panel-header-pad-x);
+            padding-right: 0;
+            flex-wrap: nowrap;
+        }
+
+        #finances-editor .finances-panel > .finances-heading .finances-heading-label {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        #finances-editor .finances-panel .finances-roster {
             flex: 1 1 0;
             min-height: 0;
             display: flex;
@@ -5526,7 +5608,7 @@
             overflow: hidden;
         }
 
-        #finances-editor .finances-panel .guests-roster-scroll {
+        #finances-editor .finances-panel .finances-roster-scroll {
             flex: 1 1 0;
             min-height: 0;
             height: auto;
@@ -7063,6 +7145,7 @@
 
         .speaker-roster-list,
         .guests-roster-list,
+        .finances-roster,
         .contacts-roster-list,
         .team-roster-list,
         .content-list {
@@ -7077,6 +7160,7 @@
         }
 
         .guests-roster-list,
+        .finances-roster,
         .team-roster-list {
             min-height: 0;
             height: 100%;
@@ -7086,6 +7170,7 @@
         /* Only this region scrolls; thead stays sticky inside it. */
         .speaker-roster-scroll,
         .guests-roster-scroll,
+        .finances-roster-scroll,
         .contacts-roster-scroll,
         .team-roster-scroll,
         .content-list-scroll {
@@ -7101,6 +7186,7 @@
         }
 
         .guests-roster-scroll,
+        .finances-roster-scroll,
         .contacts-roster-scroll,
         .team-roster-scroll {
             height: 100%;
@@ -7108,6 +7194,7 @@
 
         .speaker-roster-items,
         .guests-roster-items,
+        .finances-roster-items,
         .contacts-roster-items,
         .team-roster-items,
         .content-list-items {
@@ -7118,6 +7205,7 @@
         }
 
         .guests-roster-items,
+        .finances-roster-items,
         .contacts-roster-items,
         .team-roster-items {
             width: 100%;
@@ -7244,7 +7332,7 @@
         #emailer-editor .contacts-roster-items,
         #content-editor .content-list-items,
         #speaker-editor .speaker-roster-items,
-        #finances-editor .guests-roster-items {
+        #finances-editor .finances-roster-items {
             width: max-content;
             min-width: 100%;
         }
@@ -7256,7 +7344,7 @@
         #content-editor .content-roster-table,
         #speaker-editor .speakers-roster-table,
         #programme-editor .programme-speakers-table,
-        #finances-editor .guests-list-table {
+        #finances-editor .finances-table {
             width: max-content;
             min-width: 100%;
         }
@@ -7620,6 +7708,7 @@
 
         .speakers-roster-table tbody td,
         .guests-list-table tbody td,
+        .finances-table tbody td,
         .team-list-table tbody td,
         .content-list-table tbody td,
         .content-roster-table tbody td,
@@ -7631,6 +7720,7 @@
 
         .speaker-roster-row,
         .guests-roster-row,
+        .finances-row,
         .team-roster-row,
         .content-roster-row {
             cursor: pointer;
@@ -7641,6 +7731,7 @@
         .guests-roster-name-cell,
         .guests-roster-last-name-cell,
         .team-roster-name-cell,
+        .finances-name-cell,
         .content-roster-date-cell {
             font-weight: 500;
             word-break: normal;
@@ -7653,6 +7744,7 @@
         }
 
         .guests-list-table tbody td.guests-roster-tag-cell,
+        .finances-table tbody td.finances-tag-cell,
         .team-list-table tbody td.team-roster-tag-cell {
             text-align: center;
         }
@@ -7699,7 +7791,8 @@
         .guest-overview-section .content-badge,
         #guest-editor .guests-list-table .content-badge,
         #team-editor .team-list-table .content-badge,
-        #emailer-editor .contacts-list-table .content-badge {
+        #emailer-editor .contacts-list-table .content-badge,
+        #finances-editor .finances-table .content-badge {
             margin: 0;
             padding: 2px 5px;
             background: #ffffff;
@@ -7951,6 +8044,7 @@
 
         .speaker-roster-empty,
         .guests-roster-empty,
+        .finances-empty,
         .team-roster-empty,
         .content-list-empty {
             margin: 0;
@@ -7966,6 +8060,7 @@
 
         .edit-speaker-top,
         .edit-guest-top,
+        .finances-heading,
         .edit-preset-top,
         .edit-contact-top,
         .edit-team-top {
@@ -8004,7 +8099,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading,
+        #finances-editor .finances-panel > .finances-heading,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
         #programme-editor .activities > .edit-guest-top.guests-list-heading {
             background-color: #ffffff;
@@ -8024,7 +8119,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading,
+        #finances-editor .finances-panel > .finances-heading,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
         #programme-editor .activities > .edit-guest-top.guests-list-heading {
             flex: 0 0 auto;
@@ -8086,7 +8181,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-spacer,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-spacer {
             display: none;
@@ -8097,7 +8192,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-actions,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             flex: 1 1 auto;
@@ -8118,9 +8213,9 @@
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-title,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-label,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-label,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-first,
@@ -8144,8 +8239,8 @@
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-spacer,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-actions,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-spacer,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
@@ -8160,7 +8255,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-actions,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-top-trailing,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-top-trailing {
             display: flex;
@@ -8310,7 +8405,7 @@
         #guest-editor .edit-guest-top .selected-guestname-wrap,
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-title-wrap,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname-wrap,
@@ -8378,7 +8473,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-title,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             color: #000000;
@@ -8428,7 +8523,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-title,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             flex-direction: row;
@@ -8448,7 +8543,7 @@
         #content-editor .content-list > .edit-guest-top.guests-list-heading .selected-guestname,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .selected-guestname,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .selected-guestname,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .selected-guestname,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-title,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             padding-left: 0;
@@ -9453,8 +9548,8 @@
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading .edit-guest-name-last,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-first,
         #speaker-editor .speakers-list > .edit-guest-top.guests-list-heading .edit-guest-name-last,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-first,
-        #finances-editor .finances-panel > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-label,
+        #finances-editor .finances-panel > .finances-heading .finances-heading-label,
         #team-editor .team-list > .edit-team-top.team-list-heading .edit-team-name-first,
         #team-editor .team-list > .edit-team-top.team-list-heading .edit-team-name-last,
         #team-editor .team-viewer > .team-member-editor > .edit-team-top .edit-team-name-first,
@@ -9943,7 +10038,8 @@
         /* Guests roster: Read / Invited / Invoiced cells */
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-yes,
         #team-editor .team-list-table .content-badge.content-badge--guest-status-yes,
-        #emailer-editor .contacts-list-table .content-badge.content-badge--guest-status-yes {
+        #emailer-editor .contacts-list-table .content-badge.content-badge--guest-status-yes,
+        #finances-editor .finances-table .content-badge.finances-status-paid {
             background: var(--backend-roster-status-yes-bg);
             color: var(--backend-roster-status-yes-color);
         }
@@ -9954,13 +10050,15 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-no,
-        #team-editor .team-list-table .content-badge.content-badge--guest-status-no {
+        #team-editor .team-list-table .content-badge.content-badge--guest-status-no,
+        #finances-editor .finances-table .content-badge.finances-status-open {
             background: var(--backend-roster-status-no-bg);
             color: var(--backend-roster-status-no-color);
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-status-neutral,
-        #team-editor .team-list-table .content-badge.content-badge--guest-status-neutral {
+        #team-editor .team-list-table .content-badge.content-badge--guest-status-neutral,
+        #finances-editor .finances-table .content-badge.finances-status-neutral {
             background: #71C7FE;
             color: #ffffff;
         }
@@ -11024,6 +11122,49 @@
 
         .filter-guests-active-mark[hidden] {
             display: none !important;
+        }
+
+        #guest-editor .guests-list-table tbody td.guests-paid-cell {
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+
+        #guest-editor .guests-paid-overdue-60 {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            z-index: 2;
+            transform: translate(50%, -50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 0.85rem;
+            padding: 0 0.22rem;
+            border-radius: 999px;
+            background: #FF00FF;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: 0;
+            color: #ffffff;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: guests-paid-overdue-60-pulse 2.4s ease-in-out infinite;
+        }
+
+        @keyframes guests-paid-overdue-60-pulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: translate(50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.55;
+                transform: translate(50%, -50%) scale(0.92);
+            }
         }
 
         .guests-filter-popup[hidden] {
@@ -13422,14 +13563,7 @@
                             <a href="#texteditor" class="backend-editor-link" id="texteditor-toggle" role="button" aria-expanded="false" aria-controls="texteditor" tabindex="-1" aria-hidden="false" aria-disabled="true">Pre-sets</a>
                             <a href="#content-editor" class="backend-editor-link" id="content-toggle" role="button" aria-expanded="false" aria-controls="content-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Media content</a>
                             <a href="#emailer-editor" class="backend-editor-link" id="emailer-toggle" role="button" aria-expanded="false" aria-controls="emailer-editor" tabindex="0" aria-hidden="false" aria-disabled="false">E-mailer</a>
-                            <span
-                                class="backend-editor-link backend-editor-link--inactive"
-                                id="finances-toggle"
-                                role="button"
-                                aria-disabled="true"
-                                aria-expanded="false"
-                                tabindex="-1"
-                                title="Coming soon">Finances</span>
+                            <a href="#finances-editor" class="backend-editor-link" id="finances-toggle" role="button" aria-expanded="false" aria-controls="finances-editor" tabindex="-1" aria-hidden="true" aria-disabled="true" hidden>Finances</a>
                             <a href="#settings-editor" class="backend-editor-link" id="settings-toggle" role="button" aria-expanded="false" aria-controls="settings-editor" tabindex="0" aria-hidden="false" aria-disabled="false">Site settings</a>
                             <span
                                 class="backend-editor-link backend-editor-link--inactive"
@@ -14290,6 +14424,12 @@
                                                 <span class="guest-workflow-step-arrow guest-workflow-reminder-arrow" aria-hidden="true">⬅</span>
                                                 <button type="button" class="guest-workflow-step-btn guest-workflow-send-reminder-btn" id="guest-workflow-send-reminder-btn" hidden aria-hidden="true" disabled aria-disabled="true">
                                                     Send reminder
+                                                </button>
+                                                </div>
+                                                <div class="guest-workflow-reminder-side" id="guest-workflow-second-reminder-side" hidden aria-hidden="true">
+                                                <span class="guest-workflow-step-arrow guest-workflow-reminder-arrow" aria-hidden="true">⬅</span>
+                                                <button type="button" class="guest-workflow-step-btn guest-workflow-send-reminder-btn guest-workflow-second-reminder-btn" id="guest-workflow-second-reminder-btn" hidden aria-hidden="true" disabled aria-disabled="true">
+                                                    Send second reminder
                                                 </button>
                                                 </div>
                                                 </div>
@@ -15716,32 +15856,92 @@
 
             <section class="finances-section" id="finances-editor" aria-hidden="true" aria-label="Finances" data-name="finances-editor">
                 <div class="finances-overview">
-                    <div class="finances-panel finances-invoices-list" id="finances-invoices-list" aria-label="Invoices list">
-                        <div class="edit-guest-top guests-list-heading" id="finances-invoices-heading">
-                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
-                            <div class="selected-guestname-wrap">
-                                <div class="selected-guestname" role="group" aria-label="Invoices list title">
-                                    <span class="edit-guest-name-first">Invoices</span>
+                    <div class="finances-bottom-row" id="finances-bottom-row">
+                    <div class="finances-bottom-track" id="finances-bottom-track">
+                    <div class="finances-panel finances-items" id="finances-items" aria-label="Items">
+                        <div class="finances-heading" id="finances-items-heading">
+                            <div class="finances-heading-title-wrap">
+                                <div class="finances-heading-title" role="group" aria-label="Items">
+                                    <span class="finances-heading-label">Items</span>
                                 </div>
                             </div>
-                            <div class="edit-guest-top-trailing">
-                                <button type="button" class="add-speaker-button" id="finances-import-invoices-btn" aria-label="Import invoices from Stripe" title="Import invoices from Stripe">
+                            <div class="finances-heading-actions" aria-label="Items actions">
+                                <button type="button" class="finances-toolbar-btn" id="finances-items-previous-btn" aria-label="Previous item" title="Previous item" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M14 6L8 12l6 6z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="finances-toolbar-btn" id="finances-items-next-btn" aria-label="Next item" title="Next item" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 6l6 6-6 6z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="finances-toolbar-btn" id="finances-items-add-btn" aria-label="Add item" title="Add item">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="finances-roster" id="finances-items-roster">
+                            <div class="finances-roster-scroll">
+                                <div class="finances-roster-items" id="finances-items-rows" aria-live="polite">
+                                    <table class="finances-table" role="grid" aria-label="Items">
+                                        <thead>
+                                            <tr></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="finances-row">
+                                                <td class="finances-empty">No items yet.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="finances-panel finances-detail" id="finances-detail" aria-label="Detail">
+                        <div class="finances-heading" id="finances-detail-heading">
+                            <div class="finances-heading-title-wrap">
+                                <div class="finances-heading-title" role="group" aria-label="Detail">
+                                    <span class="finances-heading-label">Detail</span>
+                                </div>
+                            </div>
+                            <div class="finances-heading-actions" aria-label="Detail actions">
+                                <button type="button" class="finances-toolbar-btn finances-delete-btn" id="finances-detail-delete-btn" aria-label="Delete item" title="Delete item">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="finances-detail-body" id="finances-detail-body" aria-live="polite"></div>
+                    </div>
+                    <div class="finances-panel finances-financials" id="finances-financials" aria-label="Financials">
+                        <div class="finances-heading" id="finances-financials-heading">
+                            <div class="finances-heading-title-wrap">
+                                <div class="finances-heading-title" role="group" aria-label="Financials">
+                                    <span class="finances-heading-label">Financials</span>
+                                </div>
+                            </div>
+                            <div class="finances-heading-actions">
+                                <button type="button" class="finances-toolbar-btn" id="finances-financials-import-btn" aria-label="Import invoices from Stripe" title="Import invoices from Stripe">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
                                     </svg>
                                 </button>
                             </div>
                         </div>
-                        <div class="guests-roster-list" id="finances-invoices-roster-list">
-                            <div class="guests-roster-scroll">
-                                <div class="guests-roster-items" id="finances-invoices-items" aria-live="polite">
-                                    <table class="guests-list-table" role="grid" aria-label="Invoices">
+                        <div class="finances-roster" id="finances-financials-roster">
+                            <div class="finances-roster-scroll">
+                                <div class="finances-roster-items" id="finances-financials-rows" aria-live="polite">
+                                    <table class="finances-table" role="grid" aria-label="Financials">
                                         <thead>
                                             <tr></tr>
                                         </thead>
                                         <tbody>
-                                            <tr class="guests-roster-row">
-                                                <td class="guests-roster-empty">No invoices yet.</td>
+                                            <tr class="finances-row">
+                                                <td class="finances-empty">No invoices yet.</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -15749,44 +15949,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="finances-panel finances-expenses-list" id="finances-expenses-list" aria-label="Expenses list">
-                        <div class="edit-guest-top guests-list-heading" id="finances-expenses-heading">
-                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
-                            <div class="selected-guestname-wrap">
-                                <div class="selected-guestname" role="group" aria-label="Expenses list title">
-                                    <span class="edit-guest-name-first">Expenses</span>
-                                </div>
-                            </div>
-                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
-                        </div>
-                        <div class="guests-roster-list" id="finances-expenses-roster-list">
-                            <div class="guests-roster-scroll">
-                                <div class="guests-roster-items" id="finances-expenses-items" aria-live="polite">
-                                    <table class="guests-list-table" role="grid" aria-label="Expenses">
-                                        <thead>
-                                            <tr></tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="guests-roster-row">
-                                                <td class="guests-roster-empty">No expenses yet.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                    <div class="finances-panel finances-projections" id="finances-projections" aria-label="Projections">
-                        <div class="edit-guest-top guests-list-heading" id="finances-projections-heading">
-                            <div class="edit-guest-top-spacer" aria-hidden="true"></div>
-                            <div class="selected-guestname-wrap">
-                                <div class="selected-guestname" role="group" aria-label="Projections title">
-                                    <span class="edit-guest-name-first">Projections</span>
-                                </div>
-                            </div>
-                            <div class="edit-guest-top-trailing" aria-hidden="true"></div>
-                        </div>
-                        <div class="finances-panel-body" id="finances-projections-body" aria-live="polite"></div>
                     </div>
                 </div>
             </section>
@@ -16397,6 +16560,8 @@
         var backenduserRole = '';
         /** True when Role is `readonly` (case-insensitive). */
         var backenduserIsReadonly = false;
+        /** True when Role is `admin` (case-insensitive). Finances is shown only then. */
+        var backenduserIsAdmin = false;
         /** True when `Access` is `All`; otherwise the dropdown is limited to `backenduserAllowedEvents`. */
         var backenduserHasAllEventAccess = false;
         /** Event names from `Access` when it is not `All`. */
@@ -27496,6 +27661,7 @@
         async function loadBackendUserAccess(db) {
             backenduserRole = '';
             backenduserIsReadonly = false;
+            backenduserIsAdmin = false;
             backenduserHasAllEventAccess = false;
             backenduserAllowedEvents = [];
             var email = String(backenduser || '').trim();
@@ -27513,6 +27679,7 @@
                 data.Role != null ? data.Role : data.role
             );
             backenduserIsReadonly = /^readonly$/i.test(String(backenduserRole || '').trim());
+            backenduserIsAdmin = /^admin$/i.test(String(backenduserRole || '').trim());
             var parsed = parseBackendUserAccess(
                 data.Access != null ? data.Access : data.access
             );
@@ -30092,6 +30259,9 @@
         var stripeOverdueAlignPromise = null;
         var guestInvoiceDueById = Object.create(null);
         var guestInvoiceDueLoadIds = Object.create(null);
+        var guestOverdueDueUnixByGuestId = Object.create(null);
+        var guestOverdueInvoiceListReady = false;
+        var guestOverdueDueLoadPromise = null;
 
         function stripeInvoiceRaw(inv) {
             return inv && inv.stripe && typeof inv.stripe === 'object' ? inv.stripe : {};
@@ -30234,6 +30404,7 @@
             }
             stripeOverdueAlignPromise = fetchAllStripeInvoices(!!opts.force)
                 .then(function (invoices) {
+                    rememberGuestOverdueDues(invoices);
                     var overdueCount = 0;
                     var unmatched = 0;
                     var best = Object.create(null);
@@ -30539,6 +30710,9 @@
                 '" aria-haspopup="menu" aria-expanded="false" title="Paid: first click selects row, second opens values">' +
                 escapeHtml(displayText) +
                 '</button>' +
+                (guestShowsPaidOverdue60Badge(findGuestInMemory(docId))
+                    ? '<span class="guests-paid-overdue-60" title="Payment overdue by 60 days">60d</span>'
+                    : '') +
                 '<ul class="guests-paid-dropdown" hidden role="menu">' +
                 opts.join('') +
                 '</ul></div></td>'
@@ -32328,6 +32502,23 @@
                 reminderBtn.setAttribute('aria-label', 'Send reminder');
                 reminderBtn.setAttribute('title', 'Send payment reminder');
             }
+            var showSecondReminder = Boolean(firstNotice && !paidDone);
+            var secondSide = document.getElementById('guest-workflow-second-reminder-side');
+            var secondBtn = document.getElementById('guest-workflow-second-reminder-btn');
+            if (secondSide) {
+                secondSide.hidden = !showSecondReminder;
+                secondSide.setAttribute('aria-hidden', showSecondReminder ? 'false' : 'true');
+            }
+            if (secondBtn) {
+                secondBtn.hidden = !showSecondReminder;
+                secondBtn.setAttribute('aria-hidden', showSecondReminder ? 'false' : 'true');
+                secondBtn.disabled = true;
+                secondBtn.setAttribute('aria-disabled', 'true');
+                secondBtn.classList.remove('is-active');
+                secondBtn.textContent = 'Send second reminder';
+                secondBtn.setAttribute('aria-label', 'Send second reminder');
+                secondBtn.setAttribute('title', 'Send second reminder');
+            }
         }
 
         function stripeInvoiceDueUnixFromList(list, invoiceId) {
@@ -32358,6 +32549,78 @@
             if (!isFinite(days)) return null;
             if (days < 0) days = 0;
             return days;
+        }
+
+        /** Open Stripe invoices past due, keyed by guest. The earliest due date wins. */
+        function rememberGuestOverdueDues(list) {
+            var next = Object.create(null);
+            if (Array.isArray(list)) {
+                for (var i = 0; i < list.length; i++) {
+                    var inv = list[i];
+                    if (!inv) continue;
+                    var raw = stripeInvoiceRaw(inv);
+                    var due = Number(inv.due_date != null ? inv.due_date : raw.due_date);
+                    var invoiceId = String(inv.id || '').trim();
+                    if (invoiceId && isFinite(due) && due > 0) guestInvoiceDueById[invoiceId] = due;
+                    if (stripeInvoiceOverdueLabel(inv) !== 'Overdue' || !isFinite(due) || due <= 0) continue;
+                    var guest = findGuestForStripeOverdueInvoice(inv);
+                    if (!guest || !guest.id) continue;
+                    var gid = String(guest.id);
+                    if (!next[gid] || due < next[gid]) next[gid] = due;
+                }
+            }
+            var prev = guestOverdueDueUnixByGuestId;
+            var nextKeys = Object.keys(next);
+            var changed = Object.keys(prev).length !== nextKeys.length;
+            if (!changed) {
+                for (var k = 0; k < nextKeys.length; k++) {
+                    if (prev[nextKeys[k]] !== next[nextKeys[k]]) {
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+            guestOverdueDueUnixByGuestId = next;
+            guestOverdueInvoiceListReady = true;
+            return changed;
+        }
+
+        function guestShowsPaidOverdue60Badge(g) {
+            if (!g) return false;
+            if (guestCancelledFieldIsYes(g.cancelled)) return false;
+            if (guestPaidFieldIsYes(g.paid)) return false;
+            if (guestPaidFieldIsRollover(g.paid)) return false;
+            if (guestPaidIsCancelledPill(g.paid)) return false;
+            var due = 0;
+            var mapped = Number(guestOverdueDueUnixByGuestId[String(g.id || '')]);
+            if (isFinite(mapped) && mapped > 0) due = mapped;
+            else if (!guestOverdueInvoiceListReady) due = guestLinkedInvoiceDueUnix(g);
+            if (!due) return false;
+            var days = Math.floor((Date.now() / 1000 - due) / 86400);
+            return isFinite(days) && days >= 60;
+        }
+
+        function refreshGuestOverdue60Badges() {
+            if (!guestsMemoryLoaded) return Promise.resolve();
+            if (Array.isArray(stripeInvoiceListCache)) {
+                if (rememberGuestOverdueDues(stripeInvoiceListCache)) renderGuestsRoster();
+                return Promise.resolve();
+            }
+            if (guestOverdueDueLoadPromise) return guestOverdueDueLoadPromise;
+            var afterStripe = stripeOverdueAlignPromise
+                ? stripeOverdueAlignPromise.then(function () { return stripeInvoiceListCache || []; })
+                : fetchAllStripeInvoices(false);
+            guestOverdueDueLoadPromise = Promise.resolve(afterStripe)
+                .then(function (list) {
+                    if (rememberGuestOverdueDues(list)) renderGuestsRoster();
+                })
+                .catch(function (err) {
+                    console.warn('refreshGuestOverdue60Badges:', err);
+                })
+                .finally(function () {
+                    guestOverdueDueLoadPromise = null;
+                });
+            return guestOverdueDueLoadPromise;
         }
 
         function ensureGuestInvoiceDueDate(g) {
@@ -32546,17 +32809,17 @@
                 return '<span class="content-badge content-badge--guest-field-empty">—</span>';
             }
             var label = s.charAt(0).toUpperCase() + s.slice(1);
-            var mod = ' content-badge--guest-status-neutral';
-            if (s === 'paid') mod = ' content-badge--guest-status-yes';
-            else if (s === 'open' || s === 'draft') mod = ' content-badge--guest-status-no';
+            var mod = ' finances-status-neutral';
+            if (s === 'paid') mod = ' finances-status-paid';
+            else if (s === 'open' || s === 'draft') mod = ' finances-status-open';
             return '<span class="content-badge' + mod + '">' + escapeHtml(label) + '</span>';
         }
 
         function renderFinancesInvoicesTable() {
-            var itemsEl = document.getElementById('finances-invoices-items');
+            var itemsEl = document.getElementById('finances-financials-rows');
             if (!itemsEl) return;
             var colCount = 6;
-            var html = '<table class="guests-list-table" role="grid" aria-label="Invoices">' +
+            var html = '<table class="finances-table" role="grid" aria-label="Financials">' +
                 '<thead><tr>' +
                 '<th scope="col">Invoice</th>' +
                 '<th scope="col">Customer</th>' +
@@ -32566,13 +32829,13 @@
                 '<th scope="col">Created</th>' +
                 '</tr></thead><tbody>';
             if (financesInvoicesLoadError) {
-                html += '<tr class="guests-roster-row">' +
-                    '<td class="guests-roster-empty" colspan="' + colCount + '">' +
+                html += '<tr class="finances-row">' +
+                    '<td class="finances-empty" colspan="' + colCount + '">' +
                     escapeHtml(financesInvoicesLoadError) +
                     '</td></tr>';
             } else if (!financesInvoicesInMemory.length) {
-                html += '<tr class="guests-roster-row">' +
-                    '<td class="guests-roster-empty" colspan="' + colCount + '">' +
+                html += '<tr class="finances-row">' +
+                    '<td class="finances-empty" colspan="' + colCount + '">' +
                     'No invoices yet.' +
                     '</td></tr>';
             } else {
@@ -32588,13 +32851,13 @@
                         ? ('<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' +
                             escapeHtml(number) + '</a>')
                         : escapeHtml(number);
-                    html += '<tr class="guests-roster-row" data-invoice-id="' +
+                    html += '<tr class="finances-row" data-invoice-id="' +
                         escapeHtml(String(inv.id || '')) + '">' +
-                        '<td class="team-roster-name-cell">' + numberCell + '</td>' +
+                        '<td class="finances-name-cell">' + numberCell + '</td>' +
                         '<td>' + escapeHtml(customer) + '</td>' +
                         '<td>' + escapeHtml(email) + '</td>' +
                         '<td>' + escapeHtml(total) + '</td>' +
-                        '<td class="guests-roster-tag-cell">' +
+                        '<td class="finances-tag-cell">' +
                         financesInvoiceStatusBadgeHtml(inv.status) +
                         '</td>' +
                         '<td>' + escapeHtml(created) + '</td>' +
@@ -32622,9 +32885,9 @@
             }
             if (financesInvoicesImportInFlight) return financesInvoicesImportInFlight;
 
-            var itemsEl = document.getElementById('finances-invoices-items');
+            var itemsEl = document.getElementById('finances-financials-rows');
             if (opts.showLoading && itemsEl) {
-                itemsEl.innerHTML = '<p class="guests-roster-empty">Importing invoices from Stripe…</p>';
+                itemsEl.innerHTML = '<p class="finances-empty">Importing invoices from Stripe…</p>';
             }
             financesInvoicesLoadError = '';
             if (!opts.silent && typeof showStatus === 'function') {
@@ -33976,6 +34239,7 @@
             if (!opts.deferStripe && guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
                 alignGuestRosterWithStripeOverdue();
             }
+            if (guestsMemoryLoaded) refreshGuestOverdue60Badges();
         }
 
         /**
@@ -34004,6 +34268,7 @@
                 guestsMemoryLoaded = false;
             }
             renderGuestsRoster();
+            if (guestsMemoryLoaded) refreshGuestOverdue60Badges();
         }
 
         /**
@@ -39690,7 +39955,7 @@
         }
 
         function setBackendPanel(panel) {
-            if (panel === 'finances') return;
+            if (panel === 'finances' && !backenduserIsAdmin) return;
             const isEditor = panel === 'editor';
             const isContent = panel === 'content';
             const isFinances = panel === 'finances';
@@ -39983,9 +40248,19 @@
                 navigationEl.classList.toggle('navigation--no-event', !hasEvent);
             }
             if (financesToggle) {
-                financesToggle.setAttribute('aria-hidden', 'false');
-                financesToggle.setAttribute('tabindex', '-1');
-                financesToggle.setAttribute('aria-disabled', 'true');
+                var showFinances = !!backenduserIsAdmin;
+                financesToggle.hidden = !showFinances;
+                financesToggle.setAttribute('aria-hidden', showFinances ? 'false' : 'true');
+                financesToggle.setAttribute('tabindex', showFinances ? '0' : '-1');
+                financesToggle.setAttribute('aria-disabled', showFinances ? 'false' : 'true');
+                if (!showFinances) {
+                    financesToggle.classList.remove('is-active');
+                    financesToggle.setAttribute('aria-expanded', 'false');
+                    if (financesSection && financesSection.classList.contains('is-open')) {
+                        financesSection.classList.remove('is-open');
+                        financesSection.setAttribute('aria-hidden', 'true');
+                    }
+                }
             }
             if (settingsToggle) {
                 settingsToggle.setAttribute('aria-hidden', 'false');
@@ -40059,6 +40334,10 @@
                     emailerEditorSection.classList.remove('is-open');
                     emailerEditorSection.setAttribute('aria-hidden', 'true');
                 }
+                if (financesSection) {
+                    financesSection.classList.remove('is-open');
+                    financesSection.setAttribute('aria-hidden', 'true');
+                }
                 if (guestEditorSection) {
                     guestEditorSection.classList.remove('is-open');
                     guestEditorSection.setAttribute('aria-hidden', 'true');
@@ -40099,6 +40378,10 @@
                 if (emailerToggle) {
                     emailerToggle.setAttribute('aria-expanded', 'false');
                     emailerToggle.classList.remove('is-active');
+                }
+                if (financesToggle) {
+                    financesToggle.setAttribute('aria-expanded', 'false');
+                    financesToggle.classList.remove('is-active');
                 }
                 if (guestsToggle) {
                     guestsToggle.setAttribute('aria-expanded', 'false');
@@ -41643,6 +41926,7 @@
                 backenduserHasAllEventAccess = false;
                 backenduserAllowedEvents = [];
                 backenduserIsReadonly = false;
+                backenduserIsAdmin = false;
                 applyBackendReadonlyMode();
                 if (typeof showStatus === 'function') {
                     showStatus(
@@ -41722,6 +42006,14 @@
                 emailerToggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     setBackendPanel('emailer');
+                });
+            }
+            var financesToggleClick = document.getElementById('finances-toggle');
+            if (financesToggleClick) {
+                financesToggleClick.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!backenduserIsAdmin) return;
+                    setBackendPanel('finances');
                 });
             }
             if (guestsToggle) {
@@ -42939,7 +43231,7 @@
                         });
                 });
             }
-            var financesImportInvoicesBtn = document.getElementById('finances-import-invoices-btn');
+            var financesImportInvoicesBtn = document.getElementById('finances-financials-import-btn');
             if (financesImportInvoicesBtn) {
                 financesImportInvoicesBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
