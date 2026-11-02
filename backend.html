@@ -1390,7 +1390,11 @@
             overflow: hidden;
         }
 
-        #lodging-editor .lodging-rooms-table th.lodging-room-name-col,
+        #lodging-editor .lodging-rooms-table th.lodging-room-name-col {
+            text-align: left;
+            white-space: nowrap;
+        }
+
         #lodging-editor .lodging-rooms-table th.lodging-room-checkin-col,
         #lodging-editor .lodging-rooms-table th.lodging-room-checkout-col,
         #lodging-editor .lodging-rooms-table th.lodging-guest-name-col {
@@ -7718,6 +7722,10 @@
         #lodging-editor .lodging-rooms-table thead th,
         #lodging-editor .lodging-speakers-table thead th {
             text-align: center;
+        }
+
+        #lodging-editor .lodging-rooms-table thead th.lodging-room-name-col {
+            text-align: left;
         }
 
         /* Restate after the shared left-align above so these headers stay centered. */
@@ -19043,7 +19051,7 @@
                 html +=
                     '<table class="lodging-rooms-table" role="grid" aria-label="' +
                     escapeHtml(house.name) +
-                    '"><thead><tr><th scope="col" class="lodging-room-name-col">n</th><th scope="col" class="lodging-guest-name-col">Guest name</th><th scope="col" class="lodging-room-checkin-col">Check-in</th><th scope="col" class="lodging-room-checkout-col">Check-out</th></tr></thead><tbody>';
+                    '"><thead><tr><th scope="col" class="lodging-room-name-col">No.</th><th scope="col" class="lodging-guest-name-col">Guest name</th><th scope="col" class="lodging-room-checkin-col">Check-in</th><th scope="col" class="lodging-room-checkout-col">Check-out</th></tr></thead><tbody>';
                 if (!rooms.length) {
                     html +=
                         '<tr class="lodging-room-row"><td class="lodging-rooms-empty" colspan="4">No rooms.</td></tr>';
@@ -19276,8 +19284,8 @@
                 '<table class="lodging-speakers-table" role="grid" aria-label="Speakers"><thead><tr><th scope="col">Name</th><th scope="col" class="lodging-speaker-lodging-col">Lodging</th></tr></thead><tbody>';
             rows.forEach(function (rec) {
                 var name = lodgingSpeakerDisplayName(rec);
-                var housed = lodgingSpeakerIsGuestInARoom(name);
                 var lodging = normalizeSpeakerLodging(rec && rec.lodging);
+                var housed = lodgingSpeakerIsGuestInARoom(name) || lodging === 'Own lodging';
                 html +=
                     '<tr class="lodging-speaker-row"><td class="lodging-speaker-name-cell">' +
                     '<span class="lodging-speaker-pill' +
