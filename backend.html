@@ -1219,13 +1219,13 @@
 
         #lodging-editor .lodging-panels-track {
             display: grid;
-            grid-template-columns: repeat(3, minmax(var(--lodging-pane-min), 1fr));
+            grid-template-columns: minmax(var(--lodging-pane-min), 2fr) minmax(0, 4fr) minmax(0, 4fr);
             grid-template-rows: minmax(0, 1fr);
             align-items: stretch;
             gap: 16px;
             flex: none;
-            width: max(100%, calc(var(--lodging-pane-min) * 3 + 32px));
-            min-width: max(100%, calc(var(--lodging-pane-min) * 3 + 32px));
+            width: max(100%, calc(var(--lodging-pane-min) * 5 + 32px));
+            min-width: max(100%, calc(var(--lodging-pane-min) * 5 + 32px));
             min-height: 0;
             height: 100%;
             box-sizing: border-box;
@@ -1390,15 +1390,22 @@
             overflow: hidden;
         }
 
-        #lodging-editor .lodging-rooms-table th.lodging-room-name-col {
+        #lodging-editor .lodging-rooms-table th.lodging-room-name-col,
+        #lodging-editor .lodging-rooms-table th.lodging-room-checkin-col,
+        #lodging-editor .lodging-rooms-table th.lodging-room-checkout-col,
+        #lodging-editor .lodging-rooms-table th.lodging-guest-name-col {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #lodging-editor .lodging-rooms-table td.lodging-room-checkin-cell,
+        #lodging-editor .lodging-rooms-table td.lodging-room-checkout-cell {
             text-align: left;
             white-space: nowrap;
         }
 
-        #lodging-editor .lodging-rooms-table th.lodging-room-dates-col,
-        #lodging-editor .lodging-rooms-table td.lodging-room-dates-cell {
-            text-align: left;
-            white-space: nowrap;
+        #lodging-editor .lodging-rooms-table td.lodging-room-checkin-cell,
+        #lodging-editor .lodging-rooms-table td.lodging-room-checkout-cell {
             color: #0f172a;
             font-family: 'Inter', sans-serif;
             font-size: 0.9rem;
@@ -1431,7 +1438,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            text-align: left;
+            text-align: center;
         }
 
         #lodging-editor .lodging-rooms-table tbody tr:hover td,
@@ -7708,6 +7715,11 @@
             z-index: 2;
         }
 
+        #lodging-editor .lodging-rooms-table thead th,
+        #lodging-editor .lodging-speakers-table thead th {
+            text-align: center;
+        }
+
         /* Restate after the shared left-align above so these headers stay centered. */
         #content-editor .content-roster-table th.content-roster-date-col,
         #content-editor .content-list-table th.content-roster-date-col,
@@ -8160,7 +8172,7 @@
         }
 
         #lodging-editor .lodging-speakers-table .lodging-speaker-pill {
-            justify-content: flex-start;
+            justify-content: center;
             cursor: grab;
             touch-action: none;
             background: var(--backend-roster-status-no-bg);
@@ -8181,7 +8193,8 @@
             pointer-events: none;
             display: inline-flex;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
+            text-align: center;
             box-sizing: border-box;
             padding: 2px 5px;
             border: none;
@@ -8205,7 +8218,8 @@
             pointer-events: none;
             display: inline-flex;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
+            text-align: center;
             box-sizing: border-box;
             padding: 2px 5px;
             border: none;
@@ -8238,7 +8252,7 @@
         #lodging-editor .lodging-rooms-table .lodging-guest-pill {
             background: var(--backend-roster-status-yes-bg);
             color: var(--backend-roster-status-yes-color);
-            justify-content: flex-start;
+            justify-content: center;
             cursor: grab;
             touch-action: none;
         }
@@ -8689,7 +8703,8 @@
         }
 
         #speaker-editor #speakers-list-heading .speakers-roster-filter-note,
-        #lodging-editor #lodging-details-header .speakers-roster-filter-note {
+        #lodging-editor #lodging-details-header .speakers-roster-filter-note,
+        #lodging-editor #lodging-list-header .speakers-roster-filter-note {
             margin: 0;
             flex: 0 0 auto;
             align-self: center;
@@ -8702,6 +8717,10 @@
             text-transform: none;
             color: #94a3b8;
             white-space: nowrap;
+        }
+
+        #lodging-editor #lodging-list-header .speakers-roster-filter-note {
+            margin-left: 0.65rem;
         }
 
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .programme-event-date-range {
@@ -15559,10 +15578,31 @@
                 <div class="lodging-screen" id="lodging-screen">
                     <div class="lodging-panels-row" id="lodging-panels-row">
                         <div class="lodging-panels-track" id="lodging-panels-track">
+                            <div class="lodging-details-panel" id="lodging-details-panel" aria-label="Speakers">
+                                <div class="lodging-panel-header" id="lodging-details-header">
+                                    <div class="lodging-panel-title-group">
+                                        <span class="lodging-panel-title" id="lodging-details-title">SPEAKERS</span>
+                                        <span class="lodging-panel-title lodging-panel-title--inactive" id="lodging-details-team-title" aria-disabled="true">TEAM</span>
+                                    </div>
+                                    <div class="lodging-panel-actions">
+                                        <span class="speakers-roster-filter-note" id="lodging-speakers-filter-note" aria-live="polite">(n=0)</span>
+                                        <button type="button" class="add-speaker-button filter-guests-btn" id="lodging-speakers-filter-button" aria-label="Filter speakers" title="Filter speakers" aria-haspopup="dialog" aria-controls="lodging-speakers-filter-popup" aria-expanded="false">
+                                            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                                <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                            </svg>
+                                            <span class="filter-guests-active-mark" id="lodging-speakers-filter-active-mark" hidden aria-hidden="true">!</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="lodging-details-body" id="lodging-details-body">
+                                    <div id="lodging-speakers-list" class="lodging-speakers-list" aria-live="polite"></div>
+                                </div>
+                            </div>
                             <div class="lodging-list-panel" id="lodging-list-panel" aria-label="Lodging">
                                 <div class="lodging-panel-header" id="lodging-list-header">
                                     <div class="lodging-panel-title-group">
                                         <span class="lodging-panel-title" id="lodging-list-title">LODGING</span>
+                                        <span class="speakers-roster-filter-note" id="lodging-rooms-filter-note" aria-live="polite">(0 reserved, 0 Available)</span>
                                     </div>
                                     <div class="lodging-panel-actions">
                                         <button
@@ -15583,26 +15623,6 @@
                                 </div>
                                 <div class="lodging-list-body" id="lodging-list-body">
                                     <div id="lodging-subcollections-list" class="lodging-subcollections-list" aria-live="polite"></div>
-                                </div>
-                            </div>
-                            <div class="lodging-details-panel" id="lodging-details-panel" aria-label="Speakers">
-                                <div class="lodging-panel-header" id="lodging-details-header">
-                                    <div class="lodging-panel-title-group">
-                                        <span class="lodging-panel-title" id="lodging-details-title">SPEAKERS</span>
-                                        <span class="lodging-panel-title lodging-panel-title--inactive" id="lodging-details-team-title" aria-disabled="true">TEAM</span>
-                                    </div>
-                                    <div class="lodging-panel-actions">
-                                        <span class="speakers-roster-filter-note" id="lodging-speakers-filter-note" aria-live="polite">(n=0)</span>
-                                        <button type="button" class="add-speaker-button filter-guests-btn" id="lodging-speakers-filter-button" aria-label="Filter speakers" title="Filter speakers" aria-haspopup="dialog" aria-controls="lodging-speakers-filter-popup" aria-expanded="false">
-                                            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                                <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                            </svg>
-                                            <span class="filter-guests-active-mark" id="lodging-speakers-filter-active-mark" hidden aria-hidden="true">!</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="lodging-details-body" id="lodging-details-body">
-                                    <div id="lodging-speakers-list" class="lodging-speakers-list" aria-live="polite"></div>
                                 </div>
                             </div>
                             <div class="lodging-overview-panel" id="lodging-overview-panel" aria-label="Overview">
@@ -18827,16 +18847,14 @@
             return [];
         }
 
-        /** Room label: house name, a space, then the room number. `Chalet 1`. */
+        /** Room label: the room number followed by a period. `1.` */
         function lodgingRoomLabel(houseName, index) {
-            var house = String(houseName || '').trim();
-            var n = String(index);
-            return house ? house + ' ' + n : n;
+            return String(index) + '.';
         }
 
         /**
          * Room labels for a house document. Prefer stored room ids, then
-         * `{house} 1` … `{house} {number_of_beds}`.
+         * `1.` … `{number_of_beds}.`.
          */
         function lodgingRoomNamesFromHouseData(houseName, data) {
             var stored = lodgingIdsFromDocData(data);
@@ -18984,21 +19002,10 @@
             return withYear ? label + ' ' + date.y : label;
         }
 
-        function lodgingRoomDateInterval(checkin, checkout) {
-            var start = lodgingParseIsoDate(checkin);
-            var end = lodgingParseIsoDate(checkout);
-            if (!start && !end) return '';
-            if (!start) return lodgingFormatRoomDate(end, true);
-            if (!end || (start.y === end.y && start.m === end.m && start.d === end.d)) {
-                return lodgingFormatRoomDate(start, true);
-            }
-            if (start.y === end.y && start.m === end.m) {
-                return start.d + '–' + end.d + ' ' + lodgingMonthName(start.m) + ' ' + start.y;
-            }
-            if (start.y === end.y) {
-                return lodgingFormatRoomDate(start, false) + ' – ' + lodgingFormatRoomDate(end, true);
-            }
-            return lodgingFormatRoomDate(start, true) + ' – ' + lodgingFormatRoomDate(end, true);
+        function lodgingFormatStoredRoomDate(value) {
+            var date = lodgingParseIsoDate(value);
+            if (!date) return String(value || '').trim();
+            return lodgingFormatRoomDate(date, true);
         }
 
         async function lodgingRoomsWithGuestNames(db, eventName, houseName, roomNames) {
@@ -19036,19 +19043,16 @@
                 html +=
                     '<table class="lodging-rooms-table" role="grid" aria-label="' +
                     escapeHtml(house.name) +
-                    ' rooms"><thead><tr><th scope="col" class="lodging-room-name-col">' +
-                    escapeHtml(String(house.name || '').trim()) +
-                    ' rooms</th><th scope="col" class="lodging-room-dates-col"></th><th scope="col" class="lodging-guest-name-col"></th></tr></thead><tbody>';
+                    '"><thead><tr><th scope="col" class="lodging-room-name-col">n</th><th scope="col" class="lodging-guest-name-col">Guest name</th><th scope="col" class="lodging-room-checkin-col">Check-in</th><th scope="col" class="lodging-room-checkout-col">Check-out</th></tr></thead><tbody>';
                 if (!rooms.length) {
                     html +=
-                        '<tr class="lodging-room-row"><td class="lodging-rooms-empty" colspan="3">No rooms.</td></tr>';
+                        '<tr class="lodging-room-row"><td class="lodging-rooms-empty" colspan="4">No rooms.</td></tr>';
                 } else {
                     rooms.forEach(function (room) {
                         var parts = lodgingRoomRowParts(room);
                         var guestName = parts.guestName;
                         var available = lodgingGuestNameIsAvailable(guestName);
                         var label = available ? 'Available' : guestName;
-                        var interval = lodgingRoomDateInterval(parts.checkin, parts.checkout);
                         html +=
                             '<tr class="lodging-room-row" data-house="' +
                             escapeHtml(house.name) +
@@ -19056,8 +19060,6 @@
                             escapeHtml(parts.name) +
                             '"><td class="lodging-room-name-cell">' +
                             escapeHtml(parts.name) +
-                            '</td><td class="lodging-room-dates-cell">' +
-                            escapeHtml(interval) +
                             '</td><td class="lodging-guest-name-cell">' +
                             '<span class="lodging-guest-pill' +
                             (available ? ' lodging-guest-pill--available' : '') +
@@ -19067,13 +19069,18 @@
                             escapeHtml(label) +
                             '"><span class="lodging-guest-pill-label">' +
                             escapeHtml(label) +
-                            '</span></span></td></tr>';
+                            '</span></span></td><td class="lodging-room-checkin-cell">' +
+                            escapeHtml(lodgingFormatStoredRoomDate(parts.checkin)) +
+                            '</td><td class="lodging-room-checkout-cell">' +
+                            escapeHtml(lodgingFormatStoredRoomDate(parts.checkout)) +
+                            '</td></tr>';
                     });
                 }
                 html += '</tbody></table></div>';
             });
             el.innerHTML = html;
             if (typeof extendRosterTableBorders === 'function') extendRosterTableBorders(el);
+            syncLodgingRoomsFilterNote();
             if (lodgingSpeakersInMemory.length) paintLodgingSpeakersTable();
         }
 
@@ -19087,6 +19094,7 @@
                     lodgingHousesInMemory = [];
                     el.innerHTML =
                         '<p class="lodging-subcollections-empty">No current event is set.</p>';
+                    syncLodgingRoomsFilterNote();
                     if (lodgingSpeakersInMemory.length) paintLodgingSpeakersTable();
                     return;
                 }
@@ -19107,6 +19115,7 @@
                     lodgingHousesInMemory = [];
                     el.innerHTML =
                         '<p class="lodging-subcollections-empty">No houses for this event. Add one with the plus button.</p>';
+                    syncLodgingRoomsFilterNote();
                     if (lodgingSpeakersInMemory.length) paintLodgingSpeakersTable();
                     return;
                 }
@@ -19228,12 +19237,31 @@
             else note.textContent = '(n=' + n + ')';
         }
 
+        function syncLodgingRoomsFilterNote() {
+            var note = document.getElementById('lodging-rooms-filter-note');
+            if (!note) return;
+            var reserved = 0;
+            (lodgingSpeakersInMemory || []).forEach(function (rec) {
+                if (lodgingSpeakerIsGuestInARoom(lodgingSpeakerDisplayName(rec))) reserved++;
+            });
+            var available = 0;
+            (lodgingHousesInMemory || []).forEach(function (house) {
+                var rooms = house && house.rooms ? house.rooms : [];
+                rooms.forEach(function (room) {
+                    if (lodgingGuestNameIsAvailable(lodgingRoomRowParts(room).guestName)) available++;
+                });
+            });
+            note.textContent = '(' + reserved + ' reserved, ' + available + ' Available)';
+            if (typeof scheduleLodgingPaneLayout === 'function') scheduleLodgingPaneLayout();
+        }
+
         function paintLodgingSpeakersTable() {
             var el = document.getElementById('lodging-speakers-list');
             if (!el) return;
             var all = Array.isArray(lodgingSpeakersInMemory) ? lodgingSpeakersInMemory : [];
             var rows = all.filter(lodgingSpeakerMatchesLodgingFilter);
             syncLodgingSpeakersFilterNote(rows.length, all.length);
+            syncLodgingRoomsFilterNote();
             syncLodgingSpeakersFilterButton();
             if (!rows.length) {
                 el.innerHTML =
