@@ -967,7 +967,8 @@ body.home-view .navbar:not(.navbar--mobile-bottom) {
     background-size: 220% 100%;
     background-position: 130% 0;
     color: #003153 !important;
-    animation: nav-earn-cme-shimmer 2.5s ease-in-out 1;
+    /* Starts after Earn CME's 2.5s pass so the two pills shimmer one at a time. */
+    animation: nav-earn-cme-shimmer 2.5s ease-in-out 2.5s 1;
 }
 
 .navbar .nav-register-pill:hover,

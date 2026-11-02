@@ -14115,6 +14115,13 @@
                                 id="texteditor-preset-gentle-payment-reminder-btn"
                                 aria-pressed="false"
                             >Gentle payment reminder</button>
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                data-snippet-key="tbsBackend:texteditor:preset:final-payment-reminder"
+                                id="texteditor-preset-final-payment-reminder-btn"
+                                aria-pressed="false"
+                            >Final payment reminder</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -26606,6 +26613,7 @@
                 FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD,
                 FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD,
                 FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD,
+                FIRESTORE_TBS_SNIPPETS_FINAL_REMINDER_FIELD,
                 FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
                 FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD,
                 FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD,
@@ -37108,6 +37116,7 @@
         var TBS_TEXTEDITOR_PRESET_GUEST_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-invitation';
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
         var TBS_TEXTEDITOR_PRESET_GENTLE_PAYMENT_REMINDER_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:gentle-payment-reminder';
+        var TBS_TEXTEDITOR_PRESET_FINAL_PAYMENT_REMINDER_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:final-payment-reminder';
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
@@ -37123,6 +37132,7 @@
         var FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD = 'Guest invitation';
         var FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD = 'Guest sent to reserves';
         var FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD = 'guests_gentle_reminder';
+        var FIRESTORE_TBS_SNIPPETS_FINAL_REMINDER_FIELD = 'final_reminder';
         var FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD = 'Sendtoreserves';
         var FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD = 'Speakerinvitation';
         var FIRESTORE_TBS_SNIPPETS_REQUEST_LODGING_FIELD = 'Requestlodging';
@@ -37278,6 +37288,16 @@
                     loadOk: 'Gentle payment reminder loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/guests_gentle_reminder/guests_gentle_reminder.Value) into the editor.',
                     saveOk: 'Gentle payment reminder saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/guests_gentle_reminder/guests_gentle_reminder.Value).',
                     saveErr: 'Failed to save Gentle payment reminder to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_PRESET_FINAL_PAYMENT_REMINDER_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_FINAL_REMINDER_FIELD,
+                    metaLabel: 'Guest workflow e-mails — Final payment reminder',
+                    loadOk: 'Final payment reminder loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/final_reminder/final_reminder.Value) into the editor.',
+                    saveOk: 'Final payment reminder saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/final_reminder/final_reminder.Value).',
+                    saveErr: 'Failed to save Final payment reminder to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
