@@ -3489,6 +3489,66 @@ export const submitRegistrationHttp = onRequest({
 });
 
 /**
+ * Lists subcollections under a document in `tbs/Lodging`.
+ * House names are subcollections of `tbs/Lodging/{event}/{event}`.
+ * Room names are subcollections of `…/{house}/{house}`.
+ * Browser clients cannot call Firestore listCollectionIds (403).
+ * Expects JSON: { segments: string[] } — an even-length document path.
+ */
+export const listTbsLodgingCollectionIdsHttp = onRequest({
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "GET" && req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const raw = Array.isArray(body.segments) ? body.segments : [];
+  const segments = raw
+    .map((part) => String(part || "").trim())
+    .filter(Boolean);
+  if (
+    segments.length < 4 ||
+    segments.length % 2 !== 0 ||
+    segments[0] !== "tbs" ||
+    segments[1] !== "Lodging" ||
+    segments.some((part) => part.includes("/") || part === "." || part === "..")
+  ) {
+    res.status(400).json({error: "Path must be a document under tbs/Lodging."});
+    return;
+  }
+
+  try {
+    const db = getFirestore();
+    let ref: DocumentReference = db.collection(segments[0]).doc(segments[1]);
+    for (let i = 2; i < segments.length; i += 2) {
+      ref = ref.collection(segments[i]).doc(segments[i + 1]);
+    }
+    const cols = await ref.listCollections();
+    const collectionIds = cols
+      .map((col) => String(col.id || "").trim())
+      .filter(Boolean);
+    res.status(200).json({collectionIds});
+  } catch (err) {
+    logger.error("listTbsLodgingCollectionIdsHttp failed", {err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Could not list lodging.",
+    });
+  }
+});
+
+/**
  * Lists every subcollection under document `tbs/Team`.
  * Each subcollection is one team member. Browser clients cannot call
  * Firestore listCollectionIds (403).
