@@ -5836,6 +5836,85 @@
             background: #ffffff;
             border-radius: 0 0 5px 5px;
             overflow: auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        #finances-editor .finances-transaction-form {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            min-width: 0;
+            margin: 0;
+        }
+
+        #finances-editor .finances-transaction-form.is-open {
+            display: flex;
+        }
+
+        #finances-editor .finances-transaction-form .add-speaker-form-field {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.35rem;
+            min-width: 0;
+        }
+
+        #finances-editor .finances-transaction-form .add-speaker-form-field > label {
+            flex: 0 0 auto;
+            min-width: 0;
+            margin: 0;
+            border: none;
+            padding: 0;
+            padding-bottom: 0.35rem;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #finances-editor .finances-transaction-form input,
+        #finances-editor .finances-transaction-form select {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--backend-tab-pale-pink);
+            box-shadow: none;
+            outline: none;
+            padding: 0.5rem 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #0f172a;
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+        }
+
+        #finances-editor .finances-transaction-form input {
+            cursor: text;
+        }
+
+        #finances-editor .finances-transaction-form select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%230f172a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5L6 6.5L11 1.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 12px 8px;
+            cursor: pointer;
+        }
+
+        #finances-editor .finances-transaction-form input:focus,
+        #finances-editor .finances-transaction-form select:focus,
+        #finances-editor .finances-transaction-form input:focus-visible,
+        #finances-editor .finances-transaction-form select:focus-visible {
+            outline: none;
+            box-shadow: none;
         }
 
         #finances-editor .finances-overview {
@@ -16443,7 +16522,30 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="finances-detail-body" id="finances-detail-body" aria-live="polite"></div>
+                        <div class="finances-detail-body" id="finances-detail-body" aria-live="polite">
+                            <form class="finances-transaction-form" id="finances-transaction-form" autocomplete="off" hidden>
+                                <div class="add-speaker-form-field">
+                                    <label for="finances-transaction-text">Description</label>
+                                    <input type="text" id="finances-transaction-text" name="description" autocomplete="off" spellcheck="false">
+                                </div>
+                                <div class="add-speaker-form-field">
+                                    <label for="finances-transaction-type">Type</label>
+                                    <select id="finances-transaction-type" name="type">
+                                        <option value="">Select</option>
+                                        <option value="income">Income</option>
+                                        <option value="expense">Expense</option>
+                                    </select>
+                                </div>
+                                <div class="add-speaker-form-field">
+                                    <label for="finances-transaction-category">Category</label>
+                                    <select id="finances-transaction-category" name="category">
+                                        <option value="">Select</option>
+                                        <option value="registration">Registration</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                     <div class="finances-panel finances-financials" id="finances-financials" aria-label="Financials">
                         <div class="finances-heading" id="finances-financials-heading">
@@ -16467,11 +16569,7 @@
                                         <thead>
                                             <tr></tr>
                                         </thead>
-                                        <tbody>
-                                            <tr class="finances-row">
-                                                <td class="finances-empty">No invoices yet.</td>
-                                            </tr>
-                                        </tbody>
+                                        <tbody></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -41928,9 +42026,6 @@
                         }
                     });
             }
-            if (isFinances) {
-                void importFinancesInvoicesFromStripe({ showLoading: true });
-            }
             applySendBulkEmailsPopupOpen();
         }
 
@@ -45118,20 +45213,32 @@
                         });
                 });
             }
+            var financesItemsAddBtn = document.getElementById('finances-items-add-btn');
+            var financesTransactionForm = document.getElementById('finances-transaction-form');
+            function openFinancesTransactionEditor() {
+                if (!financesTransactionForm) return;
+                financesTransactionForm.hidden = false;
+                financesTransactionForm.setAttribute('aria-hidden', 'false');
+                financesTransactionForm.classList.add('is-open');
+                var textField = document.getElementById('finances-transaction-text');
+                if (textField) textField.focus();
+            }
+            if (financesTransactionForm) {
+                financesTransactionForm.addEventListener('submit', function(ev) {
+                    ev.preventDefault();
+                });
+            }
+            if (financesItemsAddBtn) {
+                financesItemsAddBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    if (backendBlockIfReadonly()) return;
+                    openFinancesTransactionEditor();
+                });
+            }
             var financesImportInvoicesBtn = document.getElementById('finances-financials-import-btn');
             if (financesImportInvoicesBtn) {
                 financesImportInvoicesBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
-                    ev.stopPropagation();
-                    if (financesImportInvoicesBtn.disabled) return;
-                    financesImportInvoicesBtn.disabled = true;
-                    financesImportInvoicesBtn.setAttribute('aria-disabled', 'true');
-                    importFinancesInvoicesFromStripe({ force: true, showLoading: true })
-                        .catch(function() {})
-                        .finally(function() {
-                            financesImportInvoicesBtn.disabled = false;
-                            financesImportInvoicesBtn.setAttribute('aria-disabled', 'false');
-                        });
                 });
             }
             var guestSendToReservesBtn = document.getElementById('guest-send-to-reserves-btn');
