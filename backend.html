@@ -11590,15 +11590,21 @@
             top: 50%;
             right: 0;
             z-index: 2;
-            transform: translate(50%, -50%);
+            transform: translate(50%, calc(-50% - 0.5rem));
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            flex: 0 0 auto;
+            width: 2.85rem;
+            min-width: 2.85rem;
+            max-width: 2.85rem;
             height: 1.45rem;
-            min-width: 1.45rem;
-            padding: 0 0.12rem;
+            min-height: 1.45rem;
+            max-height: 1.45rem;
+            padding: 0;
+            overflow: hidden;
             border-radius: 999px;
-            background: #FF00FF;
+            background: #000000;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.28), 0 3px 8px rgba(15, 23, 42, 0.22);
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
@@ -11609,19 +11615,13 @@
             color: #ffffff;
             white-space: nowrap;
             pointer-events: none;
-            animation: guests-paid-overdue-60-pulse 2.4s ease-in-out infinite;
         }
 
-        @keyframes guests-paid-overdue-60-pulse {
-            0%,
-            100% {
-                opacity: 1;
-                transform: translate(50%, -50%) scale(1);
-            }
-            50% {
-                opacity: 0.55;
-                transform: translate(50%, -50%) scale(0.92);
-            }
+        #guest-editor .guests-paid-overdue-60--skull {
+            width: 1.45rem;
+            min-width: 1.45rem;
+            max-width: 1.45rem;
+            border-radius: 50%;
         }
 
         .guests-filter-popup[hidden] {
@@ -32246,7 +32246,7 @@
                 escapeHtml(displayText) +
                 '</button>' +
                 (guestPaidValueIsFinalNotice(paidVal)
-                    ? '<span class="guests-paid-overdue-60" title="Final notice">☠︎︎</span>'
+                    ? '<span class="guests-paid-overdue-60 guests-paid-overdue-60--skull" title="Final notice">☠︎︎</span>'
                     : guestShowsPaidOverdue60Badge(findGuestInMemory(docId))
                     ? '<span class="guests-paid-overdue-60" title="Payment overdue by 60 days">60d</span>'
                     : '') +
