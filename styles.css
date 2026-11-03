@@ -3336,15 +3336,15 @@ body.home-view .home-section > .on-demand-section[hidden] {
     margin-bottom: 0;
 }
 
-.home-section .speaker-card-bio.about-text a {
-    color: #003153;
-    text-decoration: underline;
+.home-section .speaker-card-bio.about-text a,
+.home-section .speaker-card-bio.about-text a:hover,
+.home-section .speaker-card-bio.about-text a:focus,
+.home-section .speaker-card-bio.about-text a:focus-visible,
+.home-section .speaker-card-bio.about-text a:active {
+    color: #000000 !important;
+    text-decoration: underline !important;
     text-underline-offset: 2px;
     font-weight: inherit;
-}
-
-.home-section .speaker-card-bio.about-text a:hover {
-    color: #001f2e;
 }
 
 @media (min-width: 769px) {
@@ -4778,11 +4778,14 @@ body.home-view .home-programme-section .programme-slider:not(.home-carousel--min
 .programme-wednesday .programmestyle h3,
 .programme-thursday .programmestyle h3,
 .programme-friday .programmestyle h3,
-.texteditor-render-html .programmestyle h3 {
+.texteditor-render-html .programmestyle h3,
+.programme-day-name h3,
+#programme-editor .programme-day-name-text {
     font-size: 1.3rem;
     font-weight: 600;
     text-align: center;
     color: #ffffff;
+    text-transform: none;
 }
 
 /* Programme slider: titles on top of patterned backgrounds */

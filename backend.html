@@ -13909,6 +13909,20 @@
             white-space: nowrap;
         }
 
+        #programme-editor .programme-day-slot-detail * {
+            font-family: inherit !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
+            font-style: inherit !important;
+            line-height: inherit !important;
+            letter-spacing: inherit !important;
+            text-transform: inherit !important;
+            text-decoration: none !important;
+            color: inherit !important;
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+
         #programme-editor .programme-day-slot.is-selected {
             outline: none;
             box-shadow: inset 0 0 0 1px #fc70d7;
@@ -18472,15 +18486,26 @@
             return String(raw != null ? raw : '').trim();
         }
 
+        /** All-caps day titles display in title case. Mixed-case titles and ISO dates stay as stored. */
+        function formatProgrammeDayTitleCase(value) {
+            var text = String(value != null ? value : '').replace(/\s+/g, ' ').trim();
+            if (!text || /^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+            var letters = text.replace(/[^A-Za-z\u00C0-\u024F]/g, '');
+            if (!letters || letters !== letters.toUpperCase()) return text;
+            return text.toLocaleLowerCase().replace(/(^|[\s\-\u2013\u2014\/])([a-z\u00E0-\u024F])/g, function (_match, sep, ch) {
+                return sep + ch.toLocaleUpperCase();
+            });
+        }
+
         /** Empty when the heading still shows the date id, so the date collection is not renamed. */
         function programmeDayNameFromEditableText(dateStr, text) {
             var value = String(text != null ? text : '').replace(/\s+/g, ' ').trim();
             if (!value || value === dateStr) return '';
-            return value;
+            return formatProgrammeDayTitleCase(value);
         }
 
         function programmeDayHeadingText(dateStr) {
-            return programmeDayNameStored(dateStr) || dateStr;
+            return formatProgrammeDayTitleCase(programmeDayNameStored(dateStr) || dateStr);
         }
 
         function syncProgrammePersistedDayNamesFromState() {
@@ -18572,7 +18597,7 @@
             }
             var dayDates = programmeState && programmeState.dayDates ? programmeState.dayDates : [];
             for (var dn = 0; dn < dayDates.length; dn++) {
-                if (programmeDayNameStored(dayDates[dn]) !== programmePersistedDayName(dayDates[dn])) {
+                if (formatProgrammeDayTitleCase(programmeDayNameStored(dayDates[dn])) !== formatProgrammeDayTitleCase(programmePersistedDayName(dayDates[dn]))) {
                     programmeDayNamesDirty = true;
                     break;
                 }
@@ -18583,7 +18608,7 @@
                     var dayNameEl = dayNameEls[de];
                     var dayDate = dayNameEl.getAttribute('data-programme-date') || '';
                     if (!dayDate) continue;
-                    if (programmeDayNameFromEditableText(dayDate, readProgrammeDayNameEl(dayNameEl)) !== programmePersistedDayName(dayDate)) {
+                    if (programmeDayNameFromEditableText(dayDate, readProgrammeDayNameEl(dayNameEl)) !== formatProgrammeDayTitleCase(programmePersistedDayName(dayDate))) {
                         programmeDayNamesDirty = true;
                         break;
                     }
@@ -20776,6 +20801,71 @@
             return String(el && el.textContent != null ? el.textContent : '').trim();
         }
 
+        function programmeSlotPlainTextOffset(root, node, offset) {
+            if (!root || !node) return 0;
+            try {
+                var probe = document.createRange();
+                probe.selectNodeContents(root);
+                probe.setEnd(node, offset);
+                return probe.toString().length;
+            } catch (err) {
+                return (root.textContent || '').length;
+            }
+        }
+
+        function setProgrammeSlotCaretOffset(el, offset) {
+            var sel = window.getSelection();
+            if (!sel) return;
+            var range = document.createRange();
+            var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+            var textNode = walker.nextNode();
+            if (!textNode) {
+                range.setStart(el, 0);
+                range.collapse(true);
+            } else {
+                var remaining = Math.max(0, offset);
+                while (textNode) {
+                    var len = textNode.textContent.length;
+                    if (remaining <= len) {
+                        range.setStart(textNode, remaining);
+                        range.collapse(true);
+                        break;
+                    }
+                    remaining -= len;
+                    textNode = walker.nextNode();
+                }
+                if (!textNode) {
+                    var last = el.lastChild || el;
+                    range.selectNodeContents(last);
+                    range.collapse(false);
+                }
+            }
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        function insertPlainTextIntoProgrammeSlot(el, rawText) {
+            var text = String(rawText != null ? rawText : '').replace(/[\r\n\u2028\u2029]+/g, ' ').replace(/\u00a0/g, ' ');
+            var current = String(el.textContent != null ? el.textContent : '');
+            var sel = window.getSelection();
+            var start = current.length;
+            var end = current.length;
+            if (sel && sel.rangeCount && el.contains(sel.anchorNode)) {
+                var range = sel.getRangeAt(0);
+                if (el.contains(range.startContainer) && el.contains(range.endContainer)) {
+                    start = programmeSlotPlainTextOffset(el, range.startContainer, range.startOffset);
+                    end = programmeSlotPlainTextOffset(el, range.endContainer, range.endOffset);
+                    if (end < start) {
+                        var swap = start;
+                        start = end;
+                        end = swap;
+                    }
+                }
+            }
+            el.textContent = current.slice(0, start) + text + current.slice(end);
+            setProgrammeSlotCaretOffset(el, start + text.length);
+        }
+
         function getProgrammeSlotNameFromState(dateStr, sessionId, slotId) {
             var slot = getProgrammeSlotFromState(dateStr, sessionId, slotId);
             return slot ? normalizeProgrammeSlotName(slot.name) : 'TBA';
@@ -21233,6 +21323,12 @@
             }).join('') + '</div>';
         }
 
+        function applyProgrammeDayTitleCaseToHeading(h3) {
+            if (!h3 || h3.childNodes.length !== 1 || !h3.firstChild || h3.firstChild.nodeType !== 3) return;
+            var next = formatProgrammeDayTitleCase(h3.textContent);
+            if (next && next !== h3.textContent) h3.textContent = next;
+        }
+
         function wrapProgrammeDayNameContainer(html) {
             var t = String(html != null ? html : '').trim();
             if (!t) return t;
@@ -21240,9 +21336,14 @@
                 var doc = new DOMParser().parseFromString('<div class="__tbs_prog_wrap">' + t + '</div>', 'text/html');
                 var root = doc.querySelector('.__tbs_prog_wrap');
                 if (!root) return t;
-                if (root.querySelector('.programme-day-name')) return t;
+                var existingName = root.querySelector('.programme-day-name h3');
+                if (existingName) {
+                    applyProgrammeDayTitleCaseToHeading(existingName);
+                    return root.innerHTML;
+                }
                 var h3 = root.querySelector(':scope > h3') || root.querySelector('.programme-day-content > h3');
                 if (!h3) return t;
+                applyProgrammeDayTitleCaseToHeading(h3);
                 var parent = h3.parentNode;
                 if (!parent) return t;
                 var wrap = doc.createElement('div');
@@ -47312,6 +47413,17 @@
                             applyProgrammeSlotEditableElToLocal(targetEl);
                         }
                     }, 0);
+                });
+                programmeEditorEl.addEventListener('paste', function(e) {
+                    if (!programmePadlockIsOpen) return;
+                    var slotDetail = e.target && e.target.closest
+                        ? e.target.closest('.programme-day-slot-detail')
+                        : null;
+                    if (!slotDetail || !programmeEditorEl.contains(slotDetail)) return;
+                    e.preventDefault();
+                    var pasted = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+                    insertPlainTextIntoProgrammeSlot(slotDetail, pasted);
+                    applyProgrammeSlotInputToLocal(slotDetail, { skipNormalizeDom: true, skipRefresh: true });
                 });
                 programmeEditorEl.addEventListener('keydown', function(e) {
                     if (!programmePadlockIsOpen) return;

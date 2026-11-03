@@ -5461,8 +5461,19 @@ function homeProgrammeDaySessionsHtml(isoDate, sessions) {
     );
 }
 
+/** All-caps day titles display in title case. Mixed-case titles and ISO dates stay as stored. */
+function formatProgrammeDayTitleCase(value) {
+    const text = String(value != null ? value : '').replace(/\s+/g, ' ').trim();
+    if (!text || /^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+    const letters = text.replace(/[^A-Za-z\u00C0-\u024F]/g, '');
+    if (!letters || letters !== letters.toUpperCase()) return text;
+    return text.toLocaleLowerCase().replace(/(^|[\s\-\u2013\u2014\/])([a-z\u00E0-\u024F])/g, function (_match, sep, ch) {
+        return sep + ch.toLocaleUpperCase();
+    });
+}
+
 function buildHomeProgrammeDaySlideHtml(isoDate, name, sessions) {
-    const dayName = String(name != null && String(name).trim() !== '' ? name : isoDate);
+    const dayName = formatProgrammeDayTitleCase(name != null && String(name).trim() !== '' ? name : isoDate);
     return (
         '<div class="programme-day-slide" data-programme-date="' +
         homeEscapeHtml(isoDate) +
@@ -5561,6 +5572,12 @@ async function fetchHomeProgrammeDaySlideHtmlFromFirebase(isoDate) {
     return value || '';
 }
 
+function applyProgrammeDayTitleCaseToHeading(h3) {
+    if (!h3 || h3.childNodes.length !== 1 || !h3.firstChild || h3.firstChild.nodeType !== 3) return;
+    const next = formatProgrammeDayTitleCase(h3.textContent);
+    if (next && next !== h3.textContent) h3.textContent = next;
+}
+
 /** Wraps the day title/date `h3` in `.programme-day-name` when missing. */
 function wrapProgrammeDayNameContainer(html) {
     const t = String(html != null ? html : '').trim();
@@ -5569,9 +5586,14 @@ function wrapProgrammeDayNameContainer(html) {
         const doc = new DOMParser().parseFromString('<div class="__tbs_prog_wrap">' + t + '</div>', 'text/html');
         const root = doc.querySelector('.__tbs_prog_wrap');
         if (!root) return t;
-        if (root.querySelector('.programme-day-name')) return t;
+        const existingName = root.querySelector('.programme-day-name h3');
+        if (existingName) {
+            applyProgrammeDayTitleCaseToHeading(existingName);
+            return root.innerHTML;
+        }
         const h3 = root.querySelector(':scope > h3') || root.querySelector('.programme-day-content > h3');
         if (!h3) return t;
+        applyProgrammeDayTitleCaseToHeading(h3);
         const parent = h3.parentNode;
         if (!parent) return t;
         const wrap = doc.createElement('div');
