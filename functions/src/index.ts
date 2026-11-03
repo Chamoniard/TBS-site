@@ -516,9 +516,6 @@ function fillObservedEmailTokens(
   const dates = String(values.eventDates || "");
   const first = String(values.firstName || "");
   const last = String(values.lastName || "");
-  const name = values.name != null ?
-    String(values.name) :
-    `${first} ${last}`.trim();
   const byKey: Record<string, string> = {
     event,
     currentevent: event,
@@ -526,7 +523,7 @@ function fillObservedEmailTokens(
     eventdates: dates,
     firstname: first,
     lastname: last,
-    name,
+    name: first,
     stripeinvoiceurl: String(values.invoiceUrl || ""),
     stripeinvoicenumber: String(values.invoiceNumber || ""),
   };
@@ -562,7 +559,7 @@ function emailSubjectFromTopic(
 }
 
 /**
- * First name + last name for waiting-list {{Name}}.
+ * First name + last name for sent-message labels.
  * @param {Record<string, unknown>} data Guest item data.
  * @return {string} Display name.
  */

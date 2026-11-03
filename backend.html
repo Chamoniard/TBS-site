@@ -2087,7 +2087,7 @@
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
-        /* Final reminder stays white until it is sent, like the other workflow steps. */
+        /* Final reminder stays white, and pulses once it is the step that can be used. */
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active,
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active:disabled,
         body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active[aria-disabled='true'],
@@ -2096,7 +2096,7 @@
             border-color: var(--backend-roster-status-yes-bg);
             color: #0f172a;
             cursor: pointer;
-            animation: none;
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
         body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active,
@@ -30472,6 +30472,7 @@
             }
             var rec = findGuestInMemory(id);
             if (!rec || !guestPaidValueIsFirstReminder(rec.paid)) return;
+            if (String(rec.invoiced != null ? rec.invoiced : '').trim().toLowerCase() === 'no') return;
             if (!guestReminderRecipientEmail(rec, true)) {
                 if (typeof showStatus === 'function') {
                     showStatus('error', 'This guest has no valid E-mail address.');
@@ -34058,7 +34059,9 @@
                 reminderBtn.setAttribute('aria-label', 'Send reminder');
                 reminderBtn.setAttribute('title', 'Send payment reminder');
             }
-            var showSecondReminder = Boolean(firstNotice && !paidDone);
+            var invoicedIsNo =
+                String(g && g.invoiced != null ? g.invoiced : '').trim().toLowerCase() === 'no';
+            var showSecondReminder = Boolean(firstNotice && !paidDone && !invoicedIsNo);
             var secondCanRun = showSecondReminder && guestPadlockIsOpen;
             var secondSide = document.getElementById('guest-workflow-second-reminder-side');
             var secondBtn = document.getElementById('guest-workflow-second-reminder-btn');
@@ -39016,7 +39019,6 @@
             var dates = String(values.eventDates || '');
             var first = String(values.firstName || '');
             var last = String(values.lastName || '');
-            var name = values.name != null ? String(values.name) : (first + ' ' + last).trim();
             var byKey = {
                 event: event,
                 currentevent: event,
@@ -39024,7 +39026,7 @@
                 eventdates: dates,
                 firstname: first,
                 lastname: last,
-                name: name,
+                name: first,
                 stripeinvoiceurl: String(values.invoiceUrl || ''),
                 stripeinvoicenumber: String(values.invoiceNumber || '')
             };
