@@ -455,6 +455,33 @@ async function loadGuestGentleReminderTemplate(
 }
 
 /**
+ * Final payment reminder HTML and Topic from
+ * tbs/Pre-sets/{event_location}/{event_location}/final_reminder/
+ * final_reminder.
+ * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
+ */
+async function loadGuestFinalReminderTemplate(
+  db: Firestore,
+  location: string,
+): Promise<{html: string; topic: string}> {
+  const loc = String(location || "").trim();
+  if (!loc) return {html: "", topic: ""};
+  const snap = await tbsPresetValueDocRef(
+    db,
+    "final_reminder",
+    loc,
+  ).get();
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
+}
+
+/**
  * Keys inside `{{ }}`, ignoring case, spaces, and underscores.
  * @param {string} raw Token including braces.
  * @return {string} Lookup key.
@@ -586,6 +613,15 @@ function guestLogSentToReservesLine(): string {
  */
 function guestLogGentleReminderLine(): string {
   return guestLogPrefixYyMmDd() + ": First reminder sent on " +
+    formatGuestInvoicedDateDisplay(new Date()) + ".";
+}
+
+/**
+ * Log line after a final payment reminder.
+ * @return {string} e.g. `261103: Final reminder sent on 2026-11-03.`
+ */
+function guestLogFinalReminderLine(): string {
+  return guestLogPrefixYyMmDd() + ": Final reminder sent on " +
     formatGuestInvoicedDateDisplay(new Date()) + ".";
 }
 
@@ -1354,6 +1390,8 @@ function guestPaidLabelIsLocked(paid: string): boolean {
     low === "cancelled" ||
     low === "canceled" ||
     low === "first notice" ||
+    low === "first reminder" ||
+    low === "final notice" ||
     low === "rollover";
 }
 
@@ -1363,7 +1401,17 @@ function guestPaidLabelIsLocked(paid: string): boolean {
  * @return {boolean} Whether overdue sync must leave Paid alone.
  */
 function guestPaidIsFirstNotice(paid: string): boolean {
-  return String(paid || "").trim().toLowerCase() === "first notice";
+  const low = String(paid || "").trim().toLowerCase();
+  return low === "first notice" || low === "first reminder";
+}
+
+/**
+ * True after the final reminder has moved Paid to Final notice.
+ * @param {string} paid Stored Paid value.
+ * @return {boolean} Whether overdue sync must leave Paid alone.
+ */
+function guestPaidIsFinalNotice(paid: string): boolean {
+  return String(paid || "").trim().toLowerCase() === "final notice";
 }
 
 /**
@@ -1916,7 +1964,11 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
             .toLowerCase();
           const cancelled = currentPaid === "cancelled" ||
             currentPaid === "canceled";
-          if (cancelled || guestPaidIsFirstNotice(currentPaid)) continue;
+          if (
+            cancelled ||
+            guestPaidIsFirstNotice(currentPaid) ||
+            guestPaidIsFinalNotice(currentPaid)
+          ) continue;
           const locked = guestPaidLabelIsLocked(
             String(entry.data["Paid"] || ""),
           );
@@ -1958,6 +2010,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
         const lowPaid = currentPaid.trim().toLowerCase();
         if (lowPaid === "cancelled" || lowPaid === "canceled") return;
         if (guestPaidIsFirstNotice(currentPaid)) return;
+        if (guestPaidIsFinalNotice(currentPaid)) return;
         if (!overdueChoice && guestPaidLabelIsLocked(currentPaid)) {
           noteAlreadyPaid(choice.entry.guestId);
           return;
@@ -2764,6 +2817,189 @@ export const sendGuestGentleReminderHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Failed to send payment reminder.",
+    });
+  }
+});
+
+/**
+ * Guest workflow: send the final payment reminder HTML from
+ * tbs/Pre-sets/{event_location}/{event_location}/final_reminder/final_reminder
+ * `Value` as registration@tbs-zermatt.org.
+ * Allowed when Paid is First notice or First reminder.
+ * On success sets Paid to Final notice and appends a log line.
+ * Expects JSON: { guestId }.
+ */
+export const sendGuestFinalReminderHttp = onRequest({
+  secrets: [
+    gmailSendClientIdParam,
+    gmailSendClientSecretParam,
+    gmailSendRefreshTokenParam,
+    gmailSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const guestId = String(body.guestId || "").trim();
+  if (!guestId) {
+    res.status(400).json({error: "Missing guestId."});
+    return;
+  }
+
+  const configuredFrom = String(gmailSendFromParam.value() || "").trim();
+  if (!configuredFrom || !configuredFrom.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SEND_FROM secret.",
+    });
+    return;
+  }
+  const fromAddress = "registration@tbs-zermatt.org";
+
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Guests")
+    .collection(guestId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Guest item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    const paid = String(data.Paid ?? data.paid ?? "");
+    if (!guestPaidIsFirstNotice(paid)) {
+      res.status(400).json({
+        error: "Final reminder is only available when Paid is First reminder.",
+      });
+      return;
+    }
+
+    const email = pickGuestEmail(data);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({error: "Guest has no valid email."});
+      return;
+    }
+
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+
+    const template = await loadGuestFinalReminderTemplate(db, location);
+    if (!String(template.html).trim()) {
+      res.status(500).json({
+        error: "Final reminder template is empty in " +
+          presetValueDocPath(location, "final_reminder") + ".",
+      });
+      return;
+    }
+
+    const firstName = String(
+      data.Name || data.name || data["First name"] || data.firstName || "",
+    ).trim();
+    const lastName = String(
+      data["Last name"] || data.lastName || data.LastName || "",
+    ).trim();
+    const guestName = pickGuestFirstAndLastName(data);
+    const invoiceUrl = String(
+      data["Stripe Invoice Url"] || data.stripeInvoiceUrl || "",
+    ).trim();
+    const invoiceNumber = String(
+      data["Stripe Invoice Number"] || "",
+    ).trim();
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
+    const reminderTokens = {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: guestName,
+      invoiceUrl,
+      invoiceNumber,
+    };
+    const subject = emailSubjectFromTopic(template.topic, reminderTokens);
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "final_reminder") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(template.html, reminderTokens);
+
+    const accessToken = await refreshGmailSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    const logLine = guestLogFinalReminderLine();
+    await db.runTransaction(async (tx) => {
+      const fresh = await tx.get(itemRef);
+      const lines = guestLogLinesFromData(fresh.data() || {});
+      if (!lines.includes(logLine)) lines.push(logLine);
+      tx.set(itemRef, {
+        "Paid": "Final notice",
+        "Log": lines,
+      }, {merge: true});
+    });
+
+    logger.info("sendGuestFinalReminderHttp ok", {
+      guestId,
+      to: email,
+      from: fromAddress,
+      location,
+    });
+
+    res.status(200).json({
+      ok: true,
+      guestId,
+      to: email,
+      from: fromAddress,
+      logLine,
+      message: guestName ?
+        "Final reminder sent to " + guestName :
+        "Final reminder sent.",
+    });
+  } catch (err) {
+    logger.error("sendGuestFinalReminderHttp failed", {guestId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send final reminder.",
     });
   }
 });

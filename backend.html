@@ -2087,9 +2087,34 @@
             animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
         }
 
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn,
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn:disabled,
-        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn[aria-disabled='true'] {
+        /* Final reminder stays white until it is sent, like the other workflow steps. */
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active:disabled,
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active[aria-disabled='true'],
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active[aria-disabled='false'] {
+            background: #ffffff;
+            border-color: var(--backend-roster-status-yes-bg);
+            color: #0f172a;
+            cursor: pointer;
+            animation: none;
+        }
+
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active,
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active[aria-disabled='false'] {
+            animation: guest-workflow-pulse-border 1.6s ease-in-out infinite;
+        }
+
+        body.backend-page #guest-editor.guest-padlock-unlocked #guest-editor-actions .guest-workflow-step-btn.guest-workflow-second-reminder-btn.is-active:hover:not(:disabled):not([aria-disabled='true']) {
+            background: #ffffff;
+            border-color: var(--backend-roster-status-yes-bg);
+            color: #0f172a;
+            animation: none;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1), 0 6px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn:not(.is-active),
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn:disabled:not(.is-active),
+        body.backend-page #guest-editor #guest-editor-actions .guest-workflow-second-reminder-btn[aria-disabled='true']:not(.is-active) {
             background: #f1f5f9;
             border: 1px solid #c5cdd4;
             color: #94a3b8;
@@ -14866,7 +14891,7 @@
                                                 <div class="guest-workflow-reminder-side" id="guest-workflow-second-reminder-side" hidden aria-hidden="true">
                                                 <span class="guest-workflow-step-arrow guest-workflow-reminder-arrow" aria-hidden="true">⬅</span>
                                                 <button type="button" class="guest-workflow-step-btn guest-workflow-send-reminder-btn guest-workflow-second-reminder-btn" id="guest-workflow-second-reminder-btn" hidden aria-hidden="true" disabled aria-disabled="true">
-                                                    Send second reminder
+                                                    Send final reminder
                                                 </button>
                                                 </div>
                                                 </div>
@@ -30390,6 +30415,102 @@
             syncGuestWorkflowPaymentReceivedButton();
         }
 
+        /**
+         * Send the final payment reminder via `sendGuestFinalReminderHttp`.
+         * Body is `Value` on `tbs/Pre-sets/{event_location}/{event_location}/final_reminder/final_reminder`.
+         * Sent as registration@tbs-zermatt.org. On success sets Paid to Final notice.
+         */
+        async function postGuestFinalReminder(rec) {
+            var id = String(rec && rec.id || '').trim();
+            if (!id) throw new Error('Select a guest first.');
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/sendGuestFinalReminderHttp';
+            var res = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ guestId: id }),
+            });
+            var payload = {};
+            try {
+                payload = await res.json();
+            } catch (parseErr) {
+                payload = {};
+            }
+            if (!res.ok) {
+                var errMsg =
+                    payload && payload.error
+                        ? String(payload.error)
+                        : 'Function call failed (' + res.status + ')';
+                throw new Error(errMsg);
+            }
+            var logLine =
+                payload && payload.logLine
+                    ? String(payload.logLine)
+                    : guestLogFinalReminderEmailedLine();
+            var stored = findGuestInMemory(id) || rec;
+            stored.paid = 'Final notice';
+            await persistGuestReminderLogLine(id, logLine, stored);
+            if (rec && rec !== stored) {
+                rec.paid = stored.paid;
+                rec.log = Array.isArray(stored.log) ? stored.log.slice() : [];
+            }
+            if (String(guestFormEditingDocId || '').trim() === id) {
+                syncGuestManagementLogPanel();
+            }
+            return payload;
+        }
+
+        async function sendGuestFinalReminderFromWorkflow() {
+            if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('guest-workflow-second-reminder-btn');
+            var id = String(guestFormEditingDocId || '').trim();
+            if (!id) {
+                if (typeof showStatus === 'function') showStatus('error', 'Select a guest first.');
+                return;
+            }
+            var rec = findGuestInMemory(id);
+            if (!rec || !guestPaidValueIsFirstReminder(rec.paid)) return;
+            if (!guestReminderRecipientEmail(rec, true)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'This guest has no valid E-mail address.');
+                }
+                return;
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending final reminder...');
+            }
+            try {
+                var payload = await postGuestFinalReminder(rec);
+                refreshGuestReminderUiAfterSend();
+                var guestName = guestRosterDisplayName(rec);
+                var sentOkMsg =
+                    payload && payload.message
+                        ? String(payload.message)
+                        : guestName
+                          ? 'Final reminder sent to ' + guestName
+                          : 'Final reminder sent.';
+                if (typeof showStatus === 'function') {
+                    showStatus('success', sentOkMsg);
+                }
+            } catch (err) {
+                console.error('sendGuestFinalReminderFromWorkflow:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to send final reminder.'
+                    );
+                }
+            } finally {
+                syncGuestWorkflowPaymentReceivedButton();
+            }
+        }
+
         function scrollGuestEditorBottomToBio() {
             setGuestEditorBottomPane('bio');
         }
@@ -30969,7 +31090,7 @@
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
-        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Cancelled', 'Rollover'];
+        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Final notice', 'Cancelled', 'Rollover'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_BRIEFED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -31129,6 +31250,16 @@
         function guestPaidValueIsOverdue(paidVal) {
             var low = String(paidVal != null ? paidVal : '').trim().toLowerCase();
             return low === 'overdue' || low === 'overdue 30' || low === 'overdue 60';
+        }
+
+        /** Paid after the first reminder. The roster stores this as First notice. */
+        function guestPaidValueIsFirstReminder(paidVal) {
+            var low = String(paidVal != null ? paidVal : '').trim().toLowerCase();
+            return low === 'first reminder' || low === 'first notice';
+        }
+
+        function guestPaidValueIsFinalNotice(paidVal) {
+            return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'final notice';
         }
 
         function guestPaidMatchesFilter(actual, selected) {
@@ -31827,7 +31958,7 @@
                     for (var c = 0; c < ids.length; c++) {
                         var choice = best[ids[c]];
                         var paidNow = String(choice.guest.paid || '').trim().toLowerCase();
-                        if (paidNow === 'first notice' || paidNow === 'rollover') continue;
+                        if (paidNow === 'first notice' || paidNow === 'first reminder' || paidNow === 'final notice' || paidNow === 'rollover') continue;
                         if (String(choice.guest.paid || '').trim() === choice.label) continue;
                         choice.guest.paid = choice.label;
                         changes.push(choice.guest);
@@ -31947,7 +32078,9 @@
                 low === 'overdue' ||
                 low === 'overdue 30' ||
                 low === 'overdue 60' ||
-                low === 'first notice'
+                low === 'first notice' ||
+                low === 'first reminder' ||
+                low === 'final notice'
             ) {
                 return ' content-badge--guest-status-no';
             }
@@ -32109,7 +32242,9 @@
                 '" aria-haspopup="menu" aria-expanded="false" title="Paid: first click selects row, second opens values">' +
                 escapeHtml(displayText) +
                 '</button>' +
-                (guestShowsPaidOverdue60Badge(findGuestInMemory(docId))
+                (guestPaidValueIsFinalNotice(paidVal)
+                    ? '<span class="guests-paid-overdue-60" title="Final notice">☠︎︎</span>'
+                    : guestShowsPaidOverdue60Badge(findGuestInMemory(docId))
                     ? '<span class="guests-paid-overdue-60" title="Payment overdue by 60 days">60d</span>'
                     : '') +
                 '<ul class="guests-paid-dropdown" hidden role="menu">' +
@@ -32784,6 +32919,10 @@
             return guestLogYyMmDdPrefix() + ': First reminder sent on ' + guestPaidDateYyyyMmDd() + '.';
         }
 
+        function guestLogFinalReminderEmailedLine() {
+            return guestLogYyMmDdPrefix() + ': Final reminder sent on ' + guestPaidDateYyyyMmDd() + '.';
+        }
+
         function guestLogInvoiceSentLine(invoiceId) {
             var idPart = invoiceId ? ' (' + String(invoiceId) + ')' : '';
             return guestLogYyMmDdPrefix() + ': Stripe invoice finalized and sent' + idPart + '.';
@@ -33136,7 +33275,9 @@
                 low === 'overdue' ||
                 low === 'overdue 30' ||
                 low === 'overdue 60' ||
-                low === 'first notice'
+                low === 'first notice' ||
+                low === 'first reminder' ||
+                low === 'final notice'
             );
         }
 
@@ -33828,6 +33969,20 @@
             return '';
         }
 
+        /** Date of the latest “Final reminder sent” log line (YYYY-MM-DD). */
+        function guestFinalNoticeDateLabelFromRecord(g) {
+            if (!g) return '';
+            var log = Array.isArray(g.log) ? g.log : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var line = String(log[i] != null ? log[i] : '');
+                var onDate = line.match(/Final reminder sent on (\d{4}-\d{2}-\d{2})/i);
+                if (onDate) return onDate[1];
+                var m = line.match(/^(\d{2})(\d{2})(\d{2}):\s*Final reminder sent/i);
+                if (m) return '20' + m[1] + '-' + m[2] + '-' + m[3];
+            }
+            return '';
+        }
+
         function syncGuestWorkflowPaymentReceivedButton() {
             var btn = document.getElementById('guest-workflow-payment-received-btn');
             var reminderBtn = document.getElementById('guest-workflow-send-reminder-btn');
@@ -33843,15 +33998,17 @@
                     guestPaidFieldIsNo(g.paid)
             );
             var overdue = Boolean(g && guestPaidValueIsOverdue(g.paid));
-            var firstNotice = Boolean(
-                g && String(g.paid != null ? g.paid : '').trim().toLowerCase() === 'first notice'
-            );
+            var firstNotice = guestPaidValueIsFirstReminder(g && g.paid);
+            var finalNotice = guestPaidValueIsFinalNotice(g && g.paid);
             var label;
             if (paidDone) {
                 var dateLabel = guestPaidDateLabelFromRecord(g);
                 label = dateLabel ? 'Payment received ' + dateLabel : 'Payment received';
             } else if (rollover) {
                 label = 'Rollover';
+            } else if (finalNotice) {
+                var finalDate = guestFinalNoticeDateLabelFromRecord(g) || '—';
+                label = 'Final notice ' + finalDate;
             } else if (firstNotice) {
                 var reminderDate = guestFirstReminderDateLabelFromRecord(g) || '—';
                 label = 'First reminder sent ' + reminderDate;
@@ -33872,7 +34029,7 @@
             btn.setAttribute('aria-label', label);
             btn.setAttribute(
                 'title',
-                firstNotice
+                finalNotice || firstNotice
                     ? label
                     : awaiting
                       ? 'Check Stripe for this guest’s payment'
@@ -33902,6 +34059,7 @@
                 reminderBtn.setAttribute('title', 'Send payment reminder');
             }
             var showSecondReminder = Boolean(firstNotice && !paidDone);
+            var secondCanRun = showSecondReminder && guestPadlockIsOpen;
             var secondSide = document.getElementById('guest-workflow-second-reminder-side');
             var secondBtn = document.getElementById('guest-workflow-second-reminder-btn');
             if (secondSide) {
@@ -33911,12 +34069,12 @@
             if (secondBtn) {
                 secondBtn.hidden = !showSecondReminder;
                 secondBtn.setAttribute('aria-hidden', showSecondReminder ? 'false' : 'true');
-                secondBtn.disabled = true;
-                secondBtn.setAttribute('aria-disabled', 'true');
-                secondBtn.classList.remove('is-active');
-                secondBtn.textContent = 'Send second reminder';
-                secondBtn.setAttribute('aria-label', 'Send second reminder');
-                secondBtn.setAttribute('title', 'Send second reminder');
+                secondBtn.disabled = !showSecondReminder;
+                secondBtn.setAttribute('aria-disabled', secondCanRun ? 'false' : 'true');
+                secondBtn.classList.toggle('is-active', showSecondReminder);
+                secondBtn.textContent = 'Send final reminder';
+                secondBtn.setAttribute('aria-label', 'Send final reminder');
+                secondBtn.setAttribute('title', 'Send final reminder');
             }
         }
 
@@ -44659,6 +44817,23 @@
                             showStatus(
                                 'error',
                                 err && err.message ? err.message : 'Failed to send payment reminder.'
+                            );
+                        }
+                    });
+                });
+            }
+            var guestWorkflowSecondReminderBtn = document.getElementById('guest-workflow-second-reminder-btn');
+            if (guestWorkflowSecondReminderBtn) {
+                guestWorkflowSecondReminderBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowSecondReminderBtn)) return;
+                    sendGuestFinalReminderFromWorkflow().catch(function(err) {
+                        console.error('guest-workflow-second-reminder:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to send final reminder.'
                             );
                         }
                     });
