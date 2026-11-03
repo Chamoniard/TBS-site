@@ -3275,7 +3275,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     border: none;
     line-height: 1.6;
     letter-spacing: 0.02em;
-    text-transform: none;
+    text-transform: none !important;
     text-align: left;
     width: 100%;
 }
