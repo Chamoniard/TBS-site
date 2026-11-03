@@ -3275,7 +3275,7 @@ body.home-view .home-section > .on-demand-section[hidden] {
     border: none;
     line-height: 1.6;
     letter-spacing: 0.02em;
-    text-transform: uppercase;
+    text-transform: none;
     text-align: left;
     width: 100%;
 }
@@ -6286,7 +6286,6 @@ h3.section-titles {
 body.home-view .home-section > .sponsors-section .sponsors-section-title,
 body.home-view .feed-section-inner-wrapper > h2.section-titles,
 body.home-view .home-section .speaker-card--speakerinfo .speakers-section-title,
-body.home-view .home-section .speaker-card:not(.speaker-card--tba) .speaker-card-name,
 body.home-view .home-section .programme-info > .programme-info-title,
 body.home-view .home-section .programme-slider > .programme-info .about-title,
 body.home-view .home-section .programme-slider > .about .about-title,
