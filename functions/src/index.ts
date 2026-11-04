@@ -1197,7 +1197,7 @@ export const createGuestStripeInvoiceHttp = onRequest({
     const invoice = await stripe.invoices.create({
       customer: storedCustomerId,
       collection_method: "send_invoice",
-      days_until_due: 30,
+      days_until_due: 14,
       auto_advance: false,
       currency: "eur",
       rendering: {template: stripeInvoiceTemplateId},
