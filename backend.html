@@ -267,7 +267,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -827,7 +827,7 @@
         }
 
         #settings-editor #settings-sections-heading .edit-guest-top-trailing {
-            gap: 0.5rem;
+            gap: 0.25rem;
         }
 
         #settings-editor #settings-save-btn {
@@ -1285,7 +1285,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: 0;
             margin-left: auto;
@@ -1641,7 +1641,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: 0;
             padding: 0 var(--backend-table-cell-pad-x) 0 0;
@@ -1672,7 +1672,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: 0;
             padding: 0;
@@ -2894,25 +2894,52 @@
             width: 100%;
             min-width: 0;
             max-width: none;
+            overflow: hidden;
         }
 
-        #guest-editor #guest-editor-panel > .edit-guest-top .selected-guestname-wrap,
-        #guest-editor #guest-editor-panel > .edit-guest-top .selected-guestname,
+        /* Name uses leftover header space. A long name ellipsizes and does not widen the panel. */
+        #guest-editor #guest-editor-panel > .edit-guest-top .selected-guestname-wrap {
+            flex: 1 1 auto;
+            flex-wrap: nowrap;
+            min-width: 0;
+            width: auto;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        #guest-editor #guest-editor-panel > .edit-guest-top .selected-guestname {
+            display: block;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            word-break: normal;
+        }
+
         #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-name-first,
         #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-name-last {
-            flex: 0 0 auto;
-            flex-wrap: nowrap;
-            min-width: max-content;
+            display: inline;
+            flex: 0 1 auto;
+            min-width: 0;
             width: auto;
+            max-width: none;
             white-space: nowrap;
             word-break: normal;
         }
 
+        #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-name-last:not(:empty) {
+            margin-left: 0.35rem;
+        }
+
         #guest-editor #guest-editor-panel > .edit-guest-top .edit-guest-top-trailing {
-            flex: 1 0 auto;
+            flex: 0 0 auto;
             flex-wrap: nowrap;
             min-width: max-content;
             width: auto;
+            overflow: visible;
         }
 
         #guest-editor #guest-editor-panel > .edit-guest-top .guest-editor-toolbar,
@@ -2933,7 +2960,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 0 0 auto;
             width: auto;
             max-width: 100%;
@@ -2955,7 +2982,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 0 0 auto;
             width: auto;
             max-width: 100%;
@@ -2972,6 +2999,21 @@
             outline: none;
         }
 
+        /* Row gap is 0.25rem. Extra 1.25rem keeps the space after the plus button at 1.5rem. */
+        #speaker-editor #speakers-actions #add-speaker-button,
+        #guest-editor #guests-actions #add-guest-button,
+        #team-editor #team-actions #add-team-button {
+            margin-right: 1.25rem;
+        }
+
+        /* Same 1.5rem space after the filter button, before the arrow buttons. */
+        #speaker-editor #speakers-actions #filter-speakers,
+        #guest-editor #guests-actions #filter-guests,
+        #content-editor #content-actions #filter-content {
+            margin-right: 1.25rem;
+        }
+
+        #speaker-editor .speakers-actions .speakers-roster-search,
         #guest-editor .guests-actions .guests-roster-search,
         #content-editor .content-actions .content-roster-search {
             flex: 0 1 11rem;
@@ -2994,11 +3036,13 @@
             outline: none;
         }
 
+        #speaker-editor .speakers-actions .speakers-roster-search::placeholder,
         #guest-editor .guests-actions .guests-roster-search::placeholder,
         #content-editor .content-actions .content-roster-search::placeholder {
             color: #94a3b8;
         }
 
+        #speaker-editor .speakers-actions .speakers-roster-search:focus,
         #guest-editor .guests-actions .guests-roster-search:focus,
         #content-editor .content-actions .content-roster-search:focus {
             border-color: #003153;
@@ -4329,7 +4373,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: 0;
             min-height: 0;
@@ -4342,7 +4386,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 0 0 auto;
             margin: 0;
             height: 100%;
@@ -4452,7 +4496,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             width: 100%;
             min-width: 0;
@@ -4469,7 +4513,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
             margin-left: auto;
         }
@@ -5306,7 +5350,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: 0;
             padding: 0;
@@ -5382,7 +5426,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -5762,7 +5806,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: max-content;
             max-width: none;
@@ -6192,7 +6236,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 0 0 auto;
             width: 100%;
             max-width: 100%;
@@ -6205,6 +6249,10 @@
             border-radius: 0;
             overflow: visible;
             background: transparent;
+        }
+
+        #content-editor #content-actions #content-actions-add-button {
+            margin-right: 1.25rem;
         }
 
         #content-editor .content-actions[hidden] {
@@ -6484,7 +6532,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
@@ -6547,7 +6595,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
             margin-left: 0;
         }
@@ -6912,6 +6960,64 @@
 
         #speaker-editor .content-roster-published-btn:focus-visible,
         #guest-editor .guests-list-table .content-roster-published-btn:focus-visible {
+            outline: 2px solid #71C7FE;
+            outline-offset: 2px;
+        }
+
+        #guest-editor .guests-list-table th.guests-roster-priority-col,
+        #guest-editor .guests-list-table td.guests-roster-priority-cell {
+            width: 2.25rem;
+            min-width: 2.25rem;
+            max-width: 2.25rem;
+            box-sizing: border-box;
+            text-align: center;
+            vertical-align: middle;
+            padding-left: 0;
+            padding-right: 0;
+            overflow: visible;
+        }
+
+        #guest-editor .guests-list-table .guests-roster-priority-col-star {
+            color: var(--backend-button-yellow);
+            font-size: 1.15rem;
+            line-height: 1;
+            display: block;
+            width: 100%;
+            text-align: center;
+            text-shadow: 0 1px 1px rgba(15, 23, 42, 0.28), 0 1px 2px rgba(15, 23, 42, 0.18);
+        }
+
+        #guest-editor .guests-list-table button.guests-roster-priority-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            color: #64748b;
+            font-size: 1.15rem;
+            font-weight: 400;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        #guest-editor .guests-list-table button.guests-roster-priority-btn.is-priority,
+        #guest-editor .guests-list-table button.guests-roster-priority-btn[aria-pressed='true'] {
+            color: var(--backend-button-yellow);
+            background: transparent;
+            box-shadow: none;
+            text-shadow: 0 1px 1px rgba(15, 23, 42, 0.28), 0 1px 2px rgba(15, 23, 42, 0.18);
+        }
+
+        #guest-editor .guests-list-table button.guests-roster-priority-btn:hover,
+        #guest-editor .guests-list-table button.guests-roster-priority-btn:focus-visible {
+            background: transparent;
+            box-shadow: none;
             outline: 2px solid #71C7FE;
             outline-offset: 2px;
         }
@@ -7579,6 +7685,18 @@
             gap: 0;
         }
 
+        /* Blank row under Speakers, Guests, Team, and Media content so the last row clears the window edge. */
+        #speaker-editor .speaker-roster-scroll > .roster-bottom-spacer,
+        #guest-editor .guests-roster-scroll > .roster-bottom-spacer,
+        #team-editor .team-roster-scroll > .roster-bottom-spacer,
+        #content-editor .content-list-scroll > .roster-bottom-spacer {
+            flex: 0 0 2.75rem;
+            height: 2.75rem;
+            min-height: 2.75rem;
+            background: #ffffff;
+            pointer-events: none;
+        }
+
         .guests-roster-scroll,
         .finances-roster-scroll,
         .contacts-roster-scroll,
@@ -8169,7 +8287,7 @@
          * tag columns and widen the gap between pills. Lock pill columns to the same
          * content width Speakers uses (uniform pill + shared cell pad).
          */
-        #guest-editor .guests-list-table thead th:not(:first-child):not(.roster-fill-col),
+        #guest-editor .guests-list-table thead th:not(:first-child):not(.roster-fill-col):not(.guests-roster-priority-col),
         #guest-editor .guests-list-table tbody td.guests-roster-tag-cell,
         #guest-editor .guests-list-table tbody td.content-roster-published-cell,
         #team-editor .team-list-table thead th:nth-child(2),
@@ -9089,7 +9207,7 @@
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 0 0 auto;
             width: 100%;
             min-width: 0;
@@ -9127,7 +9245,7 @@
             align-items: center;
             justify-content: flex-start;
             justify-self: start;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -9139,7 +9257,7 @@
             align-items: center;
             justify-content: flex-start;
             justify-self: start;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -10497,7 +10615,7 @@
         #guest-editor .guest-viewer .guest-viewer-name-row {
             display: flex;
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: stretch;
             gap: 1rem 1.25rem;
             width: 100%;
@@ -10517,6 +10635,58 @@
         #guest-editor .guest-viewer .guest-viewer-name-row > .add-speaker-form-field {
             flex: 1 1 0;
             min-width: 0;
+        }
+
+        #guest-editor .guest-viewer .guest-viewer-name-row > .guest-editor-priority-field {
+            flex: 0 0 auto;
+            width: 5.5rem;
+            min-width: 5.5rem;
+            max-width: 5.5rem;
+            align-items: stretch;
+        }
+
+        #guest-editor .guest-editor-priority-field > label {
+            text-align: center;
+        }
+
+        body.backend-page #guest-editor button.guest-editor-priority-btn,
+        body.backend-page #guest-editor button.guest-editor-priority-btn:hover,
+        body.backend-page #guest-editor button.guest-editor-priority-btn:disabled {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto;
+            width: 100%;
+            min-height: calc(1.5rem + 1rem);
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: var(--backend-tab-pale-blue);
+            box-shadow: none;
+            color: #64748b;
+            font-size: 1.35rem;
+            font-weight: 400;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        body.backend-page #guest-editor button.guest-editor-priority-btn.is-priority,
+        body.backend-page #guest-editor button.guest-editor-priority-btn.is-priority:hover,
+        body.backend-page #guest-editor button.guest-editor-priority-btn.is-priority:disabled {
+            color: var(--backend-button-yellow);
+            background: var(--backend-tab-pale-blue);
+        }
+
+        body.backend-page #guest-editor button.guest-editor-priority-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        body.backend-page #guest-editor button.guest-editor-priority-btn:focus-visible {
+            outline: 2px solid #71C7FE;
+            outline-offset: 2px;
         }
 
         #emailer-editor .contact-viewer .guest-viewer-name-row > .add-speaker-form-field {
@@ -11798,6 +11968,10 @@
             gap: 0.25rem;
         }
 
+        .guests-filter-popup__field[hidden] {
+            display: none !important;
+        }
+
         .guests-filter-popup__field-title {
             font-size: 0.75rem;
             font-weight: 600;
@@ -12355,7 +12529,7 @@
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-end;
-            gap: 8px;
+            gap: 4px;
             height: 100%;
             min-width: 0;
             box-sizing: border-box;
@@ -13494,7 +13668,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 1 1 auto;
             min-width: 0;
             padding: 0;
@@ -13508,7 +13682,7 @@
             align-items: center;
             justify-content: flex-start;
             justify-self: start;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -13609,7 +13783,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex: 0 0 auto;
         }
 
@@ -13640,7 +13814,7 @@
             align-items: center;
             justify-content: flex-end;
             justify-self: end;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex-wrap: nowrap;
         }
 
@@ -14484,6 +14658,21 @@
                             <div class="edit-guest-top-trailing">
                             <span class="speakers-roster-filter-note" id="speakers-roster-filter-note" aria-live="polite">(n=0)</span>
                             <div id="speakers-actions" class="speakers-actions" aria-label="Speaker actions">
+                                <input
+                                    type="search"
+                                    id="speakers-roster-search"
+                                    class="speakers-roster-search"
+                                    placeholder="Search"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                    aria-label="Search speakers"
+                                />
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-speakers" aria-label="Filter speakers" title="Filter speakers">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                        <span class="filter-guests-active-mark" id="filter-speakers-active-mark" hidden aria-hidden="true">!</span>
+                                    </button>
                                 <button type="button" class="add-speaker-button" id="previous-speaker" aria-label="Previous speaker" title="Previous speaker">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M14 6L8 12l6 6z" />
@@ -14504,12 +14693,6 @@
                                             <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-speakers" aria-label="Filter speakers" title="Filter speakers">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                        </svg>
-                                        <span class="filter-guests-active-mark" id="filter-speakers-active-mark" hidden aria-hidden="true">!</span>
-                                    </button>
                                     <button type="button" class="add-speaker-button" id="export-speakers-btn" aria-label="Export speakers" title="Export speakers">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
@@ -14521,6 +14704,7 @@
                         <div class="speaker-roster-list" id="speaker-roster-list">
                             <div class="speaker-roster-scroll">
                                 <div class="speaker-roster-items" id="speaker-roster-items" aria-live="polite"></div>
+                                <div class="roster-bottom-spacer" aria-hidden="true"></div>
                             </div>
                         </div>
                     </div>
@@ -14823,6 +15007,12 @@
                                         spellcheck="false"
                                         aria-label="Search guests"
                                     />
+                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-guests" aria-label="Filter guests" title="Filter guests">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                        </svg>
+                                        <span class="filter-guests-active-mark" id="filter-guests-active-mark" hidden aria-hidden="true">!</span>
+                                    </button>
                                     <button type="button" class="add-speaker-button" id="previous-guest" aria-label="Previous guest" title="Previous guest" disabled aria-disabled="true">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M14 6L8 12l6 6z" />
@@ -14848,12 +15038,6 @@
                                             <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
                                         </svg>
                                     </button>
-                                    <button type="button" class="add-speaker-button filter-guests-btn" id="filter-guests" aria-label="Filter guests" title="Filter guests">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                            <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                        </svg>
-                                        <span class="filter-guests-active-mark" id="filter-guests-active-mark" hidden aria-hidden="true">!</span>
-                                    </button>
                                     <button type="button" class="add-speaker-button" id="export-guests-btn" aria-label="Export guests" title="Export guests">
                                         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                             <path fill="currentColor" d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
@@ -14865,6 +15049,7 @@
                             <div class="guests-roster-list" id="guests-roster-list">
                                 <div class="guests-roster-scroll">
                                     <div class="guests-roster-items" id="guests-roster-items" aria-live="polite"></div>
+                                    <div class="roster-bottom-spacer" aria-hidden="true"></div>
                                 </div>
                             </div>
                         </div>
@@ -15168,6 +15353,19 @@
                                             autocomplete="family-name"
                                         />
                                     </div>
+                                    <div class="add-speaker-form-field guest-editor-priority-field">
+                                        <label id="edit-guest-priority-label" for="edit-guest-priority-btn">Priority</label>
+                                        <button
+                                            type="button"
+                                            id="edit-guest-priority-btn"
+                                            class="guest-editor-priority-btn"
+                                            aria-pressed="false"
+                                            aria-labelledby="edit-guest-priority-label"
+                                            aria-label="Priority: no"
+                                            title="Priority — click to set yes"
+                                            disabled
+                                        >☆</button>
+                                    </div>
                                 </div>
                                 <div class="guest-editor-profile" id="guest-editor-profile" aria-label="Guest profile">
                                     <div class="guest-viewer-specialty-training-row" role="group" aria-label="Specialty and level of training">
@@ -15410,6 +15608,7 @@
                                         <tbody></tbody>
                                     </table>
                                 </div>
+                                <div class="roster-bottom-spacer" aria-hidden="true"></div>
                             </div>
                         </div>
                     </div>
@@ -15847,6 +16046,12 @@
                                     spellcheck="false"
                                     aria-label="Search content"
                                 />
+                                <button type="button" class="add-content-btn filter-guests-btn" id="filter-content" aria-label="Filter content" title="Filter content">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                                    </svg>
+                                    <span class="filter-guests-active-mark" id="filter-content-active-mark" hidden aria-hidden="true">!</span>
+                                </button>
                                 <button type="button" class="add-content-btn" id="previous-content" aria-label="Previous content" title="Previous content">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M14 6L8 12l6 6z" />
@@ -15868,12 +16073,6 @@
                                         <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                     </svg>
                                 </button>
-                                <button type="button" class="add-content-btn filter-guests-btn" id="filter-content" aria-label="Filter content" title="Filter content">
-                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                        <path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-                                    </svg>
-                                    <span class="filter-guests-active-mark" id="filter-content-active-mark" hidden aria-hidden="true">!</span>
-                                </button>
                             </div>
                             </div>
                         </div>
@@ -15884,6 +16083,7 @@
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                                 </button>
                             </div>
+                            <div class="roster-bottom-spacer" aria-hidden="true"></div>
                         </div>
                     </div>
                     <div class="content-viewer">
@@ -16980,6 +17180,10 @@
                     <span class="guests-filter-popup__field-title" id="guests-filter-cme-label">CME sent</span>
                     <div class="guests-filter-popup__checks" id="guests-filter-cme" role="group" aria-labelledby="guests-filter-cme-label" data-filter-key="cme"></div>
                 </div>
+                <div class="guests-filter-popup__field" id="guests-filter-priority-field" hidden>
+                    <span class="guests-filter-popup__field-title" id="guests-filter-priority-label">Priority</span>
+                    <div class="guests-filter-popup__checks" id="guests-filter-priority" role="group" aria-labelledby="guests-filter-priority-label" data-filter-key="priority"></div>
+                </div>
             </div>
             <div class="guests-filter-popup__actions">
                 <button type="button" class="guests-filter-clear-btn" id="guests-filter-clear">Clear</button>
@@ -17177,6 +17381,8 @@
         var speakerRosterLoadedForEvent = '';
         /** Speakers heading view: '' current-event speakers, or 'ideas'. */
         var speakersRosterView = '';
+        /** Live case-insensitive speakers roster name and email search (local only). */
+        var speakersRosterSearchQuery = '';
         var speakersFilterSettings = {
             all: emptySpeakersFilterSettings(),
             ideas: emptySpeakersFilterSettings()
@@ -17382,6 +17588,7 @@
             briefed: [],
             attended: [],
             cme: [],
+            priority: [],
         };
         /** Live case-insensitive guests roster name search (local only). */
         var guestsRosterSearchQuery = '';
@@ -19921,6 +20128,9 @@
                 Selected: guestSelectedFieldIsYes(g && g.selected) ? 'Yes' : 'No',
                 Log: Array.isArray(g.log) ? g.log.slice() : [],
             };
+            if (g.priority === 'Yes' || g.priority === 'No') {
+                payload.Priority = g.priority;
+            }
             if (g.cancelled != null && String(g.cancelled).trim() !== '') {
                 payload.cancelled = String(g.cancelled);
             }
@@ -21512,6 +21722,10 @@
             var guestLastEl = document.getElementById('edit-guest-name-last');
             if (guestFirstEl) guestFirstEl.textContent = String(rec.name || '').trim();
             if (guestLastEl) guestLastEl.textContent = String(rec.lastName || '').trim();
+            syncEditGuestHeadingTitle(
+                guestFirstEl ? guestFirstEl.textContent : '',
+                guestLastEl ? guestLastEl.textContent : ''
+            );
             guestsRosterSortInPlace();
             renderGuestsRoster();
             syncGuestRosterSelectionHighlight();
@@ -27105,7 +27319,7 @@
             });
         }
 
-        function emailerHeaderFloorWidth(head) {
+        function emailerHeaderFloorWidth(head, options) {
             if (!head) return 0;
             var clone = head.cloneNode(true);
             clone.removeAttribute('id');
@@ -27128,6 +27342,17 @@
                 search.style.setProperty('flex', '0 0 7rem', 'important');
                 search.style.setProperty('min-width', '7rem', 'important');
                 search.style.setProperty('max-width', '7rem', 'important');
+            }
+            if (options && options.ignoreGuestName) {
+                clone.querySelectorAll('.selected-guestname-wrap').forEach(function (el) {
+                    el.style.setProperty('flex', '0 0 0px', 'important');
+                    el.style.setProperty('width', '0', 'important');
+                    el.style.setProperty('min-width', '0', 'important');
+                    el.style.setProperty('max-width', '0', 'important');
+                    el.style.setProperty('padding', '0', 'important');
+                    el.style.setProperty('margin', '0', 'important');
+                    el.style.setProperty('overflow', 'hidden', 'important');
+                });
             }
             (head.parentNode || document.body).appendChild(clone);
             var width = Math.ceil(clone.getBoundingClientRect().width);
@@ -27581,7 +27806,7 @@
             if (!editor || !track || !editor.classList.contains('is-open')) return;
             ensureGuestPaneScroll();
             var listMin = emailerHeaderFloorWidth(document.getElementById('guests-list-heading'));
-            var viewerMin = emailerHeaderFloorWidth(guestViewerHeaderEl());
+            var viewerMin = emailerHeaderFloorWidth(guestViewerHeaderEl(), { ignoreGuestName: true });
             track.style.setProperty('--guest-list-min', (listMin > 0 ? listMin + 2 : 0) + 'px');
             track.style.setProperty('--guest-viewer-min', (viewerMin > 0 ? viewerMin + 2 : 0) + 'px');
             syncGuestPaneScrollbar();
@@ -29892,6 +30117,21 @@
             }
         }
 
+        /** Firestore `tbs/Guests/{guestId}/item` field **Priority** (Yes/No). Missing means not set. */
+        function guestPriorityFromDoc(d) {
+            if (!d || typeof d !== 'object') return '';
+            if (Object.prototype.hasOwnProperty.call(d, 'Priority')) {
+                return guestYesNoFromFirestoreValue(d.Priority) ? 'Yes' : 'No';
+            }
+            var s = guestCoalesceGuestItemFieldFromKeys(d, ['priority', 'PRIORITY']);
+            if (!s) return '';
+            return guestYesNoFromFirestoreValue(s) ? 'Yes' : 'No';
+        }
+
+        function guestPriorityIsYes(val) {
+            return String(val != null ? val : '').trim().toLowerCase() === 'yes';
+        }
+
         /** Firestore `tbs/Guests/{guestId}/item` field **Attended** (Yes/No). */
         function guestAttendedFromDoc(d) {
             if (!d || typeof d !== 'object') return false;
@@ -30159,6 +30399,7 @@
                 ]),
                 briefed: guestBriefedFieldFromDoc(d),
                 attended: guestAttendedFromDoc(d),
+                priority: guestPriorityFromDoc(d),
                 cmeStatus: guestCmeStatusFromDoc(d),
                 applicationDate: guestCoalesceGuestItemFieldFromKeys(d, [
                     'Application date',
@@ -30420,6 +30661,36 @@
             slot.setAttribute('aria-hidden', 'false');
         }
 
+        function syncEditGuestHeadingTitle(first, last) {
+            var heading = document.querySelector('#guest-editor-panel > .edit-guest-top .selected-guestname');
+            if (!heading) return;
+            var label = [String(first || '').trim(), String(last || '').trim()].filter(Boolean).join(' ');
+            if (label) heading.setAttribute('title', label);
+            else heading.removeAttribute('title');
+        }
+
+        function syncEditGuestPriorityButton() {
+            var btn = document.getElementById('edit-guest-priority-btn');
+            if (!btn) return;
+            if (btn.getAttribute('data-priority-bound') !== '1') {
+                btn.setAttribute('data-priority-bound', '1');
+                btn.addEventListener('click', function () {
+                    var currentId = String(guestFormEditingDocId || '').trim();
+                    if (!currentId) return;
+                    void toggleGuestRosterPriority(currentId);
+                });
+            }
+            var id = String(guestFormEditingDocId || '').trim();
+            var rec = id ? findGuestInMemory(id) : null;
+            var on = !!(rec && guestPriorityIsYes(rec.priority));
+            btn.disabled = !rec || !!backenduserIsReadonly;
+            btn.classList.toggle('is-priority', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            btn.textContent = on ? '★' : '☆';
+            btn.setAttribute('aria-label', on ? 'Priority: yes' : 'Priority: no');
+            btn.title = on ? 'Priority — click to set no' : 'Priority — click to set yes';
+        }
+
         function updateEditGuestNameHeading() {
             var guestFirstEl = document.getElementById('edit-guest-name-first');
             var guestLastEl = document.getElementById('edit-guest-name-last');
@@ -30430,13 +30701,16 @@
             if (!headingId) {
                 if (guestDraftFormActive) {
                     syncGuestDraftHeading();
+                    syncEditGuestPriorityButton();
                     return;
                 }
                 guestFirstEl.textContent = '';
                 guestLastEl.textContent = '';
+                syncEditGuestHeadingTitle('', '');
                 if (bottomFirstEl) bottomFirstEl.value = '';
                 if (bottomLastEl) bottomLastEl.value = '';
                 syncEditGuestCountryFlag(null);
+                syncEditGuestPriorityButton();
                 return;
             }
             var guestRec = findGuestInMemory(headingId);
@@ -30444,6 +30718,8 @@
             var guestLast = guestRec ? String(guestRec.lastName || '').trim() : '';
             guestFirstEl.textContent = guestFirst;
             guestLastEl.textContent = guestLast;
+            syncEditGuestHeadingTitle(guestFirst, guestLast);
+            syncEditGuestPriorityButton();
             if (bottomFirstEl) bottomFirstEl.value = guestFirst;
             if (bottomLastEl) bottomLastEl.value = guestLast;
             syncEditGuestCountryFlag(guestRec || null);
@@ -30995,6 +31271,7 @@
             var last = lastInput ? String(lastInput.value || '').trim() : '';
             guestFirstEl.textContent = first || 'New';
             guestLastEl.textContent = last || 'guest';
+            syncEditGuestHeadingTitle(guestFirstEl.textContent, guestLastEl.textContent);
         }
 
         function guestNewFormFieldValue(id) {
@@ -31299,6 +31576,7 @@
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_CME_FILTER_VALUES = ['Sent', 'Ready', 'No CME'];
         var GUEST_CME_MENU_VALUES = ['Sent', 'Ready', 'No CME'];
+        var GUEST_PRIORITY_FILTER_VALUES = ['Yes', 'No'];
 
         function emptyGuestsFilterSettings() {
             return {
@@ -31309,6 +31587,7 @@
                 briefed: [],
                 attended: [],
                 cme: [],
+                priority: [],
             };
         }
 
@@ -31362,6 +31641,7 @@
             if (!f || typeof f !== 'object') return false;
             var keys = Object.keys(emptyGuestsFilterSettings());
             for (var i = 0; i < keys.length; i++) {
+                if (keys[i] === 'priority' && String(guestsRosterView || '') !== 'waitlist') continue;
                 if (guestsFilterSelectedList(f[keys[i]]).length) return true;
             }
             return false;
@@ -31419,6 +31699,21 @@
             if (cmeSelected.length) {
                 var cmeLabel = normalizeGuestCmeStatusDisplay(g.cmeStatus);
                 if (!guestFilterValueInList(cmeLabel, cmeSelected)) return false;
+            }
+            if (String(guestsRosterView || '') === 'waitlist') {
+                var prioritySelected = guestsFilterSelectedList(f.priority);
+                if (prioritySelected.length) {
+                    var isPriority = guestPriorityIsYes(g && g.priority);
+                    var priorityMatch = false;
+                    for (var pi = 0; pi < prioritySelected.length; pi++) {
+                        var wantPriority = guestsFilterValuesEqual(prioritySelected[pi], 'Yes');
+                        if (isPriority === wantPriority) {
+                            priorityMatch = true;
+                            break;
+                        }
+                    }
+                    if (!priorityMatch) return false;
+                }
             }
             return true;
         }
@@ -31618,6 +31913,11 @@
                 document.getElementById('guests-filter-cme'),
                 GUEST_CME_FILTER_VALUES,
                 guestsFilterSettings.cme
+            );
+            fillGuestsFilterChecks(
+                document.getElementById('guests-filter-priority'),
+                GUEST_PRIORITY_FILTER_VALUES,
+                guestsFilterSettings.priority
             );
         }
 
@@ -31982,6 +32282,8 @@
 
         function openGuestsFilterPopup() {
             populateGuestsFilterPopupForm();
+            var priorityField = document.getElementById('guests-filter-priority-field');
+            if (priorityField) priorityField.hidden = String(guestsRosterView || '') !== 'waitlist';
             var popup = document.getElementById('guests-filter-popup');
             if (!popup) return;
             popup.hidden = false;
@@ -35631,6 +35933,46 @@
             );
         }
 
+        function guestRosterPriorityCellHtml(isOn) {
+            var on = !!isOn;
+            return (
+                '<td class="guests-roster-priority-cell">' +
+                '<button type="button" class="guests-roster-priority-btn' +
+                (on ? ' is-priority' : '') +
+                '" data-guest-field="priority" aria-pressed="' +
+                (on ? 'true' : 'false') +
+                '" aria-label="' +
+                (on ? 'Priority: yes' : 'Priority: no') +
+                '" title="' +
+                (on ? 'Priority — click to set no' : 'Priority — click to set yes') +
+                '">' +
+                (on ? '★' : '☆') +
+                '</button></td>'
+            );
+        }
+
+        async function toggleGuestRosterPriority(docId) {
+            if (backendBlockIfReadonly()) return;
+            var id = String(docId || '').trim();
+            if (!id) return;
+            var rec = findGuestInMemory(id);
+            if (!rec) return;
+            var next = guestPriorityIsYes(rec.priority) ? 'No' : 'Yes';
+            rec.priority = next;
+            renderGuestsRoster();
+            if (typeof syncEditGuestPriorityButton === 'function') syncEditGuestPriorityButton();
+            try {
+                await tbsGuestItemRef(getFirestore(), id).set({ Priority: next }, { merge: true });
+                if (typeof showStatus === 'function') {
+                    showStatus('success', 'Saved to Firebase: Priority = ' + next + '.');
+                }
+            } catch (err) {
+                console.error('toggleGuestRosterPriority:', err);
+                await fetchAllGuestsIntoMemory({ force: true, showLoading: false });
+                if (typeof syncEditGuestPriorityButton === 'function') syncEditGuestPriorityButton();
+            }
+        }
+
         function guestRosterSquareToggleHtml(fieldKey, label, isOn) {
             var ariaLabel = label + ': ' + (isOn ? 'yes' : 'no');
             var title = isOn ? label + ' — click to set no' : label + ' — click to set yes';
@@ -35725,7 +36067,8 @@
             guestsCmeDropdownOpenDocId = '';
             hideAllGuestRosterMenus();
             guestsRosterSortInPlace();
-            var colCount = 9;
+            var isWaitlistView = guestsRosterView === 'waitlist';
+            var colCount = isWaitlistView ? 10 : 9;
             var html = '<table class="guests-list-table" role="grid" aria-label="Guests roster">' +
                 '<thead><tr>' +
                 '<th scope="col">' +
@@ -35735,6 +36078,9 @@
                     'guests'
                 ) +
                 '</th>' +
+                (isWaitlistView
+                    ? '<th scope="col" class="guests-roster-priority-col" aria-label="Priority" title="Priority"><span class="guests-roster-priority-col-star" aria-hidden="true">★</span></th>'
+                    : '') +
                 '<th scope="col">Event</th>' +
                 '<th scope="col">Read</th>' +
                 '<th scope="col">Invited</th>' +
@@ -35818,6 +36164,7 @@
                                 escapeHtml(guestLabel)
                             ) +
                             '</td>' +
+                            (isWaitlistView ? guestRosterPriorityCellHtml(guestPriorityIsYes(g.priority)) : '') +
                             guestRosterEventCellHtml(g.id, g.event, isCancelled);
                         if (isCancelled) {
                             html +=
@@ -36434,13 +36781,38 @@
             return out;
         }
 
+        function speakerMatchesRosterSearch(rec, query) {
+            var q = String(query != null ? query : speakersRosterSearchQuery || '')
+                .trim()
+                .toLowerCase();
+            if (!q) return true;
+            if (!rec) return false;
+            var fullName = (
+                String(rec.firstName || '').trim() +
+                ' ' +
+                String(rec.lastName || '').trim()
+            )
+                .trim()
+                .toLowerCase();
+            if (fullName.indexOf(q) !== -1) return true;
+            var email = String(rec.email || '')
+                .trim()
+                .toLowerCase();
+            if (email && email.indexOf(q) !== -1) return true;
+            return false;
+        }
+
         function speakerRosterRowsAfterFilter() {
             var rows = speakerRosterRowsForView();
             var filter = speakersFilterForView();
-            if (!speakersFilterIsActive(filter)) return rows;
+            var filterActive = speakersFilterIsActive(filter);
+            var searchActive = String(speakersRosterSearchQuery || '').trim() !== '';
+            if (!filterActive && !searchActive) return rows;
             var matched = [];
             for (var i = 0; i < rows.length; i++) {
-                if (speakerMatchesFilter(rows[i], filter)) matched.push(rows[i]);
+                if (filterActive && !speakerMatchesFilter(rows[i], filter)) continue;
+                if (searchActive && !speakerMatchesRosterSearch(rows[i], speakersRosterSearchQuery)) continue;
+                matched.push(rows[i]);
             }
             return matched;
         }
@@ -44778,6 +45150,20 @@
                     openGuestsFilterPopup();
                 });
             }
+            var speakersRosterSearchInput = document.getElementById('speakers-roster-search');
+            if (speakersRosterSearchInput) {
+                speakersRosterSearchInput.addEventListener('input', function () {
+                    speakersRosterSearchQuery = String(speakersRosterSearchInput.value || '');
+                    renderSpeakerRoster();
+                });
+                speakersRosterSearchInput.addEventListener('keydown', function (ev) {
+                    if (ev.key === 'Escape') {
+                        speakersRosterSearchInput.value = '';
+                        speakersRosterSearchQuery = '';
+                        renderSpeakerRoster();
+                    }
+                });
+            }
             var filterSpeakersBtn = document.getElementById('filter-speakers');
             if (filterSpeakersBtn) {
                 filterSpeakersBtn.addEventListener('click', function (ev) {
@@ -46179,6 +46565,18 @@
                         var checkRow = nameCheckBtn.closest('.guests-roster-row');
                         var checkId = checkRow && checkRow.getAttribute('data-guests-id');
                         if (checkId) toggleGuestRosterSelected(checkId, nameCheckBtn);
+                        return;
+                    }
+                    var priorityBtn = ev.target.closest('.guests-roster-priority-btn');
+                    if (priorityBtn && guestsRosterItemsEl.contains(priorityBtn)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var pRow = priorityBtn.closest('.guests-roster-row');
+                        var pId = pRow && pRow.getAttribute('data-guests-id');
+                        if (pId) {
+                            selectGuestRosterRowFromPill(pId);
+                            void toggleGuestRosterPriority(pId);
+                        }
                         return;
                     }
                     var toggleBtn = ev.target.closest('.guests-roster-toggle-btn');
