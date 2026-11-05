@@ -334,7 +334,8 @@
         body.backend-page.backend-readonly #speaker-send-formal-invite-btn,
         body.backend-page.backend-readonly #finances-financials-import-btn,
         body.backend-page.backend-readonly #finances-items-add-btn,
-        body.backend-page.backend-readonly #finances-detail-delete-btn {
+        body.backend-page.backend-readonly #finances-detail-delete-btn,
+        body.backend-page.backend-readonly #finances-item-save-btn {
             pointer-events: none;
             cursor: not-allowed;
             opacity: 0.45;
@@ -5897,12 +5898,30 @@
             display: flex;
         }
 
+        #finances-editor .finances-transaction-form-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 1rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        #finances-editor .finances-transaction-form-row > .add-speaker-form-field {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
         #finances-editor .finances-transaction-form .add-speaker-form-field {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             gap: 0.35rem;
             min-width: 0;
+        }
+
+        #finances-editor .finances-transaction-form .add-speaker-form-field[hidden] {
+            display: none !important;
         }
 
         #finances-editor .finances-transaction-form .add-speaker-form-field > label {
@@ -5918,8 +5937,9 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #finances-editor .finances-transaction-form input,
-        #finances-editor .finances-transaction-form select {
+        #finances-editor .finances-transaction-form input:not([type="checkbox"]):not([type="radio"]),
+        #finances-editor .finances-transaction-form select,
+        #finances-editor .finances-transaction-form textarea {
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
@@ -5938,7 +5958,7 @@
             -webkit-text-fill-color: #0f172a;
         }
 
-        #finances-editor .finances-transaction-form input {
+        #finances-editor .finances-transaction-form input:not([type="checkbox"]):not([type="radio"]) {
             cursor: text;
         }
 
@@ -5953,12 +5973,44 @@
             cursor: pointer;
         }
 
+        #finances-editor .finances-transaction-form textarea {
+            min-height: 6.5rem;
+            resize: vertical;
+        }
+
         #finances-editor .finances-transaction-form input:focus,
         #finances-editor .finances-transaction-form select:focus,
+        #finances-editor .finances-transaction-form textarea:focus,
         #finances-editor .finances-transaction-form input:focus-visible,
-        #finances-editor .finances-transaction-form select:focus-visible {
+        #finances-editor .finances-transaction-form select:focus-visible,
+        #finances-editor .finances-transaction-form textarea:focus-visible {
             outline: none;
             box-shadow: none;
+        }
+
+        #finances-editor .finances-field-hint {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            line-height: 1.35;
+            color: #b45309;
+        }
+
+        #finances-editor .finances-field-hint[hidden] {
+            display: none !important;
+        }
+
+        #finances-editor .finances-transaction-form-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        #finances-editor .finances-transaction-form-actions .texteditor-save-btn {
+            min-width: 7rem;
         }
 
         #finances-editor .finances-overview {
@@ -6003,8 +6055,8 @@
             align-items: stretch;
             gap: 16px;
             flex: none;
-            width: max(100%, calc(var(--finances-pane-min) * 3 + 32px));
-            min-width: max(100%, calc(var(--finances-pane-min) * 3 + 32px));
+            width: max(100%, calc(1500px - 32px), calc(var(--finances-pane-min) * 3 + 32px));
+            min-width: max(100%, calc(1500px - 32px), calc(var(--finances-pane-min) * 3 + 32px));
             min-height: 0;
             height: 100%;
             box-sizing: border-box;
@@ -8678,12 +8730,14 @@
 
         .speaker-roster-row:hover,
         .guests-roster-row:hover,
+        .finances-row:hover,
         .content-roster-row:hover {
             background: #71C7FE;
         }
 
         .speaker-roster-row.is-selected,
         .guests-roster-row.is-selected,
+        .finances-row.is-selected,
         .content-roster-row.is-selected {
             background: #71C7FE;
         }
@@ -12380,21 +12434,6 @@
 
         body.backend-page #texteditor-unsaved-discard:hover:not(:disabled) {
             background: #F71941 !important;
-            color: #ffffff !important;
-        }
-
-        body.backend-page #texteditor-unsaved-save {
-            background: #338a17 !important;
-            color: #ffffff !important;
-            border: none;
-            padding: 0.45rem 1rem;
-            border-radius: 5px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        body.backend-page #texteditor-unsaved-save:hover:not(:disabled) {
-            background: #338a17 !important;
             color: #ffffff !important;
         }
 
@@ -16730,7 +16769,7 @@
                                 </div>
                             </div>
                             <div class="finances-heading-actions" aria-label="Detail actions">
-                                <button type="button" class="finances-toolbar-btn finances-delete-btn" id="finances-detail-delete-btn" aria-label="Delete item" title="Delete item">
+                                <button type="button" class="finances-toolbar-btn finances-delete-btn" id="finances-detail-delete-btn" aria-label="Delete item" title="Delete item" disabled aria-disabled="true">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                                     </svg>
@@ -16739,25 +16778,91 @@
                         </div>
                         <div class="finances-detail-body" id="finances-detail-body" aria-live="polite">
                             <form class="finances-transaction-form" id="finances-transaction-form" autocomplete="off" hidden>
+                                <input type="hidden" id="finances-item-id" name="id" value="">
                                 <div class="add-speaker-form-field">
-                                    <label for="finances-transaction-text">Description</label>
-                                    <input type="text" id="finances-transaction-text" name="description" autocomplete="off" spellcheck="false">
+                                    <label for="finances-item-name">Name</label>
+                                    <input type="text" id="finances-item-name" name="name" autocomplete="off" spellcheck="false" required aria-required="true">
+                                </div>
+                                <div class="finances-transaction-form-row">
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-status">Status</label>
+                                        <select id="finances-item-status" name="status" required aria-required="true">
+                                            <option value="">Select</option>
+                                            <option value="projected">Projected</option>
+                                            <option value="received">Received</option>
+                                            <option value="partially_paid">Partially paid</option>
+                                            <option value="paid">Paid</option>
+                                        </select>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-category">Category</label>
+                                        <select id="finances-item-category" name="category" required aria-required="true">
+                                            <option value="">Select</option>
+                                            <option value="travel">Travel</option>
+                                            <option value="software">Software</option>
+                                            <option value="faculty_fees">Faculty fees</option>
+                                            <option value="venue">Venue</option>
+                                            <option value="marketing">Marketing</option>
+                                            <option value="consulting">Consulting</option>
+                                            <option value="equipment">Equipment</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="add-speaker-form-field">
-                                    <label for="finances-transaction-type">Type</label>
-                                    <select id="finances-transaction-type" name="type">
-                                        <option value="">Select</option>
-                                        <option value="income">Income</option>
-                                        <option value="expense">Expense</option>
-                                    </select>
+                                    <label for="finances-item-supplier">Supplier / payee</label>
+                                    <input type="text" id="finances-item-supplier" name="supplier" list="finances-supplier-suggestions" autocomplete="off" spellcheck="false" required aria-required="true">
+                                    <datalist id="finances-supplier-suggestions"></datalist>
                                 </div>
                                 <div class="add-speaker-form-field">
-                                    <label for="finances-transaction-category">Category</label>
-                                    <select id="finances-transaction-category" name="category">
-                                        <option value="">Select</option>
-                                        <option value="registration">Registration</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                    <label for="finances-item-invoice-number">Invoice number</label>
+                                    <input type="text" id="finances-item-invoice-number" name="invoiceNumber" autocomplete="off" spellcheck="false">
+                                    <p class="finances-field-hint" id="finances-item-invoice-duplicate-hint" hidden></p>
+                                </div>
+                                <div class="add-speaker-form-field">
+                                    <label for="finances-item-description">Description</label>
+                                    <textarea id="finances-item-description" name="description" rows="4" spellcheck="true"></textarea>
+                                </div>
+                                <div class="finances-transaction-form-row">
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-currency">Currency</label>
+                                        <select id="finances-item-currency" name="currency" required aria-required="true">
+                                            <option value="SEK" selected>SEK</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="USD">USD</option>
+                                            <option value="CHF">CHF</option>
+                                            <option value="GBP">GBP</option>
+                                        </select>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-total-amount">Total amount</label>
+                                        <input type="number" id="finances-item-total-amount" name="totalAmount" inputmode="decimal" min="0" step="any" required aria-required="true">
+                                    </div>
+                                </div>
+                                <div class="add-speaker-form-field" id="finances-item-amount-base-field" hidden>
+                                    <label for="finances-item-amount-base">Amount in SEK</label>
+                                    <input type="number" id="finances-item-amount-base" name="amountBase" inputmode="decimal" min="0" step="any">
+                                </div>
+                                <div class="add-speaker-form-field" id="finances-item-amount-paid-field" hidden>
+                                    <label for="finances-item-amount-paid">Amount paid</label>
+                                    <input type="number" id="finances-item-amount-paid" name="amountPaid" inputmode="decimal" min="0" step="any">
+                                </div>
+                                <div class="finances-transaction-form-row">
+                                    <div class="add-speaker-form-field" id="finances-item-invoice-date-field" hidden>
+                                        <label for="finances-item-invoice-date">Invoice date</label>
+                                        <input type="date" id="finances-item-invoice-date" name="invoiceDate">
+                                    </div>
+                                    <div class="add-speaker-form-field" id="finances-item-due-date-field" hidden>
+                                        <label for="finances-item-due-date">Due date</label>
+                                        <input type="date" id="finances-item-due-date" name="dueDate">
+                                    </div>
+                                </div>
+                                <div class="add-speaker-form-field" id="finances-item-date-paid-field" hidden>
+                                    <label for="finances-item-date-paid">Date paid</label>
+                                    <input type="date" id="finances-item-date-paid" name="datePaid">
+                                </div>
+                                <div class="finances-transaction-form-actions">
+                                    <button type="submit" class="texteditor-save-btn" id="finances-item-save-btn" title="Save item" aria-label="Save item">Save</button>
                                 </div>
                             </form>
                         </div>
@@ -17096,8 +17201,9 @@
         <div class="guest-delete-confirm__box">
             <p id="texteditor-unsaved-popup-title">Save changes to this pre-set?</p>
             <div class="guest-delete-confirm__actions">
+                <button type="button" class="speaker-delete-cancel-btn" id="texteditor-unsaved-cancel">Cancel</button>
                 <button type="button" id="texteditor-unsaved-discard">Don't save</button>
-                <button type="button" id="texteditor-unsaved-save">Save</button>
+                <button type="button" class="speaker-delete-yes-btn" id="texteditor-unsaved-save">Save</button>
             </div>
         </div>
     </div>
@@ -34838,6 +34944,452 @@
         var financesInvoicesLoadError = '';
         var financesInvoicesLoaded = false;
         var financesInvoicesImportInFlight = null;
+        var FINANCES_BASE_CURRENCY = 'SEK';
+        var financesItemsInMemory = [];
+        var financesItemEditingId = '';
+        var financesItemsStorageKey = 'tbs-finances-items-v1';
+
+        function financesStatusLabel(status) {
+            var s = String(status || '').trim();
+            if (s === 'projected') return 'Projected';
+            if (s === 'received') return 'Received';
+            if (s === 'partially_paid') return 'Partially paid';
+            if (s === 'paid') return 'Paid';
+            return s || '—';
+        }
+
+        function financesCategoryLabel(category) {
+            var c = String(category || '').trim();
+            if (c === 'travel') return 'Travel';
+            if (c === 'software') return 'Software';
+            if (c === 'faculty_fees') return 'Faculty fees';
+            if (c === 'venue') return 'Venue';
+            if (c === 'marketing') return 'Marketing';
+            if (c === 'consulting') return 'Consulting';
+            if (c === 'equipment') return 'Equipment';
+            if (c === 'other') return 'Other';
+            return c || '—';
+        }
+
+        function financesItemById(id) {
+            var want = String(id || '').trim();
+            if (!want) return null;
+            for (var i = 0; i < financesItemsInMemory.length; i++) {
+                if (String((financesItemsInMemory[i] && financesItemsInMemory[i].id) || '').trim() === want) {
+                    return financesItemsInMemory[i];
+                }
+            }
+            return null;
+        }
+
+        function financesNewItemId() {
+            try {
+                if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+                    return window.crypto.randomUUID();
+                }
+            } catch (e) { /* ignore */ }
+            return 'fin-' + String(Date.now()) + '-' + String(Math.floor(Math.random() * 1e6));
+        }
+
+        function loadFinancesItemsFromStorage() {
+            try {
+                var raw = localStorage.getItem(financesItemsStorageKey);
+                if (!raw) {
+                    financesItemsInMemory = [];
+                    return;
+                }
+                var parsed = JSON.parse(raw);
+                financesItemsInMemory = Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+            } catch (e) {
+                console.warn('finances items storage load failed', e);
+                financesItemsInMemory = [];
+            }
+        }
+
+        function persistFinancesItemsToStorage() {
+            try {
+                localStorage.setItem(financesItemsStorageKey, JSON.stringify(financesItemsInMemory || []));
+            } catch (e) {
+                console.warn('finances items storage save failed', e);
+            }
+        }
+
+        function financesSupplierSuggestions() {
+            var seen = {};
+            var out = [];
+            for (var i = 0; i < financesItemsInMemory.length; i++) {
+                var supplier = String((financesItemsInMemory[i] && financesItemsInMemory[i].supplier) || '').trim();
+                if (!supplier) continue;
+                var key = supplier.toLowerCase();
+                if (seen[key]) continue;
+                seen[key] = true;
+                out.push(supplier);
+            }
+            out.sort(function(a, b) {
+                return a.localeCompare(b, undefined, { sensitivity: 'base' });
+            });
+            return out;
+        }
+
+        function refreshFinancesSupplierDatalist() {
+            var list = document.getElementById('finances-supplier-suggestions');
+            if (!list) return;
+            var html = '';
+            var suppliers = financesSupplierSuggestions();
+            for (var i = 0; i < suppliers.length; i++) {
+                html += '<option value="' + escapeHtml(suppliers[i]) + '"></option>';
+            }
+            list.innerHTML = html;
+        }
+
+        function formatFinancesAmount(amount, currency) {
+            var n = Number(amount);
+            if (!isFinite(n)) return '—';
+            var cur = String(currency || FINANCES_BASE_CURRENCY).trim().toUpperCase() || FINANCES_BASE_CURRENCY;
+            try {
+                return new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency: cur,
+                    maximumFractionDigits: 2
+                }).format(n);
+            } catch (e) {
+                return String(n) + ' ' + cur;
+            }
+        }
+
+        function renderFinancesItemsTable() {
+            var itemsEl = document.getElementById('finances-items-rows');
+            if (!itemsEl) return;
+            var colCount = 6;
+            var html = '<table class="finances-table" role="grid" aria-label="Items">' +
+                '<thead><tr>' +
+                '<th scope="col">Name</th>' +
+                '<th scope="col">Status</th>' +
+                '<th scope="col">Supplier</th>' +
+                '<th scope="col">Category</th>' +
+                '<th scope="col">Amount</th>' +
+                '<th scope="col">Currency</th>' +
+                '</tr></thead><tbody>';
+            if (!financesItemsInMemory.length) {
+                html += '<tr class="finances-row">' +
+                    '<td class="finances-empty" colspan="' + colCount + '">No items yet.</td>' +
+                    '</tr>';
+            } else {
+                for (var i = 0; i < financesItemsInMemory.length; i++) {
+                    var item = financesItemsInMemory[i] || {};
+                    var id = String(item.id || '').trim();
+                    var selected = id && id === String(financesItemEditingId || '').trim();
+                    html += '<tr class="finances-row' + (selected ? ' is-selected' : '') +
+                        '" data-finances-item-id="' + escapeHtml(id) + '" tabindex="0" role="row">' +
+                        '<td class="finances-name-cell">' + escapeHtml(String(item.name || '').trim() || '—') + '</td>' +
+                        '<td>' + escapeHtml(financesStatusLabel(item.status)) + '</td>' +
+                        '<td>' + escapeHtml(String(item.supplier || '').trim() || '—') + '</td>' +
+                        '<td>' + escapeHtml(financesCategoryLabel(item.category)) + '</td>' +
+                        '<td>' + escapeHtml(formatFinancesAmount(item.totalAmount, item.currency)) + '</td>' +
+                        '<td>' + escapeHtml(String(item.currency || FINANCES_BASE_CURRENCY).trim() || FINANCES_BASE_CURRENCY) + '</td>' +
+                        '</tr>';
+                }
+            }
+            html += '</tbody></table>';
+            itemsEl.innerHTML = html;
+            if (typeof extendRosterTableBorders === 'function') {
+                extendRosterTableBorders(itemsEl);
+            }
+            updateFinancesItemNavButtons();
+        }
+
+        function updateFinancesItemNavButtons() {
+            var prevBtn = document.getElementById('finances-items-previous-btn');
+            var nextBtn = document.getElementById('finances-items-next-btn');
+            var delBtn = document.getElementById('finances-detail-delete-btn');
+            var idx = -1;
+            var id = String(financesItemEditingId || '').trim();
+            if (id) {
+                for (var i = 0; i < financesItemsInMemory.length; i++) {
+                    if (String((financesItemsInMemory[i] && financesItemsInMemory[i].id) || '').trim() === id) {
+                        idx = i;
+                        break;
+                    }
+                }
+            }
+            var hasPrev = idx > 0;
+            var hasNext = idx >= 0 && idx < financesItemsInMemory.length - 1;
+            if (prevBtn) {
+                prevBtn.disabled = !hasPrev;
+                prevBtn.setAttribute('aria-disabled', hasPrev ? 'false' : 'true');
+            }
+            if (nextBtn) {
+                nextBtn.disabled = !hasNext;
+                nextBtn.setAttribute('aria-disabled', hasNext ? 'false' : 'true');
+            }
+            if (delBtn) {
+                var canDelete = !!id && idx >= 0;
+                delBtn.disabled = !canDelete;
+                delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
+            }
+        }
+
+        function syncFinancesTransactionFormVisibility() {
+            var statusEl = document.getElementById('finances-item-status');
+            var currencyEl = document.getElementById('finances-item-currency');
+            var status = String((statusEl && statusEl.value) || '').trim();
+            var currency = String((currencyEl && currencyEl.value) || FINANCES_BASE_CURRENCY).trim().toUpperCase();
+            var showBase = currency && currency !== FINANCES_BASE_CURRENCY;
+            var showPaidAmount = status === 'partially_paid' || status === 'paid';
+            var showInvoiceDates = status && status !== 'projected';
+            var showDatePaid = status === 'paid';
+            var baseField = document.getElementById('finances-item-amount-base-field');
+            var paidField = document.getElementById('finances-item-amount-paid-field');
+            var invoiceDateField = document.getElementById('finances-item-invoice-date-field');
+            var dueDateField = document.getElementById('finances-item-due-date-field');
+            var datePaidField = document.getElementById('finances-item-date-paid-field');
+            if (baseField) baseField.hidden = !showBase;
+            if (paidField) paidField.hidden = !showPaidAmount;
+            if (invoiceDateField) invoiceDateField.hidden = !showInvoiceDates;
+            if (dueDateField) dueDateField.hidden = !showInvoiceDates;
+            if (datePaidField) datePaidField.hidden = !showDatePaid;
+            var baseInput = document.getElementById('finances-item-amount-base');
+            var paidInput = document.getElementById('finances-item-amount-paid');
+            var invoiceDateInput = document.getElementById('finances-item-invoice-date');
+            var dueDateInput = document.getElementById('finances-item-due-date');
+            var datePaidInput = document.getElementById('finances-item-date-paid');
+            if (baseInput) {
+                baseInput.required = !!showBase;
+                baseInput.setAttribute('aria-required', showBase ? 'true' : 'false');
+                if (!showBase) baseInput.value = '';
+            }
+            if (paidInput) {
+                paidInput.required = !!showPaidAmount;
+                paidInput.setAttribute('aria-required', showPaidAmount ? 'true' : 'false');
+                if (!showPaidAmount) paidInput.value = '';
+            }
+            if (!showInvoiceDates) {
+                if (invoiceDateInput) invoiceDateInput.value = '';
+                if (dueDateInput) dueDateInput.value = '';
+            }
+            if (!showDatePaid && datePaidInput) datePaidInput.value = '';
+        }
+
+        function syncFinancesInvoiceDuplicateHint() {
+            var hint = document.getElementById('finances-item-invoice-duplicate-hint');
+            if (!hint) return;
+            var supplier = String((document.getElementById('finances-item-supplier') || {}).value || '').trim().toLowerCase();
+            var invoice = String((document.getElementById('finances-item-invoice-number') || {}).value || '').trim().toLowerCase();
+            var editingId = String(financesItemEditingId || '').trim();
+            if (!supplier || !invoice) {
+                hint.hidden = true;
+                hint.textContent = '';
+                return;
+            }
+            var match = null;
+            for (var i = 0; i < financesItemsInMemory.length; i++) {
+                var item = financesItemsInMemory[i] || {};
+                var id = String(item.id || '').trim();
+                if (editingId && id === editingId) continue;
+                var s = String(item.supplier || '').trim().toLowerCase();
+                var inv = String(item.invoiceNumber || '').trim().toLowerCase();
+                if (s === supplier && inv === invoice) {
+                    match = item;
+                    break;
+                }
+            }
+            if (!match) {
+                hint.hidden = true;
+                hint.textContent = '';
+                return;
+            }
+            hint.hidden = false;
+            hint.textContent = 'A record with this supplier and invoice number already exists' +
+                (match.name ? (' (“' + String(match.name).trim() + '”).') : '.');
+        }
+
+        function resetFinancesTransactionForm() {
+            var form = document.getElementById('finances-transaction-form');
+            if (!form) return;
+            form.reset();
+            var idEl = document.getElementById('finances-item-id');
+            if (idEl) idEl.value = '';
+            var currencyEl = document.getElementById('finances-item-currency');
+            if (currencyEl) currencyEl.value = FINANCES_BASE_CURRENCY;
+            financesItemEditingId = '';
+            syncFinancesTransactionFormVisibility();
+            syncFinancesInvoiceDuplicateHint();
+            refreshFinancesSupplierDatalist();
+            updateFinancesItemNavButtons();
+        }
+
+        function populateFinancesTransactionForm(item) {
+            var rec = item || {};
+            financesItemEditingId = String(rec.id || '').trim();
+            var setVal = function(id, value) {
+                var el = document.getElementById(id);
+                if (el) el.value = value == null ? '' : String(value);
+            };
+            setVal('finances-item-id', rec.id || '');
+            setVal('finances-item-name', rec.name || '');
+            setVal('finances-item-status', rec.status || '');
+            setVal('finances-item-supplier', rec.supplier || '');
+            setVal('finances-item-invoice-number', rec.invoiceNumber || '');
+            setVal('finances-item-description', rec.description || '');
+            setVal('finances-item-category', rec.category || '');
+            setVal('finances-item-currency', rec.currency || FINANCES_BASE_CURRENCY);
+            setVal('finances-item-total-amount', rec.totalAmount != null && rec.totalAmount !== '' ? rec.totalAmount : '');
+            setVal('finances-item-amount-base', rec.amountBase != null && rec.amountBase !== '' ? rec.amountBase : '');
+            setVal('finances-item-amount-paid', rec.amountPaid != null && rec.amountPaid !== '' ? rec.amountPaid : '');
+            setVal('finances-item-invoice-date', rec.invoiceDate || '');
+            setVal('finances-item-due-date', rec.dueDate || '');
+            setVal('finances-item-date-paid', rec.datePaid || '');
+            syncFinancesTransactionFormVisibility();
+            syncFinancesInvoiceDuplicateHint();
+            refreshFinancesSupplierDatalist();
+            updateFinancesItemNavButtons();
+        }
+
+        function readFinancesTransactionForm() {
+            var numOrEmpty = function(id) {
+                var raw = String((document.getElementById(id) || {}).value || '').trim();
+                if (!raw) return '';
+                var n = Number(raw);
+                return isFinite(n) ? n : NaN;
+            };
+            return {
+                id: String((document.getElementById('finances-item-id') || {}).value || financesItemEditingId || '').trim(),
+                name: String((document.getElementById('finances-item-name') || {}).value || '').trim(),
+                status: String((document.getElementById('finances-item-status') || {}).value || '').trim(),
+                supplier: String((document.getElementById('finances-item-supplier') || {}).value || '').trim(),
+                invoiceNumber: String((document.getElementById('finances-item-invoice-number') || {}).value || '').trim(),
+                description: String((document.getElementById('finances-item-description') || {}).value || '').trim(),
+                category: String((document.getElementById('finances-item-category') || {}).value || '').trim(),
+                currency: String((document.getElementById('finances-item-currency') || {}).value || FINANCES_BASE_CURRENCY).trim().toUpperCase() || FINANCES_BASE_CURRENCY,
+                totalAmount: numOrEmpty('finances-item-total-amount'),
+                amountBase: numOrEmpty('finances-item-amount-base'),
+                amountPaid: numOrEmpty('finances-item-amount-paid'),
+                invoiceDate: String((document.getElementById('finances-item-invoice-date') || {}).value || '').trim(),
+                dueDate: String((document.getElementById('finances-item-due-date') || {}).value || '').trim(),
+                datePaid: String((document.getElementById('finances-item-date-paid') || {}).value || '').trim()
+            };
+        }
+
+        function validateFinancesTransactionForm(data) {
+            if (!data.name) return 'Name is required.';
+            if (!data.status) return 'Status is required.';
+            if (!data.supplier) return 'Supplier / payee is required.';
+            if (!data.category) return 'Category is required.';
+            if (!data.currency) return 'Currency is required.';
+            if (!(typeof data.totalAmount === 'number') || !isFinite(data.totalAmount) || data.totalAmount <= 0) {
+                return 'Total amount must be greater than 0.';
+            }
+            if (data.currency !== FINANCES_BASE_CURRENCY) {
+                if (!(typeof data.amountBase === 'number') || !isFinite(data.amountBase) || data.amountBase <= 0) {
+                    return 'Amount in SEK must be greater than 0 when currency is not SEK.';
+                }
+            } else {
+                data.amountBase = '';
+            }
+            if (data.status === 'projected') {
+                data.invoiceDate = '';
+                data.dueDate = '';
+                data.datePaid = '';
+                data.amountPaid = '';
+            } else if (data.status === 'partially_paid' || data.status === 'paid') {
+                if (data.amountPaid === '' || !(typeof data.amountPaid === 'number') || !isFinite(data.amountPaid) || data.amountPaid < 0) {
+                    return 'Amount paid is required for this status.';
+                }
+                if (data.status !== 'paid') data.datePaid = '';
+            } else {
+                data.amountPaid = '';
+                data.datePaid = '';
+            }
+            return '';
+        }
+
+        function openFinancesTransactionEditor(item) {
+            var form = document.getElementById('finances-transaction-form');
+            if (!form) return;
+            form.hidden = false;
+            form.setAttribute('aria-hidden', 'false');
+            form.classList.add('is-open');
+            if (item) {
+                populateFinancesTransactionForm(item);
+            } else {
+                resetFinancesTransactionForm();
+            }
+            renderFinancesItemsTable();
+            var nameField = document.getElementById('finances-item-name');
+            if (nameField) nameField.focus();
+        }
+
+        function selectFinancesItemById(id) {
+            var rec = financesItemById(id);
+            if (!rec) return;
+            openFinancesTransactionEditor(rec);
+        }
+
+        function saveFinancesTransactionFromForm() {
+            if (backendBlockIfReadonly()) return false;
+            var data = readFinancesTransactionForm();
+            var err = validateFinancesTransactionForm(data);
+            if (err) {
+                if (typeof showStatus === 'function') showStatus('error', err);
+                return false;
+            }
+            if (data.currency === FINANCES_BASE_CURRENCY) data.amountBase = '';
+            var existing = data.id ? financesItemById(data.id) : null;
+            if (existing) {
+                Object.assign(existing, data);
+            } else {
+                data.id = data.id || financesNewItemId();
+                financesItemsInMemory.push(data);
+            }
+            financesItemEditingId = String(data.id || '').trim();
+            var idEl = document.getElementById('finances-item-id');
+            if (idEl) idEl.value = financesItemEditingId;
+            persistFinancesItemsToStorage();
+            refreshFinancesSupplierDatalist();
+            syncFinancesInvoiceDuplicateHint();
+            renderFinancesItemsTable();
+            if (typeof showStatus === 'function') {
+                showStatus('success', existing ? 'Item saved.' : 'Item added.');
+            }
+            return true;
+        }
+
+        function deleteSelectedFinancesItem() {
+            if (backendBlockIfReadonly()) return;
+            var id = String(financesItemEditingId || '').trim();
+            if (!id) return;
+            financesItemsInMemory = financesItemsInMemory.filter(function(item) {
+                return String((item && item.id) || '').trim() !== id;
+            });
+            persistFinancesItemsToStorage();
+            resetFinancesTransactionForm();
+            var form = document.getElementById('finances-transaction-form');
+            if (form) {
+                form.classList.remove('is-open');
+                form.hidden = true;
+                form.setAttribute('aria-hidden', 'true');
+            }
+            renderFinancesItemsTable();
+            if (typeof showStatus === 'function') showStatus('success', 'Item deleted.');
+        }
+
+        function stepFinancesItem(delta) {
+            var id = String(financesItemEditingId || '').trim();
+            if (!id || !financesItemsInMemory.length) return;
+            var idx = -1;
+            for (var i = 0; i < financesItemsInMemory.length; i++) {
+                if (String((financesItemsInMemory[i] && financesItemsInMemory[i].id) || '').trim() === id) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx < 0) return;
+            var next = idx + delta;
+            if (next < 0 || next >= financesItemsInMemory.length) return;
+            openFinancesTransactionEditor(financesItemsInMemory[next]);
+        }
+
+        loadFinancesItemsFromStorage();
 
         function formatStripeAmountCents(amount, currency) {
             var cents = Number(amount);
@@ -39242,7 +39794,7 @@
 
         function setTexteditorUnsavedPopupBusy(busy) {
             texteditorUnsavedBusy = !!busy;
-            ['texteditor-unsaved-discard', 'texteditor-unsaved-save'].forEach(function (id) {
+            ['texteditor-unsaved-cancel', 'texteditor-unsaved-discard', 'texteditor-unsaved-save'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (!el) return;
                 el.disabled = !!busy;
@@ -45703,26 +46255,76 @@
             }
             var financesItemsAddBtn = document.getElementById('finances-items-add-btn');
             var financesTransactionForm = document.getElementById('finances-transaction-form');
-            function openFinancesTransactionEditor() {
-                if (!financesTransactionForm) return;
-                financesTransactionForm.hidden = false;
-                financesTransactionForm.setAttribute('aria-hidden', 'false');
-                financesTransactionForm.classList.add('is-open');
-                var textField = document.getElementById('finances-transaction-text');
-                if (textField) textField.focus();
-            }
+            var financesItemsRows = document.getElementById('finances-items-rows');
+            var financesItemsPrevBtn = document.getElementById('finances-items-previous-btn');
+            var financesItemsNextBtn = document.getElementById('finances-items-next-btn');
+            var financesDetailDeleteBtn = document.getElementById('finances-detail-delete-btn');
             if (financesTransactionForm) {
                 financesTransactionForm.addEventListener('submit', function(ev) {
                     ev.preventDefault();
+                    saveFinancesTransactionFromForm();
                 });
+                var financesStatusEl = document.getElementById('finances-item-status');
+                var financesCurrencyEl = document.getElementById('finances-item-currency');
+                var financesSupplierEl = document.getElementById('finances-item-supplier');
+                var financesInvoiceEl = document.getElementById('finances-item-invoice-number');
+                if (financesStatusEl) {
+                    financesStatusEl.addEventListener('change', syncFinancesTransactionFormVisibility);
+                }
+                if (financesCurrencyEl) {
+                    financesCurrencyEl.addEventListener('change', syncFinancesTransactionFormVisibility);
+                }
+                if (financesSupplierEl) {
+                    financesSupplierEl.addEventListener('input', syncFinancesInvoiceDuplicateHint);
+                    financesSupplierEl.addEventListener('change', syncFinancesInvoiceDuplicateHint);
+                }
+                if (financesInvoiceEl) {
+                    financesInvoiceEl.addEventListener('input', syncFinancesInvoiceDuplicateHint);
+                    financesInvoiceEl.addEventListener('change', syncFinancesInvoiceDuplicateHint);
+                }
             }
             if (financesItemsAddBtn) {
                 financesItemsAddBtn.addEventListener('click', function(ev) {
                     ev.preventDefault();
                     if (backendBlockIfReadonly()) return;
-                    openFinancesTransactionEditor();
+                    openFinancesTransactionEditor(null);
                 });
             }
+            if (financesItemsPrevBtn) {
+                financesItemsPrevBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    stepFinancesItem(-1);
+                });
+            }
+            if (financesItemsNextBtn) {
+                financesItemsNextBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    stepFinancesItem(1);
+                });
+            }
+            if (financesDetailDeleteBtn) {
+                financesDetailDeleteBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    if (backendBlockIfReadonly()) return;
+                    deleteSelectedFinancesItem();
+                });
+            }
+            if (financesItemsRows) {
+                financesItemsRows.addEventListener('click', function(ev) {
+                    var row = ev.target && ev.target.closest ? ev.target.closest('tr[data-finances-item-id]') : null;
+                    if (!row) return;
+                    selectFinancesItemById(row.getAttribute('data-finances-item-id'));
+                });
+                financesItemsRows.addEventListener('keydown', function(ev) {
+                    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+                    var row = ev.target && ev.target.closest ? ev.target.closest('tr[data-finances-item-id]') : null;
+                    if (!row) return;
+                    ev.preventDefault();
+                    selectFinancesItemById(row.getAttribute('data-finances-item-id'));
+                });
+            }
+            renderFinancesItemsTable();
+            refreshFinancesSupplierDatalist();
             var financesImportInvoicesBtn = document.getElementById('finances-financials-import-btn');
             if (financesImportInvoicesBtn) {
                 financesImportInvoicesBtn.addEventListener('click', function(ev) {
@@ -47536,6 +48138,15 @@
                     ev.preventDefault();
                     ev.stopPropagation();
                     discardTexteditorUnsavedAndContinue();
+                });
+            }
+            var texteditorUnsavedCancel = document.getElementById('texteditor-unsaved-cancel');
+            if (texteditorUnsavedCancel) {
+                texteditorUnsavedCancel.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (texteditorUnsavedBusy) return;
+                    closeTexteditorUnsavedPopup();
                 });
             }
             var texteditorUnsavedSave = document.getElementById('texteditor-unsaved-save');
