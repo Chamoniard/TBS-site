@@ -1092,6 +1092,14 @@
             flex-shrink: 0;
         }
 
+        #finances-editor #finances-detail-save-btn.is-saved-spin > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.7s linear 1;
+            will-change: transform;
+        }
+
         #content-editor .content-bottom-row {
             display: flex;
             flex-direction: row;
@@ -11109,6 +11117,86 @@
         #finances-editor #finances-items .finances-table .content-badge.finances-status-partial {
             background: var(--backend-roster-status-no-bg);
             color: var(--backend-roster-status-no-color);
+        }
+
+        #finances-editor .finances-pill-wrap {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        #finances-editor #finances-items .finances-table button.finances-pill-btn {
+            cursor: pointer;
+            border: none;
+            box-shadow: none;
+            outline: 2px solid transparent;
+            outline-offset: 0;
+        }
+
+        #finances-editor #finances-items .finances-table button.finances-pill-btn.is-armed {
+            outline: 2px solid #F71941;
+            outline-offset: 0;
+            box-shadow: 0 0 10px rgba(247, 25, 65, 0.65), 0 2px 8px rgba(15, 23, 42, 0.12);
+        }
+
+        #finances-editor .finances-pill-dropdown,
+        body.backend-page > ul.finances-pill-dropdown {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 3px);
+            z-index: 60;
+            min-width: 9rem;
+            margin: 0;
+            padding: 0.2rem 0;
+            list-style: none;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+            box-sizing: border-box;
+        }
+
+        body.backend-page > ul.finances-pill-dropdown {
+            position: fixed;
+            z-index: 20001;
+        }
+
+        #finances-editor .finances-pill-dropdown[hidden],
+        body.backend-page > ul.finances-pill-dropdown[hidden] {
+            display: none !important;
+        }
+
+        #finances-editor .finances-pill-dropdown > li,
+        body.backend-page > ul.finances-pill-dropdown > li {
+            margin: 0;
+            padding: 0;
+        }
+
+        #finances-editor .finances-pill-dropdown .finances-pill-option,
+        body.backend-page > ul.finances-pill-dropdown .finances-pill-option {
+            display: block;
+            width: 100%;
+            margin: 0;
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 5px;
+            background: transparent;
+            box-shadow: none;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: left;
+            cursor: pointer;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        #finances-editor .finances-pill-dropdown .finances-pill-option:hover,
+        body.backend-page > ul.finances-pill-dropdown .finances-pill-option:hover {
+            background: #f1f5f9;
         }
 
         /* Guests CME sent: Ready (same yellow as speaker “first brief” / CME ready). */
@@ -35541,6 +35629,121 @@
                 escapeHtml(text) + '</span>';
         }
 
+        var FINANCES_CATEGORY_OPTIONS = [
+            { value: 'venue', label: 'Venue' },
+            { value: 'av_team', label: 'AV-team' },
+            { value: 'speaker_travel', label: 'Speaker travel' },
+            { value: 'team_lodging', label: 'Team lodging' }
+        ];
+        var FINANCES_STATUS_OPTIONS = [
+            { value: 'projected', label: 'Projected' },
+            { value: 'received', label: 'Received' },
+            { value: 'partially_paid', label: 'Partially paid' },
+            { value: 'paid', label: 'Paid' }
+        ];
+        var financesPillArmedKey = '';
+
+        function financesPillKey(id, field) {
+            return String(id || '').trim() + '|' + String(field || '').trim();
+        }
+
+        function financesRosterMenuOptions(field) {
+            return field === 'status' ? FINANCES_STATUS_OPTIONS : FINANCES_CATEGORY_OPTIONS;
+        }
+
+        function financesRosterDropdownPillHtml(id, field, value, label, modifier) {
+            var text = String(label || '').trim();
+            var shown = text && text !== '—' ? text : '—';
+            var mod = shown === '—' ? 'content-badge--guest-field-empty' : modifier;
+            var opts = financesRosterMenuOptions(field);
+            var items = '';
+            for (var i = 0; i < opts.length; i++) {
+                items += '<li role="none"><button type="button" class="finances-pill-option" role="menuitem" data-finances-value="' +
+                    escapeHtml(opts[i].value) + '">' + escapeHtml(opts[i].label) + '</button></li>';
+            }
+            var fieldLabel = field === 'status' ? 'Status' : 'Category';
+            return '<div class="finances-pill-wrap">' +
+                '<button type="button" class="content-badge finances-pill-btn ' + mod + '" data-finances-id="' +
+                escapeHtml(id) + '" data-finances-field="' + escapeHtml(field) +
+                '" aria-haspopup="menu" aria-expanded="false" title="' +
+                escapeHtml(fieldLabel + ': first click selects, second opens values') + '">' +
+                escapeHtml(shown) + '</button>' +
+                '<ul class="finances-pill-dropdown" hidden role="menu">' + items + '</ul></div>';
+        }
+
+        function hideFinancesPillMenus() {
+            document.querySelectorAll('.finances-pill-dropdown').forEach(function(el) {
+                if (typeof unplaceGuestsRosterDropdown === 'function') unplaceGuestsRosterDropdown(el);
+                else el.hidden = true;
+            });
+            document.querySelectorAll('#finances-items .finances-pill-btn').forEach(function(btn) {
+                btn.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        function toggleFinancesRosterPill(btn) {
+            if (!btn) return;
+            var id = btn.getAttribute('data-finances-id');
+            var field = btn.getAttribute('data-finances-field');
+            if (!id || !field) return;
+            var key = financesPillKey(id, field);
+            if (String(financesItemEditingId || '').trim() !== id) {
+                selectFinancesItemById(id);
+                btn = document.querySelector(
+                    '#finances-items .finances-pill-btn[data-finances-field="' + field + '"][data-finances-id="' + id + '"]'
+                );
+                if (!btn) return;
+            }
+            if (financesPillArmedKey === key) {
+                var wrap = btn.closest('.finances-pill-wrap');
+                var dropdown = typeof findGuestsRosterDropdown === 'function'
+                    ? findGuestsRosterDropdown(wrap, 'finances-pill-dropdown')
+                    : (wrap ? wrap.querySelector('.finances-pill-dropdown') : null);
+                if (dropdown && !dropdown.hidden) {
+                    if (typeof unplaceGuestsRosterDropdown === 'function') unplaceGuestsRosterDropdown(dropdown);
+                    else dropdown.hidden = true;
+                    btn.setAttribute('aria-expanded', 'false');
+                } else if (dropdown) {
+                    hideFinancesPillMenus();
+                    if (typeof placeGuestsRosterDropdown === 'function') placeGuestsRosterDropdown(btn, dropdown);
+                    else dropdown.hidden = false;
+                    btn.setAttribute('aria-expanded', 'true');
+                }
+            } else {
+                document.querySelectorAll('#finances-items .finances-pill-btn.is-armed').forEach(function(armed) {
+                    armed.classList.remove('is-armed');
+                });
+                hideFinancesPillMenus();
+                financesPillArmedKey = key;
+                btn.classList.add('is-armed');
+            }
+        }
+
+        async function setFinancesRosterField(id, field, value) {
+            if (backendBlockIfReadonly()) return;
+            var next = String(value || '').trim();
+            var allowed = financesRosterMenuOptions(field);
+            var ok = false;
+            for (var i = 0; i < allowed.length; i++) {
+                if (allowed[i].value === next) {
+                    ok = true;
+                    break;
+                }
+            }
+            if (!id || !ok) return;
+            var rec = financesItemById(id);
+            if (!rec) return;
+            if (String(financesItemEditingId || '').trim() !== id) {
+                openFinancesTransactionEditor(rec);
+            }
+            var inputId = field === 'status' ? 'finances-item-status' : 'finances-item-category';
+            financesEnsureSelectValue(inputId, next);
+            rec[field] = next;
+            financesPillArmedKey = '';
+            hideFinancesPillMenus();
+            await saveFinancesTransactionFromForm();
+        }
+
         function renderFinancesItemsTable() {
             var itemsEl = document.getElementById('finances-items-rows');
             if (!itemsEl) return;
@@ -35567,10 +35770,10 @@
                         '" data-finances-item-id="' + escapeHtml(id) + '" tabindex="0" role="row">' +
                         '<td class="finances-name-cell">' + escapeHtml(String(item.name || '').trim() || '—') + '</td>' +
                         '<td class="finances-tag-cell">' +
-                        financesRosterPillHtml(categoryLabel === '—' ? '' : categoryLabel, 'finances-category-pill') +
+                        financesRosterDropdownPillHtml(id, 'category', item.category, categoryLabel, 'finances-category-pill') +
                         '</td>' +
                         '<td class="finances-tag-cell">' +
-                        financesRosterPillHtml(statusLabel === '—' ? '' : statusLabel, financesStatusPillClass(item.status)) +
+                        financesRosterDropdownPillHtml(id, 'status', item.status, statusLabel, financesStatusPillClass(item.status)) +
                         '</td>' +
                         '<td class="finances-amount-cell">' + escapeHtml(formatFinancesAmount(item.totalAmount, item.currency)) + '</td>' +
                         '</tr>';
@@ -35592,12 +35795,109 @@
             return !!(name && status && category);
         }
 
+        var financesFormBaseline = '';
+        var financesSyncTimer = null;
+        var financesSyncInFlight = false;
+        var FINANCES_FIREBASE_DEBOUNCE_MS = 2000;
+
+        function financesSavedFieldsSnapshot() {
+            var data = readFinancesTransactionForm();
+            return JSON.stringify({
+                id: data.id,
+                name: data.name,
+                status: data.status,
+                category: data.category
+            });
+        }
+
+        function captureFinancesFormBaseline() {
+            financesFormBaseline = financesSavedFieldsSnapshot();
+        }
+
+        function financesFormChangedFromBaseline() {
+            return financesSavedFieldsSnapshot() !== financesFormBaseline;
+        }
+
+        function financesEditorIsOpen() {
+            var form = document.getElementById('finances-transaction-form');
+            return !!(form && form.classList.contains('is-open') && !form.hidden);
+        }
+
+        function financesOpenItemIsNew() {
+            var id = String(
+                (document.getElementById('finances-item-id') || {}).value || financesItemEditingId || ''
+            ).trim();
+            return !id || !financesItemById(id);
+        }
+
         function updateFinancesItemSaveButton() {
             var btn = document.getElementById('finances-detail-save-btn');
             if (!btn) return;
-            var ready = financesPadlockIsOpen && financesTransactionSaveReady() && !backenduserIsReadonly;
+            if (btn.classList.contains('is-autosaving')) return;
+            var ready = financesEditorIsOpen() && financesTransactionSaveReady() && !backenduserIsReadonly;
             btn.disabled = !ready;
             btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+            if (!ready) {
+                if (financesSyncTimer) {
+                    clearTimeout(financesSyncTimer);
+                    financesSyncTimer = null;
+                }
+                return;
+            }
+            scheduleFinancesFirebaseSync();
+        }
+
+        function spinFinancesSaveButton() {
+            var btn = document.getElementById('finances-detail-save-btn');
+            if (!btn) return;
+            var svg = btn.querySelector('svg');
+            if (!svg) return;
+            btn.classList.remove('is-saved-spin');
+            void btn.offsetWidth;
+            btn.classList.add('is-saved-spin');
+            function done() {
+                btn.classList.remove('is-saved-spin');
+                svg.removeEventListener('animationend', done);
+            }
+            svg.addEventListener('animationend', done);
+        }
+
+        function scheduleFinancesFirebaseSync() {
+            if (backenduserIsReadonly || !financesPadlockIsOpen || !financesEditorIsOpen()) return;
+            if (!financesTransactionSaveReady()) {
+                if (financesSyncTimer) {
+                    clearTimeout(financesSyncTimer);
+                    financesSyncTimer = null;
+                }
+                return;
+            }
+            if (!financesOpenItemIsNew() && !financesFormChangedFromBaseline()) {
+                if (financesSyncTimer) {
+                    clearTimeout(financesSyncTimer);
+                    financesSyncTimer = null;
+                }
+                return;
+            }
+            if (financesSyncTimer) clearTimeout(financesSyncTimer);
+            financesSyncTimer = setTimeout(function() {
+                financesSyncTimer = null;
+                saveFinancesTransactionFromForm({ silent: true });
+            }, FINANCES_FIREBASE_DEBOUNCE_MS);
+        }
+
+        function onFinancesFormEdit() {
+            if (financesPadlockIsOpen && financesEditorIsOpen() && financesTransactionSaveReady()) {
+                var data = readFinancesTransactionForm();
+                var existing = data.id ? financesItemById(data.id) : null;
+                if (existing) {
+                    existing.name = data.name;
+                    existing.status = data.status;
+                    existing.category = data.category;
+                    renderFinancesItemsTable();
+                }
+            }
+            updateFinancesItemSaveButton();
+            scheduleFinancesFirebaseSync();
         }
 
         function shakeFinancesPadlock() {
@@ -35853,6 +36153,7 @@
             syncFinancesInvoiceDuplicateHint();
             refreshFinancesSupplierDatalist();
             updateFinancesItemNavButtons();
+            captureFinancesFormBaseline();
             updateFinancesItemSaveButton();
         }
 
@@ -35865,11 +36166,11 @@
             };
             setVal('finances-item-id', rec.id || '');
             setVal('finances-item-name', rec.name || '');
-            setVal('finances-item-status', rec.status || '');
+            financesEnsureSelectValue('finances-item-status', rec.status || '');
             setVal('finances-item-supplier', rec.supplier || '');
             setVal('finances-item-invoice-number', rec.invoiceNumber || '');
             setVal('finances-item-description', rec.description || '');
-            setVal('finances-item-category', rec.category || '');
+            financesEnsureSelectValue('finances-item-category', rec.category || '');
             setVal('finances-item-currency', rec.currency || FINANCES_BASE_CURRENCY);
             setVal('finances-item-total-amount', rec.totalAmount != null && rec.totalAmount !== '' ? rec.totalAmount : '');
             setVal('finances-item-amount-base', rec.amountBase != null && rec.amountBase !== '' ? rec.amountBase : '');
@@ -35885,7 +36186,24 @@
             syncFinancesInvoiceDuplicateHint();
             refreshFinancesSupplierDatalist();
             updateFinancesItemNavButtons();
+            captureFinancesFormBaseline();
             updateFinancesItemSaveButton();
+        }
+
+        function financesEnsureSelectValue(id, value) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var next = value == null ? '' : String(value);
+            el.value = next;
+            if (!next || el.value === next) return;
+            var label = next;
+            if (id === 'finances-item-category') label = financesCategoryLabel(next);
+            else if (id === 'finances-item-status') label = financesStatusLabel(next);
+            var opt = document.createElement('option');
+            opt.value = next;
+            opt.textContent = label === '—' ? next : label;
+            el.appendChild(opt);
+            el.value = next;
         }
 
         function readFinancesTransactionForm() {
@@ -35952,13 +36270,13 @@
             form.hidden = false;
             form.setAttribute('aria-hidden', 'false');
             form.classList.add('is-open');
-            if (item) {
-                populateFinancesTransactionForm(item);
-                financesPadlockIsOpen = false;
-            } else {
-                resetFinancesTransactionForm();
-                financesPadlockIsOpen = true;
+            if (financesSyncTimer) {
+                clearTimeout(financesSyncTimer);
+                financesSyncTimer = null;
             }
+            financesPadlockIsOpen = !item;
+            if (item) populateFinancesTransactionForm(item);
+            else resetFinancesTransactionForm();
             syncFinancesFormEditability();
             renderFinancesItemsTable();
             var nameField = document.getElementById('finances-item-name');
@@ -35971,9 +36289,18 @@
             openFinancesTransactionEditor(rec);
         }
 
-        async function saveFinancesTransactionFromForm() {
+        async function saveFinancesTransactionFromForm(opts) {
+            opts = opts || {};
             if (backendBlockIfReadonly()) return false;
-            if (!financesTransactionSaveReady()) return false;
+            if (!financesTransactionSaveReady()) {
+                updateFinancesItemSaveButton();
+                return false;
+            }
+            if (opts.silent && !financesOpenItemIsNew() && !financesFormChangedFromBaseline()) return true;
+            if (financesSyncInFlight) {
+                scheduleFinancesFirebaseSync();
+                return true;
+            }
             var eventName = String(current_event || '').trim();
             if (!eventName) {
                 if (typeof showStatus === 'function') showStatus('error', 'No current event is set.');
@@ -36005,12 +36332,14 @@
                 return false;
             }
             data.id = transactionId;
-            var saveBtn = document.getElementById('finances-detail-save-btn');
-            if (saveBtn) {
-                saveBtn.disabled = true;
-                saveBtn.setAttribute('aria-disabled', 'true');
+            if (financesSyncTimer) {
+                clearTimeout(financesSyncTimer);
+                financesSyncTimer = null;
             }
-            if (typeof showStatus === 'function') showStatus('loading', 'Saving transaction…');
+            financesSyncInFlight = true;
+            var saveBtn = document.getElementById('finances-detail-save-btn');
+            if (saveBtn) saveBtn.classList.add('is-autosaving');
+            if (!opts.silent && typeof showStatus === 'function') showStatus('loading', 'Saving transaction…');
             try {
                 var db = getFirestore();
                 var FV = firebase.firestore && firebase.firestore.FieldValue;
@@ -36034,6 +36363,8 @@
                 );
                 await batch.commit();
             } catch (e) {
+                financesSyncInFlight = false;
+                if (saveBtn) saveBtn.classList.remove('is-autosaving');
                 updateFinancesItemSaveButton();
                 if (typeof showStatus === 'function') {
                     showStatus('error', e && e.message ? e.message : 'Could not save the transaction.');
@@ -36061,6 +36392,15 @@
             refreshFinancesSupplierDatalist();
             syncFinancesInvoiceDuplicateHint();
             renderFinancesItemsTable();
+            financesSyncInFlight = false;
+            if (saveBtn) saveBtn.classList.remove('is-autosaving');
+            financesFormBaseline = JSON.stringify({
+                id: data.id,
+                name: data.name,
+                status: data.status,
+                category: data.category
+            });
+            spinFinancesSaveButton();
             updateFinancesItemSaveButton();
             if (typeof showStatus === 'function') {
                 showStatus('success', existing ? 'Transaction saved.' : 'Transaction added.');
@@ -47109,7 +47449,11 @@
                     financesDetailSaveBtn.addEventListener('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
-                        if (financesDetailSaveBtn.disabled) return;
+                        if (financesDetailSaveBtn.disabled || financesDetailSaveBtn.classList.contains('is-autosaving')) return;
+                        if (financesSyncTimer) {
+                            clearTimeout(financesSyncTimer);
+                            financesSyncTimer = null;
+                        }
                         saveFinancesTransactionFromForm();
                     });
                 }
@@ -47163,12 +47507,8 @@
                         syncFinancesDocumentPreview(null);
                     });
                 }
-                ['finances-item-name', 'finances-item-status', 'finances-item-category'].forEach(function(id) {
-                    var field = document.getElementById(id);
-                    if (!field) return;
-                    field.addEventListener('input', updateFinancesItemSaveButton);
-                    field.addEventListener('change', updateFinancesItemSaveButton);
-                });
+                financesTransactionForm.addEventListener('input', onFinancesFormEdit);
+                financesTransactionForm.addEventListener('change', onFinancesFormEdit);
                 updateFinancesItemSaveButton();
                 var financesStatusEl = document.getElementById('finances-item-status');
                 var financesCurrencyEl = document.getElementById('finances-item-currency');
@@ -47217,18 +47557,48 @@
             }
             if (financesItemsRows) {
                 financesItemsRows.addEventListener('click', function(ev) {
+                    var option = ev.target && ev.target.closest ? ev.target.closest('.finances-pill-option') : null;
+                    if (option && financesItemsRows.contains(option)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var optRow = option.closest('tr[data-finances-item-id]');
+                        var optId = optRow && optRow.getAttribute('data-finances-item-id');
+                        var optBtn = option.closest('.finances-pill-wrap') && option.closest('.finances-pill-wrap').querySelector('.finances-pill-btn');
+                        var optField = optBtn && optBtn.getAttribute('data-finances-field');
+                        var optVal = option.getAttribute('data-finances-value');
+                        if (optId && optField && optVal) void setFinancesRosterField(optId, optField, optVal);
+                        return;
+                    }
+                    var pill = ev.target && ev.target.closest ? ev.target.closest('.finances-pill-btn') : null;
+                    if (pill && financesItemsRows.contains(pill)) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        toggleFinancesRosterPill(pill);
+                        return;
+                    }
                     var row = ev.target && ev.target.closest ? ev.target.closest('tr[data-finances-item-id]') : null;
                     if (!row) return;
+                    financesPillArmedKey = '';
+                    hideFinancesPillMenus();
                     selectFinancesItemById(row.getAttribute('data-finances-item-id'));
                 });
                 financesItemsRows.addEventListener('keydown', function(ev) {
                     if (ev.key !== 'Enter' && ev.key !== ' ') return;
+                    if (ev.target && ev.target.closest && ev.target.closest('.finances-pill-btn, .finances-pill-option')) return;
                     var row = ev.target && ev.target.closest ? ev.target.closest('tr[data-finances-item-id]') : null;
                     if (!row) return;
                     ev.preventDefault();
                     selectFinancesItemById(row.getAttribute('data-finances-item-id'));
                 });
             }
+            document.addEventListener('click', function(ev) {
+                if (ev.target && ev.target.closest && ev.target.closest('#finances-items .finances-pill-wrap, body > ul.finances-pill-dropdown')) return;
+                financesPillArmedKey = '';
+                document.querySelectorAll('#finances-items .finances-pill-btn.is-armed').forEach(function(btn) {
+                    btn.classList.remove('is-armed');
+                });
+                hideFinancesPillMenus();
+            });
             renderFinancesItemsTable();
             refreshFinancesSupplierDatalist();
             var financesImportInvoicesBtn = document.getElementById('finances-financials-import-btn');
