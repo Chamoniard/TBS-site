@@ -688,9 +688,10 @@
 
         .programme-section,
         .programme-section.is-open {
-            background: #ffffff;
+            background: #e2e8f0;
             margin-bottom: 0;
             padding-bottom: 0;
+            border: none;
             border-top-left-radius: 0 !important;
             border-radius: 0;
         }
@@ -1422,8 +1423,10 @@
         #lodging-editor .lodging-rooms-table td.lodging-room-checkout-cell {
             color: #0f172a;
             font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 400;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: normal;
+            text-transform: none;
         }
 
         #lodging-editor .lodging-rooms-table th.lodging-guest-name-col,
@@ -8002,6 +8005,8 @@
             font-weight: 500;
             font-size: 1.1rem;
             font-family: 'Inter', sans-serif;
+            letter-spacing: normal;
+            text-transform: none;
             border-bottom: none;
             position: sticky;
             top: 0;
@@ -9505,6 +9510,21 @@
         #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
             padding-left: 0;
             padding-right: 0;
+        }
+
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .selected-guestname,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .selected-guestname {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #programme-editor .programme-grid > .edit-guest-top.guests-list-heading .edit-guest-name-last,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-first,
+        #programme-editor .activities > .edit-guest-top.guests-list-heading .edit-guest-name-last {
+            min-width: max-content;
+            white-space: nowrap;
+            word-break: normal;
         }
 
         #guest-editor .guest-editor-toolbar,
