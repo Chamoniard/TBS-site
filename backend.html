@@ -335,7 +335,8 @@
         body.backend-page.backend-readonly #finances-financials-import-btn,
         body.backend-page.backend-readonly #finances-items-add-btn,
         body.backend-page.backend-readonly #finances-detail-delete-btn,
-        body.backend-page.backend-readonly #finances-item-save-btn {
+        body.backend-page.backend-readonly #finances-detail-save-btn,
+        body.backend-page.backend-readonly #finances-detail-padlock-btn {
             pointer-events: none;
             cursor: not-allowed;
             opacity: 0.45;
@@ -5194,17 +5195,24 @@
         .finances-section,
         .finances-section.is-open {
             --editor-gunmetal-border: #e2e8f0;
+            --backend-roster-pill-width: 7.5rem;
             background: #e2e8f0;
             border: none;
             padding: 16px;
+            position: relative;
         }
 
         #finances-editor.is-open,
         .finances-section.is-open {
+            flex: 1 1 auto;
             flex-direction: column;
             align-items: stretch;
             gap: 0;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
             min-height: 0;
+            overflow: hidden;
         }
 
         #team-editor,
@@ -5945,7 +5953,7 @@
             box-sizing: border-box;
             border: none;
             border-radius: 6px;
-            background-color: var(--backend-tab-pale-pink);
+            background-color: var(--backend-tab-pale-blue);
             box-shadow: none;
             outline: none;
             padding: 0.5rem 0.75rem;
@@ -6009,8 +6017,148 @@
             margin-top: 0.5rem;
         }
 
+        #finances-editor .finances-transaction-form-actions .texteditor-save-btn,
+        #finances-editor .finances-transaction-form-actions .speaker-delete-cancel-btn {
+            flex: 0 0 auto;
+            width: var(--backend-gold-toolbar-btn-width);
+            min-width: var(--backend-gold-toolbar-btn-width);
+            max-width: var(--backend-gold-toolbar-btn-width);
+            height: 35px;
+            min-height: 35px;
+            max-height: 35px;
+            padding: 0 0.85rem;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-family: var(--backend-gold-toolbar-btn-font);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+
         #finances-editor .finances-transaction-form-actions .texteditor-save-btn {
-            min-width: 7rem;
+            background: var(--backend-button-yellow);
+            color: #003153;
+        }
+
+        #finances-editor .finances-transaction-form-actions .texteditor-save-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+
+        #finances-editor .finances-transaction-form-actions .texteditor-save-btn:disabled {
+            background: var(--backend-button-yellow);
+            color: #94a3b8;
+            cursor: not-allowed;
+            filter: none;
+            opacity: 1;
+        }
+
+        #finances-editor .finances-document-upload {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        #finances-editor .finances-document-upload .content-editor-image-block {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 0;
+        }
+
+        #finances-editor .finances-transaction-form input:disabled,
+        #finances-editor .finances-transaction-form select:disabled,
+        #finances-editor .finances-transaction-form textarea:disabled,
+        #finances-editor .finances-transaction-form input[readonly] {
+            background-color: var(--backend-tab-pale-blue);
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+        }
+
+        #finances-editor.finances-padlock-unlocked .finances-transaction-form input:not([type="hidden"]):not([type="file"]),
+        #finances-editor.finances-padlock-unlocked .finances-transaction-form select,
+        #finances-editor.finances-padlock-unlocked .finances-transaction-form textarea,
+        #finances-editor.finances-padlock-unlocked .finances-transaction-form input:disabled,
+        #finances-editor.finances-padlock-unlocked .finances-transaction-form select:disabled,
+        #finances-editor.finances-padlock-unlocked .finances-document-upload .content-editor-image-placeholder {
+            background-color: var(--backend-tab-pale-pink);
+        }
+
+        #finances-editor .finances-document-upload .content-editor-image-frame {
+            width: 100%;
+            max-width: 100%;
+            aspect-ratio: 16 / 9;
+            min-height: 4rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            border-radius: 0;
+            border: none;
+            background: #f8fafc;
+            line-height: 0;
+            position: relative;
+            cursor: default;
+        }
+
+        #finances-editor.finances-padlock-unlocked .finances-document-upload .content-editor-image-frame {
+            cursor: pointer;
+        }
+
+        #finances-editor .finances-document-upload .content-editor-image-frame img {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            display: block;
+            vertical-align: top;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        #finances-editor #finances-item-document-preview:not([src]) {
+            display: none;
+        }
+
+        #finances-editor .finances-document-upload .content-editor-image-placeholder {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: var(--backend-tab-pale-blue);
+            color: #94a3b8;
+            z-index: 0;
+        }
+
+        #finances-editor #finances-item-document-preview:not([src]) + .content-editor-image-placeholder {
+            display: flex;
+        }
+
+        #finances-editor .finances-document-placeholder-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            max-width: 100%;
+            padding: 0.75rem;
+            box-sizing: border-box;
+        }
+
+        #finances-editor .finances-document-filename {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1.3;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        #finances-editor .finances-document-filename[hidden] {
+            display: none !important;
         }
 
         #finances-editor .finances-overview {
@@ -6047,48 +6195,44 @@
             display: none;
         }
 
-        #finances-editor .finances-bottom-scrollbar {
-            display: none;
-            flex: 0 0 auto;
-            align-self: stretch;
-            height: var(--horizontal-slider-scrollbar-height, 12px);
-            margin-top: 8px;
-            box-sizing: border-box;
-        }
-
-        #finances-editor .finances-bottom-scrollbar.is-active {
-            display: block;
-        }
-
-        #finances-editor .finances-bottom-scrollbar-track {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: var(--horizontal-slider-scrollbar-radius, 6px);
-            background-color: rgba(240, 224, 235, 0.45);
-            cursor: pointer;
-        }
-
-        #finances-editor .finances-bottom-scrollbar-thumb {
+        #finances-editor .finances-pane-scrollbar {
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            min-width: 22px;
-            border-radius: var(--horizontal-slider-scrollbar-radius, 6px);
-            background: var(--tbs-pink);
-            background-color: var(--tbs-pink);
-            cursor: grab;
+            top: 5px;
+            left: 16px;
+            right: 16px;
+            height: 6px;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(240, 224, 235, 0.45);
+            z-index: 6;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
-        #finances-editor .finances-bottom-scrollbar-thumb.is-dragging {
-            cursor: grabbing;
+        #finances-editor .finances-pane-scrollbar[hidden] {
+            display: none !important;
         }
 
-        #finances-editor .finances-bottom-scrollbar-thumb:hover {
+        #finances-editor .finances-pane-scrollbar-thumb {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 6px;
+            width: 0;
+            border-radius: 999px;
+            background: var(--tbs-pink);
+            cursor: grab;
+            touch-action: none;
+        }
+
+        #finances-editor .finances-pane-scrollbar-thumb:hover {
             background: var(--tbs-pink-soft);
-            background-color: var(--tbs-pink-soft);
+        }
+
+        #finances-editor .finances-pane-scrollbar-thumb:active {
+            cursor: grabbing;
         }
 
         #finances-editor .finances-bottom-track {
@@ -6099,8 +6243,8 @@
             align-items: stretch;
             gap: 16px;
             flex: none;
-            width: max(100%, calc(1500px - 32px), calc(var(--finances-pane-min) * 3 + 32px));
-            min-width: max(100%, calc(1500px - 32px), calc(var(--finances-pane-min) * 3 + 32px));
+            width: max(100%, calc(var(--finances-pane-min) * 3 + 32px));
+            min-width: max(100%, calc(var(--finances-pane-min) * 3 + 32px));
             min-height: 0;
             height: 100%;
             box-sizing: border-box;
@@ -6130,7 +6274,17 @@
         }
 
         #finances-editor .finances-panel > .finances-heading .finances-heading-label {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
             font-weight: 700;
+            font-style: normal;
+            line-height: 1.2;
+            letter-spacing: normal;
+            text-transform: uppercase;
+            text-align: left;
+            color: #000000;
             white-space: nowrap;
         }
 
@@ -7971,6 +8125,7 @@
         .speakers-roster-table,
         .guests-list-table,
         .team-list-table,
+        .finances-table,
         .content-list-table,
         .content-roster-table,
         .programme-speakers-table,
@@ -8001,6 +8156,8 @@
         .guests-list-table td,
         .team-list-table th,
         .team-list-table td,
+        .finances-table th,
+        .finances-table td,
         .content-list-table th,
         .content-list-table td,
         .content-roster-table th,
@@ -8017,6 +8174,7 @@
         .speakers-roster-table thead th,
         .guests-list-table thead th,
         .team-list-table thead th,
+        .finances-table thead th,
         .content-list-table thead th,
         .content-roster-table thead th,
         .programme-speakers-table thead th,
@@ -8062,12 +8220,14 @@
         .speakers-roster-table thead th,
         .guests-list-table thead th,
         .team-list-table thead th,
+        .finances-table thead th,
         .programme-speakers-table thead th {
             text-align: center;
         }
         .speakers-roster-table thead th:nth-child(1),
         .guests-list-table thead th:nth-child(1),
         .team-list-table thead th:nth-child(1),
+        .finances-table thead th:nth-child(1),
         .programme-speakers-table thead th:nth-child(1) {
             text-align: left;
         }
@@ -8137,6 +8297,17 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        #finances-editor #finances-items .finances-table tbody td {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-style: normal;
+            letter-spacing: normal;
+            text-transform: none;
+            color: #0f172a;
+            line-height: 1.6;
         }
 
         #guest-editor .guests-list-table tbody td.guests-roster-name-cell,
@@ -8389,7 +8560,10 @@
         #team-editor .team-list-table thead th:nth-child(2),
         #team-editor .team-list-table thead th:nth-child(3),
         #team-editor .team-list-table thead th:nth-child(4),
-        #team-editor .team-list-table tbody td.team-roster-tag-cell {
+        #team-editor .team-list-table tbody td.team-roster-tag-cell,
+        #finances-editor #finances-items .finances-table thead th:nth-child(2),
+        #finances-editor #finances-items .finances-table thead th:nth-child(3),
+        #finances-editor #finances-items .finances-table tbody td.finances-tag-cell {
             width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
             min-width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
             max-width: calc(var(--backend-roster-pill-width) + (2 * var(--backend-table-cell-pad-x)));
@@ -8397,6 +8571,29 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        #finances-editor #finances-items .finances-table thead th:nth-child(4),
+        #finances-editor #finances-items .finances-table tbody td.finances-amount-cell {
+            width: 9.5rem;
+            min-width: 9.5rem;
+            max-width: 9.5rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #finances-editor #finances-items .finances-table thead th:nth-child(1),
+        #finances-editor #finances-items .finances-table tbody td.finances-name-cell {
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
         }
 
         #programme-editor .programme-speakers-table thead th.content-roster-published-col,
@@ -8472,6 +8669,7 @@
         #guest-editor .guests-list-table .content-badge,
         #team-editor .team-list-table .content-badge,
         #emailer-editor .contacts-list-table .content-badge,
+        #finances-editor #finances-items .finances-table .content-badge,
         #programme-editor .programme-speakers-table button.speaker-roster-tag,
         #lodging-editor .lodging-speakers-table .lodging-speaker-pill,
         #lodging-editor .lodging-speakers-table button.speaker-roster-tag,
@@ -8886,6 +9084,7 @@
         #speaker-editor .edit-speaker-top,
         #content-editor .content-list > .edit-guest-top.guests-list-heading.content-list-top,
         #content-editor .content-viewer > .edit-guest-top.guests-list-heading.content-list-top,
+        #finances-editor .finances-panel > .finances-heading,
         #programme-editor .programme-grid > .edit-guest-top.guests-list-heading,
         #programme-editor .activities > .edit-guest-top.guests-list-heading {
             height: var(--backend-panel-header-height);
@@ -10886,9 +11085,30 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-field-empty,
-        #team-editor .team-list-table .content-badge.content-badge--guest-field-empty {
+        #team-editor .team-list-table .content-badge.content-badge--guest-field-empty,
+        #finances-editor #finances-items .finances-table .content-badge.content-badge--guest-field-empty {
             background: #f1f5f9;
             color: #64748b;
+        }
+
+        #finances-editor #finances-items .finances-table .content-badge.finances-category-pill {
+            background: var(--backend-navbar-bg);
+            color: #ffffff;
+        }
+
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-projected {
+            background: #71C7FE;
+            color: #ffffff;
+        }
+
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-received {
+            background: var(--backend-roster-status-ready-bg);
+            color: var(--backend-roster-status-ready-color);
+        }
+
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-partial {
+            background: var(--backend-roster-status-no-bg);
+            color: var(--backend-roster-status-no-color);
         }
 
         /* Guests CME sent: Ready (same yellow as speaker “first brief” / CME ready). */
@@ -16760,6 +16980,9 @@
             </section>
 
             <section class="finances-section" id="finances-editor" aria-hidden="true" aria-label="Finances" data-name="finances-editor">
+                <div class="finances-pane-scrollbar" id="finances-pane-scrollbar" hidden>
+                    <div class="finances-pane-scrollbar-thumb" id="finances-pane-scrollbar-thumb"></div>
+                </div>
                 <div class="finances-overview">
                     <div class="finances-bottom-row" id="finances-bottom-row">
                     <div class="finances-bottom-track" id="finances-bottom-track">
@@ -16793,11 +17016,16 @@
                                 <div class="finances-roster-items" id="finances-items-rows" aria-live="polite">
                                     <table class="finances-table" role="grid" aria-label="Items">
                                         <thead>
-                                            <tr></tr>
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Category</th>
+                                                <th scope="col">Status</th>
+                                                <th scope="col">Amount</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
                                             <tr class="finances-row">
-                                                <td class="finances-empty">No items yet.</td>
+                                                <td class="finances-empty" colspan="4">No items yet.</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -16813,6 +17041,16 @@
                                 </div>
                             </div>
                             <div class="finances-heading-actions" aria-label="Detail actions">
+                                <button type="button" class="finances-toolbar-btn guest-editor-padlock-btn" id="finances-detail-padlock-btn" aria-label="Unlock transaction" title="Unlock" aria-pressed="false" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                                        <path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="finances-toolbar-btn" id="finances-detail-save-btn" aria-label="Save transaction" title="Save transaction" disabled aria-disabled="true">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                        <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
+                                    </svg>
+                                </button>
                                 <button type="button" class="finances-toolbar-btn finances-delete-btn" id="finances-detail-delete-btn" aria-label="Delete item" title="Delete item" disabled aria-disabled="true">
                                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                                         <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -16842,14 +17080,10 @@
                                         <label for="finances-item-category">Category</label>
                                         <select id="finances-item-category" name="category" required aria-required="true">
                                             <option value="">Select</option>
-                                            <option value="travel">Travel</option>
-                                            <option value="software">Software</option>
-                                            <option value="faculty_fees">Faculty fees</option>
                                             <option value="venue">Venue</option>
-                                            <option value="marketing">Marketing</option>
-                                            <option value="consulting">Consulting</option>
-                                            <option value="equipment">Equipment</option>
-                                            <option value="other">Other</option>
+                                            <option value="av_team">AV-team</option>
+                                            <option value="speaker_travel">Speaker travel</option>
+                                            <option value="team_lodging">Team lodging</option>
                                         </select>
                                     </div>
                                 </div>
@@ -16905,8 +17139,21 @@
                                     <label for="finances-item-date-paid">Date paid</label>
                                     <input type="date" id="finances-item-date-paid" name="datePaid">
                                 </div>
-                                <div class="finances-transaction-form-actions">
-                                    <button type="submit" class="texteditor-save-btn" id="finances-item-save-btn" title="Save item" aria-label="Save item">Save</button>
+                                <div class="finances-document-upload" aria-label="Document">
+                                    <div class="content-editor-image-block" id="finances-item-document-block">
+                                        <div class="content-editor-image-frame" id="finances-item-document-frame" role="button" tabindex="0" title="Upload document" aria-label="Upload document">
+                                            <img id="finances-item-document-preview" alt="" decoding="async" referrerpolicy="no-referrer" />
+                                            <div class="content-editor-image-placeholder" id="finances-item-document-placeholder" aria-hidden="true">
+                                                <span class="finances-document-placeholder-inner">
+                                                    <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                                                        <path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5 11 16.51 14.5 12l4.5 6H5l3.5-4.5zM7 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+                                                    </svg>
+                                                    <span class="finances-document-filename" id="finances-item-document-name" hidden></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="finances-item-document-upload" accept="application/pdf,image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" hidden aria-hidden="true">
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -16940,11 +17187,6 @@
                         </div>
                     </div>
                     </div>
-                    </div>
-                    <div class="finances-bottom-scrollbar" id="finances-bottom-scrollbar" hidden aria-hidden="true">
-                        <div class="finances-bottom-scrollbar-track">
-                            <div class="finances-bottom-scrollbar-thumb"></div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -17763,6 +18005,7 @@
         let contentPadlockIsOpen = false;
         let contentDeleteConfirmArmed = false;
         let guestPadlockIsOpen = false;
+        let financesPadlockIsOpen = false;
         var guestDraftFormActive = false;
         var guestNewFormSaveInFlight = false;
         /** Ignore guest-roster row clicks until this timestamp (ms), e.g. after application-review confirm. */
@@ -19124,6 +19367,7 @@
             document.body.classList.toggle('backend-readonly', !!backenduserIsReadonly);
             if (!backenduserIsReadonly) return;
             guestPadlockIsOpen = false;
+            financesPadlockIsOpen = false;
             speakerPadlockIsOpen = false;
             contentPadlockIsOpen = false;
             texteditorPadlockIsOpen = false;
@@ -19245,6 +19489,24 @@
         function tbsLodgingRoomDocRef(db, eventName, houseName, roomName) {
             var room = String(roomName || '').trim();
             return tbsLodgingHouseDocRef(db, eventName, houseName).collection(room).doc(room);
+        }
+
+        /**
+         * Event finances doc: `tbs/Finances/{current_event}/{current_event}`.
+         * Each transaction is a subcollection of this document.
+         */
+        function tbsFinancesEventDocRef(db, eventName) {
+            var ev = String(eventName || '').trim();
+            return db.collection('tbs').doc('Finances').collection(ev).doc(ev);
+        }
+
+        /**
+         * Transaction doc: `tbs/Finances/{current_event}/{current_event}/{id}/{id}`
+         * with fields `name`, `status`, and `category`.
+         */
+        function tbsFinancesTransactionDocRef(db, eventName, transactionId) {
+            var id = String(transactionId || '').trim();
+            return tbsFinancesEventDocRef(db, eventName).collection(id).doc(id);
         }
 
         /**
@@ -27595,11 +27857,31 @@
             });
         }
 
-        function syncEmailerPaneLayout() {
+        function emailerPaneMinPx() {
             var editor = document.getElementById('emailer-editor');
-            var track = document.getElementById('emailer-bottom-track');
-            if (!editor || !track || !editor.classList.contains('is-open')) return;
-            ensureEmailerPaneScroll();
+            if (!editor) return 0;
+            var hidden = !editor.classList.contains('is-open');
+            var snapshot = null;
+            if (hidden) {
+                snapshot = {
+                    display: editor.style.display,
+                    visibility: editor.style.visibility,
+                    position: editor.style.position,
+                    left: editor.style.left,
+                    top: editor.style.top,
+                    width: editor.style.width,
+                    height: editor.style.height,
+                    pointerEvents: editor.style.pointerEvents
+                };
+                editor.style.display = 'flex';
+                editor.style.visibility = 'hidden';
+                editor.style.position = 'absolute';
+                editor.style.left = '0';
+                editor.style.top = '0';
+                editor.style.width = '100%';
+                editor.style.height = 'auto';
+                editor.style.pointerEvents = 'none';
+            }
             var heads = [
                 document.getElementById('contacts-list-heading'),
                 document.querySelector('#bulk-email-actions > .edit-contact-top'),
@@ -27609,8 +27891,27 @@
             for (var i = 0; i < heads.length; i++) {
                 minPane = Math.max(minPane, emailerHeaderFloorWidth(heads[i]));
             }
+            if (snapshot) {
+                editor.style.display = snapshot.display;
+                editor.style.visibility = snapshot.visibility;
+                editor.style.position = snapshot.position;
+                editor.style.left = snapshot.left;
+                editor.style.top = snapshot.top;
+                editor.style.width = snapshot.width;
+                editor.style.height = snapshot.height;
+                editor.style.pointerEvents = snapshot.pointerEvents;
+            }
+            return minPane > 0 ? minPane + 2 : 0;
+        }
+
+        function syncEmailerPaneLayout() {
+            var editor = document.getElementById('emailer-editor');
+            var track = document.getElementById('emailer-bottom-track');
+            if (!editor || !track || !editor.classList.contains('is-open')) return;
+            ensureEmailerPaneScroll();
+            var minPane = emailerPaneMinPx();
             if (minPane > 0) {
-                track.style.setProperty('--emailer-pane-min', (minPane + 2) + 'px');
+                track.style.setProperty('--emailer-pane-min', minPane + 'px');
             }
             syncEmailerPaneScrollbar();
         }
@@ -29944,6 +30245,7 @@
                 void loadAndRenderTeamTable({ force: true, silent: true }).catch(function (err) {
                     console.error('loadAndRenderTeamTable:', err);
                 });
+                void loadFinancesTransactionsFromFirestore();
                 if (
                     document.getElementById('lodging-editor') &&
                     document.getElementById('lodging-editor').classList.contains('is-open')
@@ -34996,6 +35298,7 @@
         var FINANCES_BASE_CURRENCY = 'SEK';
         var financesItemsInMemory = [];
         var financesItemEditingId = '';
+        var financesPendingDocument = null;
         var financesItemsStorageKey = 'tbs-finances-items-v1';
 
         function financesStatusLabel(status) {
@@ -35009,14 +35312,10 @@
 
         function financesCategoryLabel(category) {
             var c = String(category || '').trim();
-            if (c === 'travel') return 'Travel';
-            if (c === 'software') return 'Software';
-            if (c === 'faculty_fees') return 'Faculty fees';
             if (c === 'venue') return 'Venue';
-            if (c === 'marketing') return 'Marketing';
-            if (c === 'consulting') return 'Consulting';
-            if (c === 'equipment') return 'Equipment';
-            if (c === 'other') return 'Other';
+            if (c === 'av_team') return 'AV-team';
+            if (c === 'speaker_travel') return 'Speaker travel';
+            if (c === 'team_lodging') return 'Team lodging';
             return c || '—';
         }
 
@@ -35058,8 +35357,126 @@
         function persistFinancesItemsToStorage() {
             try {
                 localStorage.setItem(financesItemsStorageKey, JSON.stringify(financesItemsInMemory || []));
+                return true;
             } catch (e) {
                 console.warn('finances items storage save failed', e);
+                return false;
+            }
+        }
+
+        var financesTransactionsLoadSeq = 0;
+
+        function financesAmountFromDoc(data) {
+            if (!data || typeof data !== 'object') return '';
+            if (data.totalAmount != null && data.totalAmount !== '') return data.totalAmount;
+            if (data.amount != null && data.amount !== '') return data.amount;
+            return '';
+        }
+
+        function financesItemFromTransactionDoc(id, data) {
+            data = data && typeof data === 'object' ? data : {};
+            return {
+                id: String(id || '').trim(),
+                name: data.name != null ? String(data.name) : '',
+                status: data.status != null ? String(data.status) : '',
+                category: data.category != null ? String(data.category) : '',
+                supplier: data.supplier != null ? String(data.supplier) : '',
+                currency: data.currency != null ? String(data.currency) : '',
+                totalAmount: financesAmountFromDoc(data),
+                amountBase: data.amountBase != null ? data.amountBase : '',
+                amountPaid: data.amountPaid != null ? data.amountPaid : '',
+                Transaction: data.Transaction != null ? String(data.Transaction) : 'Expense',
+                invoiceNumber: data.invoiceNumber != null ? String(data.invoiceNumber) : '',
+                invoiceDate: data.invoiceDate != null ? String(data.invoiceDate) : '',
+                dueDate: data.dueDate != null ? String(data.dueDate) : '',
+                datePaid: data.datePaid != null ? String(data.datePaid) : '',
+                document: data.document || '',
+                documentName: data.documentName || '',
+                documentType: data.documentType || ''
+            };
+        }
+
+        async function listFinancesTransactionIds(db, eventName) {
+            var seen = {};
+            var ids = [];
+            function addId(name) {
+                var key = String(name != null ? name : '').trim();
+                if (!key || key.indexOf('/') !== -1 || seen[key]) return;
+                seen[key] = true;
+                ids.push(key);
+            }
+            var parentRef = tbsFinancesEventDocRef(db, eventName);
+            try {
+                var parentSnap = await parentRef.get();
+                if (parentSnap && parentSnap.exists) {
+                    var stored = (parentSnap.data() || {}).transactionIds;
+                    if (Array.isArray(stored)) stored.forEach(addId);
+                }
+            } catch (parentErr) {
+                console.warn('listFinancesTransactionIds parent:', parentErr);
+            }
+            try {
+                var idToken = await ensureFirebaseAuthForFirestoreRest();
+                var restIds = await firestoreRestListCollectionIdsUnderDocumentPath(
+                    lodgingFirestoreDocPath(['tbs', 'Finances', eventName, eventName]),
+                    idToken
+                );
+                if (Array.isArray(restIds)) restIds.forEach(addId);
+            } catch (restErr) {
+                console.warn('listFinancesTransactionIds rest:', restErr);
+            }
+            if (typeof parentRef.listCollections === 'function') {
+                try {
+                    var cols = await parentRef.listCollections();
+                    cols.forEach(function (col) {
+                        addId(col.id);
+                    });
+                } catch (listErr) {
+                    console.warn('listFinancesTransactionIds:', listErr);
+                }
+            }
+            ids.sort(function (a, b) {
+                return String(a).localeCompare(String(b), undefined, { sensitivity: 'base', numeric: true });
+            });
+            return ids;
+        }
+
+        async function loadFinancesTransactionsFromFirestore() {
+            var seq = ++financesTransactionsLoadSeq;
+            var eventName = String(current_event || '').trim();
+            if (!eventName || eventName.indexOf('/') !== -1) {
+                financesItemsInMemory = [];
+                renderFinancesItemsTable();
+                return;
+            }
+            try {
+                var db = getFirestore();
+                var ids = await listFinancesTransactionIds(db, eventName);
+                if (seq !== financesTransactionsLoadSeq) return;
+                var rows = await Promise.all(ids.map(function (id) {
+                    return tbsFinancesTransactionDocRef(db, eventName, id).get().then(function (snap) {
+                        return financesItemFromTransactionDoc(id, snap && snap.exists ? (snap.data() || {}) : {});
+                    });
+                }));
+                if (seq !== financesTransactionsLoadSeq) return;
+                rows.sort(function (a, b) {
+                    var byName = String(a.name || '').localeCompare(String(b.name || ''), undefined, {
+                        sensitivity: 'base',
+                        numeric: true
+                    });
+                    if (byName) return byName;
+                    return String(a.id || '').localeCompare(String(b.id || ''));
+                });
+                financesItemsInMemory = rows;
+                persistFinancesItemsToStorage();
+                refreshFinancesSupplierDatalist();
+                renderFinancesItemsTable();
+            } catch (e) {
+                if (seq !== financesTransactionsLoadSeq) return;
+                console.error('loadFinancesTransactionsFromFirestore:', e);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', e && e.message ? e.message : 'Could not load transactions.');
+                }
             }
         }
 
@@ -35106,18 +35523,34 @@
             }
         }
 
+        function financesStatusPillClass(status) {
+            var s = String(status || '').trim();
+            if (s === 'paid') return 'finances-status-paid';
+            if (s === 'partially_paid') return 'finances-status-partial';
+            if (s === 'received') return 'finances-status-received';
+            if (s === 'projected') return 'finances-status-projected';
+            return 'finances-status-neutral';
+        }
+
+        function financesRosterPillHtml(label, modifier) {
+            var text = String(label || '').trim();
+            if (!text || text === '—') {
+                return '<span class="content-badge content-badge--guest-field-empty">—</span>';
+            }
+            return '<span class="content-badge ' + modifier + '" title="' + escapeHtml(text) + '">' +
+                escapeHtml(text) + '</span>';
+        }
+
         function renderFinancesItemsTable() {
             var itemsEl = document.getElementById('finances-items-rows');
             if (!itemsEl) return;
-            var colCount = 6;
+            var colCount = 4;
             var html = '<table class="finances-table" role="grid" aria-label="Items">' +
                 '<thead><tr>' +
                 '<th scope="col">Name</th>' +
-                '<th scope="col">Status</th>' +
-                '<th scope="col">Supplier</th>' +
                 '<th scope="col">Category</th>' +
+                '<th scope="col">Status</th>' +
                 '<th scope="col">Amount</th>' +
-                '<th scope="col">Currency</th>' +
                 '</tr></thead><tbody>';
             if (!financesItemsInMemory.length) {
                 html += '<tr class="finances-row">' +
@@ -35128,14 +35561,18 @@
                     var item = financesItemsInMemory[i] || {};
                     var id = String(item.id || '').trim();
                     var selected = id && id === String(financesItemEditingId || '').trim();
+                    var categoryLabel = financesCategoryLabel(item.category);
+                    var statusLabel = financesStatusLabel(item.status);
                     html += '<tr class="finances-row' + (selected ? ' is-selected' : '') +
                         '" data-finances-item-id="' + escapeHtml(id) + '" tabindex="0" role="row">' +
                         '<td class="finances-name-cell">' + escapeHtml(String(item.name || '').trim() || '—') + '</td>' +
-                        '<td>' + escapeHtml(financesStatusLabel(item.status)) + '</td>' +
-                        '<td>' + escapeHtml(String(item.supplier || '').trim() || '—') + '</td>' +
-                        '<td>' + escapeHtml(financesCategoryLabel(item.category)) + '</td>' +
-                        '<td>' + escapeHtml(formatFinancesAmount(item.totalAmount, item.currency)) + '</td>' +
-                        '<td>' + escapeHtml(String(item.currency || FINANCES_BASE_CURRENCY).trim() || FINANCES_BASE_CURRENCY) + '</td>' +
+                        '<td class="finances-tag-cell">' +
+                        financesRosterPillHtml(categoryLabel === '—' ? '' : categoryLabel, 'finances-category-pill') +
+                        '</td>' +
+                        '<td class="finances-tag-cell">' +
+                        financesRosterPillHtml(statusLabel === '—' ? '' : statusLabel, financesStatusPillClass(item.status)) +
+                        '</td>' +
+                        '<td class="finances-amount-cell">' + escapeHtml(formatFinancesAmount(item.totalAmount, item.currency)) + '</td>' +
                         '</tr>';
                 }
             }
@@ -35144,6 +35581,84 @@
             if (typeof extendRosterTableBorders === 'function') {
                 extendRosterTableBorders(itemsEl);
             }
+            updateFinancesItemNavButtons();
+            updateFinancesItemSaveButton();
+        }
+
+        function financesTransactionSaveReady() {
+            var name = String((document.getElementById('finances-item-name') || {}).value || '').trim();
+            var status = String((document.getElementById('finances-item-status') || {}).value || '').trim();
+            var category = String((document.getElementById('finances-item-category') || {}).value || '').trim();
+            return !!(name && status && category);
+        }
+
+        function updateFinancesItemSaveButton() {
+            var btn = document.getElementById('finances-detail-save-btn');
+            if (!btn) return;
+            var ready = financesPadlockIsOpen && financesTransactionSaveReady() && !backenduserIsReadonly;
+            btn.disabled = !ready;
+            btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+        }
+
+        function shakeFinancesPadlock() {
+            var padlock = document.getElementById('finances-detail-padlock-btn');
+            if (!padlock || padlock.disabled) return;
+            padlock.classList.remove('is-angry-shake');
+            void padlock.offsetWidth;
+            padlock.classList.add('is-angry-shake');
+            if (padlock._angryShakeTimer) clearTimeout(padlock._angryShakeTimer);
+            padlock._angryShakeTimer = setTimeout(function() {
+                padlock.classList.remove('is-angry-shake');
+                padlock._angryShakeTimer = null;
+            }, 450);
+        }
+
+        function syncFinancesPadlockButtonUi() {
+            var padlock = document.getElementById('finances-detail-padlock-btn');
+            if (!padlock) return;
+            var form = document.getElementById('finances-transaction-form');
+            var formOpen = !!(form && form.classList.contains('is-open') && !form.hidden);
+            var editor = document.getElementById('finances-editor');
+            var closedPath = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+            var openPath = 'M18 8h-8V6c0-1.63 1.32-2.95 2.95-2.95 1.28 0 2.39.83 2.8 2h2.1c-.47-2.28-2.49-4-4.9-4C10.24 1.05 8 3.29 8 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z';
+            var path = padlock.querySelector('svg path');
+            if (path) path.setAttribute('d', financesPadlockIsOpen ? openPath : closedPath);
+            if (editor) editor.classList.toggle('finances-padlock-unlocked', !!financesPadlockIsOpen);
+            padlock.disabled = backenduserIsReadonly || !formOpen;
+            padlock.setAttribute('aria-disabled', padlock.disabled ? 'true' : 'false');
+            padlock.setAttribute('aria-label', financesPadlockIsOpen ? 'Lock transaction' : 'Unlock transaction');
+            padlock.setAttribute('title', financesPadlockIsOpen ? 'Lock' : 'Unlock');
+            padlock.setAttribute('aria-pressed', financesPadlockIsOpen ? 'true' : 'false');
+        }
+
+        function syncFinancesFormEditability() {
+            var form = document.getElementById('finances-transaction-form');
+            if (!form) return;
+            var canEdit = financesPadlockIsOpen && !backenduserIsReadonly;
+            form.querySelectorAll('input, select, textarea').forEach(function(el) {
+                var type = String(el.type || '').toLowerCase();
+                if (type === 'hidden' || type === 'file') return;
+                if (el.tagName === 'SELECT' || type === 'date') {
+                    el.disabled = !canEdit;
+                    return;
+                }
+                el.disabled = false;
+                if (canEdit) {
+                    el.readOnly = false;
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('aria-readonly');
+                } else {
+                    el.readOnly = true;
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('aria-readonly', 'true');
+                }
+            });
+            var frame = document.getElementById('finances-item-document-frame');
+            if (frame) {
+                frame.setAttribute('aria-disabled', canEdit ? 'false' : 'true');
+            }
+            syncFinancesPadlockButtonUi();
+            updateFinancesItemSaveButton();
             updateFinancesItemNavButtons();
         }
 
@@ -35172,7 +35687,7 @@
                 nextBtn.setAttribute('aria-disabled', hasNext ? 'false' : 'true');
             }
             if (delBtn) {
-                var canDelete = !!id && idx >= 0;
+                var canDelete = !!id && idx >= 0 && financesPadlockIsOpen && !backenduserIsReadonly;
                 delBtn.disabled = !canDelete;
                 delBtn.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
             }
@@ -35252,6 +35767,75 @@
                 (match.name ? (' (“' + String(match.name).trim() + '”).') : '.');
         }
 
+        function readFinancesFileAsDataUrl(file) {
+            return new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    resolve(String(reader.result || ''));
+                };
+                reader.onerror = function() {
+                    reject(new Error('Failed to read document.'));
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function financesClearPendingDocument() {
+            if (financesPendingDocument && financesPendingDocument.previewUrl) {
+                try {
+                    URL.revokeObjectURL(financesPendingDocument.previewUrl);
+                } catch (e) {}
+            }
+            financesPendingDocument = null;
+        }
+
+        function financesDocumentLooksLikeImage(type, name, url) {
+            var t = String(type || '').toLowerCase();
+            if (t.indexOf('image/') === 0) return true;
+            var n = String(name || '').toLowerCase();
+            if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(n)) return true;
+            var u = String(url || '').toLowerCase();
+            return u.indexOf('data:image/') === 0;
+        }
+
+        function syncFinancesDocumentPreview(rec) {
+            var img = document.getElementById('finances-item-document-preview');
+            var frame = document.getElementById('finances-item-document-frame');
+            var nameEl = document.getElementById('finances-item-document-name');
+            if (!img) return;
+            var pending = financesPendingDocument;
+            var url = '';
+            var name = '';
+            var type = '';
+            if (pending) {
+                url = pending.previewUrl || pending.dataUrl || '';
+                name = pending.name || '';
+                type = pending.type || '';
+            } else if (rec) {
+                url = rec.document != null ? String(rec.document) : '';
+                name = rec.documentName != null ? String(rec.documentName) : '';
+                type = rec.documentType != null ? String(rec.documentType) : '';
+            }
+            var isImage = !!(url && financesDocumentLooksLikeImage(type, name, url));
+            if (frame) {
+                var label = name ? ('Document: ' + name) : 'Upload document';
+                frame.title = name || 'Upload document';
+                frame.setAttribute('aria-label', label);
+            }
+            if (nameEl) {
+                nameEl.textContent = !isImage && name ? name : '';
+                nameEl.hidden = !(nameEl.textContent);
+            }
+            if (isImage) {
+                img.alt = name || '';
+                img.referrerPolicy = 'no-referrer';
+                img.src = url;
+            } else {
+                img.removeAttribute('src');
+                img.alt = '';
+            }
+        }
+
         function resetFinancesTransactionForm() {
             var form = document.getElementById('finances-transaction-form');
             if (!form) return;
@@ -35261,10 +35845,15 @@
             var currencyEl = document.getElementById('finances-item-currency');
             if (currencyEl) currencyEl.value = FINANCES_BASE_CURRENCY;
             financesItemEditingId = '';
+            financesClearPendingDocument();
+            var documentUpload = document.getElementById('finances-item-document-upload');
+            if (documentUpload) documentUpload.value = '';
+            syncFinancesDocumentPreview(null);
             syncFinancesTransactionFormVisibility();
             syncFinancesInvoiceDuplicateHint();
             refreshFinancesSupplierDatalist();
             updateFinancesItemNavButtons();
+            updateFinancesItemSaveButton();
         }
 
         function populateFinancesTransactionForm(item) {
@@ -35288,10 +35877,15 @@
             setVal('finances-item-invoice-date', rec.invoiceDate || '');
             setVal('finances-item-due-date', rec.dueDate || '');
             setVal('finances-item-date-paid', rec.datePaid || '');
+            financesClearPendingDocument();
+            var documentUpload = document.getElementById('finances-item-document-upload');
+            if (documentUpload) documentUpload.value = '';
+            syncFinancesDocumentPreview(rec);
             syncFinancesTransactionFormVisibility();
             syncFinancesInvoiceDuplicateHint();
             refreshFinancesSupplierDatalist();
             updateFinancesItemNavButtons();
+            updateFinancesItemSaveButton();
         }
 
         function readFinancesTransactionForm() {
@@ -35360,9 +35954,12 @@
             form.classList.add('is-open');
             if (item) {
                 populateFinancesTransactionForm(item);
+                financesPadlockIsOpen = false;
             } else {
                 resetFinancesTransactionForm();
+                financesPadlockIsOpen = true;
             }
+            syncFinancesFormEditability();
             renderFinancesItemsTable();
             var nameField = document.getElementById('finances-item-name');
             if (nameField) nameField.focus();
@@ -35374,31 +35971,99 @@
             openFinancesTransactionEditor(rec);
         }
 
-        function saveFinancesTransactionFromForm() {
+        async function saveFinancesTransactionFromForm() {
             if (backendBlockIfReadonly()) return false;
-            var data = readFinancesTransactionForm();
-            var err = validateFinancesTransactionForm(data);
-            if (err) {
-                if (typeof showStatus === 'function') showStatus('error', err);
+            if (!financesTransactionSaveReady()) return false;
+            var eventName = String(current_event || '').trim();
+            if (!eventName) {
+                if (typeof showStatus === 'function') showStatus('error', 'No current event is set.');
                 return false;
             }
-            if (data.currency === FINANCES_BASE_CURRENCY) data.amountBase = '';
+            if (eventName.indexOf('/') !== -1) {
+                if (typeof showStatus === 'function') showStatus('error', 'Current event cannot contain "/".');
+                return false;
+            }
+            var data = readFinancesTransactionForm();
+            data.Transaction = 'Expense';
+            if (financesPendingDocument && financesPendingDocument.file) {
+                try {
+                    if (!financesPendingDocument.dataUrl) {
+                        financesPendingDocument.dataUrl = await readFinancesFileAsDataUrl(financesPendingDocument.file);
+                    }
+                } catch (e) {
+                    if (typeof showStatus === 'function') showStatus('error', 'Could not read the document.');
+                    return false;
+                }
+                data.document = financesPendingDocument.dataUrl;
+                data.documentName = financesPendingDocument.name;
+                data.documentType = financesPendingDocument.type;
+            }
             var existing = data.id ? financesItemById(data.id) : null;
+            var transactionId = String((existing && existing.id) || data.id || '').trim() || financesNewItemId();
+            if (transactionId.indexOf('/') !== -1) {
+                if (typeof showStatus === 'function') showStatus('error', 'Transaction id cannot contain "/".');
+                return false;
+            }
+            data.id = transactionId;
+            var saveBtn = document.getElementById('finances-detail-save-btn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') showStatus('loading', 'Saving transaction…');
+            try {
+                var db = getFirestore();
+                var FV = firebase.firestore && firebase.firestore.FieldValue;
+                if (!FV || typeof FV.arrayUnion !== 'function') {
+                    throw new Error('Firestore FieldValue is unavailable.');
+                }
+                var batch = db.batch();
+                batch.set(
+                    tbsFinancesEventDocRef(db, eventName),
+                    { transactionIds: FV.arrayUnion(transactionId) },
+                    { merge: true }
+                );
+                batch.set(
+                    tbsFinancesTransactionDocRef(db, eventName, transactionId),
+                    {
+                        name: data.name,
+                        status: data.status,
+                        category: data.category
+                    },
+                    { merge: true }
+                );
+                await batch.commit();
+            } catch (e) {
+                updateFinancesItemSaveButton();
+                if (typeof showStatus === 'function') {
+                    showStatus('error', e && e.message ? e.message : 'Could not save the transaction.');
+                }
+                return false;
+            }
+            var previewUrl = financesPendingDocument && financesPendingDocument.previewUrl;
+            financesPendingDocument = null;
             if (existing) {
                 Object.assign(existing, data);
             } else {
-                data.id = data.id || financesNewItemId();
                 financesItemsInMemory.push(data);
             }
+            var saved = existing || data;
             financesItemEditingId = String(data.id || '').trim();
             var idEl = document.getElementById('finances-item-id');
             if (idEl) idEl.value = financesItemEditingId;
+            if (previewUrl) {
+                try {
+                    URL.revokeObjectURL(previewUrl);
+                } catch (e2) {}
+            }
+            syncFinancesDocumentPreview(saved);
             persistFinancesItemsToStorage();
             refreshFinancesSupplierDatalist();
             syncFinancesInvoiceDuplicateHint();
             renderFinancesItemsTable();
+            updateFinancesItemSaveButton();
             if (typeof showStatus === 'function') {
-                showStatus('success', existing ? 'Item saved.' : 'Item added.');
+                showStatus('success', existing ? 'Transaction saved.' : 'Transaction added.');
             }
             return true;
         }
@@ -35438,107 +36103,119 @@
             openFinancesTransactionEditor(financesItemsInMemory[next]);
         }
 
-        function wireFinancesBottomScrollbar() {
+        var financesPaneLayoutFrame = 0;
+        var financesPaneScrollDrag = null;
+
+        function scheduleFinancesPaneLayout() {
+            if (financesPaneLayoutFrame) return;
+            financesPaneLayoutFrame = requestAnimationFrame(function () {
+                financesPaneLayoutFrame = 0;
+                syncFinancesPaneLayout();
+            });
+        }
+
+        function syncFinancesPaneScrollbar() {
             var row = document.getElementById('finances-bottom-row');
-            var bar = document.getElementById('finances-bottom-scrollbar');
-            if (!row || !bar || bar.dataset.wired === '1') return;
-            var thumb = bar.querySelector('.finances-bottom-scrollbar-thumb');
-            var track = bar.querySelector('.finances-bottom-scrollbar-track');
-            if (!thumb || !track) return;
-            bar.dataset.wired = '1';
+            var bar = document.getElementById('finances-pane-scrollbar');
+            var thumb = document.getElementById('finances-pane-scrollbar-thumb');
+            if (!row || !bar || !thumb) return;
+            var maxScroll = row.scrollWidth - row.clientWidth;
+            var overflow = maxScroll > 1;
+            bar.hidden = !overflow;
+            if (!overflow) {
+                if (row.scrollLeft) row.scrollLeft = 0;
+                return;
+            }
+            var trackWidth = bar.clientWidth;
+            var thumbWidth = Math.max(28, Math.round(trackWidth * (row.clientWidth / row.scrollWidth)));
+            if (thumbWidth > trackWidth) thumbWidth = trackWidth;
+            var maxLeft = Math.max(0, trackWidth - thumbWidth);
+            var left = maxScroll > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
+            thumb.style.width = thumbWidth + 'px';
+            thumb.style.left = left + 'px';
+        }
 
-            function metrics() {
+        function ensureFinancesPaneScroll() {
+            if (ensureFinancesPaneScroll.done) return;
+            var row = document.getElementById('finances-bottom-row');
+            var editor = document.getElementById('finances-editor');
+            var bar = document.getElementById('finances-pane-scrollbar');
+            var thumb = document.getElementById('finances-pane-scrollbar-thumb');
+            if (!row || !editor || !bar || !thumb) return;
+            ensureFinancesPaneScroll.done = true;
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(function () {
+                    scheduleFinancesPaneLayout();
+                });
+                observer.observe(editor);
+                observer.observe(row);
+            } else {
+                window.addEventListener('resize', scheduleFinancesPaneLayout);
+            }
+            row.addEventListener('scroll', syncFinancesPaneScrollbar, { passive: true });
+            thumb.addEventListener('pointerdown', function (event) {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                event.stopPropagation();
                 var maxScroll = row.scrollWidth - row.clientWidth;
-                var trackW = track.clientWidth;
-                var thumbW = thumb.offsetWidth || 22;
-                return {
+                var maxLeft = Math.max(0, bar.clientWidth - thumb.offsetWidth);
+                financesPaneScrollDrag = {
+                    x: event.clientX,
+                    scroll: row.scrollLeft,
                     maxScroll: maxScroll,
-                    trackW: trackW,
-                    thumbW: thumbW,
-                    maxLeft: Math.max(trackW - thumbW, 0)
+                    maxLeft: maxLeft
                 };
-            }
-
-            function scrollFromThumbLeft(leftPx) {
-                var m = metrics();
-                if (m.maxLeft <= 0 || m.maxScroll <= 0) return;
-                var clamped = Math.max(0, Math.min(leftPx, m.maxLeft));
-                row.scrollLeft = (clamped / m.maxLeft) * m.maxScroll;
-            }
-
-            function update() {
-                var maxScroll = row.scrollWidth - row.clientWidth;
-                if (track.clientWidth <= 0) return;
-                if (maxScroll <= 1) {
-                    bar.classList.remove('is-active');
-                    bar.hidden = true;
-                    bar.setAttribute('aria-hidden', 'true');
-                    thumb.style.width = '100%';
-                    thumb.style.transform = 'translateX(0)';
-                    return;
+                if (thumb.setPointerCapture) thumb.setPointerCapture(event.pointerId);
+            });
+            thumb.addEventListener('pointermove', function (event) {
+                if (!financesPaneScrollDrag) return;
+                var drag = financesPaneScrollDrag;
+                var dx = event.clientX - drag.x;
+                var next = drag.scroll + (drag.maxLeft > 0 ? (dx / drag.maxLeft) * drag.maxScroll : 0);
+                row.scrollLeft = next;
+            });
+            function endFinancesPaneScrollDrag(event) {
+                if (!financesPaneScrollDrag) return;
+                financesPaneScrollDrag = null;
+                if (event && thumb.releasePointerCapture && thumb.hasPointerCapture && thumb.hasPointerCapture(event.pointerId)) {
+                    thumb.releasePointerCapture(event.pointerId);
                 }
-                bar.classList.add('is-active');
-                bar.hidden = false;
-                bar.setAttribute('aria-hidden', 'false');
-                var trackW = track.clientWidth;
-                var thumbW = Math.max((row.clientWidth / row.scrollWidth) * trackW, 22);
-                var maxLeft = Math.max(trackW - thumbW, 0);
-                var left = maxLeft > 0 ? (row.scrollLeft / maxScroll) * maxLeft : 0;
-                thumb.style.width = thumbW + 'px';
-                thumb.style.transform = 'translateX(' + left + 'px)';
             }
-
-            var dragId = null;
-            var dragStartX = 0;
-            var dragStartScroll = 0;
-
-            function endDrag() {
-                dragId = null;
-                thumb.classList.remove('is-dragging');
-            }
-
-            thumb.addEventListener('pointerdown', function (e) {
-                if (e.button !== 0 && e.pointerType === 'mouse') return;
-                e.preventDefault();
-                dragId = e.pointerId;
-                dragStartX = e.clientX;
-                dragStartScroll = row.scrollLeft;
-                thumb.classList.add('is-dragging');
-                if (typeof thumb.setPointerCapture === 'function') thumb.setPointerCapture(e.pointerId);
-            });
-            thumb.addEventListener('pointermove', function (e) {
-                if (dragId !== e.pointerId) return;
-                e.preventDefault();
+            thumb.addEventListener('pointerup', endFinancesPaneScrollDrag);
+            thumb.addEventListener('pointercancel', endFinancesPaneScrollDrag);
+            bar.addEventListener('pointerdown', function (event) {
+                if (event.target === thumb || event.button !== 0) return;
+                var rect = bar.getBoundingClientRect();
+                var thumbWidth = thumb.offsetWidth;
+                var maxLeft = Math.max(0, bar.clientWidth - thumbWidth);
                 var maxScroll = row.scrollWidth - row.clientWidth;
-                var trackW = track.clientWidth;
-                var thumbW = thumb.offsetWidth || 22;
-                var maxLeft = Math.max(trackW - thumbW, 0);
-                if (maxLeft <= 0 || maxScroll <= 0) return;
-                var startLeft = (dragStartScroll / maxScroll) * maxLeft;
-                scrollFromThumbLeft(startLeft + (e.clientX - dragStartX));
+                var left = Math.max(0, Math.min(maxLeft, event.clientX - rect.left - thumbWidth / 2));
+                row.scrollLeft = maxLeft > 0 ? (left / maxLeft) * maxScroll : 0;
             });
-            thumb.addEventListener('pointerup', function (e) {
-                if (dragId !== e.pointerId) return;
-                endDrag();
-            });
-            thumb.addEventListener('pointercancel', function (e) {
-                if (dragId !== e.pointerId) return;
-                endDrag();
-            });
-            track.addEventListener('pointerdown', function (e) {
-                if (e.target === thumb || e.button !== 0) return;
-                e.preventDefault();
-                var rect = track.getBoundingClientRect();
-                scrollFromThumbLeft(e.clientX - rect.left - (thumb.offsetWidth || 22) / 2);
-            });
-            row.addEventListener('scroll', update, { passive: true });
-            window.addEventListener('resize', update);
-            if (typeof ResizeObserver !== 'undefined') {
-                var ro = new ResizeObserver(update);
-                ro.observe(row);
-                ro.observe(track);
+        }
+
+        function syncFinancesPaneLayout() {
+            var editor = document.getElementById('finances-editor');
+            var paneTrack = document.getElementById('finances-bottom-track');
+            if (!editor || !paneTrack || !editor.classList.contains('is-open')) return;
+            ensureFinancesPaneScroll();
+            var minPane = emailerPaneMinPx();
+            if (minPane > 0) {
+                paneTrack.style.setProperty('--finances-pane-min', minPane + 'px');
             }
-            update();
+            syncFinancesPaneScrollbar();
+        }
+
+        function closeFinancesTransactionEditor() {
+            resetFinancesTransactionForm();
+            var form = document.getElementById('finances-transaction-form');
+            if (!form) return;
+            form.classList.remove('is-open');
+            form.hidden = true;
+            form.setAttribute('aria-hidden', 'true');
+            financesPadlockIsOpen = false;
+            syncFinancesFormEditability();
+            renderFinancesItemsTable();
         }
 
         loadFinancesItemsFromStorage();
@@ -43188,6 +43865,10 @@
                 scheduleEmailerPaneLayout();
                 void loadEmailerBulkPresetButtons();
             }
+            if (isFinances) {
+                scheduleFinancesPaneLayout();
+                void loadFinancesTransactionsFromFirestore();
+            }
             if (isSettings) {
                 loadPagePreviewHome();
                 void syncEventLocationAndSiteSettings(current_event)
@@ -44947,7 +45628,14 @@
                             updateBackendStartupLoadStatus('Failed to load speakers from Firestore.');
                             throw err;
                         });
-                    await Promise.all([backendGuestsPreloadPromise, speakersPreload]);
+                    await Promise.all([
+                        backendGuestsPreloadPromise,
+                        speakersPreload,
+                        loadFinancesTransactionsFromFirestore().catch(function (err) {
+                            console.error('Finances preload failed:', err);
+                            updateBackendStartupLoadStatus('Failed to load transactions from Firestore.');
+                        })
+                    ]);
                     backendStatusTickerLines = [
                         'Loaded ' + (String(current_event || selectedevent || '').trim() || 'event')
                     ];
@@ -46416,6 +47104,72 @@
                     ev.preventDefault();
                     saveFinancesTransactionFromForm();
                 });
+                var financesDetailSaveBtn = document.getElementById('finances-detail-save-btn');
+                if (financesDetailSaveBtn) {
+                    financesDetailSaveBtn.addEventListener('click', function(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        if (financesDetailSaveBtn.disabled) return;
+                        saveFinancesTransactionFromForm();
+                    });
+                }
+                var financesDetailPadlockBtn = document.getElementById('finances-detail-padlock-btn');
+                if (financesDetailPadlockBtn) {
+                    financesDetailPadlockBtn.addEventListener('click', function(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        if (financesDetailPadlockBtn.disabled) return;
+                        if (backendBlockIfReadonly()) return;
+                        financesPadlockIsOpen = !financesPadlockIsOpen;
+                        syncFinancesPadlockButtonUi();
+                        syncFinancesFormEditability();
+                    });
+                    syncFinancesPadlockButtonUi();
+                }
+                var financesDocumentFrame = document.getElementById('finances-item-document-frame');
+                var financesDocumentUpload = document.getElementById('finances-item-document-upload');
+                if (financesDocumentFrame && financesDocumentUpload) {
+                    function openFinancesDocumentPicker() {
+                        if (backendBlockIfReadonly()) return;
+                        if (!financesPadlockIsOpen) {
+                            shakeFinancesPadlock();
+                            return;
+                        }
+                        financesDocumentUpload.click();
+                    }
+                    financesDocumentFrame.addEventListener('click', openFinancesDocumentPicker);
+                    financesDocumentFrame.addEventListener('keydown', function(ev) {
+                        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+                        ev.preventDefault();
+                        openFinancesDocumentPicker();
+                    });
+                    financesDocumentUpload.addEventListener('change', function() {
+                        var file = financesDocumentUpload.files && financesDocumentUpload.files[0];
+                        financesDocumentUpload.value = '';
+                        if (!file) return;
+                        financesClearPendingDocument();
+                        financesPendingDocument = {
+                            file: file,
+                            name: String(file.name || '').trim(),
+                            type: String(file.type || '').trim(),
+                            previewUrl: URL.createObjectURL(file),
+                            dataUrl: ''
+                        };
+                        readFinancesFileAsDataUrl(file).then(function(url) {
+                            if (financesPendingDocument && financesPendingDocument.file === file) {
+                                financesPendingDocument.dataUrl = url;
+                            }
+                        }).catch(function() {});
+                        syncFinancesDocumentPreview(null);
+                    });
+                }
+                ['finances-item-name', 'finances-item-status', 'finances-item-category'].forEach(function(id) {
+                    var field = document.getElementById(id);
+                    if (!field) return;
+                    field.addEventListener('input', updateFinancesItemSaveButton);
+                    field.addEventListener('change', updateFinancesItemSaveButton);
+                });
+                updateFinancesItemSaveButton();
                 var financesStatusEl = document.getElementById('finances-item-status');
                 var financesCurrencyEl = document.getElementById('finances-item-currency');
                 var financesSupplierEl = document.getElementById('finances-item-supplier');
@@ -46477,7 +47231,6 @@
             }
             renderFinancesItemsTable();
             refreshFinancesSupplierDatalist();
-            wireFinancesBottomScrollbar();
             var financesImportInvoicesBtn = document.getElementById('finances-financials-import-btn');
             if (financesImportInvoicesBtn) {
                 financesImportInvoicesBtn.addEventListener('click', function(ev) {
