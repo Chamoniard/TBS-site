@@ -455,6 +455,33 @@ async function loadGuestGentleReminderTemplate(
 }
 
 /**
+ * Cancellation notice HTML and Topic from
+ * tbs/Pre-sets/{event_location}/{event_location}/Guest cancellation/
+ * Guest cancellation.
+ * @param {Firestore} db Firestore instance.
+ * @param {string} location Event location id.
+ * @return {Promise<{html: string, topic: string}>} Template fields.
+ */
+async function loadGuestCancellationNoticeTemplate(
+  db: Firestore,
+  location: string,
+): Promise<{html: string; topic: string}> {
+  const loc = String(location || "").trim();
+  if (!loc) return {html: "", topic: ""};
+  const snap = await tbsPresetValueDocRef(
+    db,
+    "Guest cancellation",
+    loc,
+  ).get();
+  const data = ((snap.exists ? snap.data() : null) || {}) as
+    Record<string, unknown>;
+  return {
+    html: presetHtmlFromField(data[FIRESTORE_TBS_PRESET_VALUE_FIELD]),
+    topic: presetTopicFromData(data),
+  };
+}
+
+/**
  * Final payment reminder HTML and Topic from
  * tbs/Pre-sets/{event_location}/{event_location}/final_reminder/
  * final_reminder.
@@ -620,6 +647,30 @@ function guestLogGentleReminderLine(): string {
 function guestLogFinalReminderLine(): string {
   return guestLogPrefixYyMmDd() + ": Final reminder sent on " +
     formatGuestInvoicedDateDisplay(new Date()) + ".";
+}
+
+/**
+ * Calendar date 24 hours after now, in Switzerland.
+ * @return {string} Date string such as 2026-11-07.
+ */
+function guestCancelOnDateLabel(): string {
+  const later = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Zurich",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(later);
+}
+
+/**
+ * Log line after a cancellation notice.
+ * @param {string} cancelOn Date the guest is due to be cancelled.
+ * @return {string} Log line including the Cancel on date.
+ */
+function guestLogCancellationNoticeLine(cancelOn: string): string {
+  return guestLogPrefixYyMmDd() + ": Cancellation notice sent. Cancel on " +
+    cancelOn + ".";
 }
 
 /**
@@ -1389,6 +1440,7 @@ function guestPaidLabelIsLocked(paid: string): boolean {
     low === "first notice" ||
     low === "first reminder" ||
     low === "final notice" ||
+    low === "to be cancelled" ||
     low === "rollover";
 }
 
@@ -1409,6 +1461,15 @@ function guestPaidIsFirstNotice(paid: string): boolean {
  */
 function guestPaidIsFinalNotice(paid: string): boolean {
   return String(paid || "").trim().toLowerCase() === "final notice";
+}
+
+/**
+ * True after a cancellation notice has moved Paid to To be cancelled.
+ * @param {string} paid Stored Paid value.
+ * @return {boolean} Whether overdue sync must leave Paid alone.
+ */
+function guestPaidIsToBeCancelled(paid: string): boolean {
+  return String(paid || "").trim().toLowerCase() === "to be cancelled";
 }
 
 /**
@@ -1964,7 +2025,8 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
           if (
             cancelled ||
             guestPaidIsFirstNotice(currentPaid) ||
-            guestPaidIsFinalNotice(currentPaid)
+            guestPaidIsFinalNotice(currentPaid) ||
+            guestPaidIsToBeCancelled(currentPaid)
           ) continue;
           const locked = guestPaidLabelIsLocked(
             String(entry.data["Paid"] || ""),
@@ -2008,6 +2070,7 @@ export const reconcileStripePaidInvoicesHttp = onRequest({
         if (lowPaid === "cancelled" || lowPaid === "canceled") return;
         if (guestPaidIsFirstNotice(currentPaid)) return;
         if (guestPaidIsFinalNotice(currentPaid)) return;
+        if (guestPaidIsToBeCancelled(currentPaid)) return;
         if (!overdueChoice && guestPaidLabelIsLocked(currentPaid)) {
           noteAlreadyPaid(choice.entry.guestId);
           return;
@@ -2997,6 +3060,196 @@ export const sendGuestFinalReminderHttp = onRequest({
       error: err instanceof Error ?
         err.message :
         "Failed to send final reminder.",
+    });
+  }
+});
+
+/**
+ * Guest workflow: send the cancellation notice from
+ * tbs/Pre-sets/{event_location}/{event_location}/Guest cancellation/
+ * Guest cancellation. Topic is the subject and Value is the body.
+ * Sent as info@tbs-zermatt.org.
+ * Allowed when Paid is Final notice.
+ * On success sets Paid to To be cancelled and appends a log line.
+ * Expects JSON: { guestId }.
+ */
+export const sendGuestCancellationNoticeHttp = onRequest({
+  secrets: [
+    gmailSpeakerSendClientIdParam,
+    gmailSpeakerSendClientSecretParam,
+    gmailSpeakerSendRefreshTokenParam,
+    gmailSpeakerSendFromParam,
+  ],
+  invoker: "public",
+  cors: true,
+}, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  const body = (req.body || {}) as Record<string, unknown>;
+  const guestId = String(body.guestId || "").trim();
+  if (!guestId) {
+    res.status(400).json({error: "Missing guestId."});
+    return;
+  }
+
+  const configuredFrom = String(
+    gmailSpeakerSendFromParam.value() || "",
+  ).trim();
+  if (!configuredFrom || !configuredFrom.includes("@")) {
+    res.status(500).json({
+      error: "Missing or invalid GMAIL_SPEAKER_SEND_FROM secret.",
+    });
+    return;
+  }
+  const fromAddress = "info@tbs-zermatt.org";
+
+  const db = getFirestore();
+  const itemRef = db
+    .collection("tbs")
+    .doc("Guests")
+    .collection(guestId)
+    .doc("item");
+
+  try {
+    const snap = await itemRef.get();
+    if (!snap.exists) {
+      res.status(404).json({error: "Guest item not found."});
+      return;
+    }
+    const data = snap.data() || {};
+    const paid = String(data.Paid ?? data.paid ?? "");
+    if (!guestPaidIsFinalNotice(paid)) {
+      res.status(400).json({
+        error: "Cancellation notice is only available when Paid is " +
+          "Final notice.",
+      });
+      return;
+    }
+
+    const email = pickGuestEmail(data);
+    if (
+      !email ||
+      /[\r\n]/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      res.status(400).json({error: "Guest has no valid email."});
+      return;
+    }
+
+    const settingsData = await loadTbsSettingsData(db);
+    const eventLabel = currentEventFromSettingsData(settingsData);
+    if (!eventLabel) {
+      res.status(500).json({error: "Current event is not set."});
+      return;
+    }
+    const location = await loadEventLocationForEvent(db, eventLabel);
+    if (!location) {
+      res.status(500).json({
+        error: "event_location is missing for the current event.",
+      });
+      return;
+    }
+
+    const template = await loadGuestCancellationNoticeTemplate(db, location);
+    if (!String(template.html).trim()) {
+      res.status(500).json({
+        error: "Cancellation notice template is empty in " +
+          presetValueDocPath(location, "Guest cancellation") + ".",
+      });
+      return;
+    }
+
+    const firstName = String(
+      data.Name || data.name || data["First name"] || data.firstName || "",
+    ).trim();
+    const lastName = String(
+      data["Last name"] || data.lastName || data.LastName || "",
+    ).trim();
+    const guestName = pickGuestFirstAndLastName(data);
+    const invoiceUrl = String(
+      data["Stripe Invoice Url"] || data.stripeInvoiceUrl || "",
+    ).trim();
+    const invoiceNumber = String(
+      data["Stripe Invoice Number"] || "",
+    ).trim();
+    const eventDatesLabel = eventDatesAfterCommaForCurrentEvent(
+      settingsData,
+      eventLabel,
+    );
+    const noticeTokens = {
+      event: eventLabel,
+      eventDates: eventDatesLabel,
+      firstName,
+      lastName,
+      name: guestName,
+      invoiceUrl,
+      invoiceNumber,
+    };
+    const subject = emailSubjectFromTopic(template.topic, noticeTokens);
+    if (!subject) {
+      res.status(500).json({
+        error: "E-mail topic is empty in " +
+          presetValueDocPath(location, "Guest cancellation") + ".",
+      });
+      return;
+    }
+    const html = fillObservedEmailTokens(template.html, noticeTokens);
+    const cancelOn = guestCancelOnDateLabel();
+
+    const accessToken = await refreshGmailSpeakerSendAccessToken();
+    await sendGmailHtmlMessage(accessToken, {
+      from: fromAddress,
+      to: email,
+      subject,
+      html,
+    });
+
+    const logLine = guestLogCancellationNoticeLine(cancelOn);
+    await db.runTransaction(async (tx) => {
+      const fresh = await tx.get(itemRef);
+      const lines = guestLogLinesFromData(fresh.data() || {});
+      if (!lines.includes(logLine)) lines.push(logLine);
+      tx.set(itemRef, {
+        "Paid": "To be cancelled",
+        "Log": lines,
+      }, {merge: true});
+    });
+
+    logger.info("sendGuestCancellationNoticeHttp ok", {
+      guestId,
+      to: email,
+      from: fromAddress,
+      location,
+      cancelOn,
+    });
+
+    res.status(200).json({
+      ok: true,
+      guestId,
+      to: email,
+      from: fromAddress,
+      logLine,
+      cancelOn,
+      message: guestName ?
+        "Cancellation notice sent to " + guestName :
+        "Cancellation notice sent.",
+    });
+  } catch (err) {
+    logger.error("sendGuestCancellationNoticeHttp failed", {guestId, err});
+    res.status(500).json({
+      error: err instanceof Error ?
+        err.message :
+        "Failed to send cancellation notice.",
     });
   }
 });

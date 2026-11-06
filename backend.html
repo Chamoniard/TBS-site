@@ -533,8 +533,12 @@
             box-shadow: none !important;
         }
 
-        #finances-toggle[hidden] {
+        #finances-toggle[hidden],
+        body.backend-page.backend-readonly #finances-toggle,
+        body.backend-page.backend-readonly #finances-editor,
+        body.backend-page.backend-readonly #finances-editor.is-open {
             display: none !important;
+            pointer-events: none !important;
         }
 
         /* Placeholder tabs (Overview, Finances, Admin) until their panels are built */
@@ -3915,6 +3919,8 @@
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-reminder-side[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-second-reminder-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-workflow-second-reminder-side[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-cancellation-notice-btn[hidden],
+        body.backend-page #guest-editor #guest-editor-actions #guest-workflow-cancellation-notice-side[hidden],
         body.backend-page #guest-editor #guest-editor-actions #guest-send-invite-btn[hidden],
         body.backend-page #guest-editor #guest-editor-actions #readisno[hidden],
         body.backend-page #guest-editor #guest-editor-actions #invitedisno[hidden],
@@ -9667,6 +9673,30 @@
             will-change: transform;
         }
 
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button.is-saving,
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button.is-saving:disabled {
+            opacity: 1;
+            cursor: wait;
+            pointer-events: none;
+            filter: none;
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button.is-saving > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.85s linear infinite;
+            will-change: transform;
+        }
+
+        #guest-editor .guest-editor-toolbar-trailing #save-guest-button.is-saved-spin > svg {
+            display: block;
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            animation: sync-guest-payments-spin 0.7s linear 1;
+            will-change: transform;
+        }
+
         #speaker-editor .speaker-editor-toolbar-trailing .add-speaker-delete-btn,
         #guest-editor .guest-editor-toolbar-trailing .add-speaker-delete-btn {
             height: 35px;
@@ -11004,6 +11034,15 @@
             background: var(--backend-tab-pale-blue);
         }
 
+        body.backend-page #guest-editor.guest-padlock-unlocked button.guest-editor-priority-btn,
+        body.backend-page #guest-editor.guest-padlock-unlocked button.guest-editor-priority-btn:hover,
+        body.backend-page #guest-editor.guest-padlock-unlocked button.guest-editor-priority-btn:disabled,
+        body.backend-page #guest-editor.guest-padlock-unlocked button.guest-editor-priority-btn.is-priority,
+        body.backend-page #guest-editor.guest-padlock-unlocked button.guest-editor-priority-btn.is-priority:hover,
+        body.backend-page #guest-editor.guest-padlock-unlocked button.guest-editor-priority-btn.is-priority:disabled {
+            background: var(--backend-tab-pale-pink);
+        }
+
         body.backend-page #guest-editor button.guest-editor-priority-btn:disabled {
             cursor: not-allowed;
             opacity: 0.45;
@@ -11555,6 +11594,7 @@
         }
 
         #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-cancelled,
+        #guest-editor .guests-list-table .content-badge.content-badge--guest-paid-to-be-cancelled,
         #guest-editor .guests-list-table .content-badge.content-badge--guest-invoiced-cancel,
         body.backend-page > ul.guests-invoiced-dropdown .content-badge--guest-invoiced-cancel {
             background: var(--backend-roster-pill-black);
@@ -14828,6 +14868,13 @@
                                 id="texteditor-preset-final-payment-reminder-btn"
                                 aria-pressed="false"
                             >Final payment reminder</button>
+                            <button
+                                type="button"
+                                class="texteditor-day-btn texteditor-snippet-btn"
+                                data-snippet-key="tbsBackend:texteditor:preset:guest-cancellation"
+                                id="texteditor-preset-guest-cancellation-btn"
+                                aria-pressed="false"
+                            >Guest cancellation</button>
                         </div>
                     </div>
                     <div class="texteditor-programme-toolbar">
@@ -15584,6 +15631,12 @@
                                                 <span class="guest-workflow-step-arrow guest-workflow-reminder-arrow" aria-hidden="true">⬅</span>
                                                 <button type="button" class="guest-workflow-step-btn guest-workflow-send-reminder-btn guest-workflow-second-reminder-btn" id="guest-workflow-second-reminder-btn" hidden aria-hidden="true" disabled aria-disabled="true">
                                                     Send final reminder
+                                                </button>
+                                                </div>
+                                                <div class="guest-workflow-reminder-side" id="guest-workflow-cancellation-notice-side" hidden aria-hidden="true">
+                                                <span class="guest-workflow-step-arrow guest-workflow-reminder-arrow" aria-hidden="true">⬅</span>
+                                                <button type="button" class="guest-workflow-step-btn guest-workflow-send-reminder-btn guest-workflow-second-reminder-btn" id="guest-workflow-cancellation-notice-btn" hidden aria-hidden="true" disabled aria-disabled="true">
+                                                    Send cancellation notice
                                                 </button>
                                                 </div>
                                                 </div>
@@ -17912,7 +17965,7 @@
         var backenduserRole = '';
         /** True when Role is `readonly` (case-insensitive). */
         var backenduserIsReadonly = false;
-        /** True when Role is `admin` (case-insensitive). Finances is shown only then. */
+        /** True when Role is `admin` (case-insensitive). Finances is shown only then, and never when Role is `readonly`. */
         var backenduserIsAdmin = false;
         /** True when `Access` is `All`; otherwise the dropdown is limited to `backenduserAllowedEvents`. */
         var backenduserHasAllEventAccess = false;
@@ -19471,8 +19524,14 @@
             return true;
         }
 
+        /** Finances nav link and panel: admins only, and never a readonly account. */
+        function backendUserCanViewFinances() {
+            return !!backenduserIsAdmin && !backenduserIsReadonly;
+        }
+
         function applyBackendReadonlyMode() {
             document.body.classList.toggle('backend-readonly', !!backenduserIsReadonly);
+            if (typeof syncFinancesNavAccess === 'function') syncFinancesNavAccess();
             if (!backenduserIsReadonly) return;
             guestPadlockIsOpen = false;
             financesPadlockIsOpen = false;
@@ -22260,9 +22319,44 @@
             }
         }
 
+        function setGuestSaveButtonSaving(on) {
+            var btn = document.getElementById('save-guest-button');
+            if (!btn) return;
+            if (on) btn.classList.remove('is-saved-spin');
+            btn.classList.toggle('is-saving', !!on);
+            updateSaveGuestToolbarButtonState();
+        }
+
+        function spinGuestSaveButton() {
+            var btn = document.getElementById('save-guest-button');
+            if (!btn) return;
+            var svg = btn.querySelector('svg');
+            if (!svg) return;
+            btn.classList.remove('is-saving');
+            btn.classList.remove('is-saved-spin');
+            void btn.offsetWidth;
+            btn.classList.add('is-saved-spin');
+            function done() {
+                btn.classList.remove('is-saved-spin');
+                svg.removeEventListener('animationend', done);
+            }
+            svg.addEventListener('animationend', done);
+        }
+
         function updateSaveGuestToolbarButtonState() {
             var btn = document.getElementById('save-guest-button');
             if (!btn) return;
+            if (btn.classList.contains('is-saving')) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('title', 'Saving');
+                btn.setAttribute('aria-label', 'Saving');
+                btn.setAttribute('aria-busy', 'true');
+                return;
+            }
+            btn.removeAttribute('aria-busy');
+            btn.setAttribute('title', 'Save guest');
+            btn.setAttribute('aria-label', 'Save guest');
             if (guestDraftFormActive) {
                 var draftReady = guestNewIdentityReady(readGuestRegistrationForm());
                 btn.disabled = !draftReady || !!guestNewFormSaveInFlight;
@@ -22307,7 +22401,9 @@
                 return true;
             }
             guestSyncInFlight = true;
+            setGuestSaveButtonSaving(true);
             var syncedIds = [];
+            var committed = false;
             try {
                 var db = getFirestore();
                 var batch = db.batch();
@@ -22323,6 +22419,7 @@
                     return true;
                 }
                 await batch.commit();
+                committed = true;
                 for (var w = 0; w < syncedIds.length; w++) {
                     delete guestDirtyDocIds[syncedIds[w]];
                 }
@@ -22344,6 +22441,8 @@
                 return false;
             } finally {
                 guestSyncInFlight = false;
+                setGuestSaveButtonSaving(false);
+                if (committed) spinGuestSaveButton();
                 if (Object.keys(guestDirtyDocIds).length) scheduleGuestFirebaseSync();
             }
         }
@@ -24076,6 +24175,31 @@
             var patch = {};
             patch[FIRESTORE_TBS_PRESET_IDS_FIELD] = firebase.firestore.FieldValue.arrayUnion(field);
             await parent.set(patch, { merge: true });
+        }
+
+        var guestCancellationPresetEnsureStarted = false;
+
+        /** Create tbs/Pre-sets/Zermatt/Zermatt/Guest cancellation/Guest cancellation once. */
+        async function ensureGuestCancellationPreset() {
+            if (guestCancellationPresetEnsureStarted || backenduserIsReadonly) return;
+            guestCancellationPresetEnsureStarted = true;
+            try {
+                var db = getFirestore();
+                var field = 'Guest cancellation';
+                var ref = tbsPresetValueDocRef(db, field);
+                var snap = await ref.get();
+                if (snap.exists) return;
+                var payload = {};
+                payload[FIRESTORE_TBS_PRESET_TOPIC_FIELD] = '{{Event}} - Registration withdrawed';
+                payload[FIRESTORE_TBS_PRESET_TYPE_FIELD] = 'e-mail';
+                payload[FIRESTORE_TBS_PRESET_WHERE_FIELD] = 'guest_workflow_e-mails';
+                payload[FIRESTORE_TBS_PRESET_VALUE_FIELD] = 'hello world';
+                await ref.set(payload);
+                await rememberTbsPresetFieldName(db, field, 'Zermatt');
+            } catch (err) {
+                guestCancellationPresetEnsureStarted = false;
+                console.error('ensureGuestCancellationPreset:', err);
+            }
         }
 
         function tbsSettingsRootDocRef(db) {
@@ -27579,6 +27703,7 @@
                 FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD,
                 FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD,
                 FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD,
+                FIRESTORE_TBS_SNIPPETS_GUEST_CANCELLATION_FIELD,
                 FIRESTORE_TBS_SNIPPETS_FINAL_REMINDER_FIELD,
                 FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD,
                 FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD,
@@ -29970,6 +30095,7 @@
                 syncGuestWorkflowSendToReservesButton();
                 backendSiteSettingsSyncedFor = ev;
                 void loadTexteditorBulkEmailLinks();
+                void ensureGuestCancellationPreset();
                 return;
             }
             await syncEventLocationFromSettings(ev);
@@ -29980,6 +30106,7 @@
             }
             backendSiteSettingsSyncedFor = ev;
             void loadTexteditorBulkEmailLinks();
+            void ensureGuestCancellationPreset();
         }
 
         function tbsBackendUsersCollectionRef(db) {
@@ -31555,6 +31682,107 @@
             }
         }
 
+        /**
+         * Send the cancellation notice via `sendGuestCancellationNoticeHttp`.
+         * Body is `Value` and subject is `Topic` on
+         * `tbs/Pre-sets/{event_location}/{event_location}/Guest cancellation/Guest cancellation`.
+         * Sent as info@tbs-zermatt.org. On success sets Paid to To be cancelled.
+         */
+        async function postGuestCancellationNotice(rec) {
+            var id = String(rec && rec.id || '').trim();
+            if (!id) throw new Error('Select a guest first.');
+            var fnUrl =
+                'https://us-central1-' +
+                String(firebaseConfig.projectId || '').trim() +
+                '.cloudfunctions.net/sendGuestCancellationNoticeHttp';
+            var res = await fetch(fnUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ guestId: id }),
+            });
+            var payload = {};
+            try {
+                payload = await res.json();
+            } catch (parseErr) {
+                payload = {};
+            }
+            if (!res.ok) {
+                var errMsg =
+                    payload && payload.error
+                        ? String(payload.error)
+                        : 'Function call failed (' + res.status + ')';
+                throw new Error(errMsg);
+            }
+            var cancelOn =
+                payload && payload.cancelOn
+                    ? String(payload.cancelOn)
+                    : guestCancelOnDateYyyyMmDd();
+            var logLine =
+                payload && payload.logLine
+                    ? String(payload.logLine)
+                    : guestLogCancellationNoticeLine(cancelOn);
+            var stored = findGuestInMemory(id) || rec;
+            stored.paid = 'To be cancelled';
+            await persistGuestReminderLogLine(id, logLine, stored);
+            if (rec && rec !== stored) {
+                rec.paid = stored.paid;
+                rec.log = Array.isArray(stored.log) ? stored.log.slice() : [];
+            }
+            if (String(guestFormEditingDocId || '').trim() === id) {
+                syncGuestManagementLogPanel();
+            }
+            return payload;
+        }
+
+        async function sendGuestCancellationNoticeFromWorkflow() {
+            if (backendBlockIfReadonly()) return;
+            var btn = document.getElementById('guest-workflow-cancellation-notice-btn');
+            var id = String(guestFormEditingDocId || '').trim();
+            if (!id) {
+                if (typeof showStatus === 'function') showStatus('error', 'Select a guest first.');
+                return;
+            }
+            var rec = findGuestInMemory(id);
+            if (!rec || !guestPaidValueIsFinalNotice(rec.paid)) return;
+            if (!guestReminderRecipientEmail(rec, true)) {
+                if (typeof showStatus === 'function') {
+                    showStatus('error', 'This guest has no valid E-mail address.');
+                }
+                return;
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            }
+            if (typeof showStatus === 'function') {
+                showStatus('loading', 'Sending cancellation notice...');
+            }
+            try {
+                var payload = await postGuestCancellationNotice(rec);
+                refreshGuestReminderUiAfterSend();
+                var guestName = guestRosterDisplayName(rec);
+                var sentOkMsg =
+                    payload && payload.message
+                        ? String(payload.message)
+                        : guestName
+                          ? 'Cancellation notice sent to ' + guestName
+                          : 'Cancellation notice sent.';
+                if (typeof showStatus === 'function') {
+                    showStatus('success', sentOkMsg);
+                }
+            } catch (err) {
+                console.error('sendGuestCancellationNoticeFromWorkflow:', err);
+                if (typeof showStatus === 'function') {
+                    showStatus(
+                        'error',
+                        err && err.message ? err.message : 'Failed to send cancellation notice.'
+                    );
+                }
+            } finally {
+                syncGuestWorkflowPaymentReceivedButton();
+            }
+        }
+
         function scrollGuestEditorBottomToBio() {
             setGuestEditorBottomPane('bio');
         }
@@ -32040,7 +32268,7 @@
                 return false;
             }
             guestNewFormSaveInFlight = true;
-            updateSaveGuestToolbarButtonState();
+            setGuestSaveButtonSaving(true);
             var created = false;
             var savedOk = false;
             try {
@@ -32094,7 +32322,8 @@
                 return false;
             } finally {
                 guestNewFormSaveInFlight = false;
-                updateSaveGuestToolbarButtonState();
+                setGuestSaveButtonSaving(false);
+                if (savedOk) spinGuestSaveButton();
                 if (savedOk && guestDraftFormActive && guestNewIdentityReady(readGuestRegistrationForm())) {
                     var latest = readGuestRegistrationForm();
                     var stored = findGuestInMemory(guestFormEditingDocId);
@@ -32135,7 +32364,7 @@
         var GUEST_INVITED_MENU_VALUES = ['Yes', 'No', 'Reserve', 'Sold out'];
         var GUEST_READ_MENU_VALUES = ['Yes', 'No', '💀Denied💀'];
         var GUEST_INVOICED_MENU_VALUES = ['Yes', 'No', 'Direct', 'Cancel'];
-        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Final notice', 'Cancelled', 'Rollover'];
+        var GUEST_PAID_MENU_VALUES = ['Yes', 'No', 'Pending', 'Overdue', 'First notice', 'Final notice', 'To be cancelled', 'Cancelled', 'Rollover'];
         var GUEST_BRIEFED_FILTER_VALUES = ['Yes', 'No'];
         var GUEST_BRIEFED_MENU_VALUES = ['Yes', 'No'];
         var GUEST_ATTENDED_FILTER_VALUES = ['Yes', 'No'];
@@ -32323,6 +32552,10 @@
 
         function guestPaidValueIsFinalNotice(paidVal) {
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'final notice';
+        }
+
+        function guestPaidValueIsToBeCancelled(paidVal) {
+            return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'to be cancelled';
         }
 
         function guestPaidMatchesFilter(actual, selected) {
@@ -33028,7 +33261,7 @@
                     for (var c = 0; c < ids.length; c++) {
                         var choice = best[ids[c]];
                         var paidNow = String(choice.guest.paid || '').trim().toLowerCase();
-                        if (paidNow === 'first notice' || paidNow === 'first reminder' || paidNow === 'final notice' || paidNow === 'rollover') continue;
+                        if (paidNow === 'first notice' || paidNow === 'first reminder' || paidNow === 'final notice' || paidNow === 'to be cancelled' || paidNow === 'rollover') continue;
                         if (String(choice.guest.paid || '').trim() === choice.label) continue;
                         choice.guest.paid = choice.label;
                         changes.push(choice.guest);
@@ -33154,6 +33387,7 @@
             ) {
                 return ' content-badge--guest-status-no';
             }
+            if (low === 'to be cancelled') return ' content-badge--guest-paid-to-be-cancelled';
             if (low === 'cancelled' || low === 'canceled') {
                 return ' content-badge--guest-paid-cancelled';
             }
@@ -33991,6 +34225,33 @@
 
         function guestLogFinalReminderEmailedLine() {
             return guestLogYyMmDdPrefix() + ': Final reminder sent on ' + guestPaidDateYyyyMmDd() + '.';
+        }
+
+        function guestCancelOnDateYyyyMmDd(date) {
+            var d = date instanceof Date ? date : new Date(Date.now() + 24 * 60 * 60 * 1000);
+            try {
+                var parts = new Intl.DateTimeFormat('en-CA', {
+                    timeZone: 'Europe/Zurich',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).formatToParts(d);
+                var yyyy = '';
+                var mm = '';
+                var dd = '';
+                for (var i = 0; i < parts.length; i++) {
+                    if (parts[i].type === 'year') yyyy = parts[i].value;
+                    if (parts[i].type === 'month') mm = parts[i].value;
+                    if (parts[i].type === 'day') dd = parts[i].value;
+                }
+                if (yyyy && mm && dd) return yyyy + '-' + mm + '-' + dd;
+            } catch (err) {}
+            return guestPaidDateYyyyMmDd(d);
+        }
+
+        function guestLogCancellationNoticeLine(cancelOn) {
+            var dateLabel = String(cancelOn || '').trim() || guestCancelOnDateYyyyMmDd();
+            return guestLogYyMmDdPrefix() + ': Cancellation notice sent. Cancel on ' + dateLabel + '.';
         }
 
         function guestLogInvoiceSentLine(invoiceId) {
@@ -35039,7 +35300,18 @@
             return '';
         }
 
-        /** Date of the latest “Final reminder sent” log line (YYYY-MM-DD). */
+        /** Date from the latest “Cancel on YYYY-MM-DD” log line. */
+        function guestCancelOnDateLabelFromRecord(g) {
+            if (!g) return '';
+            var log = Array.isArray(g.log) ? g.log : [];
+            for (var i = log.length - 1; i >= 0; i--) {
+                var line = String(log[i] != null ? log[i] : '');
+                var onDate = line.match(/Cancel on (\d{4}-\d{2}-\d{2})/i);
+                if (onDate) return onDate[1];
+            }
+            return '';
+        }
+
         function guestFinalNoticeDateLabelFromRecord(g) {
             if (!g) return '';
             var log = Array.isArray(g.log) ? g.log : [];
@@ -35070,12 +35342,16 @@
             var overdue = Boolean(g && guestPaidValueIsOverdue(g.paid));
             var firstNotice = guestPaidValueIsFirstReminder(g && g.paid);
             var finalNotice = guestPaidValueIsFinalNotice(g && g.paid);
+            var toBeCancelled = guestPaidValueIsToBeCancelled(g && g.paid);
             var label;
             if (paidDone) {
                 var dateLabel = guestPaidDateLabelFromRecord(g);
                 label = dateLabel ? 'Payment received ' + dateLabel : 'Payment received';
             } else if (rollover) {
                 label = 'Rollover';
+            } else if (toBeCancelled) {
+                var cancelOn = guestCancelOnDateLabelFromRecord(g) || '—';
+                label = 'Cancel on ' + cancelOn;
             } else if (finalNotice) {
                 var finalDate = guestFinalNoticeDateLabelFromRecord(g) || '—';
                 label = 'Final notice ' + finalDate;
@@ -35147,6 +35423,24 @@
                 secondBtn.textContent = 'Send final reminder';
                 secondBtn.setAttribute('aria-label', 'Send final reminder');
                 secondBtn.setAttribute('title', 'Send final reminder');
+            }
+            var showCancellationNotice = Boolean(finalNotice && !paidDone);
+            var cancellationCanRun = showCancellationNotice && guestPadlockIsOpen;
+            var cancellationSide = document.getElementById('guest-workflow-cancellation-notice-side');
+            var cancellationBtn = document.getElementById('guest-workflow-cancellation-notice-btn');
+            if (cancellationSide) {
+                cancellationSide.hidden = !showCancellationNotice;
+                cancellationSide.setAttribute('aria-hidden', showCancellationNotice ? 'false' : 'true');
+            }
+            if (cancellationBtn) {
+                cancellationBtn.hidden = !showCancellationNotice;
+                cancellationBtn.setAttribute('aria-hidden', showCancellationNotice ? 'false' : 'true');
+                cancellationBtn.disabled = !showCancellationNotice;
+                cancellationBtn.setAttribute('aria-disabled', cancellationCanRun ? 'false' : 'true');
+                cancellationBtn.classList.toggle('is-active', showCancellationNotice);
+                cancellationBtn.textContent = 'Send cancellation notice';
+                cancellationBtn.setAttribute('aria-label', 'Send cancellation notice');
+                cancellationBtn.setAttribute('title', 'Send cancellation notice');
             }
         }
 
@@ -35220,6 +35514,7 @@
             if (guestPaidFieldIsYes(g.paid)) return false;
             if (guestPaidFieldIsRollover(g.paid)) return false;
             if (guestPaidIsCancelledPill(g.paid)) return false;
+            if (guestPaidValueIsToBeCancelled(g.paid)) return false;
             var due = 0;
             var mapped = Number(guestOverdueDueUnixByGuestId[String(g.id || '')]);
             if (isFinite(mapped) && mapped > 0) due = mapped;
@@ -35550,6 +35845,7 @@
         }
 
         async function loadFinancesTransactionsFromFirestore() {
+            if (!backendUserCanViewFinances()) return;
             var seq = ++financesTransactionsLoadSeq;
             var eventName = String(current_event || '').trim();
             if (!eventName || eventName.indexOf('/') !== -1) {
@@ -39593,6 +39889,7 @@
         var TBS_TEXTEDITOR_PRESET_GUEST_SENT_TO_RESERVES_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-sent-to-reserves';
         var TBS_TEXTEDITOR_PRESET_GENTLE_PAYMENT_REMINDER_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:gentle-payment-reminder';
         var TBS_TEXTEDITOR_PRESET_FINAL_PAYMENT_REMINDER_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:final-payment-reminder';
+        var TBS_TEXTEDITOR_PRESET_GUEST_CANCELLATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:guest-cancellation';
         var TBS_TEXTEDITOR_PRESET_FORMAL_SPEAKER_INVITATION_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:formal-speaker-invitation';
         var TBS_TEXTEDITOR_PRESET_REQUEST_SPEAKER_LODGING_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:request-speaker-lodging';
         var TBS_TEXTEDITOR_PRESET_SCRAPBOOK_LS_KEY = TBS_TEXTEDITOR_LS_PREFIX + 'preset:scrapbook';
@@ -39608,6 +39905,7 @@
         var FIRESTORE_TBS_SNIPPETS_GUEST_INVITATION_FIELD = 'Guest invitation';
         var FIRESTORE_TBS_SNIPPETS_GUEST_SENT_TO_RESERVES_FIELD = 'Guest sent to reserves';
         var FIRESTORE_TBS_SNIPPETS_GUESTS_GENTLE_REMINDER_FIELD = 'guests_gentle_reminder';
+        var FIRESTORE_TBS_SNIPPETS_GUEST_CANCELLATION_FIELD = 'Guest cancellation';
         var FIRESTORE_TBS_SNIPPETS_FINAL_REMINDER_FIELD = 'final_reminder';
         var FIRESTORE_TBS_SNIPPETS_SEND_TO_RESERVES_FIELD = 'Sendtoreserves';
         var FIRESTORE_TBS_SNIPPETS_SPEAKER_INVITATION_FIELD = 'Speakerinvitation';
@@ -39764,6 +40062,16 @@
                     loadOk: 'Gentle payment reminder loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/guests_gentle_reminder/guests_gentle_reminder.Value) into the editor.',
                     saveOk: 'Gentle payment reminder saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/guests_gentle_reminder/guests_gentle_reminder.Value).',
                     saveErr: 'Failed to save Gentle payment reminder to Firestore.',
+                    target: 'tbs-snippets'
+                };
+            }
+            if (key === TBS_TEXTEDITOR_PRESET_GUEST_CANCELLATION_LS_KEY) {
+                return {
+                    field: FIRESTORE_TBS_SNIPPETS_GUEST_CANCELLATION_FIELD,
+                    metaLabel: 'Guest workflow e-mails — Guest cancellation',
+                    loadOk: 'Guest cancellation loaded from Firestore (tbs/Pre-sets/Zermatt/Zermatt/Guest cancellation/Guest cancellation.Value) into the editor.',
+                    saveOk: 'Guest cancellation saved to Firestore (tbs/Pre-sets/Zermatt/Zermatt/Guest cancellation/Guest cancellation.Value).',
+                    saveErr: 'Failed to save Guest cancellation to Firestore.',
                     target: 'tbs-snippets'
                 };
             }
@@ -43980,7 +44288,7 @@
         }
 
         function setBackendPanel(panel) {
-            if (panel === 'finances' && !backenduserIsAdmin) return;
+            if (panel === 'finances' && !backendUserCanViewFinances()) return;
             const isEditor = panel === 'editor';
             const isContent = panel === 'content';
             const isFinances = panel === 'finances';
@@ -44248,6 +44556,48 @@
             applySendBulkEmailsPopupOpen();
         }
 
+        function syncFinancesNavAccess() {
+            var showFinances = backendUserCanViewFinances();
+            var financesToggle = document.getElementById('finances-toggle');
+            var financesSection = document.getElementById('finances-editor');
+            if (financesToggle) {
+                financesToggle.hidden = !showFinances;
+                if (showFinances) {
+                    if (!financesToggle.getAttribute('href')) {
+                        financesToggle.setAttribute('href', '#finances-editor');
+                    }
+                } else {
+                    financesToggle.removeAttribute('href');
+                }
+                financesToggle.setAttribute('aria-hidden', showFinances ? 'false' : 'true');
+                financesToggle.setAttribute('tabindex', showFinances ? '0' : '-1');
+                financesToggle.setAttribute('aria-disabled', showFinances ? 'false' : 'true');
+                if (!showFinances) {
+                    financesToggle.classList.remove('is-active');
+                    financesToggle.setAttribute('aria-expanded', 'false');
+                }
+            }
+            if (!showFinances && financesSection) {
+                financesSection.setAttribute('inert', '');
+                financesSection.setAttribute('aria-hidden', 'true');
+                if (financesSection.classList.contains('is-open')) {
+                    financesSection.classList.remove('is-open');
+                    var overviewSection = document.getElementById('overview-editor');
+                    var overviewToggle = document.getElementById('overview-toggle');
+                    if (overviewSection) {
+                        overviewSection.classList.add('is-open');
+                        overviewSection.setAttribute('aria-hidden', 'false');
+                    }
+                    if (overviewToggle) {
+                        overviewToggle.classList.add('is-active');
+                        overviewToggle.setAttribute('aria-expanded', 'true');
+                    }
+                }
+            } else if (financesSection) {
+                financesSection.removeAttribute('inert');
+            }
+        }
+
         function updateBackendEditorVisibility() {
             const navigationEl = document.getElementById('backend-navigation');
             const editorToggle = document.getElementById('texteditor-toggle');
@@ -44275,21 +44625,7 @@
             if (navigationEl) {
                 navigationEl.classList.toggle('navigation--no-event', !hasEvent);
             }
-            if (financesToggle) {
-                var showFinances = !!backenduserIsAdmin;
-                financesToggle.hidden = !showFinances;
-                financesToggle.setAttribute('aria-hidden', showFinances ? 'false' : 'true');
-                financesToggle.setAttribute('tabindex', showFinances ? '0' : '-1');
-                financesToggle.setAttribute('aria-disabled', showFinances ? 'false' : 'true');
-                if (!showFinances) {
-                    financesToggle.classList.remove('is-active');
-                    financesToggle.setAttribute('aria-expanded', 'false');
-                    if (financesSection && financesSection.classList.contains('is-open')) {
-                        financesSection.classList.remove('is-open');
-                        financesSection.setAttribute('aria-hidden', 'true');
-                    }
-                }
-            }
+            syncFinancesNavAccess();
             if (settingsToggle) {
                 settingsToggle.setAttribute('aria-hidden', 'false');
                 settingsToggle.setAttribute('tabindex', '0');
@@ -45991,7 +46327,10 @@
                     await Promise.all([
                         backendGuestsPreloadPromise,
                         speakersPreload,
-                        loadFinancesTransactionsFromFirestore().catch(function (err) {
+                        (backendUserCanViewFinances()
+                            ? loadFinancesTransactionsFromFirestore()
+                            : Promise.resolve()
+                        ).catch(function (err) {
                             console.error('Finances preload failed:', err);
                             updateBackendStartupLoadStatus('Failed to load transactions from Firestore.');
                         })
@@ -46047,7 +46386,7 @@
             if (financesToggleClick) {
                 financesToggleClick.addEventListener('click', function(e) {
                     e.preventDefault();
-                    if (!backenduserIsAdmin) return;
+                    if (!backendUserCanViewFinances()) return;
                     setBackendPanel('finances');
                 });
             }
@@ -47173,6 +47512,23 @@
                             showStatus(
                                 'error',
                                 err && err.message ? err.message : 'Failed to send final reminder.'
+                            );
+                        }
+                    });
+                });
+            }
+            var guestWorkflowCancellationNoticeBtn = document.getElementById('guest-workflow-cancellation-notice-btn');
+            if (guestWorkflowCancellationNoticeBtn) {
+                guestWorkflowCancellationNoticeBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (!guestWorkflowActionAllowedOrShake(guestWorkflowCancellationNoticeBtn)) return;
+                    sendGuestCancellationNoticeFromWorkflow().catch(function(err) {
+                        console.error('guest-workflow-cancellation-notice:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus(
+                                'error',
+                                err && err.message ? err.message : 'Failed to send cancellation notice.'
                             );
                         }
                     });
