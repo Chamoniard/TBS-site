@@ -30983,7 +30983,7 @@
 
         function guestRecordFromTbsItemDoc(docId, d) {
             d = d || {};
-            return {
+            var rec = {
                 id: String(docId || '').trim(),
                 event: guestCoalesceGuestItemEvent(d),
                 name: speakerCoalesceStringField(d, ['Name', 'name', 'First Name', 'firstName']),
@@ -31109,6 +31109,15 @@
                 ]),
                 selected: guestSelectedFromDoc(d),
             };
+            if (
+                guestLogHasCancellationNotice(rec) &&
+                !guestPaidFieldIsYes(rec.paid) &&
+                !guestPaidValueIsToBeCancelled(rec.paid)
+            ) {
+                rec.paid = 'To be cancelled';
+                rec._restoreCancellationPaid = true;
+            }
+            return rec;
         }
 
         function guestRosterIsWaitList(g) {
@@ -31724,6 +31733,12 @@
             var stored = findGuestInMemory(id) || rec;
             stored.paid = 'To be cancelled';
             await persistGuestReminderLogLine(id, logLine, stored);
+            await getFirestore()
+                .collection('tbs')
+                .doc('Guests')
+                .collection(id)
+                .doc('item')
+                .set({ Paid: 'To be cancelled' }, { merge: true });
             if (rec && rec !== stored) {
                 rec.paid = stored.paid;
                 rec.log = Array.isArray(stored.log) ? stored.log.slice() : [];
@@ -32558,6 +32573,20 @@
             return String(paidVal != null ? paidVal : '').trim().toLowerCase() === 'to be cancelled';
         }
 
+        function guestLogHasCancellationNotice(g) {
+            var log = g && Array.isArray(g.log) ? g.log : [];
+            for (var i = 0; i < log.length; i++) {
+                if (/Cancellation notice sent/i.test(String(log[i] != null ? log[i] : ''))) return true;
+            }
+            return false;
+        }
+
+        /** A sent cancellation notice stays To be cancelled until the invoice is paid. */
+        function guestKeepPaidToBeCancelled(g) {
+            if (!g || guestPaidFieldIsYes(g.paid)) return false;
+            return guestPaidValueIsToBeCancelled(g.paid) || guestLogHasCancellationNotice(g);
+        }
+
         function guestPaidMatchesFilter(actual, selected) {
             if (guestFilterValueInList(actual, selected)) return true;
             var list = guestsFilterSelectedList(selected);
@@ -33261,7 +33290,14 @@
                     for (var c = 0; c < ids.length; c++) {
                         var choice = best[ids[c]];
                         var paidNow = String(choice.guest.paid || '').trim().toLowerCase();
-                        if (paidNow === 'first notice' || paidNow === 'first reminder' || paidNow === 'final notice' || paidNow === 'to be cancelled' || paidNow === 'rollover') continue;
+                        if (guestKeepPaidToBeCancelled(choice.guest)) {
+                            if (!guestPaidValueIsToBeCancelled(choice.guest.paid)) {
+                                choice.guest.paid = 'To be cancelled';
+                                changes.push(choice.guest);
+                            }
+                            continue;
+                        }
+                        if (paidNow === 'first notice' || paidNow === 'first reminder' || paidNow === 'final notice' || paidNow === 'rollover') continue;
                         if (String(choice.guest.paid || '').trim() === choice.label) continue;
                         choice.guest.paid = choice.label;
                         changes.push(choice.guest);
@@ -33522,6 +33558,8 @@
         }
 
         function guestRosterPaidCellHtml(docId, paidVal) {
+            var storedGuest = findGuestInMemory(docId);
+            if (storedGuest && guestKeepPaidToBeCancelled(storedGuest)) paidVal = 'To be cancelled';
             var raw = String(paidVal != null ? paidVal : '').trim();
             var displayText = raw || '—';
             var mod = guestPaidBadgeModifierClass(paidVal);
@@ -35514,7 +35552,7 @@
             if (guestPaidFieldIsYes(g.paid)) return false;
             if (guestPaidFieldIsRollover(g.paid)) return false;
             if (guestPaidIsCancelledPill(g.paid)) return false;
-            if (guestPaidValueIsToBeCancelled(g.paid)) return false;
+            if (guestKeepPaidToBeCancelled(g)) return false;
             var due = 0;
             var mapped = Number(guestOverdueDueUnixByGuestId[String(g.id || '')]);
             if (isFinite(mapped) && mapped > 0) due = mapped;
@@ -38368,6 +38406,16 @@
                 }
                 applyRosterSelectedYesSnapshot(list, guestSelectedSnap);
                 rememberRosterSelectedYes(guestsRosterNameCheckedIds, list);
+                var paidRestores = [];
+                if (Array.isArray(list)) {
+                    for (var restoreI = 0; restoreI < list.length; restoreI++) {
+                        if (list[restoreI] && list[restoreI]._restoreCancellationPaid) {
+                            delete list[restoreI]._restoreCancellationPaid;
+                            paidRestores.push(list[restoreI]);
+                        }
+                    }
+                }
+                if (paidRestores.length) persistGuestPaidLabels(paidRestores);
                 guestsRosterInMemory = list;
                 guestsRosterAllInMemory = list;
                 guestsRosterSortInPlace();
