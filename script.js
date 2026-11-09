@@ -6507,6 +6507,116 @@ function fillHomeSpeakerCardBioMain(bioMain, speaker) {
     bioMain.innerHTML = content;
 }
 
+function isHomeProgrammePreviewMode() {
+    try {
+        return new URLSearchParams(window.location.search).get('programme-preview') === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+function postHomeProgrammePreviewClose() {
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage({ type: 'tbs-programme-preview-close' }, window.location.origin);
+}
+
+function postHomeProgrammePreviewSized() {
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage({ type: 'tbs-programme-preview-sized' }, window.location.origin);
+}
+
+async function renderHomeProgrammePreview(payload) {
+    const root = document.getElementById('programme-preview-root');
+    if (!root) return;
+    let displayProgramme = true;
+    let infoSlide = '';
+    try {
+        displayProgramme = await fetchHomeDisplayProgrammeFromFirestore();
+    } catch (err) {
+        displayProgramme = true;
+    }
+    try {
+        infoSlide = await resolveHomeProgrammeInfoSlideHtml();
+    } catch (err) {
+        infoSlide = '';
+    }
+    const days = payload && Array.isArray(payload.days) ? payload.days : [];
+    const slides = [];
+    if (infoSlide) slides.push(infoSlide);
+    if (!days.length && displayProgramme === false) {
+        for (let tbaIdx = 0; tbaIdx < HOME_CAROUSEL_TBA_CARD_COUNT; tbaIdx++) {
+            slides.push(buildHomeProgrammeTbaSlideHtml());
+        }
+    } else {
+        days.forEach(function (day) {
+            if (!day) return;
+            slides.push(
+                buildHomeProgrammeDaySlideHtml(
+                    day.isoDate,
+                    day.name,
+                    Array.isArray(day.sessions) ? day.sessions : []
+                )
+            );
+        });
+    }
+    const section = buildHomeProgrammeSectionElement(slides, days.length > 0 || displayProgramme !== false);
+    root.innerHTML = '';
+    if (section) root.appendChild(section);
+    wireProgrammeSliderScrollbar();
+    wireHorizontalCardSliderDragScrolling(root);
+    fitHomeProgrammeCardsToContent(root);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+            fitHomeProgrammeCardsToContent(root);
+            postHomeProgrammePreviewSized();
+        });
+    }
+    requestAnimationFrame(function () {
+        fitHomeProgrammeCardsToContent(root);
+        postHomeProgrammePreviewSized();
+    });
+}
+
+function bootHomeProgrammePreviewMode() {
+    document.documentElement.classList.add('programme-preview-mode');
+    document.body.classList.add('home-view', 'programme-preview-mode');
+    document.body.classList.remove('loading');
+    const loading = document.getElementById('home-loading-screen');
+    if (loading) {
+        loading.classList.add('is-hidden');
+        loading.setAttribute('aria-hidden', 'true');
+        loading.setAttribute('aria-busy', 'false');
+    }
+    const robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute('content', 'noindex, nofollow');
+    const main = document.querySelector('.everything');
+    if (main) {
+        main.innerHTML = '<section class="home-section" id="programme-preview-root"></section>';
+    }
+    window.addEventListener('message', function (ev) {
+        if (ev.origin !== window.location.origin) return;
+        if (!ev.data || ev.data.type !== 'tbs-programme-preview') return;
+        renderHomeProgrammePreview(ev.data);
+    });
+    document.addEventListener(
+        'click',
+        function (ev) {
+            const link = ev.target && ev.target.closest ? ev.target.closest('a') : null;
+            if (link) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                return;
+            }
+            const root = document.getElementById('programme-preview-root');
+            if (root && ev.target === root) postHomeProgrammePreviewClose();
+        },
+        true
+    );
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'tbs-programme-preview-ready' }, window.location.origin);
+    }
+}
+
 function isHomeWebsiteSnippetPreviewMode() {
     try {
         return new URLSearchParams(window.location.search).get('website-snippet-preview') === '1';
@@ -9440,6 +9550,10 @@ function setHomePageLoading(isLoading) {
 initPageScrollOnReload();
 
 document.addEventListener('DOMContentLoaded', async function() {
+    if (isHomeProgrammePreviewMode()) {
+        bootHomeProgrammePreviewMode();
+        return;
+    }
     if (isHomeSpeakerBioPreviewMode()) {
         bootHomeSpeakerBioPreviewMode();
         return;

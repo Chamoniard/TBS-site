@@ -1525,7 +1525,7 @@
             gap: 12px;
             background: #ffffff;
             border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            border-radius: 5px;
             padding: 1.15rem 1.25rem 1rem;
             box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
             box-sizing: border-box;
@@ -12128,18 +12128,21 @@
             color-scheme: normal;
         }
 
-        #website-snippet-preview-popup.speaker-bio-preview-popup {
+        #website-snippet-preview-popup.speaker-bio-preview-popup,
+        #programme-preview-popup.speaker-bio-preview-popup {
             overflow: auto;
         }
 
-        #website-snippet-preview-popup .website-snippet-preview-layout {
+        #website-snippet-preview-popup .website-snippet-preview-layout,
+        #programme-preview-popup .website-snippet-preview-layout {
             position: relative;
             z-index: 1;
             flex: 0 0 auto;
             max-width: 100%;
         }
 
-        #website-snippet-preview-popup .website-snippet-preview-devices {
+        #website-snippet-preview-popup .website-snippet-preview-devices,
+        #programme-preview-popup .website-snippet-preview-devices {
             position: absolute;
             top: 12px;
             right: 12px;
@@ -12147,7 +12150,9 @@
         }
 
         #website-snippet-preview-desktop-btn,
-        #website-snippet-preview-phone-btn {
+        #website-snippet-preview-phone-btn,
+        #programme-preview-desktop-btn,
+        #programme-preview-phone-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -12170,11 +12175,14 @@
         }
 
         #website-snippet-preview-desktop-btn[hidden],
-        #website-snippet-preview-phone-btn[hidden] {
+        #website-snippet-preview-phone-btn[hidden],
+        #programme-preview-desktop-btn[hidden],
+        #programme-preview-phone-btn[hidden] {
             display: none !important;
         }
 
-        #website-snippet-preview-popup .website-snippet-preview-stage {
+        #website-snippet-preview-popup .website-snippet-preview-stage,
+        #programme-preview-popup .website-snippet-preview-stage {
             position: relative;
             z-index: 1;
             flex: 0 0 auto;
@@ -12182,10 +12190,14 @@
             height: 480px;
             overflow: hidden;
             background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            box-sizing: border-box;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
-        #website-snippet-preview-popup .website-snippet-preview-frame {
+        #website-snippet-preview-popup .website-snippet-preview-frame,
+        #programme-preview-popup .website-snippet-preview-frame {
             position: absolute;
             top: 0;
             left: 0;
@@ -12222,7 +12234,7 @@
             position: relative;
             background: #ffffff;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            border-radius: 5px;
             padding: 1.25rem 1.5rem;
             width: max-content;
             max-width: calc(100vw - 2rem);
@@ -12370,7 +12382,7 @@
             overflow: visible;
             background: #ffffff;
             border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            border-radius: 5px;
             padding: 1.15rem 1.25rem 1rem;
             box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
             box-sizing: border-box;
@@ -12576,7 +12588,7 @@
             max-height: min(90vh, 44rem);
             background: #ffffff;
             border: 1px solid #cbd5e1;
-            border-radius: 12px;
+            border-radius: 5px;
             box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
             overflow: hidden;
             box-sizing: border-box;
@@ -12696,7 +12708,7 @@
             position: relative;
             background: #ffffff;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            border-radius: 5px;
             padding: 1.25rem 1.5rem;
             width: max-content;
             max-width: calc(100vw - 2rem);
@@ -14139,6 +14151,7 @@
 
         #programme-editor .programme-toolbar .programme-padlock-btn,
         #programme-editor .programme-toolbar .programme-session-order-btn,
+        #programme-editor .programme-toolbar #programme-preview-btn,
         #programme-editor .programme-toolbar #save-programme-btn,
         #programme-editor .programme-toolbar .programme-restore-btn,
         #programme-editor .programme-toolbar #programme-delete-btn {
@@ -14170,11 +14183,22 @@
             display: block;
         }
 
+        #programme-editor .programme-toolbar #programme-preview-btn svg,
         #programme-editor .programme-toolbar #save-programme-btn svg {
             width: 18px;
             height: 18px;
             flex-shrink: 0;
             display: block;
+        }
+
+        #programme-editor .programme-toolbar #programme-preview-btn {
+            background: var(--backend-button-yellow);
+            color: #003153;
+            cursor: pointer;
+        }
+
+        #programme-editor .programme-toolbar #programme-preview-btn:hover {
+            filter: brightness(0.92);
         }
 
         #programme-editor .programme-toolbar .programme-padlock-btn {
@@ -16334,6 +16358,11 @@
                                             <button type="button" class="programme-session-order-btn" id="programme-session-order-down-btn" disabled aria-disabled="true" aria-label="Move selection down" title="Move selection down">↓</button>
                                             <button type="button" class="programme-session-order-btn swap-slots" id="swap-slots-btn" disabled aria-disabled="true" aria-label="Swap slots" title="Shift+click a second slot, then swap">⇆</button>
                                         </div>
+                                        <button type="button" class="add-speaker-button" id="programme-preview-btn" title="Preview" aria-label="Preview">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                                <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                            </svg>
+                                        </button>
                                         <button type="button" class="texteditor-save-btn" id="save-programme-btn" disabled aria-disabled="true" title="Save programme" aria-label="Save programme">
                                             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                                                 <path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
@@ -17587,6 +17616,32 @@
                 <div class="website-snippet-preview-devices">
                     <button type="button" class="website-snippet-preview-device-btn" id="website-snippet-preview-desktop-btn" hidden aria-pressed="true" title="Desktop, 1500 px" aria-label="Switch to desktop, 1500 px">🖥️</button>
                     <button type="button" class="website-snippet-preview-device-btn" id="website-snippet-preview-phone-btn" aria-pressed="false" title="iPhone portrait" aria-label="Switch to iPhone portrait">📱</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        id="programme-preview-popup"
+        class="speaker-bio-preview-popup"
+        hidden
+        aria-hidden="true"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Programme preview"
+    >
+        <div class="speaker-bio-preview-popup__backdrop" id="programme-preview-popup-backdrop"></div>
+        <div class="website-snippet-preview-layout" id="programme-preview-layout">
+            <div class="website-snippet-preview-stage" id="programme-preview-stage">
+                <iframe
+                    id="programme-preview-frame"
+                    class="website-snippet-preview-frame"
+                    title="Programme preview"
+                    src="about:blank"
+                ></iframe>
+                <div class="website-snippet-preview-devices">
+                    <button type="button" class="website-snippet-preview-device-btn" id="programme-preview-desktop-btn" hidden aria-pressed="true" title="Desktop, 1500 px" aria-label="Switch to desktop, 1500 px">🖥️</button>
+                    <button type="button" class="website-snippet-preview-device-btn" id="programme-preview-phone-btn" aria-pressed="false" title="iPhone portrait" aria-label="Switch to iPhone portrait">📱</button>
                 </div>
             </div>
         </div>
@@ -23836,6 +23891,134 @@
                 return;
             }
             iframe.src = previewUrl;
+        }
+
+        var PROGRAMME_PREVIEW_HOME_URL = 'home.html?programme-preview=1&v=20261109-programme-preview-days';
+        var PROGRAMME_PREVIEW_WIDTH = 1500;
+        var PROGRAMME_PREVIEW_PHONE_WIDTH = 390;
+        var programmePreviewDevice = 'desktop';
+
+        function programmePreviewTimestamp(ts) {
+            var date = programmeSlotTimestampToDate(ts);
+            if (!date) return null;
+            return { seconds: Math.floor(date.getTime() / 1000), nanoseconds: 0 };
+        }
+
+        function programmePreviewPayload() {
+            var dates = programmeState && programmeState.dayDates ? programmeState.dayDates.slice().sort() : [];
+            var days = [];
+            for (var i = 0; i < dates.length; i++) {
+                var iso = dates[i];
+                var name = '';
+                if (programmeState.dayNameByDay && programmeState.dayNameByDay[iso] != null) {
+                    name = String(programmeState.dayNameByDay[iso]).trim();
+                }
+                if (!name && programmeState.nameDateByDay && programmeState.nameDateByDay[iso] != null) {
+                    name = String(programmeState.nameDateByDay[iso]).trim();
+                }
+                var sessions = getProgrammeSessionsForDaySorted(iso).map(function (session) {
+                    var slots = (session.slots || []).slice().sort(function (a, b) {
+                        var diff = programmeSlotTimestampMillis(a.starttime) - programmeSlotTimestampMillis(b.starttime);
+                        return diff !== 0 ? diff : String(a.id).localeCompare(String(b.id));
+                    });
+                    return {
+                        id: session.id,
+                        name: session.name,
+                        order: session.order,
+                        slots: slots.map(function (slot) {
+                            return {
+                                id: slot.id,
+                                name: slot.name,
+                                starttime: programmePreviewTimestamp(slot.starttime),
+                                endtime: programmePreviewTimestamp(slot.endtime)
+                            };
+                        })
+                    };
+                });
+                days.push({ isoDate: iso, name: name || iso, sessions: sessions });
+            }
+            return { type: 'tbs-programme-preview', days: days };
+        }
+
+        function syncProgrammePreviewDeviceButtons() {
+            var desktopOn = programmePreviewDevice !== 'phone';
+            var desktopBtn = document.getElementById('programme-preview-desktop-btn');
+            var phoneBtn = document.getElementById('programme-preview-phone-btn');
+            if (desktopBtn) {
+                desktopBtn.hidden = desktopOn;
+                desktopBtn.setAttribute('aria-pressed', desktopOn ? 'true' : 'false');
+            }
+            if (phoneBtn) {
+                phoneBtn.hidden = !desktopOn;
+                phoneBtn.setAttribute('aria-pressed', desktopOn ? 'false' : 'true');
+            }
+        }
+
+        function syncProgrammePreviewScale() {
+            var stage = document.getElementById('programme-preview-stage');
+            var iframe = document.getElementById('programme-preview-frame');
+            if (!stage || !iframe) return;
+            var phone = programmePreviewDevice === 'phone';
+            var width = phone ? PROGRAMME_PREVIEW_PHONE_WIDTH : PROGRAMME_PREVIEW_WIDTH;
+            var maxHeight = Math.max(160, window.innerHeight - 96);
+            var layoutHeight = Math.min(phone ? 844 : 640, maxHeight);
+            try {
+                var doc = iframe.contentDocument;
+                var section = doc && doc.querySelector('.programme-section');
+                if (section) {
+                    var measured = Math.ceil(Math.max(section.scrollHeight, section.getBoundingClientRect().height));
+                    if (measured > 40) layoutHeight = Math.min(measured, maxHeight);
+                }
+            } catch (err) {
+                layoutHeight = Math.min(phone ? 844 : 640, maxHeight);
+            }
+            stage.style.width = width + 'px';
+            stage.style.height = layoutHeight + 'px';
+            stage.style.background = '#ffffff';
+            iframe.style.left = '0px';
+            iframe.style.width = width + 'px';
+            iframe.style.height = layoutHeight + 'px';
+            iframe.style.background = '#ffffff';
+            iframe.style.transform = 'none';
+        }
+
+        function sendProgrammePreviewToFrame() {
+            var iframe = document.getElementById('programme-preview-frame');
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage(programmePreviewPayload(), window.location.origin);
+        }
+
+        function closeProgrammePreviewPopup() {
+            var popup = document.getElementById('programme-preview-popup');
+            var iframe = document.getElementById('programme-preview-frame');
+            if (popup) {
+                popup.hidden = true;
+                popup.setAttribute('aria-hidden', 'true');
+            }
+            if (iframe) iframe.src = 'about:blank';
+        }
+
+        function setProgrammePreviewDevice(device) {
+            programmePreviewDevice = device === 'phone' ? 'phone' : 'desktop';
+            syncProgrammePreviewDeviceButtons();
+            syncProgrammePreviewScale();
+            requestAnimationFrame(function () {
+                sendProgrammePreviewToFrame();
+            });
+        }
+
+        function openProgrammePreviewPopup() {
+            var popup = document.getElementById('programme-preview-popup');
+            var iframe = document.getElementById('programme-preview-frame');
+            if (!popup || !iframe) return;
+            syncProgrammePreviewDeviceButtons();
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+            if (iframe.getAttribute('src') === PROGRAMME_PREVIEW_HOME_URL) {
+                sendProgrammePreviewToFrame();
+                return;
+            }
+            iframe.src = PROGRAMME_PREVIEW_HOME_URL;
         }
 
         async function performDeleteSpeakerFromFirebase() {
@@ -46784,6 +46967,17 @@
                 if (data.type === 'tbs-website-snippet-preview-close') {
                     if (fromStandbyFrame) return;
                     closeWebsiteSnippetPreviewPopup();
+                    return;
+                }
+                if (data.type === 'tbs-programme-preview-ready' || data.type === 'tbs-programme-preview-sized') {
+                    if (data.type === 'tbs-programme-preview-ready') sendProgrammePreviewToFrame();
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(syncProgrammePreviewScale);
+                    });
+                    return;
+                }
+                if (data.type === 'tbs-programme-preview-close') {
+                    closeProgrammePreviewPopup();
                 }
             });
             var websiteSnippetPreviewBtn = document.getElementById('texteditor-render-preview-btn');
@@ -46825,6 +47019,50 @@
                     sendWebsiteSnippetPreviewToFrame();
                 });
             }
+            var programmePreviewBtn = document.getElementById('programme-preview-btn');
+            if (programmePreviewBtn) {
+                programmePreviewBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    openProgrammePreviewPopup();
+                });
+            }
+            var programmePreviewDesktopBtn = document.getElementById('programme-preview-desktop-btn');
+            var programmePreviewPhoneBtn = document.getElementById('programme-preview-phone-btn');
+            if (programmePreviewDesktopBtn) {
+                programmePreviewDesktopBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    setProgrammePreviewDevice('desktop');
+                });
+            }
+            if (programmePreviewPhoneBtn) {
+                programmePreviewPhoneBtn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    setProgrammePreviewDevice('phone');
+                });
+            }
+            var programmePreviewBackdrop = document.getElementById('programme-preview-popup-backdrop');
+            if (programmePreviewBackdrop) {
+                programmePreviewBackdrop.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    closeProgrammePreviewPopup();
+                });
+            }
+            var programmePreviewFrame = document.getElementById('programme-preview-frame');
+            if (programmePreviewFrame) {
+                programmePreviewFrame.addEventListener('load', function () {
+                    var popup = document.getElementById('programme-preview-popup');
+                    if (!popup || popup.hidden) return;
+                    var src = programmePreviewFrame.getAttribute('src') || '';
+                    if (src === 'about:blank') return;
+                    sendProgrammePreviewToFrame();
+                });
+            }
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key !== 'Escape') return;
+                var programmePopup = document.getElementById('programme-preview-popup');
+                if (!programmePopup || programmePopup.hidden) return;
+                closeProgrammePreviewPopup();
+            });
             document.addEventListener('keydown', function (ev) {
                 if (ev.key !== 'Escape') return;
                 var popup = document.getElementById('website-snippet-preview-popup');
