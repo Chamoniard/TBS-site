@@ -17584,7 +17584,7 @@
                                         <select id="finances-item-status" name="status" required aria-required="true">
                                             <option value="">Select</option>
                                             <option value="projected">Projected</option>
-                                            <option value="received">Received</option>
+                                            <option value="received">Invoiced</option>
                                             <option value="partially_paid">Partially paid</option>
                                             <option value="paid">Paid</option>
                                         </select>
@@ -36274,7 +36274,7 @@
         function financesStatusLabel(status) {
             var s = String(status || '').trim();
             if (s === 'projected') return 'Projected';
-            if (s === 'received') return 'Received';
+            if (s === 'received' || s === 'invoiced') return 'Invoiced';
             if (s === 'partially_paid') return 'Partially paid';
             if (s === 'paid') return 'Paid';
             return s || '—';
@@ -36582,7 +36582,7 @@
         ];
         var FINANCES_STATUS_OPTIONS = [
             { value: 'projected', label: 'Projected' },
-            { value: 'received', label: 'Received' },
+            { value: 'received', label: 'Invoiced' },
             { value: 'partially_paid', label: 'Partially paid' },
             { value: 'paid', label: 'Paid' }
         ];
