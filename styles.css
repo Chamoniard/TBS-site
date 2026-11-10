@@ -7491,35 +7491,10 @@ h4 {
         row-gap: var(--sponsor-logo-gap);
     }
 
-    .home-section > .sponsors-section .sponsor-logo-slot,
-    .home-section > .sponsors-section .sponsor-logo-slot--solo {
+    .home-section > .sponsors-section .sponsor-logo-slot {
         flex: 0 0 auto;
         max-width: none;
         min-width: 0;
-        justify-content: center;
-    }
-
-    /* Visual order: Corpuls+Hamilton, Intersurgical+Qinflow, Heine */
-    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(1) {
-        order: 1;
-    }
-
-    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(2) {
-        order: 2;
-    }
-
-    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(4) {
-        order: 3;
-    }
-
-    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(5) {
-        order: 4;
-    }
-
-    .home-section > .sponsors-section .sponsor-logo-slot:nth-child(3) {
-        order: 5;
-        flex: 1 1 100%;
-        max-width: 100%;
         justify-content: center;
     }
 
@@ -9690,6 +9665,7 @@ h4 {
 
     body.home-view {
         padding-bottom: var(--mobile-bottom-nav-height) !important;
+        font-weight: 450;
     }
 
     body.nav-menu-open {

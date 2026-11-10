@@ -2405,9 +2405,6 @@ const HOME_SPONSOR_LOGO_SLOTS_HTML = `
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/hamiltongold.png" alt="Hamilton" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
-                            <div class="sponsor-logo-slot sponsor-logo-slot--solo">
-                                <img src="images/Sponsors/heinegold.png" alt="Heine" class="sponsors-logo-image" loading="eager" decoding="async">
-                            </div>
                             <div class="sponsor-logo-slot">
                                 <img src="images/Sponsors/intersurgicalgold.png" alt="Intersurgical" class="sponsors-logo-image" loading="eager" decoding="async">
                             </div>
@@ -2444,7 +2441,7 @@ function sponsorLogosRowGapPx(rowEl) {
     return Number.isFinite(x) ? x : 0;
 }
 
-/** Mobile wrap: Corpuls+Hamilton, Intersurgical+Qinflow, Heine. */
+/** Mobile wrap: Corpuls+Hamilton, Intersurgical+Qinflow. */
 function sponsorLogoMobileRowGroups(row) {
     const slots = Array.from(row.querySelectorAll(':scope > .sponsor-logo-slot'));
     const byAlt = {};
@@ -2465,10 +2462,8 @@ function sponsorLogoMobileRowGroups(row) {
     const groups = [];
     const row1 = pair('corpuls', 'hamilton');
     const row2 = pair('intersurgical', 'qinflow');
-    const row3 = byAlt.heine ? [byAlt.heine] : [];
     if (row1.length) groups.push(row1);
     if (row2.length) groups.push(row2);
-    if (row3.length) groups.push(row3);
     if (groups.length) return groups;
     const fallback = [];
     for (let i = 0; i < leftover.length; i += 2) {
