@@ -6318,8 +6318,55 @@
             filter: brightness(0.92);
         }
 
+        #finances-document-file-popup .finances-document-type-popup__box {
+            width: min(calc((100vh - 2rem) * 210 / 297), calc(100vw - 2rem));
+            height: auto;
+            max-height: calc(100vh - 2rem);
+            aspect-ratio: 210 / 297;
+        }
+
         #finances-document-file-popup .finances-document-type-popup__box p {
             overflow-wrap: anywhere;
+            flex: 0 0 auto;
+        }
+
+        #finances-document-file-popup .finances-document-file-view {
+            flex: 1 1 auto;
+            min-height: 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #finances-document-file-popup .finances-document-file-view iframe,
+        #finances-document-file-popup .finances-document-file-view img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #ffffff;
+            object-fit: contain;
+        }
+
+        #finances-document-file-popup .finances-document-type-popup__choices {
+            flex: 0 0 auto;
+            align-items: center;
+        }
+
+        #finances-document-file-download {
+            align-self: center;
+            width: var(--backend-square-btn-size);
+            height: var(--backend-square-btn-size);
+            min-width: var(--backend-square-btn-size);
+            min-height: var(--backend-square-btn-size);
+            max-width: var(--backend-square-btn-size);
+            max-height: var(--backend-square-btn-size);
+            padding: 0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #finances-editor .finances-transaction-form input:disabled,
@@ -18256,8 +18303,13 @@
         <div class="finances-document-type-popup__backdrop" id="finances-document-file-backdrop"></div>
         <div class="finances-document-type-popup__box">
             <p id="finances-document-file-title">File</p>
+            <div class="finances-document-file-view" id="finances-document-file-view"></div>
             <div class="finances-document-type-popup__choices">
-                <button type="button" id="finances-document-file-download">Download</button>
+                <button type="button" id="finances-document-file-download" aria-label="Download" title="Download">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                        <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -37151,6 +37203,8 @@
 
         function closeFinancesDocumentFilePopup() {
             var popup = document.getElementById('finances-document-file-popup');
+            var view = document.getElementById('finances-document-file-view');
+            if (view) view.innerHTML = '';
             if (popup) {
                 popup.hidden = true;
                 popup.setAttribute('aria-hidden', 'true');
@@ -37163,9 +37217,18 @@
             if (typeof renderFinancesDocumentList === 'function') renderFinancesDocumentList(current);
         }
 
+        function financesDocumentViewUrl(url, name) {
+            var fileUrl = String(url || '').trim();
+            if (!fileUrl) return '';
+            var isPdf = /\.pdf$/i.test(String(name || '')) || /\.pdf($|\?)/i.test(fileUrl);
+            if (!isPdf || fileUrl.indexOf('#') !== -1) return fileUrl;
+            return fileUrl + '#toolbar=0&navpanes=0';
+        }
+
         function showFinancesDocumentInFinancials(doc) {
             var popup = document.getElementById('finances-document-file-popup');
             var title = document.getElementById('finances-document-file-title');
+            var view = document.getElementById('finances-document-file-view');
             if (!popup || !doc) return;
             var url = String(doc.url || '').trim();
             if (!url) return;
@@ -37173,10 +37236,15 @@
             financesFinancialsDocumentUrl = url;
             financesFinancialsDocumentName = name;
             if (title) title.textContent = name;
+            if (view) {
+                if (financesDocumentLooksLikeImage('', name, url)) {
+                    view.innerHTML = '<img alt="' + escapeHtml(name) + '" src="' + escapeHtml(url) + '">';
+                } else {
+                    view.innerHTML = '<iframe title="' + escapeHtml(name) + '" src="' + escapeHtml(financesDocumentViewUrl(url, name)) + '"></iframe>';
+                }
+            }
             popup.hidden = false;
             popup.setAttribute('aria-hidden', 'false');
-            var downloadBtn = document.getElementById('finances-document-file-download');
-            if (downloadBtn && typeof downloadBtn.focus === 'function') downloadBtn.focus();
         }
 
         function financesFormatSekAxis(value) {
