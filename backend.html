@@ -332,7 +332,6 @@
         body.backend-page.backend-readonly #guest-send-invite-btn,
         body.backend-page.backend-readonly #guest-send-invoice-btn,
         body.backend-page.backend-readonly #speaker-send-formal-invite-btn,
-        body.backend-page.backend-readonly #finances-financials-import-btn,
         body.backend-page.backend-readonly #finances-items-add-btn,
         body.backend-page.backend-readonly #finances-detail-delete-btn,
         body.backend-page.backend-readonly #finances-detail-save-btn,
@@ -5932,6 +5931,10 @@
             min-width: 0;
         }
 
+        #finances-editor .finances-transaction-form-row[hidden] {
+            display: none !important;
+        }
+
         #finances-editor .finances-transaction-form-row > .add-speaker-form-field {
             flex: 1 1 0;
             min-width: 0;
@@ -6072,6 +6075,158 @@
             opacity: 1;
         }
 
+        #finances-editor .finances-files-title {
+            margin: 0;
+            padding: 0;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #64748b;
+        }
+
+        #finances-editor .finances-document-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            min-width: 0;
+        }
+
+        #finances-editor .finances-document-list[hidden] {
+            display: none !important;
+        }
+
+        #finances-editor .finances-document-list li {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #0f172a;
+        }
+
+        #finances-editor .finances-document-list-icon {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.35rem;
+            height: 1.35rem;
+            color: #475569;
+        }
+
+        #finances-editor .finances-document-list-icon--pdf {
+            color: #e11d48;
+        }
+
+        #finances-editor .finances-document-list-icon--image {
+            color: #0284c7;
+        }
+
+        #finances-editor .finances-document-list-icon--sheet {
+            color: #15803d;
+        }
+
+        #finances-editor .finances-document-list a,
+        #finances-editor .finances-document-list button {
+            min-width: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            overflow: hidden;
+            color: #0f172a;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        #finances-editor .finances-document-list button .finances-document-list-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-decoration: underline;
+            text-underline-offset: 0.15em;
+        }
+
+        #finances-editor .finances-document-list li.is-selected button {
+            font-weight: 600;
+        }
+
+        #finances-editor .finances-document-list .finances-document-list-type {
+            flex: 0 0 auto;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #64748b;
+        }
+
+        #finances-editor #finances-financials .finances-roster-scroll {
+            background: #ffffff;
+        }
+
+        #finances-editor #finances-financials-rows {
+            flex: 1 1 auto;
+            width: 100%;
+            min-width: 100%;
+            height: 100%;
+            min-height: 16rem;
+            background: #ffffff;
+        }
+
+        #finances-editor #finances-financials-rows.is-file-preview {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+        }
+
+        #finances-editor .finances-chart {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 16rem;
+        }
+
+        #finances-editor .finances-financials-file {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1rem;
+            background: #ffffff;
+        }
+
+        #finances-editor .finances-financials-download {
+            height: 35px;
+            min-height: 35px;
+            padding: 0 0.85rem;
+            border: none;
+            border-radius: 5px;
+            background: var(--backend-button-yellow);
+            color: #003153;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        #finances-editor .finances-financials-download:hover {
+            filter: brightness(0.92);
+        }
+
         #finances-editor .finances-document-upload {
             width: 100%;
             max-width: 100%;
@@ -6085,6 +6240,86 @@
             max-width: 100%;
             box-sizing: border-box;
             margin-bottom: 0;
+        }
+
+        #finances-editor .finances-document-upload.is-file-dragover .content-editor-image-frame {
+            outline: 2px solid #003153;
+            outline-offset: -2px;
+        }
+
+        .finances-document-type-popup[hidden] {
+            display: none !important;
+        }
+
+        .finances-document-type-popup {
+            position: fixed;
+            inset: 0;
+            z-index: 10060;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .finances-document-type-popup__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .finances-document-type-popup__box {
+            position: relative;
+            width: min(22rem, 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.85rem;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 1.15rem 1.25rem 1rem;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .finances-document-type-popup__box p {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+            color: #000000;
+        }
+
+        .finances-document-type-popup__choices {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .finances-document-type-popup__choices button {
+            height: 35px;
+            min-height: 35px;
+            border: none;
+            border-radius: 5px;
+            background: var(--backend-button-yellow);
+            color: #003153;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .finances-document-type-popup__choices button:hover {
+            filter: brightness(0.92);
+        }
+
+        #finances-document-file-popup .finances-document-type-popup__box p {
+            overflow-wrap: anywhere;
         }
 
         #finances-editor .finances-transaction-form input:disabled,
@@ -6303,6 +6538,36 @@
             text-align: left;
             color: #000000;
             white-space: nowrap;
+        }
+
+        #finances-detail > .finances-heading .finances-heading-title-wrap,
+        #finances-detail > .finances-heading .finances-heading-title {
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        #finances-detail > .finances-heading .finances-heading-label {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #finances-financials > .finances-heading .finances-heading-title-wrap,
+        #finances-financials > .finances-heading .finances-heading-title {
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            flex: 1 1 auto;
+        }
+
+        #finances-financials.is-showing-file .finances-heading-label {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: none;
         }
 
         #finances-editor .finances-panel .finances-roster {
@@ -9003,6 +9268,17 @@
             background: #71C7FE;
         }
 
+        #finances-editor #finances-items .finances-table tbody tr.finances-row:hover td,
+        #finances-editor #finances-items .finances-table tbody tr.finances-row.is-selected td {
+            background: #71C7FE;
+        }
+
+        #finances-editor #finances-items .finances-table tbody tr.finances-total-row td {
+            font-weight: 700;
+            background: #ffffff;
+            border-top: 1px solid #cbd5e1;
+        }
+
         .speaker-roster-empty,
         .guests-roster-empty,
         .finances-empty,
@@ -11159,12 +11435,12 @@
         }
 
         #finances-editor #finances-items .finances-table .content-badge.finances-category-pill {
-            background: var(--backend-navbar-bg);
-            color: #ffffff;
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
         }
 
         #finances-editor #finances-items .finances-table .content-badge.finances-status-projected {
-            background: #71C7FE;
+            background: #FF00FF;
             color: #ffffff;
         }
 
@@ -17277,10 +17553,16 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="add-speaker-form-field">
-                                    <label for="finances-item-supplier">Supplier / payee</label>
-                                    <input type="text" id="finances-item-supplier" name="supplier" list="finances-supplier-suggestions" autocomplete="off" spellcheck="false" required aria-required="true">
-                                    <datalist id="finances-supplier-suggestions"></datalist>
+                                <div class="finances-transaction-form-row">
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-supplier">Supplier / payee</label>
+                                        <input type="text" id="finances-item-supplier" name="supplier" list="finances-supplier-suggestions" autocomplete="off" spellcheck="false" required aria-required="true">
+                                        <datalist id="finances-supplier-suggestions"></datalist>
+                                    </div>
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-transaction-email">POC e-mail</label>
+                                        <input type="email" id="finances-item-transaction-email" name="transactionemail" autocomplete="off" spellcheck="false" inputmode="email">
+                                    </div>
                                 </div>
                                 <div class="add-speaker-form-field">
                                     <label for="finances-item-invoice-number">Invoice number</label>
@@ -17291,7 +17573,31 @@
                                     <label for="finances-item-description">Description</label>
                                     <textarea id="finances-item-description" name="description" rows="4" spellcheck="true"></textarea>
                                 </div>
+                                <div class="finances-transaction-form-row" id="finances-item-paid-row">
+                                    <div class="add-speaker-form-field" id="finances-item-amount-paid-field" hidden>
+                                        <label for="finances-item-amount-paid">Amount paid</label>
+                                        <input type="number" id="finances-item-amount-paid" name="amountPaid" inputmode="decimal" min="0" step="any">
+                                    </div>
+                                </div>
+                                <div class="finances-transaction-form-row" id="finances-item-dates-row">
+                                    <div class="add-speaker-form-field" id="finances-item-invoice-date-field" hidden>
+                                        <label for="finances-item-invoice-date">Invoice date</label>
+                                        <input type="date" id="finances-item-invoice-date" name="invoiceDate">
+                                    </div>
+                                    <div class="add-speaker-form-field" id="finances-item-due-date-field" hidden>
+                                        <label for="finances-item-due-date">Due date</label>
+                                        <input type="date" id="finances-item-due-date" name="dueDate">
+                                    </div>
+                                    <div class="add-speaker-form-field" id="finances-item-date-paid-field">
+                                        <label for="finances-item-date-paid">Paid date</label>
+                                        <input type="date" id="finances-item-date-paid" name="datePaid">
+                                    </div>
+                                </div>
                                 <div class="finances-transaction-form-row">
+                                    <div class="add-speaker-form-field">
+                                        <label for="finances-item-total-amount">Total amount</label>
+                                        <input type="number" id="finances-item-total-amount" name="totalAmount" inputmode="decimal" min="0" step="any" required aria-required="true">
+                                    </div>
                                     <div class="add-speaker-form-field">
                                         <label for="finances-item-currency">Currency</label>
                                         <select id="finances-item-currency" name="currency" required aria-required="true">
@@ -17302,33 +17608,13 @@
                                             <option value="GBP">GBP</option>
                                         </select>
                                     </div>
-                                    <div class="add-speaker-form-field">
-                                        <label for="finances-item-total-amount">Total amount</label>
-                                        <input type="number" id="finances-item-total-amount" name="totalAmount" inputmode="decimal" min="0" step="any" required aria-required="true">
-                                    </div>
                                 </div>
                                 <div class="add-speaker-form-field" id="finances-item-amount-base-field" hidden>
                                     <label for="finances-item-amount-base">Amount in SEK</label>
                                     <input type="number" id="finances-item-amount-base" name="amountBase" inputmode="decimal" min="0" step="any">
                                 </div>
-                                <div class="add-speaker-form-field" id="finances-item-amount-paid-field" hidden>
-                                    <label for="finances-item-amount-paid">Amount paid</label>
-                                    <input type="number" id="finances-item-amount-paid" name="amountPaid" inputmode="decimal" min="0" step="any">
-                                </div>
-                                <div class="finances-transaction-form-row">
-                                    <div class="add-speaker-form-field" id="finances-item-invoice-date-field" hidden>
-                                        <label for="finances-item-invoice-date">Invoice date</label>
-                                        <input type="date" id="finances-item-invoice-date" name="invoiceDate">
-                                    </div>
-                                    <div class="add-speaker-form-field" id="finances-item-due-date-field" hidden>
-                                        <label for="finances-item-due-date">Due date</label>
-                                        <input type="date" id="finances-item-due-date" name="dueDate">
-                                    </div>
-                                </div>
-                                <div class="add-speaker-form-field" id="finances-item-date-paid-field" hidden>
-                                    <label for="finances-item-date-paid">Date paid</label>
-                                    <input type="date" id="finances-item-date-paid" name="datePaid">
-                                </div>
+                                <h3 class="finances-files-title">Files</h3>
+                                <ul class="finances-document-list" id="finances-item-document-list" hidden></ul>
                                 <div class="finances-document-upload" aria-label="Document">
                                     <div class="content-editor-image-block" id="finances-item-document-block">
                                         <div class="content-editor-image-frame" id="finances-item-document-frame" role="button" tabindex="0" title="Upload document" aria-label="Upload document">
@@ -17348,31 +17634,17 @@
                             </form>
                         </div>
                     </div>
-                    <div class="finances-panel finances-financials" id="finances-financials" aria-label="Financials">
+                    <div class="finances-panel finances-financials" id="finances-financials" aria-label="Projections">
                         <div class="finances-heading" id="finances-financials-heading">
                             <div class="finances-heading-title-wrap">
-                                <div class="finances-heading-title" role="group" aria-label="Financials">
-                                    <span class="finances-heading-label">Financials</span>
+                                <div class="finances-heading-title" role="group" aria-label="Projections">
+                                    <span class="finances-heading-label">Projections</span>
                                 </div>
-                            </div>
-                            <div class="finances-heading-actions">
-                                <button type="button" class="finances-toolbar-btn" id="finances-financials-import-btn" aria-label="Import invoices from Stripe" title="Import invoices from Stripe">
-                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                                        <path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
-                                    </svg>
-                                </button>
                             </div>
                         </div>
                         <div class="finances-roster" id="finances-financials-roster">
                             <div class="finances-roster-scroll">
-                                <div class="finances-roster-items" id="finances-financials-rows" aria-live="polite">
-                                    <table class="finances-table" role="grid" aria-label="Financials">
-                                        <thead>
-                                            <tr></tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
+                                <div class="finances-roster-items" id="finances-financials-rows" aria-live="polite"></div>
                             </div>
                         </div>
                     </div>
@@ -17964,6 +18236,28 @@
             <div class="guest-delete-confirm__actions">
                 <button type="button" class="speaker-delete-cancel-btn" id="programme-delete-cancel">Cancel</button>
                 <button type="button" class="speaker-delete-yes-btn" id="programme-delete-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="finances-document-type-popup" class="finances-document-type-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="finances-document-type-title">
+        <div class="finances-document-type-popup__backdrop" id="finances-document-type-backdrop"></div>
+        <div class="finances-document-type-popup__box">
+            <p id="finances-document-type-title">Document type?</p>
+            <div class="finances-document-type-popup__choices">
+                <button type="button" data-document-type="Invoice">Invoice</button>
+                <button type="button" data-document-type="Transaction">Transaction</button>
+                <button type="button" data-document-type="Receipt">Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="finances-document-file-popup" class="finances-document-type-popup" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="finances-document-file-title">
+        <div class="finances-document-type-popup__backdrop" id="finances-document-file-backdrop"></div>
+        <div class="finances-document-type-popup__box">
+            <p id="finances-document-file-title">File</p>
+            <div class="finances-document-type-popup__choices">
+                <button type="button" id="finances-document-file-download">Download</button>
             </div>
         </div>
     </div>
@@ -19724,7 +20018,7 @@
 
         /**
          * Transaction doc: `tbs/Finances/{current_event}/{current_event}/{id}/{id}`
-         * with fields `name`, `status`, and `category`.
+         * with the transaction editor fields and a `documents` list.
          */
         function tbsFinancesTransactionDocRef(db, eventName, transactionId) {
             var id = String(transactionId || '').trim();
@@ -35997,26 +36291,62 @@
             return '';
         }
 
+        var FINANCES_DOCUMENT_TYPES = ['Invoice', 'Transaction', 'Receipt'];
+
+        function financesNormalizeDocuments(raw) {
+            if (!Array.isArray(raw)) return [];
+            var out = [];
+            raw.forEach(function(entry) {
+                if (!entry || typeof entry !== 'object') return;
+                var url = entry.url != null ? String(entry.url).trim() : '';
+                if (!url) return;
+                out.push({
+                    name: entry.name != null ? String(entry.name) : '',
+                    type: entry.type != null ? String(entry.type).trim() : '',
+                    url: url
+                });
+            });
+            return out;
+        }
+
+        function financesLatestDocumentEntry(rec) {
+            var docs = rec && Array.isArray(rec.documents) ? rec.documents : [];
+            for (var i = docs.length - 1; i >= 0; i--) {
+                if (docs[i] && docs[i].url) return docs[i];
+            }
+            return null;
+        }
+
         function financesItemFromTransactionDoc(id, data) {
             data = data && typeof data === 'object' ? data : {};
+            var documents = financesNormalizeDocuments(data.documents);
+            var latest = financesLatestDocumentEntry({ documents: documents });
+            var previewName = '';
+            if (latest) {
+                previewName = latest.name || '';
+                if (latest.type) previewName = previewName ? (previewName + ' · ' + latest.type) : latest.type;
+            }
             return {
                 id: String(id || '').trim(),
                 name: data.name != null ? String(data.name) : '',
                 status: data.status != null ? String(data.status) : '',
                 category: data.category != null ? String(data.category) : '',
                 supplier: data.supplier != null ? String(data.supplier) : '',
+                transactionemail: data.transactionemail != null ? String(data.transactionemail) : '',
+                invoiceNumber: data.invoiceNumber != null ? String(data.invoiceNumber) : '',
+                description: data.description != null ? String(data.description) : '',
                 currency: data.currency != null ? String(data.currency) : '',
                 totalAmount: financesAmountFromDoc(data),
                 amountBase: data.amountBase != null ? data.amountBase : '',
                 amountPaid: data.amountPaid != null ? data.amountPaid : '',
                 Transaction: data.Transaction != null ? String(data.Transaction) : 'Expense',
-                invoiceNumber: data.invoiceNumber != null ? String(data.invoiceNumber) : '',
                 invoiceDate: data.invoiceDate != null ? String(data.invoiceDate) : '',
                 dueDate: data.dueDate != null ? String(data.dueDate) : '',
                 datePaid: data.datePaid != null ? String(data.datePaid) : '',
-                document: data.document || '',
-                documentName: data.documentName || '',
-                documentType: data.documentType || ''
+                documents: documents,
+                document: latest ? latest.url : (data.document || ''),
+                documentName: latest ? previewName : (data.documentName || ''),
+                documentType: latest ? '' : (data.documentType || '')
             };
         }
 
@@ -36146,6 +36476,32 @@
             } catch (e) {
                 return String(n) + ' ' + cur;
             }
+        }
+
+        function financesTableAmount(item) {
+            var n = Number(item && item.totalAmount);
+            if (!isFinite(n)) return n;
+            if (String(item && item.Transaction || '').trim().toLowerCase() === 'expense') return -Math.abs(n);
+            return n;
+        }
+
+        function financesItemsAmountTotal() {
+            var sum = 0;
+            var currency = '';
+            var mixed = false;
+            var any = false;
+            var items = Array.isArray(financesItemsInMemory) ? financesItemsInMemory : [];
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i] || {};
+                var n = financesTableAmount(item);
+                if (!isFinite(n)) continue;
+                sum += n;
+                any = true;
+                var cur = String(item.currency || FINANCES_BASE_CURRENCY).trim().toUpperCase() || FINANCES_BASE_CURRENCY;
+                if (!currency) currency = cur;
+                else if (currency !== cur) mixed = true;
+            }
+            return { sum: sum, currency: mixed ? '' : currency, any: any };
         }
 
         function financesStatusPillClass(status) {
@@ -36312,9 +36668,21 @@
                         '<td class="finances-tag-cell">' +
                         financesRosterDropdownPillHtml(id, 'status', item.status, statusLabel, financesStatusPillClass(item.status)) +
                         '</td>' +
-                        '<td class="finances-amount-cell">' + escapeHtml(formatFinancesAmount(item.totalAmount, item.currency)) + '</td>' +
+                        '<td class="finances-amount-cell">' + escapeHtml(formatFinancesAmount(financesTableAmount(item), item.currency)) + '</td>' +
                         '</tr>';
                 }
+                var amountTotal = financesItemsAmountTotal();
+                var totalText = amountTotal.any
+                    ? (amountTotal.currency
+                        ? formatFinancesAmount(amountTotal.sum, amountTotal.currency)
+                        : financesFormatSekAxis(amountTotal.sum))
+                    : '—';
+                html += '<tr class="finances-total-row">' +
+                    '<td class="finances-name-cell">Total</td>' +
+                    '<td></td>' +
+                    '<td></td>' +
+                    '<td class="finances-amount-cell">' + escapeHtml(totalText) + '</td>' +
+                    '</tr>';
             }
             html += '</tbody></table>';
             itemsEl.innerHTML = html;
@@ -36323,6 +36691,7 @@
             }
             updateFinancesItemNavButtons();
             updateFinancesItemSaveButton();
+            if (typeof renderFinancesFinancialsChart === 'function') renderFinancesFinancialsChart();
         }
 
         function financesTransactionSaveReady() {
@@ -36337,14 +36706,36 @@
         var financesSyncInFlight = false;
         var FINANCES_FIREBASE_DEBOUNCE_MS = 2000;
 
+        function financesFirestoreNumber(value) {
+            return typeof value === 'number' && isFinite(value) ? value : null;
+        }
+
+        function financesTransactionFirestorePayload(data) {
+            data = data || {};
+            return {
+                name: String(data.name || ''),
+                status: String(data.status || ''),
+                category: String(data.category || ''),
+                supplier: String(data.supplier || ''),
+                transactionemail: String(data.transactionemail || ''),
+                invoiceNumber: String(data.invoiceNumber || ''),
+                description: String(data.description || ''),
+                currency: String(data.currency || ''),
+                totalAmount: financesFirestoreNumber(data.totalAmount),
+                amountBase: financesFirestoreNumber(data.amountBase),
+                amountPaid: financesFirestoreNumber(data.amountPaid),
+                invoiceDate: String(data.invoiceDate || ''),
+                dueDate: String(data.dueDate || ''),
+                datePaid: String(data.datePaid || ''),
+                Transaction: 'Expense'
+            };
+        }
+
         function financesSavedFieldsSnapshot() {
             var data = readFinancesTransactionForm();
-            return JSON.stringify({
-                id: data.id,
-                name: data.name,
-                status: data.status,
-                category: data.category
-            });
+            var payload = financesTransactionFirestorePayload(data);
+            payload.id = data.id;
+            return JSON.stringify(payload);
         }
 
         function captureFinancesFormBaseline() {
@@ -36427,14 +36818,16 @@
                 var data = readFinancesTransactionForm();
                 var existing = data.id ? financesItemById(data.id) : null;
                 if (existing) {
-                    existing.name = data.name;
-                    existing.status = data.status;
-                    existing.category = data.category;
+                    var live = financesTransactionFirestorePayload(data);
+                    Object.keys(live).forEach(function(key) {
+                        existing[key] = live[key];
+                    });
                     renderFinancesItemsTable();
                 }
             }
             updateFinancesItemSaveButton();
             scheduleFinancesFirebaseSync();
+            syncFinancesDetailHeading();
         }
 
         function shakeFinancesPadlock() {
@@ -36538,22 +36931,25 @@
             var showBase = currency && currency !== FINANCES_BASE_CURRENCY;
             var showPaidAmount = status === 'partially_paid' || status === 'paid';
             var showInvoiceDates = status && status !== 'projected';
-            var showDatePaid = status === 'paid';
             var baseField = document.getElementById('finances-item-amount-base-field');
             var paidField = document.getElementById('finances-item-amount-paid-field');
+            var paidRow = document.getElementById('finances-item-paid-row');
             var invoiceDateField = document.getElementById('finances-item-invoice-date-field');
             var dueDateField = document.getElementById('finances-item-due-date-field');
             var datePaidField = document.getElementById('finances-item-date-paid-field');
+            var datesRow = document.getElementById('finances-item-dates-row');
             if (baseField) baseField.hidden = !showBase;
             if (paidField) paidField.hidden = !showPaidAmount;
+            if (paidRow) paidRow.hidden = !showPaidAmount;
             if (invoiceDateField) invoiceDateField.hidden = !showInvoiceDates;
             if (dueDateField) dueDateField.hidden = !showInvoiceDates;
-            if (datePaidField) datePaidField.hidden = !showDatePaid;
+            if (datePaidField) datePaidField.hidden = false;
+            var showPaidDate = !datePaidField || datePaidField.hidden === false;
+            if (datesRow) datesRow.hidden = !(showInvoiceDates || showPaidDate);
             var baseInput = document.getElementById('finances-item-amount-base');
             var paidInput = document.getElementById('finances-item-amount-paid');
             var invoiceDateInput = document.getElementById('finances-item-invoice-date');
             var dueDateInput = document.getElementById('finances-item-due-date');
-            var datePaidInput = document.getElementById('finances-item-date-paid');
             if (baseInput) {
                 baseInput.required = !!showBase;
                 baseInput.setAttribute('aria-required', showBase ? 'true' : 'false');
@@ -36568,7 +36964,6 @@
                 if (invoiceDateInput) invoiceDateInput.value = '';
                 if (dueDateInput) dueDateInput.value = '';
             }
-            if (!showDatePaid && datePaidInput) datePaidInput.value = '';
         }
 
         function syncFinancesInvoiceDuplicateHint() {
@@ -36629,11 +37024,350 @@
         function financesDocumentLooksLikeImage(type, name, url) {
             var t = String(type || '').toLowerCase();
             if (t.indexOf('image/') === 0) return true;
-            var n = String(name || '').toLowerCase();
-            if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(n)) return true;
-            var u = String(url || '').toLowerCase();
-            return u.indexOf('data:image/') === 0;
+            function pathOnly(value) {
+                var s = String(value || '').toLowerCase().split('?')[0].split('#')[0];
+                try { s = decodeURIComponent(s); } catch (e) {}
+                return s;
+            }
+            if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(pathOnly(name))) return true;
+            var u = pathOnly(url);
+            return u.indexOf('data:image/') === 0 || /\.(png|jpe?g|gif|webp|bmp|svg)$/.test(u);
         }
+
+        var financesFinancialsDocumentUrl = '';
+        var financesFinancialsDocumentName = '';
+
+        function financesDocumentExtension(name, url) {
+            var source = String(name || url || '');
+            var path = source.split('?')[0].split('#')[0];
+            try { path = decodeURIComponent(path); } catch (e) {}
+            var base = path.split('/').pop() || '';
+            var dot = base.lastIndexOf('.');
+            if (dot < 1 || dot === base.length - 1) return '';
+            return base.slice(dot + 1).toLowerCase();
+        }
+
+        function financesDocumentIconHtml(name, url) {
+            var ext = financesDocumentExtension(name, url);
+            var kind = 'file';
+            if (ext === 'pdf') kind = 'pdf';
+            else if (/^(png|jpe?g|gif|webp|bmp|svg)$/.test(ext)) kind = 'image';
+            else if (/^(xls|xlsx|csv)$/.test(ext)) kind = 'sheet';
+            else if (/^(doc|docx|txt|rtf)$/.test(ext)) kind = 'doc';
+            var path = '';
+            if (kind === 'image') {
+                path = 'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5 11 16.51 14.5 12 19 18H5l3.5-4.5z';
+            } else if (kind === 'sheet') {
+                path = 'M4 4h16v16H4V4zm2 2v4h5V6H6zm7 0v4h5V6h-5zM6 12v6h5v-6H6zm7 0v6h5v-6h-5z';
+            } else {
+                path = 'M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm7 1.5V9h5.5L13 3.5zM8 13h8v1.5H8V13zm0 3h8v1.5H8V16z';
+            }
+            return '<span class="finances-document-list-icon finances-document-list-icon--' + kind + '" aria-hidden="true">' +
+                '<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="' + path + '"/></svg>' +
+                '</span>';
+        }
+
+        function renderFinancesDocumentList(rec) {
+            var list = document.getElementById('finances-item-document-list');
+            if (!list) return;
+            var docs = financesNormalizeDocuments(rec && rec.documents);
+            if (!list._financesDocClick) {
+                list._financesDocClick = true;
+                list.addEventListener('click', function(ev) {
+                    var btn = ev.target && ev.target.closest ? ev.target.closest('button[data-doc-index]') : null;
+                    if (!btn || !list.contains(btn)) return;
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    var idx = Number(btn.getAttribute('data-doc-index'));
+                    var current = financesItemById(financesItemEditingId);
+                    var currentDocs = financesNormalizeDocuments(current && current.documents);
+                    if (!currentDocs[idx]) return;
+                    showFinancesDocumentInFinancials(currentDocs[idx]);
+                    renderFinancesDocumentList(current);
+                });
+            }
+            if (!docs.length) {
+                list.hidden = true;
+                list.innerHTML = '';
+                return;
+            }
+            list.hidden = false;
+            list.innerHTML = docs.map(function(doc, index) {
+                var name = String(doc.name || '').trim() || 'File';
+                var selected = String(doc.url || '').trim() && String(doc.url || '').trim() === financesFinancialsDocumentUrl;
+                return '<li' + (selected ? ' class="is-selected"' : '') + '>' +
+                    '<button type="button" data-doc-index="' + index + '">' +
+                    financesDocumentIconHtml(name, doc.url) +
+                    '<span class="finances-document-list-name">' + escapeHtml(name) + '</span>' +
+                    '</button>' +
+                    '</li>';
+            }).join('');
+        }
+
+        function setFinancesFinancialsHeading(text) {
+            var label = document.querySelector('#finances-financials-heading .finances-heading-label');
+            var title = document.querySelector('#finances-financials-heading .finances-heading-title');
+            var panel = document.getElementById('finances-financials');
+            var next = String(text || '').trim() || 'Projections';
+            var showingFile = next !== 'Projections';
+            if (label) label.textContent = next;
+            if (title) title.setAttribute('aria-label', next);
+            if (panel) {
+                panel.setAttribute('aria-label', next);
+                panel.classList.toggle('is-showing-file', showingFile);
+            }
+        }
+
+        function downloadFinancesDocument(url, name) {
+            var fileName = String(name || '').trim() || 'file';
+            var fileUrl = String(url || '').trim();
+            if (!fileUrl) return Promise.resolve();
+            return fetch(fileUrl)
+                .then(function(res) {
+                    if (!res.ok) throw new Error('Could not download the file.');
+                    return res.blob();
+                })
+                .then(function(blob) {
+                    var objectUrl = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = objectUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(function() { URL.revokeObjectURL(objectUrl); }, 1000);
+                })
+                .catch(function() {
+                    var link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = fileName;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                });
+        }
+
+        function closeFinancesDocumentFilePopup() {
+            var popup = document.getElementById('finances-document-file-popup');
+            if (popup) {
+                popup.hidden = true;
+                popup.setAttribute('aria-hidden', 'true');
+            }
+            var had = !!financesFinancialsDocumentUrl;
+            financesFinancialsDocumentUrl = '';
+            financesFinancialsDocumentName = '';
+            if (!had) return;
+            var current = typeof financesItemById === 'function' ? financesItemById(financesItemEditingId) : null;
+            if (typeof renderFinancesDocumentList === 'function') renderFinancesDocumentList(current);
+        }
+
+        function showFinancesDocumentInFinancials(doc) {
+            var popup = document.getElementById('finances-document-file-popup');
+            var title = document.getElementById('finances-document-file-title');
+            if (!popup || !doc) return;
+            var url = String(doc.url || '').trim();
+            if (!url) return;
+            var name = String(doc.name || '').trim() || 'File';
+            financesFinancialsDocumentUrl = url;
+            financesFinancialsDocumentName = name;
+            if (title) title.textContent = name;
+            popup.hidden = false;
+            popup.setAttribute('aria-hidden', 'false');
+            var downloadBtn = document.getElementById('finances-document-file-download');
+            if (downloadBtn && typeof downloadBtn.focus === 'function') downloadBtn.focus();
+        }
+
+        function financesFormatSekAxis(value) {
+            var n = Math.round(Number(value) || 0);
+            return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        function financesChartAmount(value) {
+            if (typeof value === 'number' && isFinite(value)) return value;
+            var raw = String(value == null ? '' : value).replace(/\s/g, '').replace(',', '.');
+            var n = Number(raw);
+            return isFinite(n) ? n : 0;
+        }
+
+        function financesStatusColumnColor(status) {
+            var s = String(status || '').trim();
+            if (s === 'paid') return '#338a17';
+            if (s === 'partially_paid') return '#F71941';
+            if (s === 'received') return '#FECB00';
+            if (s === 'projected') return '#FF00FF';
+            return '#71C7FE';
+        }
+
+        function financesExpenseStatusColumns() {
+            var totals = {};
+            var items = Array.isArray(financesItemsInMemory) ? financesItemsInMemory : [];
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i] || {};
+                if (String(item.Transaction || '').trim() !== 'Expense') continue;
+                var status = String(item.status || '').trim();
+                if (!totals[status]) totals[status] = 0;
+                totals[status] += financesChartAmount(item.totalAmount);
+            }
+            var order = ['projected', 'received', 'partially_paid', 'paid'];
+            var seen = {};
+            var groups = [];
+            for (var o = 0; o < order.length; o++) {
+                var key = order[o];
+                seen[key] = true;
+                if (totals[key] > 0) groups.push({ status: key, total: totals[key] });
+            }
+            Object.keys(totals).sort().forEach(function(status) {
+                if (seen[status] || !(totals[status] > 0)) return;
+                groups.push({ status: status, total: totals[status] });
+            });
+            return groups;
+        }
+
+        function financesFinancialsChartHtml(barW) {
+            barW = Number(barW);
+            if (!(barW > 0)) barW = 120;
+            var yMax = 3500000;
+            var yStep = 500000;
+            var originX = 148;
+            var originY = 712;
+            var yTop = 46;
+            var xEnd = 710;
+            var labelStyle = ' fill="#000000" font-family="Inter, sans-serif" font-size="15" font-weight="600"';
+            var html = '<svg class="finances-chart" viewBox="0 0 740 784" preserveAspectRatio="xMidYMid meet" role="img" aria-label="SEK from 0 to 3 500 000. Expenses, Income and Earnings">' +
+                '<defs>' +
+                '<marker id="finances-axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">' +
+                '<path d="M0 0 L10 5 L0 10 Z" fill="#003153"></path>' +
+                '</marker>' +
+                '</defs>';
+            var steps = yMax / yStep;
+            var plotH = originY - yTop;
+            for (var i = 0; i <= steps; i++) {
+                var value = i * yStep;
+                var y = originY - (value / yMax) * plotH;
+                if (value > 0) {
+                    html += '<line x1="' + originX + '" y1="' + y + '" x2="' + (xEnd - 28) + '" y2="' + y + '" stroke="#c5ced8" stroke-width="1"></line>';
+                }
+            }
+            var span = (xEnd - 28 - originX) / 3;
+            var xLabels = ['Expenses', 'Income', 'Earnings'];
+            var xCenters = [];
+            for (var c = 0; c < xLabels.length; c++) {
+                xCenters.push(originX + span * c + span / 2);
+            }
+            var groups = financesExpenseStatusColumns();
+            if (groups.length) {
+                var barX = xCenters[0] - barW / 2;
+                var cursor = originY;
+                for (var g = 0; g < groups.length; g++) {
+                    var group = groups[g];
+                    var h = (group.total / yMax) * plotH;
+                    if (h < 1) h = 1;
+                    var top = cursor - h;
+                    if (top < yTop) {
+                        h = cursor - yTop;
+                        top = yTop;
+                    }
+                    if (h <= 0) break;
+                    var statusLabel = financesStatusLabel(group.status);
+                    var sumLabel = financesFormatSekAxis(group.total);
+                    var textFill = group.status === 'received' ? '#000000' : '#ffffff';
+                    html += '<g>' +
+                        '<title>' + escapeHtml(statusLabel + ': ' + sumLabel + ' SEK') + '</title>' +
+                        '<rect x="' + barX + '" y="' + top + '" width="' + barW + '" height="' + h + '" fill="' + financesStatusColumnColor(group.status) + '"></rect>';
+                    if (h >= 36) {
+                        html += '<text x="' + (barX + barW / 2) + '" y="' + (top + h / 2) + '" fill="' + textFill + '" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="middle" dominant-baseline="middle">' +
+                            escapeHtml(sumLabel) + '</text>';
+                    }
+                    html += '</g>';
+                    cursor = top;
+                    if (cursor <= yTop) break;
+                }
+            }
+            html += '<line x1="' + originX + '" y1="' + originY + '" x2="' + originX + '" y2="16" stroke="#003153" stroke-width="2.5" marker-end="url(#finances-axis-arrow)"></line>' +
+                '<line x1="' + originX + '" y1="' + originY + '" x2="' + xEnd + '" y2="' + originY + '" stroke="#003153" stroke-width="2.5" marker-end="url(#finances-axis-arrow)"></line>' +
+                '<text x="' + (originX - 12) + '" y="28" text-anchor="end"' + labelStyle + '>SEK</text>';
+            for (var t = 0; t <= steps; t++) {
+                var tickValue = t * yStep;
+                var tickY = originY - (tickValue / yMax) * plotH;
+                html += '<text x="' + (originX - 12) + '" y="' + (tickY + 5) + '" text-anchor="end"' + labelStyle + '>' +
+                    financesFormatSekAxis(tickValue) + '</text>';
+            }
+            for (var x = 0; x < xLabels.length; x++) {
+                html += '<text x="' + xCenters[x] + '" y="' + (originY + 38) + '" text-anchor="middle"' + labelStyle + '>' + xLabels[x] + '</text>';
+            }
+            html += '</svg>';
+            return html;
+        }
+
+        var financesChartBarWidthApplied = 0;
+
+        function financesPillWidthPx() {
+            var pill = document.querySelector('#finances-items .finances-table .content-badge');
+            if (pill) {
+                var measured = pill.getBoundingClientRect().width;
+                if (measured > 1) return measured;
+            }
+            var root = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            if (!isFinite(root) || root <= 0) root = 16;
+            return 7.5 * root;
+        }
+
+        function financesChartColumnUserWidth(box) {
+            var viewW = 740;
+            var viewH = 784;
+            var pill = financesPillWidthPx();
+            var boxW = box ? box.clientWidth : 0;
+            var boxH = box ? box.clientHeight : 0;
+            if (!(boxW > 0) || !(boxH > 0)) return pill;
+            var scale = Math.min(boxW / viewW, boxH / viewH);
+            if (!(scale > 0)) return pill;
+            return pill / scale;
+        }
+
+        function renderFinancesFinancialsChart(opts) {
+            var itemsEl = document.getElementById('finances-financials-rows');
+            if (!itemsEl) return;
+            opts = opts || {};
+            var barW = financesChartColumnUserWidth(itemsEl);
+            if (opts.layoutOnly && itemsEl.querySelector('.finances-chart') && Math.abs(barW - financesChartBarWidthApplied) < 1) return;
+            itemsEl.classList.remove('is-file-preview');
+            itemsEl.innerHTML = financesFinancialsChartHtml(barW);
+            financesChartBarWidthApplied = barW;
+        }
+
+        function clearFinancesFinancialsBody() {
+            closeFinancesDocumentFilePopup();
+            setFinancesFinancialsHeading('Projections');
+            renderFinancesFinancialsChart();
+        }
+
+        renderFinancesFinancialsChart();
+
+        (function bindFinancesDocumentFilePopup() {
+            var popup = document.getElementById('finances-document-file-popup');
+            var backdrop = document.getElementById('finances-document-file-backdrop');
+            var downloadBtn = document.getElementById('finances-document-file-download');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    downloadFinancesDocument(financesFinancialsDocumentUrl, financesFinancialsDocumentName);
+                });
+            }
+            if (backdrop) {
+                backdrop.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    closeFinancesDocumentFilePopup();
+                });
+            }
+            document.addEventListener('keydown', function(ev) {
+                if (!popup || popup.hidden || ev.key !== 'Escape') return;
+                ev.preventDefault();
+                closeFinancesDocumentFilePopup();
+            });
+        })();
 
         function syncFinancesDocumentPreview(rec) {
             var img = document.getElementById('finances-item-document-preview');
@@ -36641,6 +37375,7 @@
             var nameEl = document.getElementById('finances-item-document-name');
             if (!img) return;
             var pending = financesPendingDocument;
+            renderFinancesDocumentList(rec);
             var url = '';
             var name = '';
             var type = '';
@@ -36649,9 +37384,17 @@
                 name = pending.name || '';
                 type = pending.type || '';
             } else if (rec) {
-                url = rec.document != null ? String(rec.document) : '';
-                name = rec.documentName != null ? String(rec.documentName) : '';
-                type = rec.documentType != null ? String(rec.documentType) : '';
+                var latest = financesLatestDocumentEntry(rec);
+                if (latest) {
+                    url = String(latest.url || '');
+                    name = String(latest.name || '');
+                    if (latest.type) name = name ? (name + ' · ' + latest.type) : String(latest.type);
+                    type = '';
+                } else {
+                    url = rec.document != null ? String(rec.document) : '';
+                    name = rec.documentName != null ? String(rec.documentName) : '';
+                    type = rec.documentType != null ? String(rec.documentType) : '';
+                }
             }
             var isImage = !!(url && financesDocumentLooksLikeImage(type, name, url));
             if (frame) {
@@ -36673,6 +37416,209 @@
             }
         }
 
+        var financesDocumentUploadInFlight = false;
+
+        function financesSanitizeStorageSegment(value, maxLen) {
+            var s = String(value || '').trim();
+            s = s.replace(/[\/\\#?%\[\]*\u0000-\u001f]/g, ' ');
+            s = s.replace(/\s+/g, ' ').trim();
+            s = s.replace(/^\.+/, '').replace(/\.+$/, '');
+            if (maxLen && s.length > maxLen) s = s.slice(0, maxLen).trim();
+            return s;
+        }
+
+        function financesStorageShortFolder(transactionName, transactionId) {
+            var name = financesSanitizeStorageSegment(transactionName, 60) || 'txn';
+            var id = financesSanitizeStorageSegment(transactionId, 80) || 'id';
+            return name + '-' + id;
+        }
+
+        function financesStorageFileName(transactionName, originalName) {
+            var base = financesSanitizeStorageSegment(transactionName, 80) || 'document';
+            var ext = '';
+            var orig = String(originalName || '');
+            var dot = orig.lastIndexOf('.');
+            if (dot > 0 && dot < orig.length - 1) {
+                var raw = orig.slice(dot + 1).toLowerCase();
+                if (/^[a-z0-9]{1,8}$/.test(raw)) ext = '.' + raw;
+            }
+            return base + ext;
+        }
+
+        function financesEnsureTransactionId() {
+            var idEl = document.getElementById('finances-item-id');
+            var id = String((idEl && idEl.value) || financesItemEditingId || '').trim();
+            if (!id) id = financesNewItemId();
+            if (id.indexOf('/') !== -1) return '';
+            if (idEl) idEl.value = id;
+            financesItemEditingId = id;
+            return id;
+        }
+
+        function askFinancesDocumentType() {
+            return new Promise(function(resolve) {
+                var popup = document.getElementById('finances-document-type-popup');
+                var backdrop = document.getElementById('finances-document-type-backdrop');
+                if (!popup) {
+                    resolve('');
+                    return;
+                }
+                var settled = false;
+                var buttons = popup.querySelectorAll('[data-document-type]');
+                function onKey(ev) {
+                    if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        finish('');
+                    }
+                }
+                function onBackdrop(ev) {
+                    ev.preventDefault();
+                    finish('');
+                }
+                function onChoice(ev) {
+                    ev.preventDefault();
+                    var btn = ev.currentTarget;
+                    finish(btn ? String(btn.getAttribute('data-document-type') || '') : '');
+                }
+                function finish(value) {
+                    if (settled) return;
+                    settled = true;
+                    buttons.forEach(function(btn) { btn.removeEventListener('click', onChoice); });
+                    if (backdrop) backdrop.removeEventListener('click', onBackdrop);
+                    document.removeEventListener('keydown', onKey);
+                    popup.hidden = true;
+                    popup.setAttribute('aria-hidden', 'true');
+                    resolve(value || '');
+                }
+                buttons.forEach(function(btn) { btn.addEventListener('click', onChoice); });
+                if (backdrop) backdrop.addEventListener('click', onBackdrop);
+                document.addEventListener('keydown', onKey);
+                popup.hidden = false;
+                popup.setAttribute('aria-hidden', 'false');
+                if (buttons[0] && typeof buttons[0].focus === 'function') buttons[0].focus();
+            });
+        }
+
+        async function uploadFinancesTransactionDocument(file, documentType) {
+            if (backendBlockIfReadonly()) return false;
+            if (financesDocumentUploadInFlight) return false;
+            var type = String(documentType || '').trim();
+            if (FINANCES_DOCUMENT_TYPES.indexOf(type) === -1) return false;
+            if (!file) return false;
+            var transactionName = String((document.getElementById('finances-item-name') || {}).value || '').trim();
+            if (!transactionName) {
+                if (typeof showStatus === 'function') showStatus('error', 'Enter a transaction name before uploading.');
+                return false;
+            }
+            var eventName = String(current_event || '').trim();
+            if (!eventName) {
+                if (typeof showStatus === 'function') showStatus('error', 'No current event is set.');
+                return false;
+            }
+            if (eventName.indexOf('/') !== -1) {
+                if (typeof showStatus === 'function') showStatus('error', 'Current event cannot contain "/".');
+                return false;
+            }
+            var transactionId = financesEnsureTransactionId();
+            if (!transactionId) {
+                if (typeof showStatus === 'function') showStatus('error', 'Transaction id cannot contain "/".');
+                return false;
+            }
+            var eventSegment = financesSanitizeStorageSegment(eventName, 80);
+            var uploadedName = String(file.name || '').trim();
+            var shortFolder = financesStorageShortFolder(transactionName, transactionId);
+            var fileName = financesStorageFileName(transactionName, uploadedName);
+            if (!eventSegment || !shortFolder || !fileName) {
+                if (typeof showStatus === 'function') showStatus('error', 'Could not build a storage path for this file.');
+                return false;
+            }
+            var objectPath = 'TBS/' + eventSegment + '/Financials/' + shortFolder + '/' + fileName;
+            financesDocumentUploadInFlight = true;
+            if (typeof showStatus === 'function') showStatus('loading', 'Uploading document…');
+            try {
+                var storage = getFirebaseStorage();
+                var storageRef = storage.ref(objectPath);
+                var metadata = {};
+                if (file.type) metadata.contentType = String(file.type);
+                await storageRef.put(file, metadata);
+                var downloadUrl = await storageRef.getDownloadURL();
+                downloadUrl = String(downloadUrl || '').trim();
+                if (!downloadUrl) throw new Error('Upload did not return a download URL.');
+                var entry = {
+                    name: uploadedName || fileName,
+                    type: type,
+                    url: downloadUrl
+                };
+                var db = getFirestore();
+                var FV = firebase.firestore && firebase.firestore.FieldValue;
+                if (!FV || typeof FV.arrayUnion !== 'function') {
+                    throw new Error('Firestore FieldValue is unavailable.');
+                }
+                var batch = db.batch();
+                batch.set(
+                    tbsFinancesEventDocRef(db, eventName),
+                    { transactionIds: FV.arrayUnion(transactionId) },
+                    { merge: true }
+                );
+                batch.set(
+                    tbsFinancesTransactionDocRef(db, eventName, transactionId),
+                    {
+                        name: transactionName,
+                        documents: FV.arrayUnion(entry)
+                    },
+                    { merge: true }
+                );
+                await batch.commit();
+                var existing = financesItemById(transactionId);
+                if (!existing) {
+                    existing = {
+                        id: transactionId,
+                        name: transactionName,
+                        Transaction: 'Expense',
+                        documents: []
+                    };
+                    financesItemsInMemory.push(existing);
+                }
+                if (!Array.isArray(existing.documents)) existing.documents = [];
+                existing.documents.push(entry);
+                existing.name = existing.name || transactionName;
+                existing.document = downloadUrl;
+                existing.documentName = (uploadedName || fileName) + ' · ' + type;
+                existing.documentType = String(file.type || '');
+                financesClearPendingDocument();
+                persistFinancesItemsToStorage();
+                syncFinancesDocumentPreview(existing);
+                renderFinancesItemsTable();
+                syncFinancesDetailHeading();
+                if (typeof showStatus === 'function') showStatus('success', 'Document uploaded.');
+                return true;
+            } catch (e) {
+                console.error('uploadFinancesTransactionDocument:', e);
+                if (typeof showStatus === 'function') {
+                    showStatus('error', e && e.message ? e.message : 'Could not upload the document.');
+                }
+                return false;
+            } finally {
+                financesDocumentUploadInFlight = false;
+            }
+        }
+
+        function syncFinancesDetailHeading() {
+            var label = document.querySelector('#finances-detail-heading .finances-heading-label');
+            var title = document.querySelector('#finances-detail-heading .finances-heading-title');
+            var panel = document.getElementById('finances-detail');
+            if (!label) return;
+            var form = document.getElementById('finances-transaction-form');
+            var open = !!(form && form.classList.contains('is-open') && !form.hidden);
+            var text = 'Detail';
+            if (open) {
+                text = String((document.getElementById('finances-item-name') || {}).value || '').trim() || 'New transaction';
+            }
+            label.textContent = text;
+            if (title) title.setAttribute('aria-label', text);
+            if (panel) panel.setAttribute('aria-label', text);
+        }
+
         function resetFinancesTransactionForm() {
             var form = document.getElementById('finances-transaction-form');
             if (!form) return;
@@ -36692,6 +37638,7 @@
             updateFinancesItemNavButtons();
             captureFinancesFormBaseline();
             updateFinancesItemSaveButton();
+            syncFinancesDetailHeading();
         }
 
         function populateFinancesTransactionForm(item) {
@@ -36705,6 +37652,7 @@
             setVal('finances-item-name', rec.name || '');
             financesEnsureSelectValue('finances-item-status', rec.status || '');
             setVal('finances-item-supplier', rec.supplier || '');
+            setVal('finances-item-transaction-email', rec.transactionemail || '');
             setVal('finances-item-invoice-number', rec.invoiceNumber || '');
             setVal('finances-item-description', rec.description || '');
             financesEnsureSelectValue('finances-item-category', rec.category || '');
@@ -36725,6 +37673,7 @@
             updateFinancesItemNavButtons();
             captureFinancesFormBaseline();
             updateFinancesItemSaveButton();
+            syncFinancesDetailHeading();
         }
 
         function financesEnsureSelectValue(id, value) {
@@ -36755,6 +37704,7 @@
                 name: String((document.getElementById('finances-item-name') || {}).value || '').trim(),
                 status: String((document.getElementById('finances-item-status') || {}).value || '').trim(),
                 supplier: String((document.getElementById('finances-item-supplier') || {}).value || '').trim(),
+                transactionemail: String((document.getElementById('finances-item-transaction-email') || {}).value || '').trim(),
                 invoiceNumber: String((document.getElementById('finances-item-invoice-number') || {}).value || '').trim(),
                 description: String((document.getElementById('finances-item-description') || {}).value || '').trim(),
                 category: String((document.getElementById('finances-item-category') || {}).value || '').trim(),
@@ -36812,10 +37762,14 @@
                 financesSyncTimer = null;
             }
             financesPadlockIsOpen = !item;
+            var hadFinancialsFile = !!financesFinancialsDocumentUrl;
+            financesFinancialsDocumentUrl = '';
             if (item) populateFinancesTransactionForm(item);
             else resetFinancesTransactionForm();
             syncFinancesFormEditability();
             renderFinancesItemsTable();
+            syncFinancesDetailHeading();
+            if (hadFinancialsFile) clearFinancesFinancialsBody();
             var nameField = document.getElementById('finances-item-name');
             if (nameField) nameField.focus();
         }
@@ -36891,11 +37845,7 @@
                 );
                 batch.set(
                     tbsFinancesTransactionDocRef(db, eventName, transactionId),
-                    {
-                        name: data.name,
-                        status: data.status,
-                        category: data.category
-                    },
+                    financesTransactionFirestorePayload(data),
                     { merge: true }
                 );
                 await batch.commit();
@@ -36931,12 +37881,7 @@
             renderFinancesItemsTable();
             financesSyncInFlight = false;
             if (saveBtn) saveBtn.classList.remove('is-autosaving');
-            financesFormBaseline = JSON.stringify({
-                id: data.id,
-                name: data.name,
-                status: data.status,
-                category: data.category
-            });
+            financesFormBaseline = financesSavedFieldsSnapshot();
             spinFinancesSaveButton();
             updateFinancesItemSaveButton();
             if (typeof showStatus === 'function') {
@@ -37081,6 +38026,9 @@
                 paneTrack.style.setProperty('--finances-pane-min', minPane + 'px');
             }
             syncFinancesPaneScrollbar();
+            if (typeof renderFinancesFinancialsChart === 'function') {
+                renderFinancesFinancialsChart({ layoutOnly: true });
+            }
         }
 
         function closeFinancesTransactionEditor() {
@@ -37091,8 +38039,12 @@
             form.hidden = true;
             form.setAttribute('aria-hidden', 'true');
             financesPadlockIsOpen = false;
+            var hadFinancialsFile = !!financesFinancialsDocumentUrl;
+            financesFinancialsDocumentUrl = '';
             syncFinancesFormEditability();
             renderFinancesItemsTable();
+            syncFinancesDetailHeading();
+            if (hadFinancialsFile) clearFinancesFinancialsBody();
         }
 
         loadFinancesItemsFromStorage();
@@ -37138,57 +38090,8 @@
         }
 
         function renderFinancesInvoicesTable() {
-            var itemsEl = document.getElementById('finances-financials-rows');
-            if (!itemsEl) return;
-            var colCount = 6;
-            var html = '<table class="finances-table" role="grid" aria-label="Financials">' +
-                '<thead><tr>' +
-                '<th scope="col">Invoice</th>' +
-                '<th scope="col">Customer</th>' +
-                '<th scope="col">Email</th>' +
-                '<th scope="col">Total</th>' +
-                '<th scope="col">Status</th>' +
-                '<th scope="col">Created</th>' +
-                '</tr></thead><tbody>';
-            if (financesInvoicesLoadError) {
-                html += '<tr class="finances-row">' +
-                    '<td class="finances-empty" colspan="' + colCount + '">' +
-                    escapeHtml(financesInvoicesLoadError) +
-                    '</td></tr>';
-            } else if (!financesInvoicesInMemory.length) {
-                html += '<tr class="finances-row">' +
-                    '<td class="finances-empty" colspan="' + colCount + '">' +
-                    'No invoices yet.' +
-                    '</td></tr>';
-            } else {
-                for (var i = 0; i < financesInvoicesInMemory.length; i++) {
-                    var inv = financesInvoicesInMemory[i] || {};
-                    var number = String(inv.number || '').trim() || String(inv.id || '').trim() || '—';
-                    var customer = String(inv.customer_name || '').trim() || '—';
-                    var email = String(inv.customer_email || '').trim() || '—';
-                    var total = formatStripeAmountCents(inv.total, inv.currency);
-                    var created = formatStripeUnixDate(inv.created);
-                    var url = String(inv.hosted_invoice_url || '').trim();
-                    var numberCell = url
-                        ? ('<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' +
-                            escapeHtml(number) + '</a>')
-                        : escapeHtml(number);
-                    html += '<tr class="finances-row" data-invoice-id="' +
-                        escapeHtml(String(inv.id || '')) + '">' +
-                        '<td class="finances-name-cell">' + numberCell + '</td>' +
-                        '<td>' + escapeHtml(customer) + '</td>' +
-                        '<td>' + escapeHtml(email) + '</td>' +
-                        '<td>' + escapeHtml(total) + '</td>' +
-                        '<td class="finances-tag-cell">' +
-                        financesInvoiceStatusBadgeHtml(inv.status) +
-                        '</td>' +
-                        '<td>' + escapeHtml(created) + '</td>' +
-                        '</tr>';
-                }
-            }
-            html += '</tbody></table>';
-            itemsEl.innerHTML = html;
-            extendRosterTableBorders(itemsEl);
+            if (financesFinancialsDocumentUrl) return;
+            clearFinancesFinancialsBody();
         }
 
         /**
@@ -37207,10 +38110,6 @@
             }
             if (financesInvoicesImportInFlight) return financesInvoicesImportInFlight;
 
-            var itemsEl = document.getElementById('finances-financials-rows');
-            if (opts.showLoading && itemsEl) {
-                itemsEl.innerHTML = '<p class="finances-empty">Importing invoices from Stripe…</p>';
-            }
             financesInvoicesLoadError = '';
             if (!opts.silent && typeof showStatus === 'function') {
                 showStatus('loading', 'Importing invoices from Stripe…');
@@ -48134,7 +49033,34 @@
                 }
                 var financesDocumentFrame = document.getElementById('finances-item-document-frame');
                 var financesDocumentUpload = document.getElementById('finances-item-document-upload');
+                var financesDocumentDrop = document.querySelector('#finances-editor .finances-document-upload');
                 if (financesDocumentFrame && financesDocumentUpload) {
+                    function beginFinancesDocumentUpload(file) {
+                        if (!file) return;
+                        if (backendBlockIfReadonly()) return;
+                        if (!financesPadlockIsOpen) {
+                            shakeFinancesPadlock();
+                            return;
+                        }
+                        var transactionName = String((document.getElementById('finances-item-name') || {}).value || '').trim();
+                        if (!transactionName) {
+                            if (typeof showStatus === 'function') showStatus('error', 'Enter a transaction name before uploading.');
+                            return;
+                        }
+                        if (!financesEnsureTransactionId()) {
+                            if (typeof showStatus === 'function') showStatus('error', 'Transaction id cannot contain "/".');
+                            return;
+                        }
+                        askFinancesDocumentType().then(function(choice) {
+                            if (!choice || FINANCES_DOCUMENT_TYPES.indexOf(choice) === -1) return;
+                            return uploadFinancesTransactionDocument(file, choice);
+                        }).catch(function(err) {
+                            console.error('finances document upload:', err);
+                            if (typeof showStatus === 'function') {
+                                showStatus('error', err && err.message ? err.message : 'Could not upload the document.');
+                            }
+                        });
+                    }
                     function openFinancesDocumentPicker() {
                         if (backendBlockIfReadonly()) return;
                         if (!financesPadlockIsOpen) {
@@ -48143,31 +49069,47 @@
                         }
                         financesDocumentUpload.click();
                     }
+                    function financesDocumentDragDepth(ev) {
+                        if (!financesDocumentDrop) return;
+                        if (ev.type === 'dragenter') financesDocumentDrop._dragDepth = (financesDocumentDrop._dragDepth || 0) + 1;
+                        else if (ev.type === 'dragleave') financesDocumentDrop._dragDepth = Math.max(0, (financesDocumentDrop._dragDepth || 0) - 1);
+                        else financesDocumentDrop._dragDepth = 0;
+                        financesDocumentDrop.classList.toggle('is-file-dragover', financesDocumentDrop._dragDepth > 0);
+                    }
                     financesDocumentFrame.addEventListener('click', openFinancesDocumentPicker);
                     financesDocumentFrame.addEventListener('keydown', function(ev) {
                         if (ev.key !== 'Enter' && ev.key !== ' ') return;
                         ev.preventDefault();
                         openFinancesDocumentPicker();
                     });
-                    financesDocumentUpload.addEventListener('change', function() {
+                    financesDocumentUpload.addEventListener('change', function(ev) {
+                        if (ev) ev.stopPropagation();
                         var file = financesDocumentUpload.files && financesDocumentUpload.files[0];
                         financesDocumentUpload.value = '';
-                        if (!file) return;
-                        financesClearPendingDocument();
-                        financesPendingDocument = {
-                            file: file,
-                            name: String(file.name || '').trim(),
-                            type: String(file.type || '').trim(),
-                            previewUrl: URL.createObjectURL(file),
-                            dataUrl: ''
-                        };
-                        readFinancesFileAsDataUrl(file).then(function(url) {
-                            if (financesPendingDocument && financesPendingDocument.file === file) {
-                                financesPendingDocument.dataUrl = url;
-                            }
-                        }).catch(function() {});
-                        syncFinancesDocumentPreview(null);
+                        beginFinancesDocumentUpload(file);
                     });
+                    if (financesDocumentDrop) {
+                        ['dragenter', 'dragover'].forEach(function(type) {
+                            financesDocumentDrop.addEventListener(type, function(ev) {
+                                ev.preventDefault();
+                                ev.stopPropagation();
+                                if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'copy';
+                                if (type === 'dragenter') financesDocumentDragDepth(ev);
+                            });
+                        });
+                        financesDocumentDrop.addEventListener('dragleave', function(ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            financesDocumentDragDepth(ev);
+                        });
+                        financesDocumentDrop.addEventListener('drop', function(ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            financesDocumentDragDepth(ev);
+                            var files = ev.dataTransfer && ev.dataTransfer.files;
+                            beginFinancesDocumentUpload(files && files[0]);
+                        });
+                    }
                 }
                 financesTransactionForm.addEventListener('input', onFinancesFormEdit);
                 financesTransactionForm.addEventListener('change', onFinancesFormEdit);
@@ -48263,12 +49205,6 @@
             });
             renderFinancesItemsTable();
             refreshFinancesSupplierDatalist();
-            var financesImportInvoicesBtn = document.getElementById('finances-financials-import-btn');
-            if (financesImportInvoicesBtn) {
-                financesImportInvoicesBtn.addEventListener('click', function(ev) {
-                    ev.preventDefault();
-                });
-            }
             var guestSendToReservesBtn = document.getElementById('guest-send-to-reserves-btn');
             var guestDenySoldOutBtn = document.getElementById('guest-deny-sold-out-btn');
             function setReadisyesActionButtonsDisabled(disabled) {
