@@ -11481,24 +11481,34 @@
             color: #64748b;
         }
 
-        #finances-editor #finances-items .finances-table .content-badge.finances-category-pill {
-            background: var(--backend-roster-status-yes-bg);
-            color: var(--backend-roster-status-yes-color);
-        }
-
-        #finances-editor #finances-items .finances-table .content-badge.finances-status-projected {
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-projected,
+        body.backend-page > ul.finances-pill-dropdown .content-badge.finances-status-projected {
             background: #FF00FF;
             color: #ffffff;
         }
 
-        #finances-editor #finances-items .finances-table .content-badge.finances-status-received {
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-received,
+        body.backend-page > ul.finances-pill-dropdown .content-badge.finances-status-received {
             background: var(--backend-roster-status-ready-bg);
             color: var(--backend-roster-status-ready-color);
         }
 
-        #finances-editor #finances-items .finances-table .content-badge.finances-status-partial {
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-partial,
+        body.backend-page > ul.finances-pill-dropdown .content-badge.finances-status-partial {
             background: var(--backend-roster-status-no-bg);
             color: var(--backend-roster-status-no-color);
+        }
+
+        #finances-editor #finances-items .finances-table .content-badge.finances-status-paid,
+        body.backend-page > ul.finances-pill-dropdown .content-badge.finances-status-paid {
+            background: #338a17;
+            color: #ffffff;
+        }
+
+        #finances-editor #finances-items .finances-table .content-badge.finances-category-pill,
+        body.backend-page > ul.finances-pill-dropdown .content-badge.finances-category-pill {
+            background: var(--backend-roster-status-yes-bg);
+            color: var(--backend-roster-status-yes-color);
         }
 
         #finances-editor .finances-pill-wrap {
@@ -11526,15 +11536,15 @@
             position: absolute;
             left: 0;
             top: calc(100% + 3px);
-            z-index: 60;
+            z-index: 20001;
             min-width: 9rem;
             margin: 0;
-            padding: 0.2rem 0;
+            padding: 0.35rem;
             list-style: none;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
             box-sizing: border-box;
         }
 
@@ -11550,35 +11560,46 @@
 
         #finances-editor .finances-pill-dropdown > li,
         body.backend-page > ul.finances-pill-dropdown > li {
+            display: flex;
+            justify-content: center;
             margin: 0;
             padding: 0;
         }
 
-        #finances-editor .finances-pill-dropdown .finances-pill-option,
-        body.backend-page > ul.finances-pill-dropdown .finances-pill-option {
-            display: block;
-            width: 100%;
-            margin: 0;
-            padding: 0.4rem 0.75rem;
+        #finances-editor .finances-pill-dropdown .finances-pill-option.content-badge,
+        body.backend-page > ul.finances-pill-dropdown .finances-pill-option.content-badge {
+            display: inline-flex;
+            width: var(--backend-roster-pill-width);
+            min-width: var(--backend-roster-pill-width);
+            max-width: var(--backend-roster-pill-width);
+            min-height: var(--backend-roster-pill-min-height);
+            margin: 0.18rem auto;
+            padding: 2px 5px;
             border: none;
             border-radius: 5px;
-            background: transparent;
             box-shadow: none;
-            color: #0f172a;
             font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
-            line-height: 1.25;
-            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: 0.01875em;
+            text-align: center;
+            justify-content: center;
             cursor: pointer;
             box-sizing: border-box;
             appearance: none;
             -webkit-appearance: none;
         }
 
-        #finances-editor .finances-pill-dropdown .finances-pill-option:hover,
-        body.backend-page > ul.finances-pill-dropdown .finances-pill-option:hover {
-            background: #f1f5f9;
+        #finances-editor .finances-pill-dropdown .finances-pill-option.content-badge:hover,
+        body.backend-page > ul.finances-pill-dropdown .finances-pill-option.content-badge:hover {
+            filter: brightness(0.92);
+        }
+
+        body.backend-page button.finances-pill-option {
+            box-shadow: none;
+            font-weight: 400;
+            font-size: 0.9rem;
         }
 
         /* Guests CME sent: Ready (same yellow as speaker “first brief” / CME ready). */
@@ -17597,6 +17618,7 @@
                                             <option value="av_team">AV-team</option>
                                             <option value="speaker_travel">Speaker travel</option>
                                             <option value="team_lodging">Team lodging</option>
+                                            <option value="organisers">Organisers</option>
                                         </select>
                                     </div>
                                 </div>
@@ -17681,11 +17703,11 @@
                             </form>
                         </div>
                     </div>
-                    <div class="finances-panel finances-financials" id="finances-financials" aria-label="Projections">
+                    <div class="finances-panel finances-financials" id="finances-financials" aria-label="Financials">
                         <div class="finances-heading" id="finances-financials-heading">
                             <div class="finances-heading-title-wrap">
-                                <div class="finances-heading-title" role="group" aria-label="Projections">
-                                    <span class="finances-heading-label">Projections</span>
+                                <div class="finances-heading-title" role="group" aria-label="Financials">
+                                    <span class="finances-heading-label">Financials</span>
                                 </div>
                             </div>
                         </div>
@@ -36286,6 +36308,7 @@
             if (c === 'av_team') return 'AV-team';
             if (c === 'speaker_travel') return 'Speaker travel';
             if (c === 'team_lodging') return 'Team lodging';
+            if (c === 'organisers') return 'Organisers';
             return c || '—';
         }
 
@@ -36557,10 +36580,10 @@
         }
 
         function financesStatusPillClass(status) {
-            var s = String(status || '').trim();
+            var s = String(status || '').trim().toLowerCase();
             if (s === 'paid') return 'finances-status-paid';
-            if (s === 'partially_paid') return 'finances-status-partial';
-            if (s === 'received') return 'finances-status-received';
+            if (s === 'partially_paid' || s === 'partially paid') return 'finances-status-partial';
+            if (s === 'received' || s === 'invoiced') return 'finances-status-received';
             if (s === 'projected') return 'finances-status-projected';
             return 'finances-status-neutral';
         }
@@ -36578,7 +36601,8 @@
             { value: 'venue', label: 'Venue' },
             { value: 'av_team', label: 'AV-team' },
             { value: 'speaker_travel', label: 'Speaker travel' },
-            { value: 'team_lodging', label: 'Team lodging' }
+            { value: 'team_lodging', label: 'Team lodging' },
+            { value: 'organisers', label: 'Organisers' }
         ];
         var FINANCES_STATUS_OPTIONS = [
             { value: 'projected', label: 'Projected' },
@@ -36603,7 +36627,11 @@
             var opts = financesRosterMenuOptions(field);
             var items = '';
             for (var i = 0; i < opts.length; i++) {
-                items += '<li role="none"><button type="button" class="finances-pill-option" role="menuitem" data-finances-value="' +
+                var optionClass = field === 'status'
+                    ? financesStatusPillClass(opts[i].value)
+                    : 'finances-category-pill';
+                items += '<li role="none"><button type="button" class="finances-pill-option content-badge ' +
+                    optionClass + '" role="menuitem" data-finances-value="' +
                     escapeHtml(opts[i].value) + '">' + escapeHtml(opts[i].label) + '</button></li>';
             }
             var fieldLabel = field === 'status' ? 'Status' : 'Category';
@@ -37160,8 +37188,8 @@
             var label = document.querySelector('#finances-financials-heading .finances-heading-label');
             var title = document.querySelector('#finances-financials-heading .finances-heading-title');
             var panel = document.getElementById('finances-financials');
-            var next = String(text || '').trim() || 'Projections';
-            var showingFile = next !== 'Projections';
+            var next = String(text || '').trim() || 'Financials';
+            var showingFile = next !== 'Financials';
             if (label) label.textContent = next;
             if (title) title.setAttribute('aria-label', next);
             if (panel) {
@@ -37407,7 +37435,7 @@
 
         function clearFinancesFinancialsBody() {
             closeFinancesDocumentFilePopup();
-            setFinancesFinancialsHeading('Projections');
+            setFinancesFinancialsHeading('Financials');
             renderFinancesFinancialsChart();
         }
 
@@ -49264,7 +49292,20 @@
                 });
             }
             document.addEventListener('click', function(ev) {
-                if (ev.target && ev.target.closest && ev.target.closest('#finances-items .finances-pill-wrap, body > ul.finances-pill-dropdown')) return;
+                var menuOption = ev.target && ev.target.closest ? ev.target.closest('.finances-pill-option') : null;
+                if (menuOption) {
+                    ev.preventDefault();
+                    var menu = menuOption.closest('.finances-pill-dropdown');
+                    var menuWrap = menuOption.closest('.finances-pill-wrap');
+                    if (!menuWrap && menu && menu._rosterHome) menuWrap = menu._rosterHome.parent;
+                    var menuBtn = menuWrap && menuWrap.querySelector('.finances-pill-btn');
+                    var menuId = menuBtn && menuBtn.getAttribute('data-finances-id');
+                    var menuField = menuBtn && menuBtn.getAttribute('data-finances-field');
+                    var menuVal = menuOption.getAttribute('data-finances-value');
+                    if (menuId && menuField && menuVal) void setFinancesRosterField(menuId, menuField, menuVal);
+                    return;
+                }
+                if (ev.target && ev.target.closest && ev.target.closest('#finances-items .finances-pill-wrap, .finances-pill-dropdown')) return;
                 financesPillArmedKey = '';
                 document.querySelectorAll('#finances-items .finances-pill-btn.is-armed').forEach(function(btn) {
                     btn.classList.remove('is-armed');
