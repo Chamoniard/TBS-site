@@ -6137,6 +6137,7 @@
 
         #finances-editor .finances-document-list a,
         #finances-editor .finances-document-list button {
+            flex: 0 0 auto;
             min-width: 0;
             display: inline-flex;
             align-items: center;
@@ -6152,13 +6153,15 @@
             cursor: pointer;
         }
 
-        #finances-editor .finances-document-list button .finances-document-list-name {
+        #finances-editor #finances-item-document-list input.finances-document-list-name {
+            flex: 1 1 auto;
+            width: auto;
             min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-decoration: underline;
-            text-underline-offset: 0.15em;
+            margin: 0;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.3;
         }
 
         #finances-editor .finances-document-list li.is-selected button {
@@ -10923,6 +10926,7 @@
         #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field,
         #speaker-editor .speaker-editor-bio > .add-speaker-form-field,
         #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field,
+        #speaker-editor .speaker-editor-bio .speaker-email-country-row .add-speaker-form-field,
         #team-editor .team-editor-bio > .add-speaker-form-field,
         #team-editor .team-editor-bio .team-name-row .add-speaker-form-field,
         #team-editor .team-editor-bio .team-country-team-row .add-speaker-form-field {
@@ -10939,6 +10943,7 @@
         #emailer-editor .emailer-editor-bio .guest-viewer-name-row .add-speaker-form-field > label,
         #speaker-editor .speaker-editor-bio > .add-speaker-form-field > label,
         #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field > label,
+        #speaker-editor .speaker-editor-bio .speaker-email-country-row .add-speaker-form-field > label,
         #team-editor .team-editor-bio > .add-speaker-form-field > label,
         #team-editor .team-editor-bio .team-name-row .add-speaker-form-field > label,
         #team-editor .team-editor-bio .team-country-team-row .add-speaker-form-field > label {
@@ -10965,6 +10970,8 @@
         #speaker-editor .speaker-editor-bio > .add-speaker-form-field > input,
         #speaker-editor .speaker-editor-bio > .add-speaker-form-field > textarea,
         #speaker-editor .speaker-editor-bio .speaker-name-row .add-speaker-form-field > input,
+        #speaker-editor .speaker-editor-bio .speaker-email-country-row .add-speaker-form-field > input,
+        #speaker-editor .speaker-editor-bio .speaker-email-country-row .add-speaker-form-field > select,
         #team-editor .team-editor-bio > .add-speaker-form-field > input,
         #team-editor .team-editor-bio > .add-speaker-form-field > select,
         #team-editor .team-editor-bio .team-name-row .add-speaker-form-field > input,
@@ -11231,6 +11238,7 @@
         }
 
         #speaker-editor .speaker-editor-bio input:focus,
+        #speaker-editor .speaker-editor-bio select:focus,
         #speaker-editor .speaker-editor-bio textarea:focus,
         #guest-editor .guest-editor-bio input:focus,
         #guest-editor .guest-editor-profile input:focus,
@@ -11245,6 +11253,7 @@
         #content-editor .add-content-form .add-content-form-field input:focus,
         #content-editor .add-content-form .add-content-form-field textarea:focus,
         #speaker-editor .speaker-editor-bio input:focus-visible,
+        #speaker-editor .speaker-editor-bio select:focus-visible,
         #speaker-editor .speaker-editor-bio textarea:focus-visible,
         #guest-editor .guest-editor-bio input:focus-visible,
         #emailer-editor .emailer-editor-bio input:focus-visible,
@@ -12051,6 +12060,55 @@
         #speaker-editor .speaker-name-row .add-speaker-form-field {
             flex: 1 1 0;
             min-width: 0;
+        }
+
+        #speaker-editor .speaker-email-country-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 1rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        #speaker-editor .speaker-email-country-row .add-speaker-form-field {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        #speaker-editor .speaker-editor-bio select,
+        #speaker-editor.speaker-padlock-unlocked .speaker-editor-bio select {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--backend-tab-pale-blue);
+            box-shadow: none;
+            outline: none;
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #0f172a;
+            opacity: 1;
+            -webkit-text-fill-color: #0f172a;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%230f172a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5L6 6.5L11 1.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 12px 8px;
+            cursor: pointer;
+        }
+
+        #speaker-editor.speaker-padlock-unlocked .speaker-editor-bio select {
+            background-color: var(--backend-tab-pale-pink);
+        }
+
+        #speaker-editor .speaker-editor-bio select:disabled {
+            cursor: default;
         }
 
         #speaker-editor .speaker-potential-field {
@@ -15628,9 +15686,61 @@
                                     </span>
                                 </label>
                             </div>
+                            <div class="speaker-email-country-row">
                             <div class="add-speaker-form-field">
                                 <label for="add-speaker-email">E-mail</label>
                                 <input type="email" id="add-speaker-email" name="email" autocomplete="email" spellcheck="false">
+                            </div>
+                            <div class="add-speaker-form-field">
+                                <label for="add-speaker-country">Country</label>
+                                <select id="add-speaker-country" name="country" autocomplete="country-name">
+                                    <option value="None">None</option>
+                                    <option value="Other (Enter into bio below.)">Other (Enter into bio below.)</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Austria">Austria</option>
+                                    <option value="Belgium">Belgium</option>
+                                    <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                                    <option value="Bulgaria">Bulgaria</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Croatia">Croatia</option>
+                                    <option value="Czech Republic">Czech Republic</option>
+                                    <option value="Denmark">Denmark</option>
+                                    <option value="Estonia">Estonia</option>
+                                    <option value="Finland">Finland</option>
+                                    <option value="France">France</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="Greece">Greece</option>
+                                    <option value="Hungary">Hungary</option>
+                                    <option value="Iceland">Iceland</option>
+                                    <option value="India">India</option>
+                                    <option value="Ireland">Ireland</option>
+                                    <option value="Italy">Italy</option>
+                                    <option value="Jersey">Jersey</option>
+                                    <option value="Latvia">Latvia</option>
+                                    <option value="Lithuania">Lithuania</option>
+                                    <option value="Luxembourg">Luxembourg</option>
+                                    <option value="Monaco">Monaco</option>
+                                    <option value="Netherlands">Netherlands</option>
+                                    <option value="New Zeeland">New Zeeland</option>
+                                    <option value="Northern Ireland">Northern Ireland</option>
+                                    <option value="Norway">Norway</option>
+                                    <option value="Poland">Poland</option>
+                                    <option value="Portugal">Portugal</option>
+                                    <option value="Romania">Romania</option>
+                                    <option value="Saudi Arabia">Saudi Arabia</option>
+                                    <option value="Serbia">Serbia</option>
+                                    <option value="Slovakia">Slovakia</option>
+                                    <option value="Slovenia">Slovenia</option>
+                                    <option value="Spain">Spain</option>
+                                    <option value="Sweden">Sweden</option>
+                                    <option value="Switzerland">Switzerland</option>
+                                    <option value="UAE">UAE</option>
+                                    <option value="Ukraine">Ukraine</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="United States">United States</option>
+                                    <option value="South Africa">South Africa</option>
+                                </select>
+                            </div>
                             </div>
                             <div class="add-speaker-form-field">
                                 <label for="add-speaker-topic1">Topic 1</label>
@@ -16865,10 +16975,10 @@
                         <div class="edit-guest-top guests-list-heading content-list-top" id="content-list-heading">
                             <div class="edit-guest-top-spacer" aria-hidden="true"></div>
                             <div class="selected-guestname-wrap">
-                                <span class="content-roster-view-title" id="content-roster-processing-link">Processing</span>
                                 <div class="selected-guestname is-active" id="content-roster-site-link" role="group" aria-pressed="true" aria-label="Site content">
                                     <span class="edit-guest-name-first">Site content</span>
                                 </div>
+                                <span class="content-roster-view-title" id="content-roster-processing-link">Processing</span>
                                 <span class="content-roster-view-title" id="content-roster-short-link">Short content</span>
                             </div>
                             <div class="edit-guest-top-trailing">
@@ -18963,6 +19073,7 @@
                 firstName: s.firstName != null ? String(s.firstName) : '',
                 lastName: s.lastName != null ? String(s.lastName) : '',
                 email: s.email != null ? String(s.email) : '',
+                Country: s.country != null && String(s.country).trim() !== '' ? String(s.country).trim() : 'None',
                 topic1: s.topic1 != null ? String(s.topic1) : '',
                 topic2: s.topic2 != null ? String(s.topic2) : '',
                 topic3: s.topic3 != null ? String(s.topic3) : '',
@@ -19462,6 +19573,7 @@
             s.firstName = fnEl ? String(fnEl.value || '') : '';
             s.lastName = lnEl ? String(lnEl.value || '') : '';
             s.email = emEl ? String(emEl.value || '') : '';
+            s.country = readSpeakerCountrySelectValue();
             s.topic1 = t1El ? String(t1El.value || '') : '';
             s.topic2 = t2El ? String(t2El.value || '') : '';
             s.topic3 = t3El ? String(t3El.value || '') : '';
@@ -22607,6 +22719,39 @@
 
         var speakerBioFormBaseline = null;
 
+        function normalizeSpeakerCountryValue(raw) {
+            var value = raw != null ? String(raw).trim() : '';
+            return value || 'None';
+        }
+
+        function setSpeakerCountrySelectValue(raw) {
+            var el = document.getElementById('add-speaker-country');
+            if (!el) return;
+            var value = normalizeSpeakerCountryValue(raw);
+            var extra = el.querySelector('option[data-speaker-country-extra]');
+            if (extra) extra.remove();
+            var known = false;
+            for (var i = 0; i < el.options.length; i++) {
+                if (el.options[i].value === value) {
+                    known = true;
+                    break;
+                }
+            }
+            if (!known) {
+                var opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = value;
+                opt.setAttribute('data-speaker-country-extra', 'true');
+                el.appendChild(opt);
+            }
+            el.value = value;
+        }
+
+        function readSpeakerCountrySelectValue() {
+            var el = document.getElementById('add-speaker-country');
+            return normalizeSpeakerCountryValue(el ? el.value : 'None');
+        }
+
         function readSpeakerBioFormSnapshot() {
             var fnEl = document.getElementById('add-speaker-first-name');
             var lnEl = document.getElementById('add-speaker-last-name');
@@ -22623,6 +22768,7 @@
                 firstName: fnEl ? String(fnEl.value || '') : '',
                 lastName: lnEl ? String(lnEl.value || '') : '',
                 email: emEl ? String(emEl.value || '') : '',
+                country: readSpeakerCountrySelectValue(),
                 topic1: t1El ? String(t1El.value || '') : '',
                 topic2: t2El ? String(t2El.value || '') : '',
                 topic3: t3El ? String(t3El.value || '') : '',
@@ -22645,6 +22791,7 @@
                 current.firstName !== speakerBioFormBaseline.firstName ||
                 current.lastName !== speakerBioFormBaseline.lastName ||
                 current.email !== speakerBioFormBaseline.email ||
+                current.country !== speakerBioFormBaseline.country ||
                 current.topic1 !== speakerBioFormBaseline.topic1 ||
                 current.topic2 !== speakerBioFormBaseline.topic2 ||
                 current.topic3 !== speakerBioFormBaseline.topic3 ||
@@ -23538,6 +23685,7 @@
                 firstName: '',
                 lastName: '',
                 email: '',
+                country: 'None',
                 topic1: '',
                 topic2: '',
                 topic3: '',
@@ -23577,6 +23725,7 @@
             rec.firstName = fnEl ? String(fnEl.value || '') : '';
             rec.lastName = lnEl ? String(lnEl.value || '') : '';
             rec.email = emEl ? String(emEl.value || '') : '';
+            rec.country = readSpeakerCountrySelectValue();
             rec.topic1 = t1El ? String(t1El.value || '') : '';
             rec.topic2 = t2El ? String(t2El.value || '') : '';
             rec.topic3 = t3El ? String(t3El.value || '') : '';
@@ -23686,6 +23835,7 @@
                 if (el.type === 'checkbox') el.checked = false;
                 else el.value = '';
             });
+            setSpeakerCountrySelectValue('None');
             updateEditSpeakerNameHeading();
             updateLongBioLetterCounter();
         }
@@ -24556,6 +24706,7 @@
                 firstName: fn,
                 lastName: ln,
                 email: em,
+                country: speakerCoalesceStringField(d, ['Country', 'country']),
                 topic1: t1,
                 topic2: t2,
                 topic3: t3,
@@ -32464,7 +32615,7 @@
             var panel = document.getElementById('speaker-editor-panel');
             if (!panel) return;
             var canEdit = !panel.classList.contains('is-empty') && speakerPadlockIsOpen;
-            panel.querySelectorAll('#speaker-editor-bio input, #speaker-editor-bio textarea').forEach(function (el) {
+            panel.querySelectorAll('#speaker-editor-bio input, #speaker-editor-bio textarea, #speaker-editor-bio select').forEach(function (el) {
                 // Long bio stays enabled (readonly when locked) so autosize can show full text.
                 // Disabled textareas often report a clipped scrollHeight and hide overflow.
                 if (el.id === 'add-speaker-long-bio') {
@@ -32475,9 +32626,11 @@
                 if (canEdit) {
                     el.removeAttribute('readonly');
                     el.removeAttribute('aria-readonly');
-                } else {
+                } else if (el.tagName !== 'SELECT') {
                     el.readOnly = true;
                     el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('aria-readonly', 'true');
+                } else {
                     el.setAttribute('aria-readonly', 'true');
                 }
             });
@@ -33321,6 +33474,7 @@
             speakers: [
                 { key: 'name', label: 'Speaker name' },
                 { key: 'event', label: 'Event' },
+                { key: 'country', label: 'Country' },
                 { key: 'status', label: 'Status' },
                 { key: 'lodging', label: 'Lodging' },
                 { key: 'bio', label: 'Bio' },
@@ -33511,6 +33665,10 @@
             if (key === 'event') {
                 var eventLabel = String(speaker.event != null ? speaker.event : '').trim();
                 return eventLabel || '-';
+            }
+            if (key === 'country') {
+                var countryLabel = String(speaker.country != null ? speaker.country : '').trim();
+                return countryLabel || 'None';
             }
             if (key === 'status') return normalizeSpeakerInviteStatus(speaker.inviteStatus);
             if (key === 'topic') return String(speaker.topic1 != null ? speaker.topic1 : '').trim();
@@ -36893,7 +37051,8 @@
             }, FINANCES_FIREBASE_DEBOUNCE_MS);
         }
 
-        function onFinancesFormEdit() {
+        function onFinancesFormEdit(ev) {
+            if (ev && ev.target && ev.target.classList && ev.target.classList.contains('finances-document-list-name')) return;
             if (financesPadlockIsOpen && financesEditorIsOpen() && financesTransactionSaveReady()) {
                 var data = readFinancesTransactionForm();
                 var existing = data.id ? financesItemById(data.id) : null;
@@ -37165,6 +37324,28 @@
                     showFinancesDocumentInFinancials(currentDocs[idx]);
                     renderFinancesDocumentList(current);
                 });
+                list.addEventListener('keydown', function(ev) {
+                    var input = ev.target;
+                    if (!input || !input.classList || !input.classList.contains('finances-document-list-name')) return;
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        input.blur();
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        var docs = financesNormalizeDocuments(
+                            (financesItemById(financesItemEditingId) || {}).documents
+                        );
+                        var idx = Number(input.getAttribute('data-doc-index'));
+                        if (docs[idx]) input.value = docs[idx].name || '';
+                        input.blur();
+                    }
+                });
+                list.addEventListener('focusout', function(ev) {
+                    var input = ev.target;
+                    if (!input || !input.classList || !input.classList.contains('finances-document-list-name')) return;
+                    var idx = Number(input.getAttribute('data-doc-index'));
+                    void renameFinancesDocument(idx, input.value, input);
+                });
             }
             if (!docs.length) {
                 list.hidden = true;
@@ -37172,16 +37353,79 @@
                 return;
             }
             list.hidden = false;
+            var canEditNames = !!financesPadlockIsOpen && !backenduserIsReadonly;
             list.innerHTML = docs.map(function(doc, index) {
                 var name = String(doc.name || '').trim() || 'File';
                 var selected = String(doc.url || '').trim() && String(doc.url || '').trim() === financesFinancialsDocumentUrl;
                 return '<li' + (selected ? ' class="is-selected"' : '') + '>' +
-                    '<button type="button" data-doc-index="' + index + '">' +
+                    '<button type="button" data-doc-index="' + index + '" title="Open file" aria-label="Open ' + escapeHtml(name) + '">' +
                     financesDocumentIconHtml(name, doc.url) +
-                    '<span class="finances-document-list-name">' + escapeHtml(name) + '</span>' +
                     '</button>' +
+                    '<input type="text" class="finances-document-list-name" data-doc-index="' + index +
+                    '" value="' + escapeHtml(name) + '" aria-label="File name"' +
+                    (canEditNames ? '' : ' readonly') + '>' +
                     '</li>';
             }).join('');
+        }
+
+        async function renameFinancesDocument(index, nextName, input) {
+            if (backendBlockIfReadonly()) return false;
+            if (!financesPadlockIsOpen) return false;
+            var id = String(financesItemEditingId || '').trim();
+            var rec = id ? financesItemById(id) : null;
+            var docs = financesNormalizeDocuments(rec && rec.documents);
+            var current = docs[index];
+            if (!rec || !current) return false;
+            var name = String(nextName || '').trim();
+            var previous = String(current.name || '').trim();
+            if (!name || name === previous) {
+                if (input && input.isConnected) input.value = previous || 'File';
+                return false;
+            }
+            var eventName = String(current_event || '').trim();
+            if (!eventName || eventName.indexOf('/') !== -1) {
+                if (input && input.isConnected) input.value = previous || 'File';
+                if (typeof showStatus === 'function') showStatus('error', 'No current event is set.');
+                return false;
+            }
+            docs[index] = { name: name, type: current.type || '', url: current.url };
+            try {
+                await tbsFinancesTransactionDocRef(getFirestore(), eventName, id).set({
+                    documents: docs.map(function(doc) {
+                        return {
+                            name: String(doc.name || ''),
+                            type: String(doc.type || ''),
+                            url: String(doc.url || '')
+                        };
+                    })
+                }, { merge: true });
+            } catch (e) {
+                if (input && input.isConnected) input.value = previous || 'File';
+                if (typeof showStatus === 'function') {
+                    showStatus('error', e && e.message ? e.message : 'Could not rename the file.');
+                }
+                return false;
+            }
+            rec.documents = docs;
+            var latest = docs[docs.length - 1];
+            if (latest) {
+                rec.document = latest.url;
+                rec.documentName = latest.type ? (latest.name + ' · ' + latest.type) : latest.name;
+            }
+            if (String(financesFinancialsDocumentUrl || '') === String(current.url || '')) {
+                financesFinancialsDocumentName = name;
+                var title = document.getElementById('finances-document-file-title');
+                if (title) title.textContent = name;
+            }
+            if (input && input.isConnected) {
+                var openBtn = input.parentElement && input.parentElement.querySelector('button[data-doc-index]');
+                if (openBtn) openBtn.setAttribute('aria-label', 'Open ' + name);
+            } else {
+                renderFinancesDocumentList(rec);
+            }
+            persistFinancesItemsToStorage();
+            if (typeof showStatus === 'function') showStatus('success', 'File name saved.');
+            return true;
         }
 
         function setFinancesFinancialsHeading(text) {
@@ -37479,18 +37723,6 @@
                 url = pending.previewUrl || pending.dataUrl || '';
                 name = pending.name || '';
                 type = pending.type || '';
-            } else if (rec) {
-                var latest = financesLatestDocumentEntry(rec);
-                if (latest) {
-                    url = String(latest.url || '');
-                    name = String(latest.name || '');
-                    if (latest.type) name = name ? (name + ' · ' + latest.type) : String(latest.type);
-                    type = '';
-                } else {
-                    url = rec.document != null ? String(rec.document) : '';
-                    name = rec.documentName != null ? String(rec.documentName) : '';
-                    type = rec.documentType != null ? String(rec.documentType) : '';
-                }
             }
             var isImage = !!(url && financesDocumentLooksLikeImage(type, name, url));
             if (frame) {
@@ -39482,6 +39714,18 @@
         async function queryCurrentEventGuestRecords(db) {
             var want = String(current_event || '').trim();
             if (!want) return [];
+            try {
+                var parentSnap = await db.collection('tbs').doc('Guests').get();
+                var indexed =
+                    parentSnap && parentSnap.exists
+                        ? guestIdsFromTbsGuestsParentData(parentSnap.data() || {})
+                        : [];
+                if (indexed.length) {
+                    return fetchGuestItemSnapsByIds(db, dedupeContentRowIds(indexed));
+                }
+            } catch (indexErr) {
+                console.warn('queryCurrentEventGuestRecords index:', indexErr);
+            }
             var specs = [
                 ['Event', '=='],
                 ['event', '=='],
@@ -39512,24 +39756,39 @@
             return anyOk ? list : null;
         }
 
-        async function fetchCurrentEventGuestsByKnownIds(db, guestsParentSnap) {
-            var ids = await listGuestIdsUnderTbsGuests(db, guestsParentSnap);
+        async function readDocsByIdsParallel(ids, getOne) {
+            var list = Array.isArray(ids) ? ids : [];
+            var chunkSize = 80;
+            var tasks = [];
+            for (var i = 0; i < list.length; i += chunkSize) {
+                var chunk = list.slice(i, i + chunkSize);
+                tasks.push(Promise.all(chunk.map(getOne)));
+            }
+            var groups = await Promise.all(tasks);
+            var snaps = [];
+            for (var g = 0; g < groups.length; g++) {
+                var group = groups[g];
+                for (var j = 0; j < group.length; j++) snaps.push(group[j]);
+            }
+            return snaps;
+        }
+
+        async function fetchGuestItemSnapsByIds(db, ids) {
+            var snaps = await readDocsByIdsParallel(ids, function (rowId) {
+                return db.collection('tbs').doc('Guests').collection(rowId).doc('item').get();
+            });
             var list = [];
             var seen = Object.create(null);
-            var chunkSize = 50;
-            for (var i = 0; i < ids.length; i += chunkSize) {
-                var chunk = ids.slice(i, i + chunkSize);
-                var snaps = await Promise.all(
-                    chunk.map(function (rowId) {
-                        return db.collection('tbs').doc('Guests').collection(rowId).doc('item').get();
-                    })
-                );
-                for (var j = 0; j < chunk.length; j++) {
-                    var snap = snaps[j];
-                    if (snap && snap.exists) pushCurrentEventGuestFromItemDoc(snap, seen, list);
-                }
+            for (var i = 0; i < snaps.length; i++) {
+                var snap = snaps[i];
+                if (snap && snap.exists) pushCurrentEventGuestFromItemDoc(snap, seen, list);
             }
             return list;
+        }
+
+        async function fetchCurrentEventGuestsByKnownIds(db, guestsParentSnap) {
+            var ids = await listGuestIdsUnderTbsGuests(db, guestsParentSnap);
+            return fetchGuestItemSnapsByIds(db, ids);
         }
 
         /**
@@ -39574,7 +39833,8 @@
                     guestsRosterAllInMemory = [];
                     guestsMemoryLoaded = true;
                     rememberRosterSelectedYes(guestsRosterNameCheckedIds, []);
-                    renderGuestsRoster();
+                    if (opts.deferRender) updateGuestsOverwatchRegisteredCount();
+                    else renderGuestsRoster();
                     return;
                 }
                 var list = await queryCurrentEventGuestRecords(db);
@@ -39607,7 +39867,8 @@
                 updateBackendCurrentEventDisplay();
                 rememberRosterSelectedYes(guestsRosterNameCheckedIds, []);
             }
-            renderGuestsRoster();
+            if (opts.deferRender) updateGuestsOverwatchRegisteredCount();
+            else renderGuestsRoster();
             if (!opts.deferStripe && guestsMemoryLoaded && guestsPaidFilterIncludesOverdue(guestsFilterSettings)) {
                 alignGuestRosterWithStripeOverdue();
             }
@@ -39650,6 +39911,18 @@
         async function querySpeakersForCurrentEvent(db) {
             var want = String(current_event || '').trim();
             if (!want) return [];
+            try {
+                var parentSnap = await db.collection('tbs').doc('Speakers').get();
+                var indexed =
+                    parentSnap && parentSnap.exists
+                        ? speakerIdsFromTbsSpeakersParentData(parentSnap.data() || {})
+                        : [];
+                if (indexed.length) {
+                    return fetchSpeakerRecordsForIds(db, dedupeContentRowIds(indexed));
+                }
+            } catch (indexErr) {
+                console.warn('querySpeakersForCurrentEvent index:', indexErr);
+            }
             var specs = [
                 ['event', '==', want],
                 ['Event', '==', want],
@@ -39685,33 +39958,32 @@
             return anyOk ? list : null;
         }
 
-        async function fetchSpeakerRecordsByKnownIds(db) {
-            var ids = await listSpeakerIdsUnderTbsSpeakers(db);
+        async function fetchSpeakerRecordsForIds(db, ids) {
+            var idList = Array.isArray(ids) ? ids : [];
+            if (!idList.length) return [];
+            var snaps = await readDocsByIdsParallel(idList, function (rowId) {
+                return tbsSpeakerItemRef(db, rowId).get();
+            });
             var list = [];
-            if (!ids.length) return list;
-            var chunkSize = 40;
-            for (var i = 0; i < ids.length; i += chunkSize) {
-                var chunk = ids.slice(i, i + chunkSize);
-                var snaps = await Promise.all(
-                    chunk.map(function (rowId) {
-                        return tbsSpeakerItemRef(db, rowId).get();
-                    })
-                );
-                for (var j = 0; j < chunk.length; j++) {
-                    var rowId = chunk[j];
-                    var snap = snaps[j];
-                    if (snap && snap.exists) {
-                        var rec = speakerRecordFromTbsItemDoc(rowId, snap.data() || {});
-                        if (rosterRecordEventMatchesCurrentEvent(rec) || speakerEventIsPotential(rec)) {
-                            list.push(rec);
-                        }
+            for (var j = 0; j < idList.length; j++) {
+                var snap = snaps[j];
+                if (snap && snap.exists) {
+                    var rec = speakerRecordFromTbsItemDoc(idList[j], snap.data() || {});
+                    if (rosterRecordEventMatchesCurrentEvent(rec) || speakerEventIsPotential(rec)) {
+                        list.push(rec);
                     }
                 }
             }
             return list;
         }
 
-        async function fetchSpeakersForSelectedEvent() {
+        async function fetchSpeakerRecordsByKnownIds(db) {
+            var ids = await listSpeakerIdsUnderTbsSpeakers(db);
+            return fetchSpeakerRecordsForIds(db, ids);
+        }
+
+        async function fetchSpeakersForSelectedEvent(opts) {
+            opts = opts || {};
             var speakerSelectedSnap = rosterSelectedYesSnapshot(speakerRosterInMemory);
             speakerDirtyDocIds = Object.create(null);
             if (speakerSyncTimer) {
@@ -39736,7 +40008,7 @@
                 }
                 if (!String(current_event || '').trim()) {
                     rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
-                    renderSpeakerRoster();
+                    if (!opts.deferRender) renderSpeakerRoster();
                     return;
                 }
                 var list = await querySpeakersForCurrentEvent(db);
@@ -39754,7 +40026,7 @@
                 speakerRosterLoadedForEvent = '';
                 rememberRosterSelectedYes(speakersRosterNameCheckedIds, []);
             }
-            renderSpeakerRoster();
+            if (!opts.deferRender) renderSpeakerRoster();
         }
 
         function clearSpeakerRosterItemSelection() {
@@ -41062,6 +41334,7 @@
             if (fn) fn.value = s.firstName != null ? String(s.firstName) : '';
             if (ln) ln.value = s.lastName != null ? String(s.lastName) : '';
             if (em) em.value = s.email != null ? String(s.email) : '';
+            setSpeakerCountrySelectValue(s.country);
             if (t1) t1.value = s.topic1 != null ? String(s.topic1) : '';
             if (t2) t2.value = s.topic2 != null ? String(s.topic2) : '';
             if (t3) t3.value = s.topic3 != null ? String(s.topic3) : '';
@@ -45714,15 +45987,24 @@
                 scheduleContentPaneLayout();
             }
             if (isSpeakers) {
+                var speakerRosterItemsEl = document.getElementById('speaker-roster-items');
+                if (speakerRosterItemsEl && !speakerRosterItemsEl.querySelector('table')) {
+                    renderSpeakerRoster();
+                }
                 void openSpeakersOverwatch().catch(function (err) {
                     console.error('openSpeakersOverwatch on Speakers tab:', err);
                 });
                 scheduleSpeakerPaneLayout();
             }
             if (isOverview) {
-                void loadAndRenderGuestsTable().then(function () {
+                var paintOverviewGuestCounts = function () {
                     updateGuestsOverwatchRegisteredCount();
-                });
+                };
+                if (guestsMemoryLoaded) paintOverviewGuestCounts();
+                else {
+                    void (backendGuestsPreloadPromise || fetchAllGuestsIntoMemory({ deferStripe: true, deferRender: true }))
+                        .then(paintOverviewGuestCounts);
+                }
             }
             if (isGuests) {
                 void loadAndRenderGuestsTable();
@@ -47538,29 +47820,19 @@
                     function updateBackendStartupLoadStatus(errorMessage) {
                         if (errorMessage) showStatus('error', errorMessage);
                     }
-                    backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({ deferStripe: true })
+                    backendGuestsPreloadPromise = fetchAllGuestsIntoMemory({ deferStripe: true, deferRender: true })
                         .catch(function (err) {
                             console.error('Guests preload failed:', err);
                             updateBackendStartupLoadStatus('Failed to load guests from Firestore.');
                             throw err;
                         });
-                    var speakersPreload = fetchSpeakersForSelectedEvent()
+                    var speakersPreload = fetchSpeakersForSelectedEvent({ deferRender: true })
                         .catch(function (err) {
                             console.error('Speakers preload failed:', err);
                             updateBackendStartupLoadStatus('Failed to load speakers from Firestore.');
                             throw err;
                         });
-                    await Promise.all([
-                        backendGuestsPreloadPromise,
-                        speakersPreload,
-                        (backendUserCanViewFinances()
-                            ? loadFinancesTransactionsFromFirestore()
-                            : Promise.resolve()
-                        ).catch(function (err) {
-                            console.error('Finances preload failed:', err);
-                            updateBackendStartupLoadStatus('Failed to load transactions from Firestore.');
-                        })
-                    ]);
+                    await Promise.all([backendGuestsPreloadPromise, speakersPreload]);
                     backendStatusTickerLines = [
                         'Loaded ' + (String(current_event || selectedevent || '').trim() || 'event')
                     ];
@@ -50717,7 +50989,7 @@
                 syncAddSpeakerFormToMemoryIfEditing();
                 updateAddSpeakerSaveButtonState();
             }
-            ['add-speaker-first-name', 'add-speaker-last-name', 'add-speaker-email', 'add-speaker-topic1', 'add-speaker-topic2', 'add-speaker-topic3', 'add-speaker-short-bio', 'add-speaker-long-bio', 'add-speaker-link-one', 'add-speaker-link-two', 'add-speaker-link-three'].forEach(function(id) {
+            ['add-speaker-first-name', 'add-speaker-last-name', 'add-speaker-email', 'add-speaker-country', 'add-speaker-topic1', 'add-speaker-topic2', 'add-speaker-topic3', 'add-speaker-short-bio', 'add-speaker-long-bio', 'add-speaker-link-one', 'add-speaker-link-two', 'add-speaker-link-three'].forEach(function(id) {
                 var el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('input', onAddSpeakerFormInput);
@@ -51304,6 +51576,14 @@
                 void loadAndRenderTeamTable({ silent: true }).catch(function (err) {
                     console.error('Team table background load:', err);
                 });
+                if (backendUserCanViewFinances()) {
+                    void loadFinancesTransactionsFromFirestore().catch(function (err) {
+                        console.error('Finances preload failed:', err);
+                        if (typeof showStatus === 'function') {
+                            showStatus('error', 'Failed to load transactions from Firestore.');
+                        }
+                    });
+                }
             }, 0);
             syncGuestEditorToolbarForBottomScroll();
             syncSpeakerEditorToolbarForBottomScroll();
