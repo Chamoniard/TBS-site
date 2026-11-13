@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Public reads for website media assets.
+    match /tbs/Content/{contentId}/images/{fileName} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Finance transaction files:
+    // TBS/{current_event}/Financials/{transaction name}-{id}/{transaction name}.{ext}
+    match /TBS/{eventName}/Financials/{folderName}/{fileName} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Keep everything else private by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

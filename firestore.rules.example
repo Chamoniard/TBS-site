@@ -1,0 +1,13 @@
+// Example rules so the backend page (Firebase Web SDK, no Admin) can read `tbs_content`.
+// Copy into Firebase Console → Firestore → Rules, or merge with your existing rules.
+// The Node sync script uses Admin SDK and is not limited by these rules.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tbs_content/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
